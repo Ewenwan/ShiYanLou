@@ -11,8 +11,8 @@
 
 顺序存储结构读取元素的效率比较高，链式存储结构添加和删除元素的效率比较高。
 */ 
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdio.h>  //标准库 输入输出 
+#include <stdlib.h> //标准库  
 
 #define TRUE 1
 #define FALSE 0
@@ -20,29 +20,31 @@
 #define ERROR 0
 #define OVERFLOW -2
 
-typedef int ElemType;
-typedef int Status;
+//  等价 数据类型 定义 
+typedef int Status;  //状态 
+typedef int ElemType;//表 元素类型 
 
 /*
  * 存储结构
  */
 typedef struct LNode
 {
-    ElemType data;
-    struct LNode *next;
-}LNode, *LinkList;
+    ElemType data;//元素  这里的元素可以不只一个  类型也可以为 字符串数组等
+	              // 例如 char cName[20];/*学生姓名*/  int iNumber;/*学生学号*/
+    struct LNode *next;//后继指针 
+}LNode, *LinkList;//链表 结构体变量  结构体指针 
 
 /*
  * 初始化线性表
  */
 void InitList(LinkList *L)
 {
-    *L = (LinkList) malloc(sizeof(LNode));
+    *L = (LinkList) malloc(sizeof(LNode));// 一个元素 + 一个指针变量  的内存大小 
     if (!L)
     {
         exit(OVERFLOW);
     }
-    (*L)->next = NULL;
+    (*L)->next = NULL;//初始化时  后继指针为NULL 
 }
 
 /*
@@ -51,11 +53,11 @@ void InitList(LinkList *L)
 void DestroyList(LinkList *L)
 {
     LinkList temp;
-    while (*L)
+    while (*L)//未到表尾 表尾部为NULL 
     {
-        temp = (*L)->next;
-        free(*L);
-        *L = temp;
+        temp = (*L)->next;//保存后继的节点 
+        free(*L);//删除当前节点内存 
+        *L = temp;//下一个节点 
     }
 }
 
@@ -64,9 +66,9 @@ void DestroyList(LinkList *L)
  */
 void ClearList(LinkList L)
 {
-    LinkList p = L->next;
-    L->next = NULL;
-    DestroyList(&p);
+    LinkList p = L->next;//下一个节点 
+    L->next = NULL;//后继指针为NULL 
+    DestroyList(&p);//清空内存 
 }
 
 /*
@@ -76,11 +78,11 @@ Status isEmpty(LinkList L)
 {
     if (L->next)
     {
-        return FALSE;
+        return FALSE;//后继有内容 不为空 
     }
     else
     {
-        return TRUE;
+        return TRUE;//后继无内容  为空 
     }
 }
 
@@ -90,11 +92,11 @@ Status isEmpty(LinkList L)
 int GetLength(LinkList L)
 {
     int i = 0;
-    LinkList p = L->next;
+    LinkList p = L->next;//后继节点 
     while (p)
     {
-        i++;
-        p = p->next;
+        i++;//后继节点 计数 
+        p = p->next;//依次遍历后继节点 
     }
     return i;
 }
@@ -105,13 +107,13 @@ int GetLength(LinkList L)
 Status GetElem(LinkList L, int i, ElemType *e)
 {
     int j = 1;
-    LinkList p = L->next;
-    while (p && j < i)
+    LinkList p = L->next;//后继节点 
+    while (p && j < i)//p 未到尾节点 且j<i 
     {
-        j++;
-        p = p->next;
+        j++;//位置计数 
+        p = p->next;//下一个后级节点 
     }
-    if (!p || j > i)
+    if (!p || j > i)//越界  p到了尾部 
     {
         return ERROR;
     }
@@ -130,11 +132,11 @@ Status compare(ElemType e1, ElemType e2)
     }
     else if (e1 < e2)
     {
-        return -1;
+        return -1;//前面的小于后面的 
     }
     else
     {
-        return 1;
+        return 1;//前面的大于后面的 
     }
 }
 
@@ -144,15 +146,15 @@ Status compare(ElemType e1, ElemType e2)
 int FindElem(LinkList L, ElemType e, Status (*compare)(ElemType, ElemType))
 {
     int i = 0;
-    LinkList p = L->next;
+    LinkList p = L->next;//后继节点 
     while (p)
     {
-        i++;
-        if (!compare(p->data, e))
+        i++;//位置计数 +1 
+        if (!compare(p->data, e))//比较当前节点元素值和 目标元素值 
         {
-            return i;
+            return i;//相等返回 位置计数值 
         }
-        p = p->next;
+        p = p->next;//指向后继  
     }
     return 0;
 }
@@ -162,16 +164,16 @@ int FindElem(LinkList L, ElemType e, Status (*compare)(ElemType, ElemType))
  */
 Status PreElem(LinkList L, ElemType cur_e, ElemType *pre_e)
 {
-    LinkList q, p = L->next;
-    while (p->next)
+    LinkList q, p = L->next;//后继节点 
+    while (p->next)//后继 不为空 
     {
-        q = p->next;
-        if (q->data == cur_e)
+        q = p->next;//p节点的后继为q 
+        if (q->data == cur_e)//q节点的元素与目标 元素相等
         {
-            *pre_e = p->data;
+            *pre_e = p->data;//q的前驱 p的元素为 目标元素的前驱 
             return OK;
         }
-        p = q;
+        p = q;//p指向下一个后继 
     }
     return ERROR;
 }
@@ -181,15 +183,15 @@ Status PreElem(LinkList L, ElemType cur_e, ElemType *pre_e)
  */
 Status NextElem(LinkList L, ElemType cur_e, ElemType *next_e)
 {
-    LinkList p = L->next;
-    while (p->next)
+    LinkList p = L->next;//后继 
+    while (p->next)//节点后继不为空 
     {
-        if (p->data == cur_e)
+        if (p->data == cur_e)//节点元素与目标元素相等 
         {
-            *next_e = p->next->data;
+            *next_e = p->next->data;//当前节点的后继节点的元素为 目标元素的后继元素 
             return OK;
         }
-        p = p->next;
+        p = p->next;//指向下一个后继 
     }
     return ERROR;
 }
@@ -200,20 +202,20 @@ Status NextElem(LinkList L, ElemType cur_e, ElemType *next_e)
 Status InsertElem(LinkList L, int i, ElemType e)
 {
     int j = 0;
-    LinkList s, p = L;
+    LinkList s, p = L;// 
     while (p && j < i - 1)
     {
-        j++;
-        p = p->next;
+        j++;//位置计数 +1 
+        p = p->next;//指向后继 后移 
     }
-    if (!p || j > i - 1)
+    if (!p || j > i - 1)//位置越界 
     {
         return ERROR;
     }
-    s = (LinkList) malloc(sizeof(LNode));
-    s->data = e;
-    s->next = p->next;
-    p->next = s;
+    s = (LinkList) malloc(sizeof(LNode));//新开辟一段内存空间 
+    s->data = e;//元素值 
+    s->next = p->next;//后继指向p的后继 
+    p->next = s;//p的后继指向新的元素节点 
     return OK;
 }
 
@@ -227,16 +229,16 @@ Status DeleteElem(LinkList L, int i, ElemType *e)
     while (p->next && j < i - 1)
     {
         j++;
-        p = p->next;
+        p = p->next;//找到 目标位置节点 
     }
     if (!p->next || j > i - 1)
     {
         return ERROR;
     }
-    q = p->next;
-    p->next = q->next;
-    *e = q->data;
-    free(q);
+    q = p->next;//保存节点的后继 为目标位置节点 
+    p->next = q->next;//节点的后继 指向后继的后继 
+    *e = q->data;//节点后继 的值 目标位置节点的元素值 
+    free(q);//清除空间 
     return OK;
 }
 
@@ -253,11 +255,11 @@ void visit(ElemType e)
  */
 void TraverseList(LinkList L, void (*visit)(ElemType))
 {
-    LinkList p = L->next;
+    LinkList p = L->next;//后继 
     while (p)
     {
-        visit(p->data);
-        p = p->next;
+        visit(p->data);//访问 
+        p = p->next;//指向后继 
     }
 }
 
