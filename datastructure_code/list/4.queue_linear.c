@@ -1,4 +1,5 @@
 /*
+链式 队列 
 栈是先进后出，而队列是先进先出。
 队列刚好和栈相反，它是一种先进先出的线性表，
 只能在一端插入元素，在另一端删除元素，
@@ -25,13 +26,13 @@ typedef int Status;
  */
 typedef struct QNode
 {
-    QElemType data;
-    struct QNode *next;
+    QElemType data;//元素 
+    struct QNode *next;//后继指针   链式队列 
 }QNode, *QueuePtr;
 
 typedef struct
 {
-    QueuePtr front;    //队头指针
+    QueuePtr front;   //队头指针
     QueuePtr rear;    //队尾指针
 }LinkQueue;
 
@@ -40,12 +41,12 @@ typedef struct
  */
 Status InitQueue(LinkQueue *Q)
 {
-    Q->front = Q->rear = (QueuePtr) malloc(sizeof(QNode));
-    if (!Q->front)
+    Q->front = Q->rear = (QueuePtr) malloc(sizeof(QNode));//队尾 队头 
+    if (!Q->front)//分配出错 
     {
         exit(OVERFLOW);
     }
-    Q->front->next = NULL;
+    Q->front->next = NULL;//为空指针 
     return OK;
 }
 
@@ -54,9 +55,9 @@ Status InitQueue(LinkQueue *Q)
  */
 Status DestroyQueue(LinkQueue *Q)
 {
-    while (Q->front)
+    while (Q->front)//
     {
-        Q->rear = Q->front->next;
+        Q->rear = Q->front->next;//下一个 
         free(Q->front);
         Q->front = Q->rear;
     }
