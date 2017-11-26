@@ -22,8 +22,8 @@
 #define OK 1
 #define ERROR 0
 #define OVERFLOW -2
-#define INIT_SIZE 20
-#define INCREMENT_SIZE 5
+#define INIT_SIZE 20//初始栈分配内存大小 
+#define INCREMENT_SIZE 5//分配增长  
 
 typedef int SElemType;
 typedef int Status;
@@ -33,9 +33,9 @@ typedef int Status;
  */
 typedef struct
 {
-    SElemType *base;    //栈尾指针
-    SElemType *top;        //栈顶指针
-    int size;            //栈的大小
+    SElemType *base;    //栈尾指针   表头 
+    SElemType *top;     //栈顶指针  表尾 
+    int size;           //栈的大小
 }SqStack;
 
 /*
@@ -43,12 +43,12 @@ typedef struct
  */
 Status InitStack(SqStack *S)
 {
-    S->base = (SElemType*) malloc(INIT_SIZE * sizeof(SElemType));
-    if (!S->base)
+    S->base = (SElemType*) malloc(INIT_SIZE * sizeof(SElemType));//表头 
+    if (!S->base)//分配出错 
     {
         exit(OVERFLOW);
     }
-    S->top = S->base;
+    S->top = S->base;//栈顶也是栈尾  表头也是表尾 
     S->size = INIT_SIZE;
     return OK;
 }
@@ -58,7 +58,7 @@ Status InitStack(SqStack *S)
  */
 Status DestroyStack(SqStack *S)
 {
-    free(S->base);
+    free(S->base);//栈尾 表头 
     S->base = NULL;
     S->top = NULL;
     S->size = 0;
@@ -70,7 +70,7 @@ Status DestroyStack(SqStack *S)
  */
 Status ClearStack(SqStack *S)
 {
-    S->top = S->base;
+    S->top = S->base;//栈顶指向栈尾 
     return OK;
 }
 
@@ -79,7 +79,7 @@ Status ClearStack(SqStack *S)
  */
 Status IsEmpty(SqStack S)
 {
-    if (S.top == S.base)
+    if (S.top == S.base)//栈顶 = 栈尾 
     {
         return TRUE;
     }
@@ -92,7 +92,7 @@ Status IsEmpty(SqStack S)
  */
 int GetLength(SqStack S)
 {
-    return S.top - S.base;
+    return S.top - S.base;//栈顶-栈尾 
 }
 
 
@@ -117,18 +117,18 @@ Status GetTop(SqStack S, SElemType *e)
  */
 Status Push(SqStack *S, SElemType e)
 {
-    if ((S->top - S->base) / sizeof(SElemType) >= S->size)
+    if ((S->top - S->base) / sizeof(SElemType) >= S->size)//内存不够了 
     {
         S->base = (SElemType*) realloc(S->base, (S->size + INCREMENT_SIZE) * sizeof(SElemType));
-        if (!S->base)
+        if (!S->base)//分配出错 
         {
             exit(OVERFLOW);
         }
-        S->top = S->base + S->size;
-        S->size += INCREMENT_SIZE;
+        S->top = S->base + S->size;//更新栈顶地址   向上生长 
+        S->size += INCREMENT_SIZE;//更新大小 
     }
-    *S->top = e;
-    S->top++;
+    *S->top = e;//*地址  取值  更新值 
+    S->top++;//地址+1 
     return OK;
 }
 
@@ -137,12 +137,12 @@ Status Push(SqStack *S, SElemType e)
  */
 Status Pop(SqStack *S, SElemType *e)
 {
-    if (S->top == S->base)
+    if (S->top == S->base)//空 
     {
         return ERROR;
     }
-    S->top--;
-    *e = *S->top;
+    S->top--;//地址-1 
+    *e = *S->top;//取栈顶地址里的值 
     return OK;
 }
 
@@ -162,7 +162,7 @@ Status TraverseStack(SqStack S, void (*visit)(SElemType))
     while (S.top > S.base)
     {
         visit(*S.base);
-        S.base++;
+        S.base++;//栈尾地址++ 
     }
     return OK;
 }
