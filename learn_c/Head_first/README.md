@@ -12,7 +12,7 @@
 # 链表 动态存储
 
 # 函数指针   
-int tee(char *tmp){}; 函数
-int (*fun_p)(char *tmp); 函数指针
+> int tee(char *tmp){}; 函数
+> int (*fun_p)(char *tmp); 函数指针
 
 #
