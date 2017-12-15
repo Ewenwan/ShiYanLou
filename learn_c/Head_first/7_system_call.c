@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
+//system("strstr...") 把字符串当成命令运行
  
 /*
 struct tm {
