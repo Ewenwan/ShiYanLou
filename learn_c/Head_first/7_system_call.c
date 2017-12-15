@@ -1,60 +1,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-// ½ø³Ì ´æ´¢Æ÷ÖĞÔËĞĞµÄ³ÌĞò 
-// taskmgr windowÏÂ  
-//  ps -ef  linuxÏÂ 
-// exec + l / v / p /e ÃüÁî ÓÃÒ»¸ö½ø³ÌÌæ»»Ò»¸ö½ø³Ì PID²»±ä ½ÓÁ¦Èü
-// l list ²ÎÊıÁĞ±í £» v vector ²ÎÊıÊı×é/ÏòÁ¿ £»p Â·¾¶ path ; e »·¾³±äÁ¿ environment 
-//  C³ÌĞòÖĞÊ¹ÓÃ getenv("±äÁ¿Ãû") »ñÈ¡»·¾³±äÁ¿µÄÖµ
-// char *my_env[] = {"±äÁ¿Ãû=Öµ",NULL}; //±äÁ¿Êı×é ×îºóÒ»¸ö±ØĞëÎª NULL
-// execle("diner_info", "diner_info", "4", NULL, my_env);//Ê¹ÓÃ diner_infoÌæ»»µ±Ç°½ø³Ì 
-// Ö´ĞĞµÄ×´Ì¬ ±£´æÔÚ±äÁ¿ errno ÖĞ  puts(strderror(errno));²éÑ¯´íÎóĞÅÏ¢
-// #include <unistd.h>  // execXXX()º¯Êı 
-// #include <errno.h>   // errno ±äÁ¿ 
-// #include <string.h>  // strerron() ÏÔÊ¾´íÎóÏûÏ¢
-// ÀıÈç²é¿´ ÍøÂçĞÅÏ¢
-/*
-#include <unistd.h>  // execXXX()º¯Êı 
-#include <errno.h>   // errno ±äÁ¿ 
-#include <string.h>
-
-int main(){// exec()º¯ÊıÔËĞĞÆäËû½ø³Ì³É¹¦ ±¾º¯Êı½øĞĞ¾ÍËÀÍöÁË 
-  if(execl("/sbin/ifconfig","/sbin/ifconfig", NULL)==-1){
-  	if(execl("ipconfig","ipconfig", NULL)==-1)
-  	  fprintf(stderr,"²»ÄÜÔËĞĞ ipconfig: %s", strerron(erron));
-  	  return 1;
-  }
-  return 0;
-} 
-*/ 
 
  
 /*
 struct tm {
-   int tm_sec; //Ãë£¬·¶Î§´Ó 0 µ½ 59 //
-   int tm_min; //·Ö£¬·¶Î§´Ó 0 µ½ 59 //
-   int tm_hour;//Ğ¡Ê±£¬·¶Î§´Ó 0 µ½ 23/
-   int tm_mday;//Ò»ÔÂÖĞµÄµÚ¼¸Ìì£¬·¶Î§´Ó 1 µ½ 31//
-   int tm_mon; //ÔÂ·İ£¬·¶Î§´Ó 0 µ½ 11 //
-   int tm_year; //×Ô 1900 ÆğµÄÄêÊı//
-   int tm_wday; //Ò»ÖÜÖĞµÄµÚ¼¸Ìì£¬·¶Î§´Ó 0 µ½ 6//
-   int tm_yday; //Ò»ÄêÖĞµÄµÚ¼¸Ìì£¬·¶Î§´Ó 0 µ½ 365 //
-   int tm_isdst;//ÏÄÁîÊ±// 
+   int tm_sec; //ç§’ï¼ŒèŒƒå›´ä» 0 åˆ° 59 //
+   int tm_min; //åˆ†ï¼ŒèŒƒå›´ä» 0 åˆ° 59 //
+   int tm_hour;//å°æ—¶ï¼ŒèŒƒå›´ä» 0 åˆ° 23/
+   int tm_mday;//ä¸€æœˆä¸­çš„ç¬¬å‡ å¤©ï¼ŒèŒƒå›´ä» 1 åˆ° 31//
+   int tm_mon; //æœˆä»½ï¼ŒèŒƒå›´ä» 0 åˆ° 11 //
+   int tm_year; //è‡ª 1900 èµ·çš„å¹´æ•°//
+   int tm_wday; //ä¸€å‘¨ä¸­çš„ç¬¬å‡ å¤©ï¼ŒèŒƒå›´ä» 0 åˆ° 6//
+   int tm_yday; //ä¸€å¹´ä¸­çš„ç¬¬å‡ å¤©ï¼ŒèŒƒå›´ä» 0 åˆ° 365 //
+   int tm_isdst;//å¤ä»¤æ—¶// 
 };
 */
 char * now_time(){
 	time_t t;
 	time (&t);
-	return asctime (localtime (&t));	//C++ ÖĞ asctime²»°²È«£¬½¨ÒéÊ¹ÓÃasctime_s´úÌæ¡£Óëlocaltime_s½áºÏÊ¹ÓÃ
+	return asctime (localtime (&t));	//C++ ä¸­ asctimeä¸å®‰å…¨ï¼Œå»ºè®®ä½¿ç”¨asctime_sä»£æ›¿ã€‚ä¸localtime_sç»“åˆä½¿ç”¨
 }
 
 int main(){
-	char comment[80];//¼ÇÂ¼µÄÎÄ±¾
-	char cmd[120];//system Ö´ĞĞµÄÃüÁî
-	fgets(comment,80,stdin);//»ñÈ¡¼ÇÂ¼µÄÎÄ±¾
+	char comment[80];//è®°å½•çš„æ–‡æœ¬
+	char cmd[120];//system æ‰§è¡Œçš„å‘½ä»¤
+	fgets(comment,80,stdin);//è·å–è®°å½•çš„æ–‡æœ¬
 	sprintf(cmd,"echo '%s %s' >> report.log",comment,now_time());
-	system(cmd);//ÏµÍ³µ÷ÓÃ 
+	system(cmd);//ç³»ç»Ÿè°ƒç”¨ 
 	
 	return 0;
 }
