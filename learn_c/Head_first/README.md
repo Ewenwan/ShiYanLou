@@ -135,7 +135,16 @@
 
 > dup2(fileno(f),1)；//将标准输出 重定向到 stories.txt文件
 
-### 管道 ls | grep txt C函数 pipe()函数建立管道
+### 进程
+> system("XXX") 把字符串当成命令行执行
+
+> fock() 创建进程  execXXX()执行新任务 
+
+> execl() 参数列表 execle() 参数列表+环境变量 execlp()参数列表+搜索PATH
+
+> execv() 参数数组 execve() 参数数组+环境变量 execvp()参数数组+搜索PATH
+
+### 管道|  命令行 ls | grep txt C函数 pipe()函数建立管道  exit()终止程序  waitpid()等待进程结束
 
 > int fd[2];//文件描述符 file description
 
@@ -155,7 +164,7 @@
 
 > 另一个可以 从父进程的标准输出定向到 管道输入，再从管道输出 定向到 子进程的标志输入，实现双向通信。
 
-### 信号控制进程   Ctrl-C中断信号 SIGINT值为2 会调用 exit()函数结束程序  sigaction设置信号处理器 raise()向自己发送信号 kill 命令行 命令发送信号   alarm()函数定时向进程发送 SIGALRM 信号   
+### 信号控制进程   Ctrl-C中断信号 SIGINT值为2 会调用 exit()函数结束程序  sigaction设置信号处理器 raise()向自己发送信号 kill 命令行 命令发送信号   alarm()函数定时向进程发送 SIGALRM 信号    kill 命令发送信号
 
 > int catch_signal(int sig, void(*handler)(int)){//信号编号 处理器指针
 > struct sigaction action;      // 结构体
@@ -239,18 +248,18 @@
 > if(c == -1) error("无法连接服务器");
 
 > getaddrinfo()获取域名方法 创建 socket
-`
-  #include <netdb.h>
-  struct addrinfo *res;//解析结果 结构体指针
-  struct addrinfo hints;//结构体变量
-  memset(&hints, 0, sizeof(hints));//初始化为0
-  hints.ai_family = PF_UNSPEC;     //协议类型 AF_UNSPEC  0 协议无关  AF_INET 2 IPv4协议   AF_INET6 23 IPv6协议
-  hints.ai_socktype = SOCK_STREAM; //数据类型 SOCK_STREAM 1 流  SOCK_DGRAM  2  数据报
-  getaddrinfo("www.oreilly.com", "80", &hints, &res);// 端口80 域名 "www.oreilly.com" 的解析信息
-  int s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);//创建端口
-  connect(s, res->ai_addr, res->ai_addrlen);//连接
-  freeaddrinfo(res);//连接后删除 地址信息  该信息存储在 堆中 需要手动清除
-`
+
+> #include <netdb.h>
+> struct addrinfo *res;//解析结果 结构体指针
+> struct addrinfo hints;//结构体变量
+> memset(&hints, 0, sizeof(hints));//初始化为0
+> hints.ai_family = PF_UNSPEC;     //协议类型 AF_UNSPEC  0 协议无关  AF_INET 2 IPv4协议   AF_INET6 23 IPv6协议
+>  hints.ai_socktype = SOCK_STREAM; //数据类型 SOCK_STREAM 1 流  SOCK_DGRAM  2  数据报
+> getaddrinfo("www.oreilly.com", "80", &hints, &res);// 端口80 域名 "www.oreilly.com" 的解析信息
+> int s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);//创建端口
+> connect(s, res->ai_addr, res->ai_addrlen);//连接
+> freeaddrinfo(res);//连接后删除 地址信息  该信息存储在 堆中 需要手动清除
+
 ### 开始通信  read()  send()
 > 发送  接收消息
 
