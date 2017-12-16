@@ -167,26 +167,49 @@
 ### 信号控制进程   Ctrl-C中断信号 SIGINT值为2 会调用 exit()函数结束程序  sigaction设置信号处理器 raise()向自己发送信号 kill 命令行 命令发送信号   alarm()函数定时向进程发送 SIGALRM 信号    kill 命令发送信号
 
 > int catch_signal(int sig, void(*handler)(int)){//信号编号 处理器指针
+
 > struct sigaction action;      // 结构体
+
 > action.sa_handler = diediedie;// 信号处理器函数
+
 > sigemptyset(&action.sa_mask); // 用掩码过滤 sigaction要处理的信号
+
 > action.sa_flags = 0;          // 附加标志位
+
 > if(sigaction(sig, &action, NULL))//编号 新动作 旧动作(可以为NULL)
+
 > {
+
 > fprintf("发送错误，错误：%s",strerror(errno));
+
 >  return -1;
+
 >  }
+
 >  else return 0; //直接 return sigaction(sig, &action, NULL)
+
 > }
+
 > void diediedie(int sig){      // 自定义信号处理器函数
+
 >   puts("再见了...");
+
 >   exit(1);
+
 > }
+
 > catch_signal(SIGINT, diediedie);//函数指针 按下 Ctrl-C之后触发 SIGINT 信号，会进入指定的信号处理函数
 
 # 不同电脑 上 程序通信 网络套接字 socket()  新的数据流     文件、标准输入、标准输出 
 ### BLAB四部曲  Bind 绑定端口  Listen 监听端口 Accept 接收连接   Begin  开始通信   端口就好比 电视不同的频道
+
 ## 服务器Serve
+>  可以用fock()克隆进程 处理多个客户端
+
+> 子进程 关闭 监听套接字 开启 连接套接字 绘画结束 关闭连接套接字  关闭进程
+
+> 父进程 开启监听套接字 关闭连接套接字
+
 ### 创建socket
 
 >  #include <sys/socket.h>
@@ -233,8 +256,13 @@
 > * if(send(connect_d, msg, strlen(msg), 0) == -1) error("send error");//最后一个参数 是高级选项 0 就可以了
 
 ## 客户端Client
+> talnet 命令行  工具 是一个简易的网络客户端
 
 > 需要 远程服务器的 ip地址(可以使用 域名 ) 和端口号 
+
+> getaddrinfo()根据域名找IP地址
+
+> DNS domain name system 域名系统
 
 ### 连接远程端口
 
@@ -264,28 +292,41 @@
 > 发送  接收消息
 
 # 线程
+> 有了线程，一个进程就可以同时做很多事情
+
 > 进程（店面）的缺点： 创建时间较长；共享数据不方便，需要管道；代码较复杂，先fock()一个进程，在执行execXXX();普通进程，单线程，一个人干活。
 
 > 线程（员工）启动快，又可以共享数据，可以并行执行多个线程，一个进程可以多开几个线程（多雇几名员工），并行工作。
 
-> 使用POSIX 线程库，也叫 pthread  #include<pthread.h> pthread_create()创建线程 pthread_t结构体 变量保存 线程信息 pthread_join()等待线程结束
+> 使用POSIX 线程库，也叫 pthread  #include<pthread.h>
+
+> pthread_create()创建线程 pthread_t结构体 变量保存 线程信息 pthread_join()等待线程结束
 
 > 使用线程库 编译时需要链接库 -lpthread 
 
 > 多线程会同时运行，因此两个线程可能会同时访问共享的数据资源，会出现意想不到的后果，需要增设红绿灯来防止撞车，老司机开车小心！
 
 > pthread_mutex_t a_lock = PTHREAD_MUTEX_INITIALIZER;//初始化锁 
-> pthread_mutex_lock(&a_lock);//启动锁
-> 含有共享数据的代码 (同一时间段 只能有一个线程通过)
-> pthread_mutex_unlock(&a_lock)//开锁
 
-`
-pthread_t pt1;
-pthread_t pt2;
-if(pthread_create(&pt1, NULL, 函数1, NULL) == -1) error("创建线程pt1失败");
-if(pthread_create(&pt2, NULL, 函数2, NULL) == -1) error("创建线程pt2失败");
-void *result;
-if(pthread_join(pt1, &result) == -1) error("无法回收线程 pt1");
-if(pthread_join(pt2, &result) == -1) error("无法回收线程 pt2");
-`
+> pthread_mutex_lock(&a_lock);//启动锁
+
+> 含有共享数据的代码 (同一时间段 只能有一个线程通过)
+
+> pthread_mutex_unlock(&a_lock)//开锁  释放互斥锁
+
+
+> pthread_t pt1;
+
+> pthread_t pt2;
+
+> if(pthread_create(&pt1, NULL, 函数1, NULL) == -1) error("创建线程pt1失败");
+
+> if(pthread_create(&pt2, NULL, 函数2, NULL) == -1) error("创建线程pt2失败");
+
+> void *result;
+
+> if(pthread_join(pt1, &result) == -1) error("无法回收线程 pt1");
+
+> if(pthread_join(pt2, &result) == -1) error("无法回收线程 pt2");
+
 
