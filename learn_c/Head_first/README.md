@@ -57,6 +57,7 @@ catch_signal(SIGINT, diediedie);//函数指针 按下 Ctrl-C之后触发 SIGINT 
 
 # 不同电脑 上 程序通信 网络套接字 socket()  新的数据流     文件、标准输入、标准输出 
 ### BLAB四部曲  Bind 绑定端口  Listen 监听端口 Accept 接收连接   Begin  开始通信   端口就好比 电视不同的频道
+## 服务器Serve
 ### 创建socket
 `
 #include <sys/socket.h>
@@ -68,8 +69,8 @@ if(listener_d == -1) error("无法打开套接字");
 #include <arpa/inet.h>
 struct sockaddr_in name;
 name.sin_family = PF_INET;
-name.sin_port = (int_port_t)htons(30000);//端口 范围  0~65535  通常 选择 1024以上
-name.sin_addr.s_addr = htonl(INADDR_ANY);
+name.sin_port = (int_port_t)htons(30000);//端口 范围  0~65535  通常 选择 1024以上  本地端口
+name.sin_addr.s_addr = htonl(INADDR_ANY);//本地IP
 int c = bind(listener_d, (struct sockaddr *) &name, sizeof(name));
 if(c == -1) error("无法绑定端口");
 `
@@ -84,13 +85,40 @@ unsigned int address_size = sizeof(client_addr);
 int connect_d = accept(listener_d,  (struct sockaddr *) &client_addr, &address_size);
 if(connect_d == -1) error("无法打开副套接字);
 `
-### Begin  开始通信
-> 使用send()通信  不是 fprintf()、fscanf()、fgets()、fputs()
+### Begin  开始通信 
+> 使用send()通信  不是 fprintf()、fscanf()、fgets()、fputs()   recv()接收数据
 `
 char *msg = "Internet Knock-Knock Protocol Server\r\nVersion 1.0\r\nKnock! knock!\r\n> ";//发送的消息
 if(send(connect_d, msg, strlen(msg), 0) == -1) error("send error");//最后一个参数 是高级选项 0 就可以了
 `
-
+## 客户端Client
+> 需要 远程服务器的 ip地址(可以使用 域名 ) 和端口号 
+### 连接远程端口
+`
+int s = socket(PF_INET, SOCKET_STREAM, 0);// 协议  socket数据流   0为协议号
+if( s == -1) error("无法打开套接字");
+struct sockaddr_in name;
+name.sin_family = PF_INET;
+name.sin_addr.s_addr = inet_addr("208.201.239.100");//远程 服务器 ip地址   getaddrinfo()获取域名的ip  #include<netdb.h>
+name.sin_port = htons(80);// 绝大多数 网络服务器 运行在 80 端口
+int c = connect(s, (struct sockaddr *) &name, sizeof(name));
+if(c == -1) error("无法连接服务器");
+`
+> getaddrinfo()获取域名方法 创建 socket
+`
+  #include <netdb.h>
+  struct addrinfo *res;//解析结果 结构体指针
+  struct addrinfo hints;//结构体变量
+  memset(&hints, 0, sizeof(hints));//初始化为0
+  hints.ai_family = PF_UNSPEC;     //协议类型 AF_UNSPEC  0 协议无关  AF_INET 2 IPv4协议   AF_INET6 23 IPv6协议
+  hints.ai_socktype = SOCK_STREAM; //数据类型 SOCK_STREAM 1 流  SOCK_DGRAM  2  数据报
+  getaddrinfo("www.oreilly.com", "80", &hints, &res);// 端口80 域名 "www.oreilly.com" 的解析信息
+  int s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);//创建端口
+  connect(s, res->ai_addr, res->ai_addrlen);//连接
+  freeaddrinfo(res);//连接后删除 地址信息  该信息存储在 堆中 需要手动清除
+`
+### 开始通信  read()  send()
+> 发送  接收消息
 
 # 多个源文件
 
