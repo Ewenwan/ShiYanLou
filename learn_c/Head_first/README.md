@@ -156,76 +156,88 @@
 > 另一个可以 从父进程的标准输出定向到 管道输入，再从管道输出 定向到 子进程的标志输入，实现双向通信。
 
 ### 信号控制进程   Ctrl-C中断信号 SIGINT值为2 会调用 exit()函数结束程序  sigaction设置信号处理器 raise()向自己发送信号 kill 命令行 命令发送信号   alarm()函数定时向进程发送 SIGALRM 信号   
-`
-int catch_signal(int sig, void(*handler)(int)){//信号编号 处理器指针
-struct sigaction action;      // 结构体
-action.sa_handler = diediedie;// 信号处理器函数
-sigemptyset(&action.sa_mask); // 用掩码过滤 sigaction要处理的信号
-action.sa_flags = 0;          // 附加标志位
-if(sigaction(sig, &action, NULL))//编号 新动作 旧动作(可以为NULL)
- {
- fprintf("发送错误，错误：%s",strerror(errno));
- return -1;
- }
- else return 0; //直接 return sigaction(sig, &action, NULL)
-}
-void diediedie(int sig){      // 自定义信号处理器函数
-  puts("再见了...");
-  exit(1);
-}
-catch_signal(SIGINT, diediedie);//函数指针 按下 Ctrl-C之后触发 SIGINT 信号，会进入指定的信号处理函数
-`
 
+> int catch_signal(int sig, void(*handler)(int)){//信号编号 处理器指针
+> struct sigaction action;      // 结构体
+> action.sa_handler = diediedie;// 信号处理器函数
+> sigemptyset(&action.sa_mask); // 用掩码过滤 sigaction要处理的信号
+> action.sa_flags = 0;          // 附加标志位
+> if(sigaction(sig, &action, NULL))//编号 新动作 旧动作(可以为NULL)
+> {
+> fprintf("发送错误，错误：%s",strerror(errno));
+>  return -1;
+>  }
+>  else return 0; //直接 return sigaction(sig, &action, NULL)
+> }
+> void diediedie(int sig){      // 自定义信号处理器函数
+>   puts("再见了...");
+>   exit(1);
+> }
+> catch_signal(SIGINT, diediedie);//函数指针 按下 Ctrl-C之后触发 SIGINT 信号，会进入指定的信号处理函数
 
 # 不同电脑 上 程序通信 网络套接字 socket()  新的数据流     文件、标准输入、标准输出 
 ### BLAB四部曲  Bind 绑定端口  Listen 监听端口 Accept 接收连接   Begin  开始通信   端口就好比 电视不同的频道
 ## 服务器Serve
 ### 创建socket
-`
-#include <sys/socket.h>
-int listener_d = socket(PF_INET, SOCKET_STREAM, 0);// 协议  socket数据流   0为协议号
-if(listener_d == -1) error("无法打开套接字");
-`
+
+>  #include <sys/socket.h>
+
+>  int listener_d = socket(PF_INET, SOCKET_STREAM, 0);// 协议  socket数据流   0为协议号
+
+>  if(listener_d == -1) error("无法打开套接字");
+
 ### Bind 绑定端口
-`
-#include <arpa/inet.h>
-struct sockaddr_in name;
-name.sin_family = PF_INET;
-name.sin_port = (int_port_t)htons(30000);//端口 范围  0~65535  通常 选择 1024以上  本地端口
-name.sin_addr.s_addr = htonl(INADDR_ANY);//本地IP
-int c = bind(listener_d, (struct sockaddr *) &name, sizeof(name));
-if(c == -1) error("无法绑定端口");
-`
+
+> #include <arpa/inet.h>
+
+> struct sockaddr_in name;
+
+> name.sin_family = PF_INET;
+
+> name.sin_port = (int_port_t)htons(30000);//端口 范围  0~65535  通常 选择 1024以上  本地端口
+
+> name.sin_addr.s_addr = htonl(INADDR_ANY);//本地IP
+
+> int c = bind(listener_d, (struct sockaddr *) &name, sizeof(name));
+
+> if(c == -1) error("无法绑定端口");
+
 ### Listen 监听端口
-`
-if(listen(listener_d, 10) == -1) error("无法监听");// 监听队列最大为10  排队 列队最长 10   后面的客户端会被通知 服务器忙
-`
+
+> if(listen(listener_d, 10) == -1) error("无法监听");// 监听队列最大为10  排队 列队最长 10   后面的客户端会被通知 服务器忙
+
 ### Accept 接收连接
-`
-struct sockaddr_storage client_addr;//保存客户端的详细信息
-unsigned int address_size = sizeof(client_addr);
-int connect_d = accept(listener_d,  (struct sockaddr *) &client_addr, &address_size);
-if(connect_d == -1) error("无法打开副套接字);
-`
+
+> struct sockaddr_storage client_addr;//保存客户端的详细信息
+
+> unsigned int address_size = sizeof(client_addr);
+
+> int connect_d = accept(listener_d,  (struct sockaddr *) &client_addr, &address_size);
+
+> if(connect_d == -1) error("无法打开副套接字);
+
 ### Begin  开始通信 
-> 使用send()通信  不是 fprintf()、fscanf()、fgets()、fputs()   recv()接收数据
-`
-char *msg = "Internet Knock-Knock Protocol Server\r\nVersion 1.0\r\nKnock! knock!\r\n> ";//发送的消息
-if(send(connect_d, msg, strlen(msg), 0) == -1) error("send error");//最后一个参数 是高级选项 0 就可以了
-`
+> * 使用send()通信  不是 fprintf()、fscanf()、fgets()、fputs()   recv()接收数据
+
+> * char *msg = "Internet Knock-Knock Protocol Server\r\nVersion 1.0\r\nKnock! knock!\r\n> ";//发送的消息
+
+> * if(send(connect_d, msg, strlen(msg), 0) == -1) error("send error");//最后一个参数 是高级选项 0 就可以了
+
 ## 客户端Client
+
 > 需要 远程服务器的 ip地址(可以使用 域名 ) 和端口号 
+
 ### 连接远程端口
-`
-int s = socket(PF_INET, SOCKET_STREAM, 0);// 协议  socket数据流   0为协议号
-if( s == -1) error("无法打开套接字");
-struct sockaddr_in name;
-name.sin_family = PF_INET;
-name.sin_addr.s_addr = inet_addr("208.201.239.100");//远程 服务器 ip地址   getaddrinfo()获取域名的ip  #include<netdb.h>
-name.sin_port = htons(80);// 绝大多数 网络服务器 运行在 80 端口
-int c = connect(s, (struct sockaddr *) &name, sizeof(name));
-if(c == -1) error("无法连接服务器");
-`
+
+> *int s = socket(PF_INET, SOCKET_STREAM, 0);// 协议  socket数据流   0为协议号
+> if( s == -1) error("无法打开套接字");
+> struct sockaddr_in name;
+> name.sin_family = PF_INET;
+> name.sin_addr.s_addr = inet_addr("208.201.239.100");//远程 服务器 ip地址   getaddrinfo()获取域名的ip  #include<netdb.h>
+> name.sin_port = htons(80);// 绝大多数 网络服务器 运行在 80 端口
+> int c = connect(s, (struct sockaddr *) &name, sizeof(name));
+> if(c == -1) error("无法连接服务器");
+
 > getaddrinfo()获取域名方法 创建 socket
 `
   #include <netdb.h>
