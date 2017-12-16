@@ -47,12 +47,10 @@ if(sigaction(sig, &action, NULL))//编号 新动作 旧动作(可以为NULL)
  }
  else return 0; //直接 return sigaction(sig, &action, NULL)
 }
-
 void diediedie(int sig){      // 自定义信号处理器函数
   puts("再见了...");
   exit(1);
 }
-
 catch_signal(SIGINT, diediedie);//函数指针 按下 Ctrl-C之后触发 SIGINT 信号，会进入指定的信号处理函数
 `
 
