@@ -72,7 +72,6 @@ struct sockaddr_in name;
 name.sin_family = PF_INET;
 name.sin_port = (int_port_t)htons(30000);//端口 范围  0~65535  通常 选择 1024以上
 name.sin_addr.s_addr = htonl(INADDR_ANY);
-
 int c = bind(listener_d, (struct sockaddr *) &name, sizeof(name));
 if(c == -1) error("无法绑定端口");
 `
