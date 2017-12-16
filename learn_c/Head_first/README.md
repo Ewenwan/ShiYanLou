@@ -6,6 +6,28 @@
 > void *all;    可以指向任意类型
 > int a = *(int*)all // 函数参数类型使用 void*  函数内使用需要先转化为具体类型的指针 再 取值
  `
+
+# 多个源文件
+
+
+# 枚举 联合 结构体
+> 枚举 enum{COUNT, POUNDS, PINTS};  联合 union{short count; float weight; float volume;};  结构体 struct{};
+
+# 链表 动态存储
+typedef struct island{ char *name; char *opens; char *closes; struct island *nest;}island;
+
+# 函数指针   
+> int tee(char *tmp){}; 函数
+> int (*fun_p)(char *tmp); 函数指针
+
+# 函数指针数组
+> int (*fun_p_a[])(char *tmp); 函数指针数组
+
+# 可变参数函数
+> variadic function
+> #include<stdarg.h>
+> va_List va_start  va_arg  va_end
+
 # 数据流 重定向 文件  管道|连接进程  一台主机上 进程间通信
 > < 输入重定向 ， 输出重定向 >；每一种数据流都对应描述符； 0号为标志输入 stdin 默认 来源于键盘 ； 1号为标志输出 stdout  2号为标志错> 误 ； 1号和2号 默认输出到 屏幕；
 > 2>  代表重定向标志错误，可以重定向到文件 2>error.txt;  2>&1 把标识错误和标准输出重定向到同一个地方。
@@ -120,25 +142,29 @@ if(c == -1) error("无法连接服务器");
 ### 开始通信  read()  send()
 > 发送  接收消息
 
-# 多个源文件
+# 线程
+> 进程（店面）的缺点： 创建时间较长；共享数据不方便，需要管道；代码较复杂，先fock()一个进程，在执行execXXX();普通进程，单线程，一个人干活。
 
+> 线程（员工）启动快，又可以共享数据，可以并行执行多个线程，一个进程可以多开几个线程（多雇几名员工），并行工作。
 
-# 枚举 联合 结构体
-> 枚举 enum{COUNT, POUNDS, PINTS};  联合 union{short count; float weight; float volume;};  结构体 struct{};
+> 使用POSIX 线程库，也叫 pthread  #include<pthread.h> pthread_create()创建线程 pthread_t结构体 变量保存 线程信息 pthread_join()等待线程结束
 
-# 链表 动态存储
-typedef struct island{ char *name; char *opens; char *closes; struct island *nest;}island;
+> 使用线程库 编译时需要链接库 -lpthread 
 
-# 函数指针   
-> int tee(char *tmp){}; 函数
-> int (*fun_p)(char *tmp); 函数指针
+> 多线程会同时运行，因此两个线程可能会同时访问共享的数据资源，会出现意想不到的后果，需要增设红绿灯来防止撞车，老司机开车小心！
 
-# 函数指针数组
-> int (*fun_p_a[])(char *tmp); 函数指针数组
+> pthread_mutex_t a_lock = PTHREAD_MUTEX_INITIALIZER;//初始化锁 
+> pthread_mutex_lock(&a_lock);//启动锁
+> 含有共享数据的代码 (同一时间段 只能有一个线程通过)
+> pthread_mutex_unlock(&a_lock)//开锁
 
-# 可变参数函数
-> variadic function
-> #include<stdarg.h>
-> va_List va_start  va_arg  va_end
-
+`
+pthread_t pt1;
+pthread_t pt2;
+if(pthread_create(&pt1, NULL, 函数1, NULL) == -1) error("创建线程pt1失败");
+if(pthread_create(&pt2, NULL, 函数2, NULL) == -1) error("创建线程pt2失败");
+void *result;
+if(pthread_join(pt1, &result) == -1) error("无法回收线程 pt1");
+if(pthread_join(pt2, &result) == -1) error("无法回收线程 pt2");
+`
 
