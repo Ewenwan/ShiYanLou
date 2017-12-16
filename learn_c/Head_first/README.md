@@ -6,7 +6,7 @@
 > void *all;    可以指向任意类型
 > int a = *(int*)all // 函数参数类型使用 void*  函数内使用需要先转化为具体类型的指针 再 取值
  `
-# 数据流 重定向 文件  管道|连接进程
+# 数据流 重定向 文件  管道|连接进程  一台主机上 进程间通信
 > < 输入重定向 ， 输出重定向 >；每一种数据流都对应描述符； 0号为标志输入 stdin 默认 来源于键盘 ； 1号为标志输出 stdout  2号为标志错> 误 ； 1号和2号 默认输出到 屏幕；
 > 2>  代表重定向标志错误，可以重定向到文件 2>error.txt;  2>&1 把标识错误和标准输出重定向到同一个地方。
 ### 其他任意指定，使用fileno() 查看文件指针 的 描述符
@@ -54,8 +54,47 @@ void diediedie(int sig){      // 自定义信号处理器函数
 }
 
 catch_signal(SIGINT, diediedie);//函数指针 按下 Ctrl-C之后触发 SIGINT 信号，会进入指定的信号处理函数
-
 `
+
+
+# 不同电脑 上 程序通信 网络套接字 socket()  新的数据流     文件、标准输入、标准输出 
+### BLAB四部曲  Bind 绑定端口  Listen 监听端口 Accept 接收连接   Begin  开始通信   端口就好比 电视不同的频道
+### 创建socket
+`
+#include <sys/socket.h>
+int listener_d = socket(PF_INET, SOCKET_STREAM, 0);// 协议  socket数据流   0为协议号
+if(listener_d == -1) error("无法打开套接字");
+`
+### Bind 绑定端口
+`
+#include <arpa/inet.h>
+struct sockaddr_in name;
+name.sin_family = PF_INET;
+name.sin_port = (int_port_t)htons(30000);//端口 范围  0~65535  通常 选择 1024以上
+name.sin_addr.s_addr = htonl(INADDR_ANY);
+
+int c = bind(listener_d, (struct sockaddr *) &name, sizeof(name));
+if(c == -1) error("无法绑定端口");
+`
+### Listen 监听端口
+`
+if(listen(listener_d, 10) == -1) error("无法监听");// 监听队列最大为10  排队 列队最长 10   后面的客户端会被通知 服务器忙
+`
+### Accept 接收连接
+`
+struct sockaddr_storage client_addr;//保存客户端的详细信息
+unsigned int address_size = sizeof(client_addr);
+int connect_d = accept(listener_d,  (struct sockaddr *) &client_addr, &address_size);
+if(connect_d == -1) error("无法打开副套接字);
+`
+### Begin  开始通信
+> 使用send()通信  不是 fprintf()、fscanf()、fgets()、fputs()
+`
+char *msg = "Internet Knock-Knock Protocol Server\r\nVersion 1.0\r\nKnock! knock!\r\n> ";//发送的消息
+if(send(connect_d, msg, strlen(msg), 0) == -1) error("send error");//最后一个参数 是高级选项 0 就可以了
+`
+
+
 # 多个源文件
 
 
