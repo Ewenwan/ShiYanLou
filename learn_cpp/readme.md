@@ -28,9 +28,9 @@
 这就产生了运行时类型识别的要求。
 
 
-    C++对RTTI的支持：
+      C++对RTTI的支持：
     
-　　C++提供了两个关键字typeid（指示类型） 和dynamic_cast（类型强转）和一个type_info类来支持RTTI
+      C++提供了两个关键字typeid（指示类型） 和dynamic_cast（类型强转）和一个type_info类来支持RTTI
 
 #############################################################
 ###【1】dynamic_cast操作符：     运行时强制类型转换
@@ -72,9 +72,9 @@ dynamic_cast提供了两种转换方式，
 
 
 
-int a=1;int *p=&a;//指针是变量的地址    *p  定义时  和 在函数参数中时  是 表示指针变量   其他表示取值
+    int a=1;int *p=&a;//指针是变量的地址    *p  定义时  和 在函数参数中时  是 表示指针变量   其他表示取值
 
-int a=1;int &b=a;//引用 是 变量别名     &放在左边 以及在 函数参数中 是引用   方在右边是 取地址
+    int a=1;int &b=a;//引用 是 变量别名     &放在左边 以及在 函数参数中 是引用   方在右边是 取地址
 
 上面定义了一个整形变量和一个指针变量p，该指针变量指向a的存储单元，
 
@@ -295,8 +295,6 @@ typename可以更加直观的反映出后面的名字是一个类型名。
     }; 
 
 
-
-
 ## 【【C】】虚函数技术
 
 C++中的虚函数的作用主要是实现了多态的机制。
@@ -370,7 +368,7 @@ Base::f
 
 2）父类的虚函数在子类的虚函数前面。
 
-|Base::f()|Base::g()|Base::h()|Derive::f1()|Derive::g1()|Derive::h1()|.|
+    |Base::f()|Base::g()|Base::h()|Derive::f1()|Derive::g1()|Derive::h1()|.|
 
 
 #### 【2】一般继承（有虚函数覆盖）
@@ -380,7 +378,7 @@ Base::f
 
 2）没有被覆盖的函数依旧。
 
-|Derive::f1()|Base::g()|Base::h()|Derive::g1()|Derive::h1()|.|
+    |Derive::f1()|Base::g()|Base::h()|Derive::g1()|Derive::h1()|.|
 
 这样，我们就可以看到对于下面这样的程序，
  
@@ -396,9 +394,12 @@ Base::f
 #### 【3】多重继承（无虚函数覆盖）
  Derive 继承 于 Base1 Base2 Base3
 
- |Base1::f()|Base1::g()|Base1::h()|Derive::f1()|Derive::g1()|Derive::h1()|.|
- |Base2::f()|Base2::g()|Base2::h()|.|
- |Base3::f()|Base3::g()|Base3::h()|.|
+     |Base1::f()|Base1::g()|Base1::h()|Derive::f1()|Derive::g1()|Derive::h1()|.|
+     
+     |Base2::f()|Base2::g()|Base2::h()|.|
+     
+     |Base3::f()|Base3::g()|Base3::h()|.|
+     
 
 我们可以看到：
 
@@ -413,9 +414,12 @@ Base::f
 #### 【4】多重继承（有虚函数覆盖）
  Derive 继承 于 Base1 Base2 Base3   且有相同函数 f()
 
- |Derive::f()|Base1::g()|Base1::h()|Derive::g1()|Derive::h1()|.|
- |Derive::f()|Base2::g()|Base2::h()|.|
- |Derive::f()|Base3::g()|Base3::h()|.|
+     |Derive::f()|Base1::g()|Base1::h()|Derive::g1()|Derive::h1()|.|
+
+     |Derive::f()|Base2::g()|Base2::h()|.|
+
+     |Derive::f()|Base3::g()|Base3::h()|.|
+ 
  三个父类虚函数表中的f()的位置被替换成了子类的函数指针。
  
  这样，我们就可以任一静态类型的父类来指向子类，并调用子类的f()了。
@@ -449,24 +453,24 @@ Base::f
 
 所以，我们同样可以使用访问虚函数表的方式来访问这些non-public的虚函数，这是很容易做到的。
 
-class Base {
-    private:
-            virtual void f() { cout << "Base::f" << endl; } 
-};
- 
+    class Base {
+        private:
+                virtual void f() { cout << "Base::f" << endl; } 
+    };
 
-class Derive : public Base{//继承 于 Base父类
-};
- 
 
-typedef void(*Fun)(void);//函数指针
- 
+    class Derive : public Base{//继承 于 Base父类
+    };
 
-void main() {
-    Derive d;
-    Fun  pFun = (Fun)*((int*)*(int*)(&d)+0);//调用父类的私有虚函数
-    pFun();
-}
+
+    typedef void(*Fun)(void);//函数指针
+
+
+    void main() {
+        Derive d;
+        Fun  pFun = (Fun)*((int*)*(int*)(&d)+0);//调用父类的私有虚函数
+        pFun();
+    }
 
 
 下面是一个关于多重继承的虚函数表访问的例程：
