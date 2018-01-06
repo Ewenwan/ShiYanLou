@@ -139,7 +139,41 @@
       VERSION 指代动态库版本,SOVERSION 指代 API 版本。
       
       
+# 使用 库文件 和头文件
 
+      重复以前的步骤,建立 t4/src 目录,  mkdir -p t4/src
+      编写源文件 main.c,内容如下:
+      #include <hello.h>  //使用头文件
+      int main()
+      {
+      HelloFunc();
+      return 0;
+      }
+      
+      编写工程主文件 CMakeLists.txt
+      PROJECT(NEWHELLO)
+      ADD_SUBDIRECTORY(src)
+      
+      编写 src/CMakeLists.txt
+      ADD_EXECUTABLE(main main.c)
+      
+      在 src/CMakeLists.txt 中添加一个头文件搜索路径,方式很简单,加入:
+      INCLUDE_DIRECTORIES(/usr/include/hello)#头文件 直接指定了地址   LINK_DIRECTORIES 指令加入非标准的库文件搜索路径
+      TARGET_LINK_LIBRARIES(main hello)#链接动态库    TARGET_LINK_LIBRARIES(main libhello.a) 链接 静态库
+
+
+      为了将程序更智能一点,我们可以使用 CMAKE_INCLUDE_PATH 来进行,使用 bash 的方法
+      如下:
+      
+      设置环境变量
+      export CMAKE_INCLUDE_PATH=/usr/include/hello 
+      
+      然后在头文件中将 INCLUDE_DIRECTORIES(/usr/include/hello)替换为:
+      
+      FIND_PATH(myHeader hello.h)#找头文件
+      IF(myHeader)
+      INCLUDE_DIRECTORIES(${myHeader})#包含头文件
+      ENDIF(myHeader)
 
 
 
