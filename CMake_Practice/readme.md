@@ -47,5 +47,13 @@
         # 添加可执行文件 最前面为 可执行文件名
         # ADD_EXECUTABLE(hello main.c func.c)或者 ADD_EXECUTABLE(hello main.c;func.c)
         # 这里也可以 忽略掉 source 列表中的源文件后缀 ADD_EXECUTABLE(t1 main) 也可以 但是最好加上后缀
-    ADD_EXECUTABLE(hello ${SRC_LIST} )#添加可执行文件 使用变量   
+    ADD_EXECUTABLE(hello ${SRC_LIST} )#添加可执行文件 使用变量  
+    
+  # 外部编译
+> mkdir build   cd build    cmake ..    make     make clean 清理编译文件
+> 变量PROJECT_SOURCE_DIR 指代工程路径 变量PROJECT_BINARY_DIR  指代编译路径 ../build 
+
+
+
+
     
