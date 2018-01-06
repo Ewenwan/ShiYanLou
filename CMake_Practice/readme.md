@@ -73,13 +73,20 @@
       SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)#共享库 输出保存地址        工程名/build/lib
 
       安装库/可执行文件
-      CMAKE 命令行 变量 cmake -DCMAKE_INSTALL_PREFIX=/usr  指定安装路径   默认定义是/usr/local
+      CMAKE 命令行 变量 cmake -DCMAKE_INSTALL_PREFIX=/usr .. 指定安装路径   默认定义是/usr/local
+      cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+      make
+      make install 
+      
       cmake 指令 
       INSTALL(TARGETS myrun mylib mystaticlib  # 可执行文件myrun  动态库 mylib   静态库 mystaticlib 
       RUNTIME DESTINATION bin       # 可执行文件 安装路径 ${CMAKE_INSTALL_PREFIX}/bin
       LIBRARY DESTINATION lib       # 动态库文件 安装路径 ${CMAKE_INSTALL_PREFIX}/lib
       ARCHIVE DESTINATION libstatic # 静态库文件 安装路径 ${CMAKE_INSTALL_PREFIX}/libstatic
       )
+      
+      安装 头文件
+      INSTALL(FILES hello.h DESTINATION include/hello) #头文件安装到 ${CMAKE_INSTALL_PREFIX}/include/hello
 
     
 # 静态库与动态库构建
@@ -108,7 +115,8 @@
       #endif
 
       在 lib 目录下建立 CMakeLists.txt,内容如下:
-      SET(LIBHELLO_SRC hello.c)
+      
+      SET(LIBHELLO_SRC hello.c)# 显示 指定变量
       ADD_LIBRARY(hello SHARED ${LIBHELLO_SRC})# SHARED 表示 创建共享库 对于libXXX.so  STATIC,静态库 对应 libXXX.a
       
       编译共享库 
@@ -119,8 +127,18 @@
       
       在lib下 得到一个 共享库 libhello.so 
       
+      静态库构建  同时生成 同名的 动态库和静态库
+      向 lib/CMakeLists.txt 中添加:
+      ADD_LIBRARY(hello_static STATIC ${LIBHELLO_SRC})
+      SET_TARGET_PROPERTIES(hello_static PROPERTIES OUTPUT_NAME "hello")# 重命名
+      SET_TARGET_PROPERTIES(hello PROPERTIES CLEAN_DIRECT_OUTPUT 1) # 动态库 不清除
+      SET_TARGET_PROPERTIES(hello_static PROPERTIES CLEAN_DIRECT_OUTPUT 1)#静态库 不清除
       
-
+      动态库版本号
+      SET_TARGET_PROPERTIES(hello PROPERTIES VERSION 1.2 SOVERSION 1)
+      VERSION 指代动态库版本,SOVERSION 指代 API 版本。
+      
+      
 
 
 
