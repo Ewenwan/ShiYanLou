@@ -1,0 +1,46 @@
+三维模型
+
+
+1】C语言格式 的 三维模型编辑器 openscad
+ 安装：
+sudo apt-get install openscad
+ 运行：
+ openscad
+ 
+ 编辑：
+ 在openSCAD的编辑器，输入一下命令：  长宽高分别为 2 3 4的长方体方体
+ 
+规则形状：
+ cube([2,3,4]);
+ cube(30, center=true); //立方体  坐标中心为几何中心
+ sphere(20);            //半径 20 的球体
+ cylinder(h=40, r=10);  //圆柱体  底面半径10  高 40
+ 
+  函数运算
+  1） 差运算 
+difference() {
+cube(30, center=true);  // 立方体 内中心 抠掉 球体 
+sphere(20);
+}
+
+2）平移运算
+
+translate([0, 0, 30]) {//沿 z轴平移 30
+cylinder(h=40, r=10);
+}
+
+3)颜色函数
+color([1,0,0]) cube([2,3,4]);  // 红色 长方体
+translate([3,0,0])// x轴 平移 3
+color([0,1,0]) cube([2,3,4]);  // 绿色
+translate([6,0,0])
+color([0,0,1]) cube([2,3,4]);  // 蓝色
+
+4) 联合使用改变颜色
+translate([0,0,0])
+{
+color([0,0,1])
+cube([2,3,4]);
+}
+
+
