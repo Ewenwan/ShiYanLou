@@ -6,8 +6,9 @@
     int &refVal = val;// 整形引用 refVal 指向 val ，是val的另一个名字，引用必须被初始化，引用不是对象，只是为所存在的对象起的一个别名。
     refVal = 2;       // 把2 赋值给refVal 也就是 赋值给了 val
     int i = refVal;   // 相当于 i = val; 
-    int &refVal2 = 10;// 错误，引用只能绑定(bind)在对象向,不能与字面值或某个表达式的计算结果绑定在一起, 且引用的类型 必须和 对象的类型一致
-    double dval = 3.14;// 浮点数
+    int &refVal2 = 10;// 错误，非常量引用只能绑定(bind)在对象向,不能与字面值或某个表达式的计算结果绑定在一起, 且引用的类型 必须和 对象的类型一致
+    const int &rci = 10;// 常量引用可以绑定到 字面值 、 非常量 一般表达式
+    double dval = 3.14;// 浮点数
     int &refVal3 = dval; // 错误，引用的类型 和 对象 必须一致
 
 ## 指针 pointer * 指向 point to 另外一个对象（其存储地址）
@@ -86,6 +87,53 @@
         int *&r_p = p;//引用r_p的类型为 指向整形的指针int * ， 该引用 r_p 是指针p的一个别名 从右向左 离变量最近的符号为 & 即为 引用，* 引用的为 指针类型
         r_p = &i;// 相当于 p = &i p 指向 i
         *r_p = 0;// 相当于 *p = 0 即 i =0 改变了指针指向对象的值
+
+
+## const 限定符
+> 修饰变量后，可以防止变量被修改
+
+        const int bufSize = 512;//初始化常量 一旦创建后就不能被修改
+        bufSize = 1024;// 错误，常量不能被赋值
+        const int i = get_size();// 一个函数赋值 运行时初始化
+        const int j = 42;//编译时初始化
+        const int k;//错误，常量定义式必须初始化
+        //也可以由其他类型变量 强制转换成 常量
+        double dvel = 3.14;
+        const int ci = dvel;// 由double类型变量 强制转换成 整形常量 3
+
+        extern const int bufSize = 1024;//定义了一个变量，想在其他文件也使用 bufSize 必须在定义之前 加extern
+        extern const int bufSize;// 另一个文件中 声明 bufSize 后 就可以使用了
+        
+> const 的引用 即对常量的引用 reference to const 常量 的 别名 不能修改
+
+        const int c_i = 1024;   // 常整数
+        const int &r_c_i = c_i; // 常整数 c_i 的 引用（别名）
+        r_c_i = 42;// 错误r_c_i 是常量引用 不能被修改
+        int &r_c_i2 = c_i;//错误 常整数 不能赋值给 int变量 左右两边类型必须一样
+
+        > 允许将一个常量引用绑定到 非常量对象、字面值，甚至是个 一般表达式
+        int i = 52;
+        const int &r1 = i; // 允许将 常量引用 const int & 绑定到 int变量上
+        const int &r2 = 42;// 绑定到 字面值上
+        const int &r3 = r1 * 2;// 绑定到一个 表达式上
+        int &r4 = r1 * 2;// 错误，r4是非常量 引用，只能绑定到 其对应类型的对象上
+
+        double dval = 3.14;//浮点数
+        const int &ri = dval;//常量引用 绑定到 非常量上 
+        //相当于 先把 非常量转化成常量 强制类型转换 常量引用实际上绑定了一个临时变量
+        const int temp = dval;//
+
+        int i = 42;// int 变量
+        int &r1 = i;// 整数变量引用 r1为 i 的别名
+        const int &r2 = i;//常量 引用 r2 绑定到 变量 i上
+        r1 = 0;// 相当于 i =0
+        r2 = 0;// 错误 r2 时常量引用 不允许改变
+
+
+
+
+
+
 
 
 
