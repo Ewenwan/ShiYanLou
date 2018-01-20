@@ -131,12 +131,14 @@
 
 > 指向常量的指针  const int *   指针指向的值不能变  也就是 *p 不能被赋值 不能改变
 
-        const double pi = 3.14;//双精度 浮点型 常量
-        double *ptr_d = &pi;// 错误，浮点型变量指针 不能绑定一个 常量的存储地址
-        const double *ptr_d_c = &pi;// 双精度常量 针 ptr_d_c  指向一个 双精度常量
-        *ptr_d_c = 42;// 不能给 pi 赋值 指向常量的指针的解引用相当于 绑定的常量 ，因此不能赋值
-        doubel dvel = 3.14;//双精度变量
-        ptr_d_c = &dvel;//允许 常量指针ptr_d_c 指向一个变量dvel 但是不能通过 常量指针ptr_d_c 修改变量dvel
+
+            const double pi = 3.14;//双精度 浮点型 常量
+            double *ptr_d = &pi;// 错误，浮点型变量指针 不能绑定一个 常量的存储地址
+            const double *ptr_d_c = &pi;// 双精度常量 针 ptr_d_c  指向一个 双精度常量
+            *ptr_d_c = 42;// 不能给 pi 赋值 指向常量的指针的解引用相当于 绑定的常量 ，因此不能赋值
+            doubel dvel = 3.14;//双精度变量
+            ptr_d_c = &dvel;//允许 常量指针ptr_d_c 指向一个变量dvel 但是不能通过 常量指针ptr_d_c 修改变量dvel
+
 
 > 常量指针 *const 指针本身不能改变 也就是指向不能改变  p不能改变 但是其指向的对象 无影响
 
@@ -145,6 +147,7 @@
         *conpErr = 3;//相当于 errNumber = 3
         const double pi = 3.14;//
         const double *const cd_cp = &pi;//指向 常量的常量指针，即 指针本身cd_cp不能变， 其指向的值 *cd_cp也不能变
+
 
 
 
