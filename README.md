@@ -97,8 +97,7 @@
         const int i = get_size();// 一个函数赋值 运行时初始化
         const int j = 42;//编译时初始化
         const int k;//错误，常量定义式必须初始化
-        //也可以由其他类型变量 强制转换成 常量
-        double dvel = 3.14;
+        double dvel = 3.14;//  也可以由其他类型变量 强制转换成 常量
         const int ci = dvel;// 由double类型变量 强制转换成 整形常量 3
 
         extern const int bufSize = 1024;//定义了一个变量，想在其他文件也使用 bufSize 必须在定义之前 加extern
@@ -111,7 +110,8 @@
         r_c_i = 42;// 错误r_c_i 是常量引用 不能被修改
         int &r_c_i2 = c_i;//错误 常整数 不能赋值给 int变量 左右两边类型必须一样
 
-        > 允许将一个常量引用绑定到 非常量对象、字面值，甚至是个 一般表达式
+> 允许将一个常量引用绑定到 非常量对象、字面值，甚至是个 一般表达式
+
         int i = 52;
         const int &r1 = i; // 允许将 常量引用 const int & 绑定到 int变量上
         const int &r2 = 42;// 绑定到 字面值上
