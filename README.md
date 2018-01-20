@@ -150,6 +150,14 @@
 
 > 常量表达式 编译时就能确定的量/式子 constexpr int ce = 20;
 
+const int *p = nullptr;// 指向整形常量 的指针
+constexpr int *p = nullptr;//指向整形变量的 常量指针   constexpr 声明中出现 指针 仅仅说明 指针为常量指针
+int *const p =nullptr;//指向 整形变量的 常量指针
+const int *const p = nullptr;// 指向 整形常量 的常量指针
+constexpr const int *p = nullptr;// 指向 整形常量 的常量指针
 
+constexpr int ci = 42; // ci 是整形常量
+int j = 0;
+constexpr int *pci = &j; // 指向整形的 常量指针
 
 
