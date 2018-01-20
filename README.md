@@ -148,7 +148,7 @@
         const double pi = 3.14;//
         const double *const cd_cp = &pi;//指向 常量的常量指针，即 指针本身cd_cp不能变， 其指向的值 *cd_cp也不能变
 
-
+> 常量表达式 编译时就能确定的量/式子 constexpr int ce = 20;
 
 
 
