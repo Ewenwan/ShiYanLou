@@ -70,7 +70,7 @@
     int *p1, *p2;// p1 和 p2 都是指向 整形的指针
     
 
-> 指针的指针
+> 指向指针的指针
 
     int ival = 1024;
     int *pi = &ival; //指向整形变量的指针
@@ -103,7 +103,7 @@
         extern const int bufSize = 1024;//定义了一个变量，想在其他文件也使用 bufSize 必须在定义之前 加extern
         extern const int bufSize;// 另一个文件中 声明 bufSize 后 就可以使用了
         
-> const 的引用 即对常量的引用 reference to const 常量 的 别名 不能修改
+> 绑定到常量的引用 const 的引用 即对常量的引用 reference to const 常量 的 别名 不能修改 不存在常量引用 &const 引用不是对象
 
         const int c_i = 1024;   // 常整数
         const int &r_c_i = c_i; // 常整数 c_i 的 引用（别名）
@@ -129,11 +129,22 @@
         r1 = 0;// 相当于 i =0
         r2 = 0;// 错误 r2 时常量引用 不允许改变
 
+> 指向常量的指针  const int *   指针指向的值不能变  也就是 *p 不能被赋值 不能改变
 
+        const double pi = 3.14;//双精度 浮点型 常量
+        double *ptr_d = &pi;// 错误，浮点型变量指针 不能绑定一个 常量的存储地址
+        const double *ptr_d_c = &pi;// 双精度常量 针 ptr_d_c  指向一个 双精度常量
+        *ptr_d_c = 42;// 不能给 pi 赋值 指向常量的指针的解引用相当于 绑定的常量 ，因此不能赋值
+        doubel dvel = 3.14;//双精度变量
+        ptr_d_c = &dvel;//允许 常量指针ptr_d_c 指向一个变量dvel 但是不能通过 常量指针ptr_d_c 修改变量dvel
 
+> 常量指针 *const 指针本身不能改变 也就是指向不能改变  p不能改变 但是其指向的对象 无影响
 
-
-
+        int errNumber = 0;//
+        int *const conpErr = &errNumber;// * 可变指针  *const 常量指针不可变 指向整形的 常量指针，conpErr 一直指向 errNumber
+        *conpErr = 3;//相当于 errNumber = 3
+        const double pi = 3.14;//
+        const double *const cd_cp = &pi;//指向 常量的常量指针，即 指针本身cd_cp不能变， 其指向的值 *cd_cp也不能变
 
 
 
