@@ -160,4 +160,39 @@ constexpr int ci = 42; // ci 是整形常量
 int j = 0;
 constexpr int *pci = &j; // 指向整形的 常量指针
 
+## 处理类型
+
+### 类型别名  type alias
+
+        typedef double wages;   // wages 是double类型的 同义词
+        typedef wages base, *p; // base 也是double类型的 同义词。 p是double * 的同义词
+        wages d_money = 1.00;//等有价于 double d_money = 1.00
+        p p_dmoney =   &d_money;//等价于 double *p_dmoney =   &d_money;
+        cout << p_dmoney << endl; 
+        // 别名声明 alias declaration
+        using SI = Sales_Item; // SI 是 Sales_Item 的 同义词
+        SI item;//等价于 Sales_Item item;
+        // 指针、常量const 类别别名
+        typedef char *pstring;// pstring等价于 char *  指向char 的指针（是指针）
+        const pstring cstr = 0;// cstr是指向 char 的 常量指针 ！！！！不是指向常量字符的 指针 不能直接替换 const修饰的主语是指针
+        const pstring *ps;     // ps是一个指针 它指向的对象 是 指向char的常量指针
+
+### auto 类型说明符  让 编译器根据右式 类型 自动推算左式的类型
+
+auto item = val1 +val2;//item 初始化为 val1 和 val2相加的结果 类型 相同
+// 一条语句定义多个变量时，各变量类型必须一致
+auto i=0, *p = &i;//正确 i是整数， p是指向整形的指针
+auto sz = 0, pi = 3.4;// 错误 sz 和 pi 类型不一致
+
+// 引用 指针 常量 与 auto
+int i = 0, &r = i;//r是i的别名 int类型
+auto a = r;// a 是一个整形数
+
+// auto 会忽略掉 顶层const
+const int ci = i, &cir = ci;// 常整数
+auto b = ci; // b是一个整数，ci的顶层 const特性被忽略
+auto c = cir; // c是一个整数，ci的顶层 const特性被忽略
+
+
+
 
