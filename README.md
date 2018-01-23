@@ -345,7 +345,11 @@
 	 vector<int>::const_iterator it3;//it3只能读元素，不能写元素
 	 string::const_iterator it4;     //it4只能读字符，不能写字符
 
-
-
+  	 // cbegin()   cend() 返回 常量 迭代器 仅能读取 容器元素 不能修改
+	 vector<int> iv;        // 变量
+	 const vector<int> civ; // 常量
+	 auto it1 = iv.begin(); //  it1的类型为 vector<int>::iterator  能读写iv的元素
+	 auto it2 = iv.cbegin(); // it2的类型为 vector<int>::const_iterator  能读iv的元素 不能修改 iv的元素
+	 auto it3 = civ.begin(); // it3的类型为 vector<int>::const_iterator  能读civ的元素 不能修改 civ的元素
 
 
