@@ -190,9 +190,37 @@
 
         // auto 会忽略掉 顶层const
         const int ci = i, &cir = ci;// 常整数
-        auto b = ci; // b是一个整数，ci的顶层 const特性被忽略
+        auto b = ci;  // b是一个整数，ci的顶层 const(最外层修饰 为顶层)特性被忽略
         auto c = cir; // c是一个整数，ci的顶层 const特性被忽略
+        auto d = &i;  // d是一个指向整形的指针
+        auto e = &ci; // e是一个指向整形常量的指针 const 外又被 取地址符号修饰，所以这里的 const是 底层const 不被忽略
 
+        // 如果希望 auto 推断出的类型是 一个顶层 const，需要在其前面 明确指出
+        const auto f = ci; // ci的推演类型是 int ，f是 const int
 
+        // 将引用设置为 auto 还按之前的初始化规则  保留 顶层 const
+        auto &g = ci; // g 是一个 整形常量的 引用 （别名）
+        auto &h = 42; // 错误，非常量 引用 不能绑定 到 字面值
+        const auto &j = 42; // 正确， 常量引用可以绑定到 字面值
+        
+        // 将 指针设置为 auto， 也按之前的初始化规则 保留顶层 const
+        auto *k = &ci; // k为指向 整形常量的 指针
+        auto *l = 0;   // l为空指针
+        const auto *m = &ci; // m 为 指向整形常量的 常量指针
+        
+        
+        int i = 1024;
+        const int c_i = i;
+        auto b = c_i; // b是一个 整数 ,c_i的 顶层 const被忽略
+        auto e = &c_i;// e 是一个 指向 整形常量的引用  这里的const是底层const 不被忽略
+        auto k = c_i, &ll = i;// k 是整数， ll 是一个整数引用
+        auto k = c_i, &o = c_i;// 错误，k 是整数变量 o是一个整数常量引用 类型不一致
+        auto &m =c_i, *p = &c_i;//正确 m是整数常量引用，p是指向整数常量的指针
+        auto n = &c_i, *p = &c_i;// 正确 n是整数常量 引用(底层const，不被忽略) p是指向整数常量的指针
+        
+        
+        
+        
+        
 
 
