@@ -2,14 +2,15 @@
 
 # 复合类型
 ## 引用 &   左值引用lvalue reference  别名; int val; &refval = val; 右值引用 rvalue reference 
-    int val = 1024;//整形变量
-    int &refVal = val;// 整形引用 refVal 指向 val ，是val的另一个名字，引用必须被初始化，引用不是对象，只是为所存在的对象起的一个别名。
-    refVal = 2;       // 把2 赋值给refVal 也就是 赋值给了 val
-    int i = refVal;   // 相当于 i = val; 
-    int &refVal2 = 10;// 错误，非常量引用只能绑定(bind)在对象向,不能与字面值或某个表达式的计算结果绑定在一起, 且引用的类型 必须和 对象的类型一致
-    const int &rci = 10;// 常量引用可以绑定到 字面值 、 非常量 一般表达式
-    double dval = 3.14;// 浮点数
-    int &refVal3 = dval; // 错误，引用的类型 和 对象 必须一致
+
+	int val = 1024;//整形变量
+	int &refVal = val;// 整形引用 refVal 指向 val ，是val的另一个名字，引用必须被初始化，引用不是对象，只是为所存在的对象起的一个别名。
+	refVal = 2;       // 把2 赋值给refVal 也就是 赋值给了 val
+	int i = refVal;   // 相当于 i = val; 
+	int &refVal2 = 10;// 错误，非常量引用只能绑定(bind)在对象向,不能与字面值或某个表达式的计算结果绑定在一起, 且引用的类型 必须和 对象的类型一致
+	const int &rci = 10;// 常量引用可以绑定到 字面值 非常量 一般表达式
+	double dval = 3.14;// 浮点数
+	int &refVal3 = dval; // 错误，引用的类型 和 对象 必须一致
 
 ## 指针 pointer * 指向 point to 另外一个对象（其存储地址）
     int ival = 42;  // 整数
