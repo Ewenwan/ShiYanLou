@@ -219,24 +219,21 @@
         
   ### decltype 类型指示符  用表达式推断类型 但是不用表达式的值初始化变量   
   
-      decltype(f()) sum = x; // sum 的类型为 函数 f() 的返回值类型 初始化为 x 就像 int sum = x; 一样
-      const int ci = 0, &cj = ci;// ci 整形常量  cj 整形常量的引用
-      decltype(ci) x = 0; // x的类型 同ci 是 整形常量 const int 不忽略 顶层 const
-      decltype(cj) y = x; // y的类型 同cj 是 整形常量的引用 const int &  y绑定到x上
-      decltype(cj) z;     // 错误 z是一个 引用 ，必须初始化
+        decltype(f()) sum = x; // sum 的类型为 函数 f() 的返回值类型 初始化为 x 就像 int sum = x; 一样
+        const int ci = 0, &cj = ci;// ci 整形常量  cj 整形常量的引用
+        decltype(ci) x = 0; // x的类型 同ci 是 整形常量 const int 不忽略 顶层 const
+        decltype(cj) y = x; // y的类型 同cj 是 整形常量的引用 const int &  y绑定到x上
+        decltype(cj) z;     // 错误 z是一个 引用 ，必须初始化
 
-      // decltype和引用 指针
-      int i =42, j=12, *p = &i, &r = i;
-      decltype(r) a = j;// a的类型和r的类型一致，为整数的引用 int& a绑定到j上
-      decltype(r + 0) b;//正确 加法的结果为 整形 int 因此 b为整形， 这里只定义 没有初始化
-      decltype(*p) c; // 错误 其实*p 解引用指针 相当于i的别名 也就是引用 ，所有这里 c的类型为 整数引用 int &，是个引用，必须初始化
-      
-      // decltype 的表达式如果 加上括号，得到的结果将是引用
-      decltype(i) e; // e 是一个未初始化的 整形变量
-      decltype((i)) d = e; // d是一个 整数的引用 绑定到 整形变量 e上  双层引用括号 的结果 永远都是 
+        // decltype和引用 指针
+        int i =42, j=12, *p = &i, &r = i;
+        decltype(r) a = j;// a的类型和r的类型一致，为整数的引用 int& a绑定到j上
+        decltype(r + 0) b;//正确 加法的结果为 整形 int 因此 b为整形， 这里只定义 没有初始化
+        decltype(*p) c; // 错误 其实*p 解引用指针 相当于i的别名 也就是引用 ，所有这里 c的类型为 整数引用 int &，是个引用，必须初始化
 
-      // 赋值表达式 也会产生 引用 引用的类型就是 等式左边变量的类型 如果 i是int i = x的类型是 int&
-      
+        // decltype 的表达式如果 加上括号，得到的结果将是引用
+        decltype(i) e; // e 是一个未初始化的 整形变量
+        decltype((i)) d = e; // d是一个 整数的引用 绑定到 整形变量 e上  双层引用括号 的结果 永远都是 
 
-
-
+        // 赋值表达式 也会产生 引用 引用的类型就是 等式左边变量的类型 如果 i是int i = x的类型是 int&
+ 
