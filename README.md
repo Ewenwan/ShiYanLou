@@ -217,7 +217,8 @@
         auto &m =c_i, *p = &c_i;//正确 m是整数常量引用，p是指向整数常量的指针
         auto n = &c_i, *p = &c_i;// 正确 n是整数常量 引用(底层const，不被忽略) p是指向整数常量的指针
         
-  ### decltype 类型指示符  用表达式推断类型 但是不用表达式的值初始化变量   
+  
+  ### decltype 类型指示符  用表达式推断类型 但是不用表达式的值初始化变量   
   
         decltype(f()) sum = x; // sum 的类型为 函数 f() 的返回值类型 初始化为 x 就像 int sum = x; 一样
         const int ci = 0, &cj = ci;// ci 整形常量  cj 整形常量的引用
