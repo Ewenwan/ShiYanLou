@@ -56,7 +56,9 @@
 
 > 相等 == 操作符  不等 != 操作符 
 
-> void* 类型的指针  可一指向 任意类型 的 地址 ， 可一存放任意类型的 地址，用作函数参数，函数体内使用时需要，转化成实际传入类型的指针
+> void* 类型的指针  可一指向 任意类型 的 地址 ， 可一存放任意类型的 地址，
+
+> 用作函数参数，函数体内使用时需要，转化成实际传入类型的指针
 
     double obj = 3.14, *pd = &obj; // double 类型 的变量 double类型的指针
     void *pv = &obj; // obj 可以是任意类型的对象
@@ -83,26 +85,26 @@
 
 > 指向指针的 引用 指针对象的别名  引用不是对象 不存在 指向引用的指针
 
-        int i = 42;//整形对象
-        int *p;//指向整形类型的指针
-        int *&r_p = p;//引用r_p的类型为 指向整形的指针 int * ， 该引用 r_p 是指针p的一个别名 从右向左 离变量最近的符号为 & 即为 引用，* 引用的为 指针类型
-        r_p = &i;// 相当于 p = &i p 指向 i
-        *r_p = 0;// 相当于 *p = 0 即 i =0 改变了指针指向对象的值  这里 *p *解引用指针的类型其实相当于 原变量的别名 引用
+	int i = 42;//整形对象
+	int *p;//指向整形类型的指针
+	int *&r_p = p;//引用r_p的类型为 整形的指针引用int*&，r_p 是指针p的一个别名 
+	 //从右向左 离变量最近的符号为 & 即为 引用，* 引用的为 指针类型
+	r_p = &i;// 相当于 p = &i p 指向 i
+	*r_p = 0;// 相当于 *p = 0 即 i =0 改变了指针指向对象的值  这里 *p *解引用指针的类型其实相当于 原变量的别名 引用
 
 
 ## const 限定符
 > 修饰变量后，可以防止变量被修改
 
-        const int bufSize = 512;//初始化常量 一旦创建后就不能被修改
-        bufSize = 1024;// 错误，常量不能被赋值
-        const int i = get_size();// 一个函数赋值 运行时初始化
-        const int j = 42;//编译时初始化
-        const int k;//错误，常量定义式必须初始化
-        double dvel = 3.14;//  也可以由其他类型变量 强制转换成 常量
-        const int ci = dvel;// 由double类型变量 强制转换成 整形常量 3
-
-        extern const int bufSize = 1024;//定义了一个变量，想在其他文件也使用 bufSize 必须在定义之前 加extern
-        extern const int bufSize;// 另一个文件中 声明 bufSize 后 就可以使用了
+	const int bufSize = 512;//初始化常量 一旦创建后就不能被修改
+	bufSize = 1024;// 错误，常量不能被赋值
+	const int i = get_size();// 一个函数赋值 运行时初始化
+	const int j = 42;//编译时初始化
+	const int k;//错误，常量定义式必须初始化
+	double dvel = 3.14;//  也可以由其他类型变量 强制转换成 常量
+	const int ci = dvel;// 由double类型变量 强制转换成 整形常量 3
+	extern const int bufSize = 1024;//定义了一个变量，想在其他文件也使用 bufSize 必须在定义之前 加extern
+	extern const int bufSize;// 另一个文件中 声明 bufSize 后 就可以使用了
         
 > 绑定到常量的引用 const 的引用 即对常量的引用 reference to const 常量 的 别名 不能修改 不存在常量引用 &const 引用不是对象
 
@@ -165,18 +167,18 @@
 
 ### 类型别名  type alias
 
-        typedef double wages;   // wages 是double类型的 同义词
-        typedef wages base, *p; // base 也是double类型的 同义词。 p是double * 的同义词
-        wages d_money = 1.00;//等有价于 double d_money = 1.00
-        p p_dmoney =   &d_money;//等价于 double *p_dmoney =   &d_money;
-        cout << p_dmoney << endl; 
-        // 别名声明 alias declaration
-        using SI = Sales_Item; // SI 是 Sales_Item 的 同义词
-        SI item;//等价于 Sales_Item item;
-        // 指针、常量const 类别别名
-        typedef char *pstring;// pstring等价于 char *  指向char 的指针（是指针）
-        const pstring cstr = 0;// cstr是指向 char 的 常量指针 ！！！！不是指向常量字符的 指针 不能直接替换 const修饰的主语是指针
-        const pstring *ps;     // ps是一个指针 它指向的对象 是 指向char的常量指针
+	typedef double wages;   // wages 是double类型的 同义词
+	typedef wages base, *p; // base 也是double类型的 同义词。 p是double * 的同义词
+	wages d_money = 1.00;//等有价于 double d_money = 1.00
+	p p_dmoney =   &d_money;//等价于 double *p_dmoney =   &d_money;
+	cout << p_dmoney << endl; 
+	 // 别名声明 alias declaration
+	using SI = Sales_Item; // SI 是 Sales_Item 的 同义词
+	SI item;//等价于 Sales_Item item;
+	 // 指针、常量const 类别别名
+	typedef char *pstring;// pstring等价于 char *  指向char 的指针（是指针）
+	const pstring cstr = 0;// cstr是指向 char 的 常量指针 ！！！！不是指向常量字符的 指针 不能直接替换 const修饰的主语是指针
+	const pstring *ps;     // ps是一个指针 它指向的对象 是 指向char的常量指针
 
 ### auto 类型说明符  让 编译器根据右式 类型 自动推算左式的类型  且用表达式的值 初始化变量
 
@@ -243,82 +245,84 @@
  ## 字符串类 string 类  #include <string> 存储一个可变长度的 字符串          使用内置数组类型实现
  
  ### 范围for  访问所有元素
-     string str("some string");
-     for (auto c : str)// auto自动推断类型
-        cout << c << endl; 
-     // 范围for 引用 改变 内容
-     string s("Hello World!!!");
-     for (auto &c : s)// c是 字符串中每个元素的一个别名
-        c = toupper(c);//变成大写
-     cout << s << endl;
+ 
+	string str("some string");
+	for (auto c : str)// auto自动推断类型
+	cout << c << endl; 
+	// 范围for 引用 改变 内容
+	string s("Hello World!!!");
+	for (auto &c : s)// c是 字符串中每个元素的一个别名
+	c = toupper(c);//变成大写
+	cout << s << endl;
+     
  ### 下标运算符(索引)[] 和 迭代器 访问单个元素
  > string的下标 类型为 string::size_type 无符号数 可用 decltype(s.size())获取 s[0] 是第一个字符 s[s.size()-1]是最后一个字符
  
-     // 第一个字符改为大写
-     string s("some string");
-     if(!s.empty())
-        s[0] = toupper(s.[0]);//第一个字符改为大写  在 cctype头文件中
-     // 第一个单词改为大写
-     for(decltype(s.size()) index = 0;
-         index != s.size() && !isspace(s[index]; ++index))
-         s[index] = toupper(s[index]);
+		// 第一个字符改为大写
+		string s("some string");
+		if(!s.empty())
+			s[0] = toupper(s.[0]);//第一个字符改为大写  在 cctype头文件中
+		// 第一个单词改为大写
+		for(decltype(s.size()) index = 0;
+		    index != s.size() && !isspace(s[index]; ++index))
+			s[index] = toupper(s[index]);
+	 
 ## 向量 模板  容器container  vector 模板  #include <vector> 存储一个可变长度的 对象 集合 使用内置数组类型实现
 > 因为 vector 可以存放任意类型 所以事先需要知道 存放的对象是什么类型  vector<int> ivec; vector<string>; vector<vector<string> >;
     
-    // 初始化方式
-    vector<int> ivec(10,-1);// 直接初始化 10个元素 全为 -1
-    vector<int> ivec2 = ivec;//拷贝初始化
-    vector<int> ivec3{10};//一个元素 10 
-    vector<int> ivec3{10，1};//两个元素 10  和 1
-    vector<string> svec{"a","an","the"};//列表初始化 直接方式
-    vector<string> svec2 = {"a","an","the"};//列表初始化 拷贝方式
-    // 默认初始化 
-    vector<int> ivec(10);    // 10个元素，每个值都是0 
-    vector<string> svec(10); // 10个元素，每个值都是空 string 对象
-    vector<string> svec2{10};// 10个元素，每个值都是空 string 对象
-    vector<string> svec3{10, "hi"};// 10个 "hi"元素
-    vector<string> svec3(10, "hi");// 10个 "hi"元素
-
-    // 使用 .push_back() 添加元素
-    vector<int> ivec2; //空vec对象
-    for(int i = 0; i != 100; ++i)
-        ivec2.push_back(i);// 一次把整数值 放到 ivec2尾部 结束后 ivec2有100个元素 0~99
-
-    // 实时添加 string 元素
-    string word;
-    vector<string> text;//空对象
-    while (cin >> word) 
-        text.push_back(word);// 把word添加到 text 后面
-
-    //使用范围for  + 引用 访问 并改变vector元素
-    vector<int> iv{1,2,3,4,5,6,7,8,9};// 列表直接初始化
-    for (auto &i : v)// 对于v中每个 元素的 引用 需要改变其值
-        i *= i;      // 变成原来值 的 平方
-    for (auto i : v) // 仅读取其中的变量
-        cout << i << " ";
-    cout << endl;
-    
-    // vector 对象大小 类型为size_type
-    vector<int>::size_type se = iv.size();
-
-    // 使用索引[] 访问 计算vector对象元素索引   统计各个分数段上 出现的 成绩个数
-    // 索引不能添加元素
-    vector<unsigned> scores(11,0);//11个分数段， 0~9，10~19，...,90~99，100 计数值全部初始化为0
-    unsigned grade;
-    while (cin >> grade){
-    if(grade <= 100) ++scores[grade/10];
-    }
-    
-    // cin 读入一组词 改成大写 存入 vector中  #include <cctype> 使用toupper()
-    vector<string> sv;
+	// 初始化方式
+	vector<int> ivec(10,-1);// 直接初始化 10个元素 全为 -1
+	vector<int> ivec2 = ivec;//拷贝初始化
+	vector<int> ivec3{10};//一个元素 10 
+	vector<int> ivec3{10，1};//两个元素 10  和 1
+	vector<string> svec{"a","an","the"};//列表初始化 直接方式
+	vector<string> svec2 = {"a","an","the"};//列表初始化 拷贝方式
+	
+	// 默认初始化 
+	vector<int> ivec(10);    // 10个元素，每个值都是0 
+	vector<string> svec(10); // 10个元素，每个值都是空 string 对象
+	vector<string> svec2{10};// 10个元素，每个值都是空 string 对象
+	vector<string> svec3{10, "hi"};// 10个 "hi"元素
+	vector<string> svec3(10, "hi");// 10个 "hi"元素
+	
+	// 使用 .push_back() 添加元素
+	vector<int> ivec2; //空vec对象
+	for(int i = 0; i != 100; ++i)
+	ivec2.push_back(i);// 一次把整数值 放到 ivec2尾部 结束后 ivec2有100个元素 0~99
+	
+	// 实时添加 string 元素
+	string word;
+	vector<string> text;//空对象
+	while (cin >> word) 
+	text.push_back(word);// 把word添加到 text 后面
+	
+	//使用范围for  + 引用 访问 并改变vector元素
+	vector<int> iv{1,2,3,4,5,6,7,8,9};// 列表直接初始化
+	for (auto &i : v)// 对于v中每个 元素的 引用 需要改变其值
+	i *= i;      // 变成原来值 的 平方
+	for (auto i : v) // 仅读取其中的变量
+	cout << i << " ";
+	cout << endl;
+	
+	// vector 对象大小 类型为size_type
+	vector<int>::size_type se = iv.size();
+	
+	// 使用索引[] 访问 计算vector对象元素索引   统计各个分数段上 出现的 成绩个数
+	// 索引不能添加元素
+	vector<unsigned> scores(11,0);//11个分数段， 0~9，10~19，...,90~99，100 计数值全部初始化为0
+	unsigned grade;
+	while (cin >> grade){
+	if(grade <= 100) ++scores[grade/10];
+	}    
+	
+	// cin 读入一组词 改成大写 存入 vector中  #include <cctype> 使用toupper()
+	vector<string> sv;
 	string word1 = "qwe";
 	cout << word1 << endl; 
 	while(cin >> word1){
-		for (auto &c : word1) c = toupper(c);
-        sv.push_back(word1);
-	//cout << string::toupper(word1)word1 << endl; 	
-		cout << word1 << endl; vector
-        
+	        for (auto &c : word1) c = toupper(c);
+		sv.push_back(word1); 	
+		cout << word1 << endl; vector  
 	}
 
 
