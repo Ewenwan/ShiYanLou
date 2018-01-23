@@ -241,8 +241,60 @@
  # 标准库 std
  ## 字符串类 string 类  #include <string> 存储一个可变长度的 字符串          使用内置数组类型实现
  
+ ### 范围for  访问所有元素
+     string str("some string");
+     for (auto c : str)// auto自动推断类型
+        cout << c << endl; 
+     // 范围for 引用 改变 内容
+     string s("Hello World!!!");
+     for (auto &c : s)// c是 字符串中每个元素的一个别名
+        c = toupper(c);//变成大写
+     cout << s << endl;
+ ### 下标运算符(索引)[] 和 迭代器 访问单个元素
+ > string的下标 类型为 string::size_type 无符号数 可用 decltype(s.size())获取 s[0] 是第一个字符 s[s.size()-1]是最后一个字符
  
- ## 向量类   vector 类  #include <vector> 存储一个可变长度的 对象 是一个集合 使用内置数组类型实现
+     // 第一个字符改为大写
+     string s("some string");
+     if(!s.empty())
+        s[0] = toupper(s.[0]);//第一个字符改为大写
+     // 第一个单词改为大写
+     for(decltype(s.size()) index = 0;
+         index != s.size() && !isspace(s[index]; ++index))
+         s[index] = toupper(s[index]);
+## 向量 模板  容器container  vector 模板  #include <vector> 存储一个可变长度的 对象 集合 使用内置数组类型实现
+> 因为 vector 可以存放任意类型 所以事先需要知道 存放的对象是什么类型  vector<int> ivec; vector<string>; vector<vector<string> >;
+    
+        // 初始化方式
+        vector<int> ivec(10,-1);// 直接初始化 10个元素 全为 -1
+        vector<int> ivec2 = ivec;//拷贝初始化
+        vector<int> ivec3{10};//一个元素 10 
+        vector<int> ivec3{10，1};//两个元素 10  和 1
+        vector<string> svec{"a","an","the"};//列表初始化 直接方式
+        vector<string> svec2 = {"a","an","the"};//列表初始化 拷贝方式
+        // 默认初始化 
+        vector<int> ivec(10);    // 10个元素，每个值都是0 
+        vector<string> svec(10); // 10个元素，每个值都是空 string 对象
+        vector<string> svec2{10};// 10个元素，每个值都是空 string 对象
+        vector<string> svec3{10, "hi"};// 10个 "hi"元素
+        vector<string> svec3(10, "hi");// 10个 "hi"元素
+    
+        // 添加整数元素
+        vector<int> ivec2; //空vec对象
+        for(int i = 0; i != 100; ++i)
+            ivec2.push_back(i);// 一次把整数值 放到 ivec2尾部 结束后 ivec2有100个元素 0~99
+            
+        // 实时添加 string 元素
+        string word;
+        vector<string> text;//空对象
+        while (cin >> word) 
+            text.push_back(word);// 把word添加到 text 后面
+            
+        //使用范围for  + 引用 访问 并改变vector元素
+        vector<int> iv{1,2,3,4,5,6,7,8,9};// 列表直接初始化
+        for (auto &i : v)//对于v中每个 元素的应用
+            i *= i; //变成原来值 的 平方
+       
+
 
 
 
