@@ -256,45 +256,68 @@
      // 第一个字符改为大写
      string s("some string");
      if(!s.empty())
-        s[0] = toupper(s.[0]);//第一个字符改为大写
-     // 第一个单词改为大写
+        s[0] = toupper(s.[0]);//第一个字符改为大写  在 cctype头文件中
+     // 第一个单词改为大写
      for(decltype(s.size()) index = 0;
          index != s.size() && !isspace(s[index]; ++index))
          s[index] = toupper(s[index]);
 ## 向量 模板  容器container  vector 模板  #include <vector> 存储一个可变长度的 对象 集合 使用内置数组类型实现
 > 因为 vector 可以存放任意类型 所以事先需要知道 存放的对象是什么类型  vector<int> ivec; vector<string>; vector<vector<string> >;
     
-        // 初始化方式
-        vector<int> ivec(10,-1);// 直接初始化 10个元素 全为 -1
-        vector<int> ivec2 = ivec;//拷贝初始化
-        vector<int> ivec3{10};//一个元素 10 
-        vector<int> ivec3{10，1};//两个元素 10  和 1
-        vector<string> svec{"a","an","the"};//列表初始化 直接方式
-        vector<string> svec2 = {"a","an","the"};//列表初始化 拷贝方式
-        // 默认初始化 
-        vector<int> ivec(10);    // 10个元素，每个值都是0 
-        vector<string> svec(10); // 10个元素，每个值都是空 string 对象
-        vector<string> svec2{10};// 10个元素，每个值都是空 string 对象
-        vector<string> svec3{10, "hi"};// 10个 "hi"元素
-        vector<string> svec3(10, "hi");// 10个 "hi"元素
+    // 初始化方式
+    vector<int> ivec(10,-1);// 直接初始化 10个元素 全为 -1
+    vector<int> ivec2 = ivec;//拷贝初始化
+    vector<int> ivec3{10};//一个元素 10 
+    vector<int> ivec3{10，1};//两个元素 10  和 1
+    vector<string> svec{"a","an","the"};//列表初始化 直接方式
+    vector<string> svec2 = {"a","an","the"};//列表初始化 拷贝方式
+    // 默认初始化 
+    vector<int> ivec(10);    // 10个元素，每个值都是0 
+    vector<string> svec(10); // 10个元素，每个值都是空 string 对象
+    vector<string> svec2{10};// 10个元素，每个值都是空 string 对象
+    vector<string> svec3{10, "hi"};// 10个 "hi"元素
+    vector<string> svec3(10, "hi");// 10个 "hi"元素
+
+    // 使用 .push_back() 添加元素
+    vector<int> ivec2; //空vec对象
+    for(int i = 0; i != 100; ++i)
+        ivec2.push_back(i);// 一次把整数值 放到 ivec2尾部 结束后 ivec2有100个元素 0~99
+
+    // 实时添加 string 元素
+    string word;
+    vector<string> text;//空对象
+    while (cin >> word) 
+        text.push_back(word);// 把word添加到 text 后面
+
+    //使用范围for  + 引用 访问 并改变vector元素
+    vector<int> iv{1,2,3,4,5,6,7,8,9};// 列表直接初始化
+    for (auto &i : v)// 对于v中每个 元素的 引用 需要改变其值
+        i *= i;      // 变成原来值 的 平方
+    for (auto i : v) // 仅读取其中的变量
+        cout << i << " ";
+    cout << endl;
+    
+    // vector 对象大小 类型为size_type
+    vector<int>::size_type se = iv.size();
+
+    // 使用索引[] 访问 计算vector对象元素索引   统计各个分数段上 出现的 成绩个数
+    // 索引不能添加元素
+    vector<unsigned> scores(11,0);//11个分数段， 0~9，10~19，...,90~99，100 计数值全部初始化为0
+    unsigned grade;
+    while (cin >> grade){
+    if(grade <= 100) ++scores[grade/10];
+    }
     
-        // 添加整数元素
-        vector<int> ivec2; //空vec对象
-        for(int i = 0; i != 100; ++i)
-            ivec2.push_back(i);// 一次把整数值 放到 ivec2尾部 结束后 ivec2有100个元素 0~99
-            
-        // 实时添加 string 元素
-        string word;
-        vector<string> text;//空对象
-        while (cin >> word) 
-            text.push_back(word);// 把word添加到 text 后面
-            
-        //使用范围for  + 引用 访问 并改变vector元素
-        vector<int> iv{1,2,3,4,5,6,7,8,9};// 列表直接初始化
-        for (auto &i : v)//对于v中每个 元素的应用
-            i *= i; //变成原来值 的 平方
-       
-
-
+    // cin 读入一组词 改成大写 存入 vector中  #include <cctype> 使用toupper()
+    vector<string> sv;
+	string word1 = "qwe";
+	cout << word1 << endl; 
+	while(cin >> word1){
+		for (auto &c : word1) c = toupper(c);
+        sv.push_back(word1);
+	//cout << string::toupper(word1)word1 << endl; 	
+		cout << word1 << endl; vector
+        
+	}
 
 
