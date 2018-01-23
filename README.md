@@ -150,15 +150,15 @@
 
 > 常量表达式 编译时就能确定的量/式子 constexpr int ce = 20;
 
-const int *p = nullptr;// 指向整形常量 的指针
-constexpr int *p = nullptr;//指向整形变量的 常量指针   constexpr 声明中出现 指针 仅仅说明 指针为常量指针
-int *const p =nullptr;//指向 整形变量的 常量指针
-const int *const p = nullptr;// 指向 整形常量 的常量指针
-constexpr const int *p = nullptr;// 指向 整形常量 的常量指针
+        const int *p = nullptr;// 指向整形常量 的指针
+        constexpr int *p = nullptr;//指向整形变量的 常量指针   constexpr 声明中出现 指针 仅仅说明 指针为常量指针
+        int *const p =nullptr;//指向 整形变量的 常量指针
+        const int *const p = nullptr;// 指向 整形常量 的常量指针
+        constexpr const int *p = nullptr;// 指向 整形常量 的常量指针
 
-constexpr int ci = 42; // ci 是整形常量
-int j = 0;
-constexpr int *pci = &j; // 指向整形的 常量指针
+        constexpr int ci = 42; // ci 是整形常量
+        int j = 0;
+        constexpr int *pci = &j; // 指向整形的 常量指针
 
 ## 处理类型
 
@@ -179,19 +179,19 @@ constexpr int *pci = &j; // 指向整形的 常量指针
 
 ### auto 类型说明符  让 编译器根据右式 类型 自动推算左式的类型
 
-auto item = val1 +val2;//item 初始化为 val1 和 val2相加的结果 类型 相同
-// 一条语句定义多个变量时，各变量类型必须一致
-auto i=0, *p = &i;//正确 i是整数， p是指向整形的指针
-auto sz = 0, pi = 3.4;// 错误 sz 和 pi 类型不一致
+        auto item = val1 +val2;//item 初始化为 val1 和 val2相加的结果 类型 相同
+        // 一条语句定义多个变量时，各变量类型必须一致
+        auto i=0, *p = &i;//正确 i是整数， p是指向整形的指针
+        auto sz = 0, pi = 3.4;// 错误 sz 和 pi 类型不一致
 
-// 引用 指针 常量 与 auto
-int i = 0, &r = i;//r是i的别名 int类型
-auto a = r;// a 是一个整形数
+        // 引用 指针 常量 与 auto
+        int i = 0, &r = i;//r是i的别名 int类型
+        auto a = r;// a 是一个整形数
 
-// auto 会忽略掉 顶层const
-const int ci = i, &cir = ci;// 常整数
-auto b = ci; // b是一个整数，ci的顶层 const特性被忽略
-auto c = cir; // c是一个整数，ci的顶层 const特性被忽略
+        // auto 会忽略掉 顶层const
+        const int ci = i, &cir = ci;// 常整数
+        auto b = ci; // b是一个整数，ci的顶层 const特性被忽略
+        auto c = cir; // c是一个整数，ci的顶层 const特性被忽略
 
 
 
