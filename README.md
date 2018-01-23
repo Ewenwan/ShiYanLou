@@ -20,18 +20,18 @@
     double *pd2 = pd;   // pd存放 的是 dval存放的地址
 
     int *pi = pd;     // 错误， 指针pi 的类型 和 右边指针对象 类型 不匹配
-        pi = &dval;   // 错误， 视图把 double 类型对象的地址 给 int类型的指针 错误  左右两边类型 必须匹配
+    pi = &dval;   // 错误， 视图把 double 类型对象的地址 给 int类型的指针 错误  左右两边类型 必须匹配
     
 > 利用指针访问对象 取地址内存储的值 解引用符 来访问向
 
-    int ival = 42; //整形 变量
-    int *p = &ival;//指针变量定义初始化， p 存放着 变量ival 在内存中的地址
-    std::cout << *p;// 表达式里 *p 为 解引用 取的p存放的地址 指向的值
-    int &ref_i = ival; // 引用声明定义， ref_i 是一个引用
-    int *p; //指针声明定义，p是一个指针
-    p = &ival;// 表达式 p为指针（地址），&val 为取的 val 地址
-    *p = ival;   //表达式  *p 相当于 ival *是一个解引用
-        int &ref_i2 = *p;// &ref_i2 为引用定义 *p 相当于 ival， *是一个解引用
+	int ival = 42; //整形 变量
+	int *p = &ival;//指针变量定义初始化， p 存放着 变量ival 在内存中的地址
+	std::cout << *p;// 表达式里 *p 为 解引用 取的p存放的地址 指向的值
+	int &ref_i = ival; // 引用声明定义， ref_i 是一个引用
+	int *p; //指针声明定义，p是一个指针
+	p = &ival;// 表达式 p为指针（地址），&val 为取的 val 地址
+	*p = ival;   //表达式  *p 相当于 ival *是一个解引用
+	int &ref_i2 = *p;// &ref_i2 为引用定义 *p 相当于 ival， *是一个解引用
     
     
 > 空指针
