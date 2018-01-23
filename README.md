@@ -261,7 +261,7 @@
 		// 第一个字符改为大写
 		string s("some string");
 		if(!s.empty())
-			s[0] = toupper(s.[0]);//第一个字符改为大写  在 cctype头文件中
+			s[0] = toupper(s[0]);//第一个字符改为大写  在 cctype头文件中
 		// 第一个单词改为大写
 		for(decltype(s.size()) index = 0;
 		    index != s.size() && !isspace(s[index]; ++index))
@@ -324,5 +324,28 @@
 		sv.push_back(word1); 	
 		cout << word1 << endl; vector  
 	}
+
+## 迭代器 访问容器中的 元素 auto b = v.begin(), e = v.end(); b表示v的第一个元素 e表示v尾元素 的下一个位置  类似 指针
+
+	// 修改 字符串 第一个元素为大小字符
+	string s("some string");
+	if (s.begin() != s.end()){//确保 s非空
+	  auto it = s.begin();// it 指向 s的第一个字符 类似指针 的作用
+	  *it = toupper(*it);// 将当前字符改写成大写形式  *it 解引用迭代器 得到其所指向的 对象  是其指向对象的别名 引用
+	}
+	
+	// 字符串的第一个单词 改写成大写
+	for (auto it = s.begin(); it != s.end() && !isspace(*it); ++it)
+		*it = toupper(*it);
+	
+	// 迭代器类型  iterator (具有读写功能)  const_iterator 具有 读功能  不具有写功能
+	// 对象为常量 只具有常量类型的迭代器 const_iterator  对象为变量具有 iterator 和 const_iterator
+	vector<int>::iterator it;// 迭代器 it 可以读写 vector<int> 类型容器 的元素
+	 string::iterator it2;   // it2 可以读写  string对象 中的字符
+	 vector<int>::const_iterator it3;//it3只能读元素，不能写元素
+	 string::const_iterator it4;     //it4只能读字符，不能写字符
+
+
+
 
 
