@@ -352,4 +352,10 @@
 	 auto it2 = iv.cbegin(); // it2的类型为 vector<int>::const_iterator  能读iv的元素 不能修改 iv的元素
 	 auto it3 = civ.begin(); // it3的类型为 vector<int>::const_iterator  能读civ的元素 不能修改 civ的元素
 
+	  // 访问 容器元素对象的 成员函数   (*it).empty  等同于 it->empty()  解引用 和成员访问
+	  vector<string> text;
+	  for (auto it = text.cbegin(); it !=text.cend() && !it->empty(); ++it)
+	  	cout << *it << endl;
+
+
 
