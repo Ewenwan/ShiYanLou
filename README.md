@@ -331,13 +331,13 @@
 	string s("some string");
 	if (s.begin() != s.end()){//确保 s非空
 	  auto it = s.begin();// it 指向 s的第一个字符 类似指针 的作用
-	  *it = toupper(*it);// 将当前字符改写成大写形式  *it 解引用迭代器 得到其所指向的 对象  是其指向对象的别名 引用
+	  *it = toupper(*it);// 将当前字符改写成大写形式  *it 解引用迭代器 得到其所指向的 对象  是其指向对象的别名 引用
 	}
-	
+
 	// 字符串的第一个单词 改写成大写
 	for (auto it = s.begin(); it != s.end() && !isspace(*it); ++it)
 		*it = toupper(*it);
-	
+
 	// 迭代器类型  iterator (具有读写功能)  const_iterator 具有 读功能  不具有写功能
 	// 对象为常量 只具有常量类型的迭代器 const_iterator  对象为变量具有 iterator 和 const_iterator
 	vector<int>::iterator it;// 迭代器 it 可以读写 vector<int> 类型容器 的元素
@@ -345,38 +345,38 @@
 	 vector<int>::const_iterator it3;//it3只能读元素，不能写元素
 	 string::const_iterator it4;     //it4只能读字符，不能写字符
 
-  	 // cbegin()   cend() 返回 常量 迭代器 仅能读取 容器元素 不能修改
+	 // cbegin()   cend() 返回 常量 迭代器 仅能读取 容器元素 不能修改
 	 vector<int> iv;        // 变量
 	 const vector<int> civ; // 常量
 	 auto it1 = iv.begin(); //  it1的类型为 vector<int>::iterator  能读写iv的元素
 	 auto it2 = iv.cbegin(); // it2的类型为 vector<int>::const_iterator  能读iv的元素 不能修改 iv的元素
 	 auto it3 = civ.begin(); // it3的类型为 vector<int>::const_iterator  能读civ的元素 不能修改 civ的元素
 
-	  // 访问 容器元素对象的 成员函数   (*it).empty  等同于 it->empty()  解引用 和成员访问
-	  vector<string> text;
+	  // 访问 容器元素对象的 成员函数   (*it).empty  等同于 it->empty()  解引用 和成员访问
+	  vector<string> text;
 	  for (auto it = text.cbegin(); it !=text.cend() && !it->empty(); ++it)
-	  	cout << *it << endl;
-     
-          // 迭代器 运算
-	  auto mid = iv.begin() + iv.size()/2; //指向容器的中间位置
-	  if (it < mid) // 处理前半部分元素
+		cout << *it << endl;
+
+	  // 迭代器 运算
+	  auto mid = iv.begin() + iv.size()/2; //指向容器的中间位置
+	  if (it < mid) // 处理前半部分元素
 	  
-	  // 两个迭代器相减 得到的类型为 带符号整数  difference_type
-	  
+	// 两个迭代器相减 得到的类型为 带符号整数  difference_type
+
 	// 常规二分查找算法
-        //                 升序数组 查找的元素  范围开始  结束 
+	// 升序数组 查找的元素  范围开始  结束 
 	int BinarySearch(int *array, int key, int low, int high)
 	{
 	    int mid;
-	    while (low <= high)//  缩小范围 
-	    {
+	    while (low <= high)//  缩小范围 
+	    {
 		mid = (low + high) / 2;//更新中间元素的 下标 
 		if (key == array[mid])//中间元素是否 等于所查找的元素 
 		    return mid+1;//相等 返回元素下标  
 		else if (key < array[mid])//所查元素 比 中间元素小  则在 前区间查找 
-		    high = mid - 1;//将区间 右侧 退后 到 中间元素下标前一个元素  搜索 范围为  low，mid-1
+		    high = mid - 1;//将区间 右侧 退后 到 中间元素下标前一个元素  搜索 范围为  low，mid-1
 		else//所查元素 比 中间元素大 则 在后区间查找 
-		    low = mid + 1;//将区间  左测 提至  中间元素下标后一个元素    搜索 范围 mid+1，high
+		    low = mid + 1;//将区间  左测 提至  中间元素下标后一个元素    搜索 范围 mid+1，high
 	    }
 	    return 0;
 	}
