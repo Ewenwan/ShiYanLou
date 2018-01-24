@@ -356,6 +356,57 @@
 	  vector<string> text;
 	  for (auto it = text.cbegin(); it !=text.cend() && !it->empty(); ++it)
 	  	cout << *it << endl;
-
-
-
+     
+          // 迭代器 运算
+	  auto mid = iv.begin() + iv.size()/2; //指向容器的中间位置
+	  if (it < mid) // 处理前半部分元素
+	  
+	  // 两个迭代器相减 得到的类型为 带符号整数  difference_type
+	  
+	// 常规二分查找算法
+        //                 升序数组 查找的元素  范围开始  结束 
+	int BinarySearch(int *array, int key, int low, int high)
+	{
+	    int mid;
+	    while (low <= high)//  缩小范围 
+	    {
+		mid = (low + high) / 2;//更新中间元素的 下标 
+		if (key == array[mid])//中间元素是否 等于所查找的元素 
+		    return mid+1;//相等 返回元素下标  
+		else if (key < array[mid])//所查元素 比 中间元素小  则在 前区间查找 
+		    high = mid - 1;//将区间 右侧 退后 到 中间元素下标前一个元素  搜索 范围为  low，mid-1
+		else//所查元素 比 中间元素大 则 在后区间查找 
+		    low = mid + 1;//将区间  左测 提至  中间元素下标后一个元素    搜索 范围 mid+1，high
+	    }
+	    return 0;
+	}
+	
+	// 使用迭代器完成二分查找
+	 vector<int> text// 升序容器
+	 auto b = text.begin(), e = text.end();//起始 结束位置
+	 auto mid = b + (e - b)/2;//中间位置
+	 while(low <= end && *mid != key){
+	 	if(key < *mid) e = mid - 1;//所查元素 比 中间元素小  则在 前区间查找
+		else b = mid + 1;// 所查元素 比 中间元素大 则 在后区间查找
+		mid =  b + (e - b)/2;//更新 中间位置
+	 }
+	
+	// 使用索引[] 访问 计算vector对象元素索引   统计各个分数段上 出现的 成绩个数
+	// 索引不能添加元素
+	vector<unsigned> scores(11,0);//11个分数段， 0~9，10~19，...,90~99，100 计数值全部初始化为0
+	unsigned grade;
+	while (cin >> grade){
+	if(grade <= 100) ++scores[grade/10];
+	} 
+	// 使用迭代器 访问 计算vector对象元素索引   统计各个分数段上 出现的 成绩个数
+	vector<unsigned> scores(11,0);//11个分数段， 0~9，10~19，...,90~99，100 计数值全部初始化为0
+	unsigned grade;
+	auto it0 = scores.begin();
+	while (cin >> grade){
+		auto it = it0 +  grade/10;
+		if(grade <= 100) ++*it;
+	} 
+	
+	
+	
+	
