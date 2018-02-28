@@ -409,4 +409,123 @@
 	
 	
 	
+# 数组 
+>  数组与标准库 类型 vector 类似，都存放类型相同对象的容器。
+>  需要通过其所在的位置访问对象。
+>  与vector不同的是，数组大小确定不变，不能随意向数组中增加元素, 数组不允许拷贝，vector允许拷贝。
+>  注意数组名 相当于数组首元素的地址   ia[10]  ia === &ia[0]
+
+## 【1】定义
+
+	constexpr unsigned sz = 42;//constexpr修饰，常量表达式
+	int arr[10];  //字面值常量初始化  含有10个整数的数组
+	int arr2[sz]; //常量表达式初始化 含有42个个整数的数组
+	int *parr[sz];//常量表达式初始化 含有42个指向整数的指针的数组
+
+	定义时必须指定数组类型，不能由auto来推断
+	不存在引用的数组，引用不是对象！！！
+        string nums[] = {"one", "two", "three"};// 数组元素是string对象
+	string *sp = &nums[0];// p指向nums的第一个元素
+	string *sp2 = nums;   // 等价于 string *sp2 = &nums[0]
+        
+	auto sp3(nums); //sp3 是一个string指针，指向nums的第一个元素
+	// 而decltype关键字 声明的 不发生上述转换
+	 decltype(nums) sa = {"two", "three", "four"};//sa 是一个 含有3个string对象的 数组
+
+
+##【2】显式初始化数组元素
+
+	const unsigned sz = 3;//
+	int ia1[sz] = {0, 1, 2};//列表初始化 含有3个元素
+	int ia2[] = {0, 1, 2};//维度为3
+	int ia3[5] = {0, 1, 2};//等价于 {0, 1, 2, 0, 0}
 	
+	// 字符数组
+	char ca1[] = {'C', 'P', 'P'};//列表初始化
+	char ca2[] = {'C', 'P', 'P', '\0'};//含有显式的 空字符
+	char ca3[] = "CPP";//字符串字面值初始化 自动添加表示字符串结束的空字符
+	
+	// string 对象初始化 字符数组
+	string s("Hello World");
+	const char *str = s.c_str();// 用string对象初始化 字符数组 需要使用 c_str() 方法 最好再重新拷贝一份
+	
+        // 数组  初始化 vector 对象
+	int i_arr[] = {1, 2, 3, 4, 5, 6};
+	vector<int> ivec(begin(i_arr), end(i_arr));//全部副本
+        vector<int> sub_ivec(i_arr + 1, i_arr + 4);// 包含 {2, 3, 4, 5}四个元素
+	
+	
+	
+	// 不允许拷贝和赋值
+	char ca4 = ca3;// 错误
+	
+	// 复杂的数组声明定义
+	int *parr[10];// 是数组，包含10个整形指针的数组
+	int &rarr[10]=?;//错误，不存在 引用数组，引用不是对象
+	int (*Parray)[10] = &arr;//是指针，指向一个含有10个整数的数组
+	int (&Rarray)[10] = arr;//是引用，引用一个含有10个整数的数组	
+	
+## 【3】访问数组元素
+### 与标准库类型vector 和 string 一样，数组元素也可以使用 范围for语句
+### 或下标运算符 访问，元素下标从0开始，下标通常定义为 size_t类型,unsigned类型。
+### 标准库类型vector 和 string 下标运算符索引必须为正值 unsigned类型，数组下标运算符索引 为signed类型，内置类型，可以为负值
+
+	//下标访问修改元素
+	unsigned score[11];//11个分数段
+	unsigned grade;
+	while(cin >> grade){
+	    if(grade <= 100) ++score[grade/10];//对应段 计数+1
+	}
+	// 范围for 访问修改所有元素
+	for( auto i:score)//可以设置为 引用就可以修改元素了
+	    cout << i << " ";
+	cout << endl;
+
+	// 指针访问数组
+	int iarr[] = {0,1,2,3,4};//含有5个元素
+	int *pi = iarr;//指向第一个元素的指针 iarr[0]
+	int *pi2 = iarr + 2;//指向第三个元素的指针 iarr[2]
+        auto num = end(iarr) - begin(iarr); // num的值是5 就是iarr包含元素的数量 ptrdiff_t 类型 是signde类型 结果可能为负
+	++pi;//指向第二个元素 iarr[1]
+	j = pi[1];   // 等价于 *(p+1),就是 iarr[2], 就是 2
+	k = pi[-1];  // 等价于 *(p-1),就是 iarr[0], 就是 0
+	pi + 3;//指向最后一个元素
+	*pi;//第二个元素 4
+	int last =  *(iarr + 4);// 等价于 last = iarr[4];
+	int *end = &iarr[6];//指向尾后的位置 到达不了    不能执行解引用运算！！！！！
+	// 使用 for 
+	fot(int *begin = arr; begin != end; ++begin)
+		cout << *begin  << endl;//输出每一个元素
+        // 使用 while
+	while(begin<end){//指针指向相关的对象 可以比较大小（单位（间隔）一样大）
+		cout << *begin  << endl;//输出每一个元素
+		++begin;
+	}
+
+	//标准库函数 begin() end() 函数得到指针
+	int iarr = {0,1,2,3,4};//函数5个元素
+	int *beg = begin(iarr);//首元素指针
+	int *end = end(iarr);//尾后指针                 不能执行解引用运算！！！！！
+	while(beg != end && *beg >=0) ++beg;//找第一个负值元素
+
+## 多维数组 数组的数组
+
+### 初始化
+	constexpr size_t row =3, col = 4;
+	int iarr[row][col];//定义未初始化
+	
+	// for 循环初始化
+	for(size_t i = 0; i != row; ++i){
+		for(size_t j = 0; j != col; ++j)
+			iarr[i][j] = i * col + j;//元素索引为其 值
+	}
+	
+        // 范围for 初始化
+ 	size_t cnt = 0;
+	for (auto &row1 : iarr)//每一行 引用
+	 	for (auto &col1 : row1){//每一行的每一个元素 引用  可以读写
+		col1 = cnt;//赋值
+		++cnt;
+		}
+
+
