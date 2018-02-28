@@ -514,18 +514,51 @@
 	constexpr size_t row =3, col = 4;
 	int iarr[row][col];//定义未初始化
 	
-	// for 循环初始化
+	//下标运算符 for 循环初始化
 	for(size_t i = 0; i != row; ++i){
-		for(size_t j = 0; j != col; ++j)
+		for(size_t j = 0; j != col; ++j){
 			iarr[i][j] = i * col + j;//元素索引为其 值
+			cout << iarr[i][j] << ' '; // 访问输出  数组元素
+			}
+		 cout << endl;	
 	}
 	
         // 范围for 初始化
  	size_t cnt = 0;
 	for (auto &row1 : iarr)//每一行 引用
-	 	for (auto &col1 : row1){//每一行的每一个元素 引用  可以读写
+         {	
+	 	for (auto &col1 : row1){//每一行的每一个元素 引用  可以读写 除去最内层外 其它必须使用 引用
 		col1 = cnt;//赋值
+		cout << col1 << ' ';// 访问 输出数组元素
 		++cnt;
 		}
+	        cout << endl;
+	 }	
+		
+### 访问 
+	// 指针访问
+	int (*p)[4] = iarr;//p 指向一个含有4个整数的数组 iarr的 第一行   圆括号必不可少
+	p = &iarr[2]; // iarr的 第3行
+	// for 循环访问
+	for( auto p = ia; p != ia + row; ++p){// 相当于定义 int (*p)[4] = iarr; p 指向 含有4个整数的数组
+		 for( auto q = *p; q != *p + col; ++q) // *p 为含有4个元素的数组 q指向数组的首元素，即指向一个整数
+			cout << *q << ' ';
+		 cout << endl;
+	}
+	// 使用 标准库函数 begin() 和 end()
+	for( auto p = begin(ia); p != end(ia); ++p){// 相当于定义 int (*p)[4] = iarr; p 指向 含有4个整数的数组
+		 for( auto q = begin(*p); q != end(*p); ++q) // *p 为含有4个元素的数组 q指向数组的首元素，即指向一个整数
+			cout << *q << ' ';
+		 cout << endl;
+	}	
+	// 使用类型别名
+	using int_arr_tpye = int[4];// int_arr_tpye为包含4个元素的整形数组
+	typedef int int_arr_tpye[4];// 效果同上
+	for( int_arr_tpye *p = ia; p != ia + row; ++p){// 相当于定义 int (*p)[4] = iarr; p 指向 含有4个整数的数组
+		 for( int *q = *p; q != *p + col; ++q) // *p 为含有4个元素的数组 q指向数组的首元素，即指向一个整数
+			cout << *q << ' ';
+		 cout << endl;
+	}
+
 
 
