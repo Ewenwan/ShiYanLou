@@ -424,10 +424,10 @@
 
 	定义时必须指定数组类型，不能由auto来推断
 	不存在引用的数组，引用不是对象！！！
-        string nums[] = {"one", "two", "three"};// 数组元素是string对象
+	string nums[] = {"one", "two", "three"};// 数组元素是string对象
 	string *sp = &nums[0];// p指向nums的第一个元素
 	string *sp2 = nums;   // 等价于 string *sp2 = &nums[0]
-        
+
 	auto sp3(nums); //sp3 是一个string指针，指向nums的第一个元素
 	// 而decltype关键字 声明的 不发生上述转换
 	 decltype(nums) sa = {"two", "three", "four"};//sa 是一个 含有3个string对象的 数组
@@ -439,26 +439,26 @@
 	int ia1[sz] = {0, 1, 2};//列表初始化 含有3个元素
 	int ia2[] = {0, 1, 2};//维度为3
 	int ia3[5] = {0, 1, 2};//等价于 {0, 1, 2, 0, 0}
-	
+
 	// 字符数组
 	char ca1[] = {'C', 'P', 'P'};//列表初始化
 	char ca2[] = {'C', 'P', 'P', '\0'};//含有显式的 空字符
 	char ca3[] = "CPP";//字符串字面值初始化 自动添加表示字符串结束的空字符
-	
+
 	// string 对象初始化 字符数组
 	string s("Hello World");
 	const char *str = s.c_str();// 用string对象初始化 字符数组 需要使用 c_str() 方法 最好再重新拷贝一份
-	
-        // 数组  初始化 vector 对象
+
+	// 数组  初始化 vector 对象
 	int i_arr[] = {1, 2, 3, 4, 5, 6};
 	vector<int> ivec(begin(i_arr), end(i_arr));//全部副本
-        vector<int> sub_ivec(i_arr + 1, i_arr + 4);// 包含 {2, 3, 4, 5}四个元素
-	
-	
-	
+	vector<int> sub_ivec(i_arr + 1, i_arr + 4);// 包含 {2, 3, 4, 5}四个元素
+
+
+
 	// 不允许拷贝和赋值
 	char ca4 = ca3;// 错误
-	
+
 	// 复杂的数组声明定义
 	int *parr[10];// 是数组，包含10个整形指针的数组
 	int &rarr[10]=?;//错误，不存在 引用数组，引用不是对象
@@ -485,7 +485,7 @@
 	int iarr[] = {0,1,2,3,4};//含有5个元素
 	int *pi = iarr;//指向第一个元素的指针 iarr[0]
 	int *pi2 = iarr + 2;//指向第三个元素的指针 iarr[2]
-        auto num = end(iarr) - begin(iarr); // num的值是5 就是iarr包含元素的数量 ptrdiff_t 类型 是signde类型 结果可能为负
+	auto num = end(iarr) - begin(iarr); // num的值是5 就是iarr包含元素的数量 ptrdiff_t 类型 是signde类型 结果可能为负
 	++pi;//指向第二个元素 iarr[1]
 	j = pi[1];   // 等价于 *(p+1),就是 iarr[2], 就是 2
 	k = pi[-1];  // 等价于 *(p-1),就是 iarr[0], 就是 0
@@ -496,7 +496,7 @@
 	// 使用 for 
 	fot(int *begin = arr; begin != end; ++begin)
 		cout << *begin  << endl;//输出每一个元素
-        // 使用 while
+	// 使用 while
 	while(begin<end){//指针指向相关的对象 可以比较大小（单位（间隔）一样大）
 		cout << *begin  << endl;//输出每一个元素
 		++begin;
