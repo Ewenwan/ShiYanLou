@@ -513,8 +513,8 @@
 ### 初始化
 	constexpr size_t row =3, col = 4;
 	int iarr[row][col];//定义未初始化
-	
-	//下标运算符 for 循环初始化
+
+	//下标运算符（size_t 类型） for 循环初始化
 	for(size_t i = 0; i != row; ++i){
 		for(size_t j = 0; j != col; ++j){
 			iarr[i][j] = i * col + j;//元素索引为其 值
@@ -522,17 +522,17 @@
 			}
 		 cout << endl;	
 	}
-	
-        // 范围for 初始化
- 	size_t cnt = 0;
-	for (auto &row1 : iarr)//每一行 引用
-         {	
-	 	for (auto &col1 : row1){//每一行的每一个元素 引用  可以读写 除去最内层外 其它必须使用 引用
+
+	// 范围for 初始化
+	size_t cnt = 0;
+	for (auto &row1 : iarr)//每一行 引用  int (&row1)[4] 是引用 引用一个含有4个整数的数组
+	 {	
+		for (auto &col1 : row1){// int &col1 每一行的每一个元素 引用  可以读写 除去最内层外 其它必须使用 引用
 		col1 = cnt;//赋值
 		cout << col1 << ' ';// 访问 输出数组元素
 		++cnt;
 		}
-	        cout << endl;
+		cout << endl;
 	 }	
 		
 ### 访问 
@@ -541,13 +541,13 @@
 	p = &iarr[2]; // iarr的 第3行
 	// for 循环访问
 	for( auto p = ia; p != ia + row; ++p){// 相当于定义 int (*p)[4] = iarr; p 指向 含有4个整数的数组
-		 for( auto q = *p; q != *p + col; ++q) // *p 为含有4个元素的数组 q指向数组的首元素，即指向一个整数
+		 for( auto q = *p; q != *p + col; ++q) // *p 为含有4个元素的数组 q指向数组的首元素，即指向一个整数 int *q = *p
 			cout << *q << ' ';
 		 cout << endl;
 	}
 	// 使用 标准库函数 begin() 和 end()
 	for( auto p = begin(ia); p != end(ia); ++p){// 相当于定义 int (*p)[4] = iarr; p 指向 含有4个整数的数组
-		 for( auto q = begin(*p); q != end(*p); ++q) // *p 为含有4个元素的数组 q指向数组的首元素，即指向一个整数
+		 for( auto q = begin(*p); q != end(*p); ++q) // *p 为含有4个元素的数组 q指向数组的首元素，即指向一个整数 int *q = *p
 			cout << *q << ' ';
 		 cout << endl;
 	}	
