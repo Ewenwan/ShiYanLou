@@ -1,4 +1,4 @@
-1¡¢Êä³ö×Ö·û banner   È«#ºÅ
+1ã€è¾“å‡ºå­—ç¬¦ banner   å…¨#å·
 sudo apt-get install sysvbanner
 
 
@@ -8,58 +8,63 @@ banner linux
 printerbanner -w 50 AB
 
 
-ÀàËÆµÄÃüÁî toilet    #ºÅ "ºÅ ×ÖÄ¸m
+ç±»ä¼¼çš„å‘½ä»¤ toilet    #å· "å· å­—æ¯m
 sudo apt-get install toilet
 
 
-figlet     -ºÅ
+figlet     -å·
 sudo apt-get install figlet
 
 
 
 
 
-2¡¢Ò»Ë«ÑÛ¾¦
+2ã€ä¸€åŒçœ¼ç›
 xeyes
 sudo apt-get install x11-apps
 
 
 
-3¡¢ÎÄ×ÖÓê
+3ã€æ–‡å­—é›¨
 cmatrix
 sudo apt-get install cmatrix
 
 
-4¡¢ÎÄ×Ö»ğÂ¯
+4ã€æ–‡å­—ç«ç‚‰
 aafire
 sudo ape-get install libaa-bin
 
 
 
-5¡¢Ñ¹Ëõ½âÑ¹
-zip£º
+5ã€å‹ç¼©è§£å‹
+zipï¼š
 
-´ò°ü £ºzip something.zip something £¨Ä¿Â¼Çë¼Ó -r ²ÎÊı£©
+æ‰“åŒ… ï¼šzip something.zip something ï¼ˆç›®å½•è¯·åŠ  -r å‚æ•°ï¼‰
 
-½â°ü£ºunzip something.zip
-Ö¸¶¨Â·¾¶£º-d ²ÎÊı
-
-
-tar£º
-
-´ò°ü£ºtar -zcvf something.tar something
-
-½â°ü£ºtar -zxvf something.tar
-
-Ö¸¶¨Â·¾¶£º-C 
+è§£åŒ…ï¼šunzip something.zip
+æŒ‡å®šè·¯å¾„ï¼š-d å‚æ•°
 
 
-6¡¢¶¯ÎïÎÄ×Ö
+tarï¼š
+
+æ‰“åŒ…ï¼štar -zcvf something.tar something
+
+è§£åŒ…ï¼štar -zxvf something.tar
+
+æŒ‡å®šè·¯å¾„ï¼š-C 
+
+
+6ã€åŠ¨ç‰©æ–‡å­—
 cowsay
 
 sudo apt-get install cowsay
 
-cowsay hello shiyanlou   Ä¬ÈÏÅ£
-cowsay -l ´òÓ¡Ö§³ÖµÄËùÓĞ¶¯Îï
+cowsay hello shiyanlou   é»˜è®¤ç‰›
+cowsay -l æ‰“å°æ”¯æŒçš„æ‰€æœ‰åŠ¨ç‰©
 cowsay -f elephant hello shiyanlou
 
+7ã€æœç‹—æ‹¼éŸ³è¾“å…¥æ³•æ— æ³•è¾“å…¥ä¸­æ–‡
+cd ~/.config
+rm -rf SogouPY SogouPY.users sogou-qimpanel
+killall fcitx
+fcitx
