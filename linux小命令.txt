@@ -68,3 +68,26 @@ cd ~/.config
 rm -rf SogouPY SogouPY.users sogou-qimpanel
 killall fcitx
 fcitx
+
+
+8、linux 设置默认声卡
+终端里打alsamixer 按 f6 会出现声卡列表 
+一般来说，usb 声卡总是第二位的，声卡编号是1(默认声卡是0) 
+在 $HOME 下建立 .asoundrc 里面输入 
+defaults.ctl.card 1 defaults.pcm.card 1 
+最后的1是声卡编号 然后重启一下alsa就把1号声卡(usb声卡)设置成默认声卡了。 
+
+
+//////////　　可能不行
+pcm.!default {
+    type asym
+    playback.pcm {
+        type plug
+        slave.pcm "hw:0,0"
+    }
+    capture.pcm {
+        type plug
+        slave.pcm "hw:1,0"
+    }
+}
+
