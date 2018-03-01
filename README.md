@@ -831,17 +831,17 @@
 	   // 此处 无需 显示的 return 语句   会隐式指向 return
 	}
 ### 有返回值函数  return 后有值 且返回的对象类型 与 函数定义的 返回类型相同
-// 两个 string 对象是否 最短的部分 是相同的
-bool str_subrange(const string &str1, const string &str2){
- if (str1.size() == str.size())
-     return str1 == str2; // 之间判断 相同长度间的部分是否相同
- auto size = (str1.size() < str2.size()) ? str1.size() : str2.size(); //得到最短 字符串的 长度
- for(decltype(size) i = 0; i != size; ++i){
-   if ( str1[i] != str2[i])// 如果 有 不相等的 字符 返回 false
-    return false;// 有 不相等的 字符 返回 false
-  }
- return true; // 否者 相等 返回 true
-}
+	// 两个 string 对象是否 最短的部分 是相同的
+	bool str_subrange(const string &str1, const string &str2){
+	 if (str1.size() == str.size())
+	     return str1 == str2; // 之间判断 相同长度间的部分是否相同
+	 auto size = (str1.size() < str2.size()) ? str1.size() : str2.size(); //得到最短 字符串的 长度
+	 for(decltype(size) i = 0; i != size; ++i){
+	   if ( str1[i] != str2[i])// 如果 有 不相等的 字符 返回 false
+	    return false;// 有 不相等的 字符 返回 false
+	  }
+	 return true; // 否者 相等 返回 true
+	}
 ### 返回类型为 引用时 不会对结果进行拷贝 节省时间  但是 不要 返回 函数内部 临时变量的 引用， 临时变量离开函数后就不存在了
 ### 建议 返回 引用对象 是一个 调用函数 之前就纯在的一个变量
 ### 同时 返回 非常量的引用 可以作为 左值 被赋值
