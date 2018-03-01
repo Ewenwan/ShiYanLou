@@ -680,7 +680,7 @@
 
 	// 函数返回多个值 返回字符在某个字符串中第一次出现的位置，并返回出现的 总次数
 	string::size_type find_char(const string &crs, char c, string::size_type &occurs){
-	                                // 字符串        查找的字符      出现的次数
+					// 字符串        查找的字符      出现的次数
 		auto ret = crs.size();//初始化 第一次出现的位置
 		occurs = 0;//初始化 出现的次数
 		for(decltype(ret) i = 0; i != crs.size(); ++i){
@@ -692,16 +692,16 @@
 		}  
 		return ret;//返回第一次出现的位置
 	}
-	
+
 	// 调用
 	string s("some string");
 	string::size_type count = 0;
 	auto index = find_char(s, 'o', count);
-	
-        // 判断 string对象是否是 一个句子
+
+	// 判断 string对象是否是 一个句子
 	 bool is_sentence(const string &crs){
-	          // 如果 find_char() 的string参数 必须为 string & 那么不能直接把 const string & 带入
-		  // 需要再定义一个 string对象， 另其为 crs 的副本，再带入
+		  // 如果 find_char() 的string参数 必须为 string & 那么不能直接把 const string & 带入
+		  // 需要再定义一个 string对象， 另其为 crs 的副本，再带入
 		 string::size_type count = 0;
 		 return (find_char(crs, '.', count) == (crs.size() - 1)) &&  count == 1;
 	 }
