@@ -706,5 +706,59 @@
 		 return (find_char(crs, '.', count) == (crs.size() - 1)) &&  count == 1;
 	 }
 
+### 数组形参 必须确保使用数组时不会越界  通常需要给一个结束标志
+1 不允许拷贝数组 2 在使用数组时会将其转换成指针（指向数组首元素的指针）
+
+	// 三个函数等价 形参 都是 const int * 类型
+	void print(const int*);
+	void print(const int[]);
+	void print(const int[10]);// 这里的维度表示期望数组含有多少元素，实际不一定
+	//调用
+	int i = 0;
+	j[2] = {0, 1};
+	print(&i); //&i 是int *类型 可以赋值给 const int *类型
+	print(j);  //j 为 &j[0] 是 int * 类型
+
+#### 使用标记指定数组长度   要求数组本身包含 一个结束标志  典型 C风格字符串 带有一个空字符
+
+	// C风格字符串 带有一个空字符
+	void print(const char *cp){
+	  if(cp)// 确定 cp 不是一个空指针
+	    while(*cp) // 只要 指针所指的字符不是 空字符
+	       cout << *cp++;// 打印 字符
+	}
+
+#### 使用标准库规范 传递 数组元素的 首末地址
+
+	void print(const int *beg, const int *end){
+	  while(beg != end) 
+	    cout << *beg++ << endl;//输出当前元素 并将指针向前移动一个位置
+	}
+	// 调用
+	int j[2] =  {0, 1};
+	print(begin(j), end(j));// 使用标准库 begin() 和 end() 函数
+
+#### 显示传递 一个数组大小的形参
+	void print(const int ia[], size_t size){
+	  for (size_t i = 0; i != size; ++i) 
+	     cout << ia[i] << endl;// 等价于 cout << *(ia+i) << endl;
+	}
+	// 调用
+	int j[2] =  {0, 1};
+	print( j, end(j) - begin(j) );// 使用标准库 begin() 和 end() 函数 做差来得到数组的大小
+
+#### 数组引用形参 int (&r_arr)[10] 是一个含有10个元素数组的 引用  直接包含了 数组大小的信息
+
+void print(int (&r_arr)[10]){ // 注意形式 int (&r_arr)[10]   而 int &arr[10] 成了 包含引用的数组（还不存在，引用不是对象）
+  for (auto elem : r_arr)// 变量数组每个元素  范围for
+    cout << elem << endl;
+}
+// 调用 调用时 必须是 大小为10的整形 数组作为实参才可以
+int k[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+print(k);// 大小必须为10 多一点 少一点 都不行
+
+#### 多维数组形参 数组指针 形参
+void print(int (*p_arr)[10], int rowSize){}// 形参是 指向 一个含有10个整数的指针
+
 
 
