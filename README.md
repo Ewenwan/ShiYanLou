@@ -817,4 +817,64 @@
 	void foo(param_list, ...)//
 	void foo(param_list...)//
 	void foo(...)//
+	
+## 函数 返回类型 和 return语句
+### 无返回值函数 void函数 无需显示的 return 语句   return 后无值
+	// 交换两个值的函数
+	void swap(int &r_i1, int &r_i2){
+	   if (r_i1 == r_i2)// 两个值相等 无需交换
+	      return;
+	   // 若 执行 到这里，说明还需要继续完成下面的功能 
+	   int temp = r_i1;//
+	   r_i1 = r_i2;
+	   r_i2 = temp;
+	   // 此处 无需 显示的 return 语句   会隐式指向 return
+	}
+### 有返回值函数  return 后有值 且返回的对象类型 与 函数定义的 返回类型相同
+// 两个 string 对象是否 最短的部分 是相同的
+bool str_subrange(const string &str1, const string &str2){
+ if (str1.size() == str.size())
+     return str1 == str2; // 之间判断 相同长度间的部分是否相同
+ auto size = (str1.size() < str2.size()) ? str1.size() : str2.size(); //得到最短 字符串的 长度
+ for(decltype(size) i = 0; i != size; ++i){
+   if ( str1[i] != str2[i])// 如果 有 不相等的 字符 返回 false
+    return false;// 有 不相等的 字符 返回 false
+  }
+ return true; // 否者 相等 返回 true
+}
+### 返回类型为 引用时 不会对结果进行拷贝 节省时间  但是 不要 返回 函数内部 临时变量的 引用， 临时变量离开函数后就不存在了
+### 建议 返回 引用对象 是一个 调用函数 之前就纯在的一个变量
+### 同时 返回 非常量的引用 可以作为 左值 被赋值
+
+	// 不要 返回 函数内部 临时变量的 引用
+	string temp("glo");
+	const string &mainip() {
+		 string ret("Empty"); // 函数内部临时变量
+		 return ret; // 错误 ，不能返回 临时变量 作为 函数返回值的 引用
+		 // return temp;// 返回 一个调用函数之前就出现的 变量 的引用     或者  参数 为引用类型的参数也可以
+	}
+
+	// 返回 两个字符串中 短的那个
+	const string &shortString(const string &s1, const string &s2){// 返回 s1 或者 s2的引用
+		return s1.size() < s2.size() ? s1 : s2;//返回 两个字符串中 短的那个
+	}
+
+	// 函数返回类型 为 标准库 类类型 可以直接调用 其成员函数
+	auto sz = shortString(s1, s2).size()// 得到最短字符串 的长度
+
+	// 返回 非常量的引用 可以作为 左值 被赋值  
+	char &get_char(string &str, string::size_type id){
+		return str[id];// 获取指定位置的 字符
+	}
+	// 调用
+	string s("a value");
+	cout << s << endl;// a value
+	get_char(s, 0) = 'A';// 将s第一个位置上的字符 替换为 大写的 A
+	cout << s << endl;// A value
+	// 而返回为 常量引用 的不能被赋值
+	shortString("hi", "bye") = "X"; // 错误 函数返回值是个 常量引用 不能被赋值
+
+
+
+
 
