@@ -619,5 +619,92 @@
 	}
 	// 编译
 	gcc fact_main.c fact.cc -o main
+## 参数传递
+> 当形参是引用类型时，为引用传递，实际传递的是实参的别名，没有进行拷贝，当实参的值被拷贝给形参时，形参和实参是两个独立的对象
+
+### 值传递    函数对形参做的所有操作 都不会影响实参
+
+	int n=0;
+	int i = n;// n拷贝给i
+	i = 42;//i的值改变， n的值不变    函数对形参做的所有操作 都不会影响实参 例如 fact(i) 不会改变i的值
+
+### 引用传递  函数对形参做的所有操作 都会影响实参
+
+	int n = 0;
+	int &r_i = n;//r_i 是 n 的引用 即别名 同一个变量
+	r_i = 42;//r_i 和 n 都变成 42    
+
+### 指针形参
+
+	int n=0, i =42;
+	int *p_n = &n, *p_i = &i;// 指针
+	*p_n = 100;// n 的值 变为100 指针p_n（变量你存储的地址） 不变
+	p_n = p_i;// 现在 p_n  和  p_i 都指向了 i
+
+	// 指针形参 函数
+	void reset(int *pi){
+	 *ip = 0;//改变了指针 pi 所指向的对象的值
+	 ip = 0;// 值改变了 形参ip的值 实参未被改变
+	}
+	
+	// 调用
+	int i = 42;
+	cout << "address of i =" << &i <<endl;
+	reset(&i);// i 的值改变为0
+	cout << "i = " << i << endl;// i 的值改变为0
+	cout << "address of i =" << &i <<endl;// i 的存储地址未改变
+	
+	// C 程序中 通常使用 指针类型的形参 来访问和改变 函数外部的对象
+	// C++ 程序中，建议使用引用类型的形参代替 指针形参，这样会更安全，也省时间（引用 无拷贝操作）
+	
+	// 使用 引用避免拷贝 拷贝大的类对象或容器 都比较低效 费时
+	
+### 引用形参
+
+	 void reset(int &i){
+	  i = 0;// 改变了i所引用的对象
+	 }
+	 // 调用
+	 int j = 42;
+	 reset(j);// 采样传 引用方式，它的值被改变 调用时 形参i 只是 实参j的一个别名，在函数reset内部对i的操作，即对j的使用
+	 cout << "j = " << j << endl;
+
+### 常量引用形参 当函数无须 改变引用参数的值时，最好将其声明为 常量引用
+
+	// 比较两个字符串的长度
+	bool isShorter(const string &rs1, const string &rs2){
+		return rs1.size() < rs2.size();
+	}
+
+### 使用引用形参 返回额外信息
+
+	// 函数返回多个值 返回字符在某个字符串中第一次出现的位置，并返回出现的 总次数
+	string::size_type find_char(const string &crs, char c, string::size_type &occurs){
+	                                // 字符串        查找的字符      出现的次数
+		auto ret = crs.size();//初始化 第一次出现的位置
+		occurs = 0;//初始化 出现的次数
+		for(decltype(ret) i = 0; i != crs.size(); ++i){
+		  if(crs[i] == c){// 出现字符 c
+		    if (ret == crs.size())//位置 还未改变 为  第一次出现 
+		    ret  = i;//记录第一次出现的位置
+		    ++occurs;//出现次数 +1  通过形参引用间接返回 出现的次数
+		  }
+		}  
+		return ret;//返回第一次出现的位置
+	}
+	
+	// 调用
+	string s("some string");
+	string::size_type count = 0;
+	auto index = find_char(s, 'o', count);
+	
+        // 判断 string对象是否是 一个句子
+	 bool is_sentence(const string &crs){
+	          // 如果 find_char() 的string参数 必须为 string & 那么不能直接把 const string & 带入
+		  // 需要再定义一个 string对象， 另其为 crs 的副本，再带入
+		 string::size_type count = 0;
+		 return (find_char(crs, '.', count) == (crs.size() - 1)) &&  count == 1;
+	 }
+
 
 
