@@ -595,7 +595,29 @@
 	 for(int i =0; i<10; ++i)  count_call(); //sc 输出 1 2,...10，c 输出一直是1
 	 return 0;
 	}
-
-
+## 分离式编译 函数声明 与函数定义类似但是 不包括函数体，以;代替函数体 int fact(int val); 函数可以多次声明
+	// 源文件 fact.cc
+	#include "fact.h"
+	int fact(int val){
+		int ret = 1;
+		while(val >1) ret *= val--;
+		return ret;// 返回主调函数 结束函数调用
+	}
+	// 函数声明头文件 fact.h
+	#ifndef FACT_H
+	#define FACT_H
+	int fact(int val);// 函数声明 
+	#endif
+	// 主函数调用 fact_main.c
+	#include <iostream>
+	#include "fact.h"
+	using namespace std;
+	int main(){
+	int j = fact(5);// 实参5 初始化 形参（int val）
+	cout << "5! = " << j << endl;
+	return 0;
+	}
+	// 编译
+	gcc fact_main.c fact.cc -o main
 
 
