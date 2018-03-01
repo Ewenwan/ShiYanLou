@@ -875,6 +875,81 @@
 	shortString("hi", "bye") = "X"; // 错误 函数返回值是个 常量引用 不能被赋值
 
 
+### 函数返回类型为 列表 以花括号 {} 包围
+	vector<string> process(){
+		if(expected.empty())
+		  return {};// 返回一个 空vector对象
+		else if (expected == actual)
+		  return {"function", "okey"};
+		else 
+		  return {"function", expected, actual};
+	}
+### 函数递归  返回值为自身函数 的一个 式子   main 函数不能调用自己
+
+	// 计算阶乘的函数
+	int factorial( int val){
+		if(val > 1)
+		   return val * factorial(val-1);
+		else 
+		    return 1;
+	}
+	// 递归 返回一个vector的元素函数
+	void print_vec(vector<int> vi){
+		auto it = vi.begin();
+		if(vi.size() > 1)
+		 {
+		   cout << *it <<endl;
+		   vi.erase(it);
+		   print_vec(vi);
+		}
+		else 
+		   cout << *it <<endl;
+	}
+
+### 返回 数组 指针 数组不能被 拷贝 所以函数不能返回数组 但可以返回 数组的指针 或引用
+
+	// 使用类别别名
+	typedef int arrT[10];// arrT是一个类别别名 表示一个 含有 10个整数 的 数组
+	using arrT = int[10];// 同上
+	arrT* func(int i);   // 函数func 返回一个 指向 10个整数的数组的 指针
+
+	//直接声明
+	int arr[10]; //arr 是一个 含有 10个整数的数组
+	int *arr_p[10]; //arr_p 是一个数组   含有 10个指整形针 的 数组
+	int (*p2)[10] = &arr; // p2 是一个指针， 指向一个含有 10个整数的 数组 arr
+	// 函数声明 类似
+	Type (*function_name(parameter_list))[dimension]
+	int ( *func(int i) )[10];// 声明一个函数 其形参为 int i ,返回类型 为 指针 ，指向 一个 含有 10个整数的 数组
+
+	// 使用 auto 和 尾置返回类型
+	auto func(int i) -> int(*)[10];// 声明一个函数 其形参为 int i ,返回类型 为 指针 ，指向 一个 含有 10个整数的 数组
+
+	// 使用 decltype 知道返回数组  类似类别别名 声明 定义
+	int odd[] = {1, 3, 5, 7, 9};
+	int even[] = {0, 2, 4, 6, 8};
+	decltype(odd) *arrPtr(int i){ //使用decltype(odd) 表面类型与 odd类似
+	 return (i%2) ? &odd : &even;// 返回一个指向数组的指针
+	}
+
+	// 声明一个 返回 引用 一个 含有10个string对象的数组 的函数
+	string ( &func_r(string str) )[10];// 直接声明
+	  // 使用类别别名
+	typedef string arrS[10];// 类别别 含有10个string对象的数组
+	using arrS = string[10];// 同上
+	arrS &func(string str);   // 函数func 返回一个 指向 10个整数的数组的 指针
+	  // 使用 auto 和 尾置返回类型
+	auto func(string str) -> string(&)[10];
+	  // 使用 decltype 知道返回数组  类似类别别名 声明 定义
+	string str_arr[] = {"a string", "two"};
+	decltype(str_arr) &arrPtr(string str);
+
+## 函数 重载  同一个作用域内 的几个函数名字相同，但形参列表不同，成为 重载 (overloaded)
+// 打印 数组元素的 几个 同名函数
+void print(const char *cp);//
+void print(const int *beg, const int *end);//
+void print(const int ia[], size_t size);//
+
+
 
 
 
