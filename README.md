@@ -760,5 +760,61 @@
 #### 多维数组形参 数组指针 形参
 	void print(int (*p_arr)[10], int rowSize){}// 形参是 指向 一个含有10个整数的指针
 
+### main函数 主函数参数列表
+	// argc：argument counter 参数计数,argv：argument vector 参数 字符串 容器
+	int main(int argc, char *argv[]){}
+	int main(int argc, char **argv){}//第二个参数为 字符串数组 即数组的数组 指针的指针   argv 指向 char*
+	//程序执行 program -d -o outfile data0
+	则 argc = 5
+	argv[0] = "program"; // 程序名
+	argv[1] = "-d";      // 第一个参数 开始
+	argv[2] = "-o";      // 第二个参数
+	argv[3] = "outfile"; // 第三个参数
+	argv[4] = "data0";   // 第四个参数  最后一个指针
+	argv[5] = 0;   // 最后一个指针之后 的元素为0
 
+### 含有可变形参的函数  1 传递一个 initializer_list 标准库类型，2 特殊参数类型 省略号 ...
+
+#### initializer_list 形参  实参数量未知  但是全部实参类型 都 相同
+	// initializer_list 提供的操作
+	initializer_list<T> lst;// 默认初始化 T类型元素的空列表 模实际需要指定模板T的 具体类型
+	initializer_list<T> lst{a, b, c...};// 列表中的元素是 const 常量
+	lst2(lst); // 拷贝一个initializer_list对象，不会新建，原始列表 和 副本 共享元素
+	lst2 = lst;// 同上
+	lst.size();// 列表 中的元素
+	lst.begin();//返回指向lst中首元素的指针
+	lst.end();  //返回指向lst中尾元素下一个位置的指针
+	// 因为有 begin() 和 end()对象可以使用 范围for 遍历参数
+
+	// 具体
+	initializer_list<string> ls ;//initializer_list 的元素类型是 string
+	initializer_list<int> li ;   //initializer_list 的元素类型是 int
+	// 和vector不同的是 initializer_list中的元素是常量 不能被修改
+
+	// 定义函数
+	void error_msg(initializer_list<string> ls){
+		 for(auto beg = ls.begin(); beg != ls.end(); ++beg)
+		   cout << *beg << " ";
+		 cout << endl;
+	}
+	//调用函数
+	//expected 和 actual 是string 对象
+	if (expected != actual)
+		error_msg({"function", expected, actual});
+	else
+		error_msg({"function", "okey"});
+	// 传递了一个含有不同数量元素的 initializer_list
+
+	// 定义函数 包含 ErrCode
+	void error_msg(ErrCode e, initializer_list<string> ls){
+		 cout << e.msg() << ": "
+		 for(const auto &elem : ls )//范围for 遍历
+		  cout << elem << " ";
+		 cout << endl;
+	} 
+
+#### 省略符 ... 形参
+	void foo(param_list, ...)//
+	void foo(param_list...)//
+	void foo(...)//
 
