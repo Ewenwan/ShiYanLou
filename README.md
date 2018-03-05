@@ -921,6 +921,10 @@
 	Type (*function_name(parameter_list))[dimension]
 	int ( *func(int i) )[10];// 声明一个函数 其形参为 int i ,返回类型 为 指针 ，指向 一个 含有 10个整数的 数组
 
+	// 函数指针数组
+	多个函数可以像数组一样被调用
+	int (*fun_p_a[])(char *tmp); 函数指针数组
+
 	// 使用 auto 和 尾置返回类型
 	auto func(int i) -> int(*)[10];// 声明一个函数 其形参为 int i ,返回类型 为 指针 ，指向 一个 含有 10个整数的 数组
 
