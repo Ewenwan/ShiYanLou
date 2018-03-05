@@ -1,4 +1,4 @@
-# 语言学习记录
+# C++ 语言学习记录
 
 # 复合类型
 ## 引用 &   左值引用lvalue reference  别名; int val; &refval = val; 右值引用 rvalue reference 
@@ -948,12 +948,48 @@
 	decltype(str_arr) &arrPtr(string str);
 
 ## 函数 重载  同一个作用域内 的几个函数名字相同，但形参列表不同，成为 重载 (overloaded)
-// 打印 数组元素的 几个 同名函数
-void print(const char *cp);//
-void print(const int *beg, const int *end);//
-void print(const int ia[], size_t size);//
+	// 打印 数组元素的 几个 同名函数
+	void print(const char *cp);//出入参数为 带有结束符的 字符串指针
+	void print(const int *beg, const int *end);//输入参数为 数组的首地址 和尾后地址
+	void print(const int ia[], size_t size);//输入参数为 数组首地址和 数组大小信息
+	int j[2] = {0, 1};
+	print("Hello World");// 调用  print(const char *cp)
+	print(begin(j), end(j));// 调用 print(const int *beg, const int *end)
+	print(j, end(j) - begin(j));// 调用 print(const int ia[], size_t size)
+> 函数重载 可以起到减轻 起名字、记名字的负担	 main() 函数不能重载
+### 定义重载函数
+> 一种数据库引用，记录 名字、电话、账户号码等信息
 
+	Record lookup(const Account&); // 根据Account 查找记录  省略了 形参的名字
+	Record lookup(const Phone&);   // 根据Phone   查找记录
+	Record lookup(const Name&);    // 根据Name    查找记录
+	Account acct;
+	Phone   phond;
+	Name    name;
+	Record r1 = lookup(acct); // 接收  Account  的 版本
+	Record r2 = lookup(phond);// 接收  Phone    的 版本
+	Record r3 = lookup(name); // 接收  Name     的 版本
+	// 函数重载 可以根据 实参 的类型 确定调用哪一个函数
+	
+        // 不允许两个函数 除了返回类型不同以外 其他都相同
+	bool lookup(const Name&);    // 错误 冲突
+	
+	// 形参 的类型是否相同
+	Record lookup(const Account&); // 根据Account 查找记录  省略了 形参的名字
+	Record lookup(const Account& acct); //  错误 与上述定义重复
+	typedef Phone Telno;
+	Record lookup(const Phone&);   // 根据Phone   查找记录
+        Record lookup(const Telno&);   //  错误 与上述定义重复
 
-
-
+        // 形参 相差一个 顶层 const 为 重复定义
+	Record lookup(Phone);
+	Record lookup(const Phone);// 顶层const 不影响传入函数的对象 错误 与上述定义重复
+	Record lookup(Phone* );
+	Record lookup(Phone* const);// 顶层const 不影响传入函数的对象 错误 与上述定义重复	
+	
+	// 形参为 某种类型的 指针 或引用 呢可以通过 区分指向的 是常量 还是 非常量 实现函数重载
+	Record lookup(Account&);// 非常量引用
+	Record lookup(const Account&);//  新函数 常量引用
+	Record lookup(Account*);// 非常量指针
+	Record lookup(const Account*);//  新函数 常量指针
 
