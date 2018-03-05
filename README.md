@@ -970,23 +970,23 @@
 	Record r2 = lookup(phond);// 接收  Phone    的 版本
 	Record r3 = lookup(name); // 接收  Name     的 版本
 	// 函数重载 可以根据 实参 的类型 确定调用哪一个函数
-	
-        // 不允许两个函数 除了返回类型不同以外 其他都相同
+
+	// 不允许两个函数 除了返回类型不同以外 其他都相同
 	bool lookup(const Name&);    // 错误 冲突
-	
+
 	// 形参 的类型是否相同
 	Record lookup(const Account&); // 根据Account 查找记录  省略了 形参的名字
 	Record lookup(const Account& acct); //  错误 与上述定义重复
 	typedef Phone Telno;
 	Record lookup(const Phone&);   // 根据Phone   查找记录
-        Record lookup(const Telno&);   //  错误 与上述定义重复
+	Record lookup(const Telno&);   //  错误 与上述定义重复
 
-        // 形参 相差一个 顶层 const 为 重复定义
+	// 形参 相差一个 顶层 const 为 重复定义
 	Record lookup(Phone);
 	Record lookup(const Phone);// 顶层const 不影响传入函数的对象 错误 与上述定义重复
 	Record lookup(Phone* );
 	Record lookup(Phone* const);// 顶层const 不影响传入函数的对象 错误 与上述定义重复	
-	
+
 	// 形参为 某种类型的 指针 或引用 呢可以通过 区分指向的 是常量 还是 非常量 实现函数重载
 	Record lookup(Account&);// 非常量引用
 	Record lookup(const Account&);//  新函数 常量引用
