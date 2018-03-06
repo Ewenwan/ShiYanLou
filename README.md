@@ -1009,19 +1009,49 @@
 	}
 
 ## 特殊用途语言特性  函数默认实参 内联函数inline  常量表达式constexpr函数
-### 函数默认实参  含有默认实参的函数，可以包含该实参，也可以省略该实参，省略时将使用默认实参的值  
-typedef string::size_type sz;// 类型别名
-string screen(sz ht = 24, sz wid = 80, char background = ' ');//为每一个形参提供了 默认实参
-// 需要注意的是，一旦某个形参被赋予了默认值，它后面的所有形参都必须配有默认值。
-// 调用
-string window;
-window = screen();             // 等价于 screen(24, 80, ' ')
-window = screen(66);           // screen(66, 80, ' ')
-window = screen(66, 256);      // screen(66, 256, ' ')
-window = screen(66, 256, '#'); // screen(66, 256, '#')
-window = screen('?');          // 只能省略尾部的实参 相当于 screen('?', 80, ' ') 与调用意图不符合
-// 在函数声明与定义中 形参的默认实参只能被赋予一次
-string screen2(sz, sz, char = ' ');// 定义 最后一个形参有默认实参
-string screen2(sz, sz, char = '*');// 错误 重复声明
-string screen2(sz = 24, sz = 80, char); //正确声明 添加 默认实参 
+### 函数默认实参  含有默认实参的函数，可以包含该实参，也可以省略该实参，省略时将使用默认实参的值 
+
+	typedef string::size_type sz;// 类型别名
+	string screen(sz ht = 24, sz wid = 80, char background = ' ');//为每一个形参提供了 默认实参
+	// 需要注意的是，一旦某个形参被赋予了默认值，它后面的所有形参都必须配有默认值。
+	// 调用
+	string window;
+	window = screen();             // 等价于 screen(24, 80, ' ')
+	window = screen(66);           // screen(66, 80, ' ')
+	window = screen(66, 256);      // screen(66, 256, ' ')
+	window = screen(66, 256, '#'); // screen(66, 256, '#')
+	window = screen('?');          // 只能省略尾部的实参 相当于 screen('?', 80, ' ') 与调用意图不符合
+	// 在函数声明与定义中 形参的默认实参只能被赋予一次
+	string screen2(sz, sz, char = ' ');// 定义 最后一个形参有默认实参
+	string screen2(sz, sz, char = '*');// 错误 重复声明
+	string screen2(sz = 24, sz = 80, char); //正确声明 添加 默认实参
+	
+### 内联函数 inline
+#### 把规模较小的操作定义成函数有很多好处
+	1】便于阅读和理解 理解 shorterString函数 比理解 等价的条件表达式容易的多
+	2】使用函数可以确保 每次执行的 行为的 统一
+	3】更易于修改计算过程 找函数去修改 更容易
+	4】函数可以被其他应用重复利用，省去了重新编写的代价
+       缺点： 函数比等价的条件表达式要慢一些，调用函数需要 保存寄存器，返回时恢复，可能需要拷贝实参，转向新的位置继续执行
+#### 内联函数 inline 将函数在 原处 直接展开 避免调用 避免函数调用的开销
+	// 定义内联函数
+	inline const string &
+	shorterString(const string &s1, const string &s2){
+		return s1.size() < s2.size() ? s1 : s2;
+	}
+	//调用 内联函数
+	cout << shorterString(s1, s2) << endl;
+	// 相当于
+	cout << (s1.size() < s2.size() ? s1 : s2) << endl;
+	// inline 内联说明 只是向编译器 发出一个请求，清酒展开函数，但如果函数较复杂，或者函数较长，则编译器乐意选择忽略这个请求
+### constexpr 函数 值能用于常量表达式的函数  函数的 返回值类型 和 形参类型都得是 字面值类型， 函数体内 必须 有且只有一个return
+	constexpr int new_sz(){ return 42; }//
+	constexpr int foo = new_sz(); // 正确，foo是一个常量表达式   常量 42  不能改变的量
+	// constexpr 返回的不一定是 常量 
+	constexpr size_t scale(size_t cnt) { return new_sz() * cnt; } // 如果参数是 常量则返回的也是常量，反之不一定
+	int arr[scale(2)]; // 正确 scale(2) 是常量表达式
+	int i = 2;         // i 是整形变量
+	int a2[scale(i)];  // 错误 scale(i) 不是常量表达式，初始化数组时，必须使用常量表达式初始化数组
+
+### 通常将 内联函数 和 constexpr 函数 的 声明和定义 都放在 头文件 .h文件中，因为他们的 多个定义必须一致
 
