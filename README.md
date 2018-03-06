@@ -1055,3 +1055,18 @@
 
 ### 通常将 内联函数 和 constexpr 函数 的 声明和定义 都放在 头文件 .h文件中，因为他们的 多个定义必须一致
 
+### 函数中 使用assert(expr) 宏 确保函数运行正确
+	assert(dem>0);// 例如在 dem作为除数时 使用。 
+	// expr 表达式 为 假时 输出信息并终止程序的执行，为真时 什么也不做，继续执行后面的程序
+	assert(word.size() > threshold);// 确保输入的文本 单词的长度大于 某个阈值时 结束
+### NDEBUG预处理变量
+	// 如果 NDEBUG未定义 #ifndef 和 #endif之间的代码将被执行，反之，这些代码将被忽略 __func__  输出当前调试函数的名字
+	void print(const int ia[], size_t size){
+	#ifndef NDEBUG
+		cerr << __func__ << ": array size is "<< zise << endl;
+	#endif
+	}
+
+
+
+
