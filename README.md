@@ -1090,13 +1090,37 @@
 	void (*pf2)(int); // 错误 无对应形参的函数
 	double (*pf3)(int*); // 错误 返回值类型也必须一样
 ### 函数指针 作为 另一个函数的 形参
+	void useBigger(const string &s1, const string &s2,
+		       bool pf(const string &, const string &));// 第三个参数是函数类型 会自动的转换成 函数的指针
+	void useBigger(const string &s1, const string &s2,
+		       bool (*pf)(const string &, const string &));// 显示的将形参定义成 指向函数的指针
+	void useBigger(const string &s1, const string &s2, lengthCompare);// 直接使用原函数 作为实参使用 自动转成函数指针
+#### 注意到 直接使用函数指针 显得冗长而烦琐  使用类型别名typrdef 和 类型声明 decltype 简化使用函数指针
+	// Func 和 Func2是函数类型 的别名
+	typedef bool Func(const string&, const string&);
+	typedef decltype(lengthCompare) Func2;// 等价的类型
+	// FuncP 和 FuncP2是 指向函数的指针 类型
+	typedef bool (*FuncP)(const string&, const string&);
+	typedef decltype(lengthCompare) *FuncP2;// 等价的类型
+	// 使用类型别名
+	void useBigger(const string &s1, const string &s2, Func);  // 第三个参数是函数类型 的类别别名 会自动的转换成 函数的指针
+	void useBigger(const string &s1, const string &s2, FuncP2);// 显示的将形参定义成 指向函数的指针 的类别别名
 
-
-
-
-
-
-
+### 函数的返回类型  为 指向函数的指针    函数不能返回函数  但可以返回 指向函数的指针
+	// 定义类别别名
+	using F = int(int*, int);     // F  是函数类型
+	using PF = int(*)(int*, int); // PF 是指针类型 指向函数
+	// 使用类别别名 定义函数 
+	PF f1(int); // 正确 PF是指向函数的指针，f1 返回的类型为 指向函数的指针
+	F f2(int);  // 错误 函数f2 不能返回函数类型
+	F *f3(int); // 正确 显示的 指定返回类型是指向函数的指针
+	// 直接定义
+	int (*f1(int))(int*, int);
+	// 使用尾置返回类型定义 返回函数指针的 函数
+	auto f1(int) -> int (*)(int*, int);
+	// 使用auto 和 decltype 定义函数
+	string::size_type sumLength(const string&, const string&);
+	decltype(sumLength) *getFcn(const string&);// decltype作用域某个函数时 仅返回函数类型 需要显示的 加上* 来表示 返回指针
 
 
 
