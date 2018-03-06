@@ -923,7 +923,7 @@
 
 	// 函数指针数组
 	多个函数可以像数组一样被调用
-	int (*fun_p_a[])(char *tmp); 函数指针数组
+	int (*fun_p_a[])(char *tmp); //函数指针数组
 
 	// 使用 auto 和 尾置返回类型
 	auto func(int i) -> int(*)[10];// 声明一个函数 其形参为 int i ,返回类型 为 指针 ，指向 一个 含有 10个整数的 数组
@@ -1066,6 +1066,36 @@
 		cerr << __func__ << ": array size is "<< zise << endl;
 	#endif
 	}
+
+## 函数指针 函数指针指向的是函数 而非对象，函数的类型由 它的返回值类型 和 形参类型共同决定，与函数名无关
+	// 比较 两个string 对象的 长度函数
+	bool lengthCompare(const string &, const string &);
+	// 该函数的类型是 bool(const string &, const string &) 声明一个之前该函数的指针，只需要用指针替换函数名即可
+	bool (*Pf)(const string&, const string&); //指针未初始化  *pf 两端的括号不能少 
+	// 返回值为 指针的 函数f
+	bool *f(const string&, const string&);
+	// 函数指针的初始化  使用函数名 自动转换成 指向函数的指针
+	pf = lengthCompare;
+	pf = &lengthCompare;// 同上式 等价  取地址符号是可选的
+	// 函数的调用
+	bool b1 = pf("hello", "goodbye");    		 // 三个等价的调用
+	bool b2 = (*pf)("hello", "goodbye");     	 //  调用lengthCompare 获取结果
+	bool b3 = lengthCompare("hello", "goodbye");     //
+	// 不同函数类型的指针间不存在 转换规则
+	
+### 重载函数的指针
+	void ff(int*);         //
+	void ff(unsigned int); //
+	void (*pf1)(unsigned int) = ff; // 该 函数指针 pf1 指向 ff(unsigned int) 函数
+	void (*pf2)(int); // 错误 无对应形参的函数
+	double (*pf3)(int*); // 错误 返回值类型也必须一样
+### 函数指针 作为 另一个函数的 形参
+
+
+
+
+
+
 
 
 
