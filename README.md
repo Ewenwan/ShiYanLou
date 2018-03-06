@@ -992,4 +992,22 @@
 	Record lookup(const Account&);//  新函数 常量引用
 	Record lookup(Account*);// 非常量指针
 	Record lookup(const Account*);//  新函数 常量指针
+	
+#### const_cast 和重载
+
+// 比较两个string 对象的长度，返回较短的那个引用 函数的参数和返回类型都是 const string 的 引用。
+// 对非常量的string实参 调用该函数，但返回的结果是 const string 的引用
+const string &shorterString(const string &s1, const string &s2){
+	return s1.size() <= s2.size() ? s1 : s2;
+}
+
+// 使用 const_cast 重载shorterString()函数 使得当实参不是常量时，返回的是 一个非常量的 引用
+string &shorterString(string &s1, string &s2){
+	auto &r = shorterString(const_cast<const string&>(s1), // 将实参强制转换成 const string 的 引用
+				const_cast<const string&>(s2));// 调用上述形参为 const string& 的函数
+	return const_cast<string &>(r);//强制转换成非常量引用
+}
+
+
+
 
