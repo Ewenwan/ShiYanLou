@@ -1,4 +1,4 @@
-# C++ 语言学习记录
+# C++ primer5 语言学习记录
 
 # 复合类型
 ## 引用 &   左值引用lvalue reference  别名; int val; &refval = val; 右值引用 rvalue reference 
@@ -995,19 +995,33 @@
 	
 #### const_cast 和重载
 
-// 比较两个string 对象的长度，返回较短的那个引用 函数的参数和返回类型都是 const string 的 引用。
-// 对非常量的string实参 调用该函数，但返回的结果是 const string 的引用
-const string &shorterString(const string &s1, const string &s2){
-	return s1.size() <= s2.size() ? s1 : s2;
-}
+	// 比较两个string 对象的长度，返回较短的那个引用 函数的参数和返回类型都是 const string 的 引用。
+	// 对非常量的string实参 调用该函数，但返回的结果是 const string 的引用
+	const string &shorterString(const string &s1, const string &s2){
+		return s1.size() <= s2.size() ? s1 : s2;
+	}
 
-// 使用 const_cast 重载shorterString()函数 使得当实参不是常量时，返回的是 一个非常量的 引用
-string &shorterString(string &s1, string &s2){
-	auto &r = shorterString(const_cast<const string&>(s1), // 将实参强制转换成 const string 的 引用
-				const_cast<const string&>(s2));// 调用上述形参为 const string& 的函数
-	return const_cast<string &>(r);//强制转换成非常量引用
-}
+	// 使用 const_cast 重载shorterString()函数 使得当实参不是常量时，返回的是 一个非常量的 引用
+	string &shorterString(string &s1, string &s2){
+		auto &r = shorterString(const_cast<const string&>(s1), // 将实参强制转换成 const string 的 引用
+					const_cast<const string&>(s2));// 调用上述形参为 const string& 的函数
+		return const_cast<string &>(r);//强制转换成非常量引用
+	}
 
-
-
+## 特殊用途语言特性  函数默认实参 内联函数inline  常量表达式constexpr函数
+### 函数默认实参  含有默认实参的函数，可以包含该实参，也可以省略该实参，省略时将使用默认实参的值  
+typedef string::size_type sz;// 类型别名
+string screen(sz ht = 24, sz wid = 80, char background = ' ');//为每一个形参提供了 默认实参
+// 需要注意的是，一旦某个形参被赋予了默认值，它后面的所有形参都必须配有默认值。
+// 调用
+string window;
+window = screen();             // 等价于 screen(24, 80, ' ')
+window = screen(66);           // screen(66, 80, ' ')
+window = screen(66, 256);      // screen(66, 256, ' ')
+window = screen(66, 256, '#'); // screen(66, 256, '#')
+window = screen('?');          // 只能省略尾部的实参 相当于 screen('?', 80, ' ') 与调用意图不符合
+// 在函数声明与定义中 形参的默认实参只能被赋予一次
+string screen2(sz, sz, char = ' ');// 定义 最后一个形参有默认实参
+string screen2(sz, sz, char = '*');// 错误 重复声明
+string screen2(sz = 24, sz = 80, char); //正确声明 添加 默认实参 
 
