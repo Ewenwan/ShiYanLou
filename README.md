@@ -1121,6 +1121,24 @@
 	// 使用auto 和 decltype 定义函数
 	string::size_type sumLength(const string&, const string&);
 	decltype(sumLength) *getFcn(const string&);// decltype作用域某个函数时 仅返回函数类型 需要显示的 加上* 来表示 返回指针
+#### 声明一个vector对象 器元素类型为 指向 一个函数的指针
+	int func(int, int);        // 函数定义
+	typedef decltype(func) *f; // 类型别名  using pf = int(*)(int, int);
+	vector<f> v_f_p;// 定义 相应的 vector
 
-
+	// 加减乘除 函数 定义
+	int m_add(int a, int b){ return a + b;}
+	int m_sub(int a, int b){ return a - b;}
+	int m_mul(int a, int b){ return a * b;}
+	int m_dev(int a, int b){if(b&&a) return a/b;}
+	// 存储 函数指针的 容器
+	using f = int(int, int);
+	vector<f*> v_p_f;
+	// 向容器内 添加元素
+	v_p_f.push_back(m_add);
+	v_p_f.push_back(m_sub);
+	v_p_f.push_back(m_mul);
+	v_p_f.push_back(m_dev);
+	// 打印 容器的 元素
+	for (auto p_f : v_p_f) cout << p_f << endl;
 
