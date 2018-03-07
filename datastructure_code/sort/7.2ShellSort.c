@@ -4,38 +4,39 @@
 int n;
 
 /*
- * Ï£¶ûÅÅÐò
-   ¼ä¸ôÔöÁ¿ ²åÈëÅÅÐò 
- Ï£¶ûÅÅÐòÒ²ÊÇ²åÈëÅÅÐòµÄÒ»ÖÖ£¬µ«ËüÔÚÐ§ÂÊÉÏÒª±ÈÉÏÃæµÄÖ±½Ó²åÈëÅÅÐò¸ß£¬
- ËüÊÇ¶ÔÖ±½Ó²åÈëÅÅÐòµÄ¸Ä½ø£¬ËüµÄ»ù±¾Ë¼ÏëÊÇÏÈÈ¡Ò»¸öÐ¡ÓÚnµÄÕûÊýd1×÷ÎªµÚÒ»¸öÔöÁ¿£¬
- °ÑÎÄ¼þµÄÈ«²¿¼ÇÂ¼·Ö×é¡£
- ËùÓÐ¾àÀëÎªd1µÄ±¶ÊýµÄ¼ÇÂ¼·ÅÔÚÍ¬Ò»¸ö×éÖÐ¡£
- ÏÈÔÚ¸÷×éÄÚ½øÐÐÖ±½Ó²åÈëÅÅÐò£»
- È»ºó£¬È¡µÚ¶þ¸öÔöÁ¿d2< d1ÖØ¸´ÉÏÊöµÄ·Ö×éºÍÅÅÐò£¬
- Ö±ÖÁËùÈ¡µÄÔöÁ¿dt=1(dt<¡­< d2< d1)£¬¼´ËùÓÐ¼ÇÂ¼·ÅÔÚÍ¬Ò»×éÖÐ½øÐÐÖ±½Ó²åÈëÅÅÐòÎªÖ¹£¬
- ÔöÁ¿ÐòÁÐÓÈÎª¹Ø¼ü£¬Ò»°ãµÄ³õ´ÎÈ¡ÐòÁÐµÄÒ»°ëÎªÔöÁ¿£¬ÒÔºóÃ¿´Î¼õ°ë£¬Ö±µ½ÔöÁ¿Îª1
+ https://www.cnblogs.com/chengxiao/p/6104371.html
+ * å¸Œå°”æŽ’åº
+   é—´éš”å¢žé‡ æ’å…¥æŽ’åº 
+ å¸Œå°”æŽ’åºä¹Ÿæ˜¯æ’å…¥æŽ’åºçš„ä¸€ç§ï¼Œä½†å®ƒåœ¨æ•ˆçŽ‡ä¸Šè¦æ¯”ä¸Šé¢çš„ç›´æŽ¥æ’å…¥æŽ’åºé«˜ï¼Œ
+ å®ƒæ˜¯å¯¹ç›´æŽ¥æ’å…¥æŽ’åºçš„æ”¹è¿›ï¼Œå®ƒçš„åŸºæœ¬æ€æƒ³æ˜¯å…ˆå–ä¸€ä¸ªå°äºŽnçš„æ•´æ•°d1ä½œä¸ºç¬¬ä¸€ä¸ªå¢žé‡ï¼Œ
+ æŠŠæ–‡ä»¶çš„å…¨éƒ¨è®°å½•åˆ†ç»„ã€‚
+ æ‰€æœ‰è·ç¦»ä¸ºd1çš„å€æ•°çš„è®°å½•æ”¾åœ¨åŒä¸€ä¸ªç»„ä¸­ã€‚
+ å…ˆåœ¨å„ç»„å†…è¿›è¡Œç›´æŽ¥æ’å…¥æŽ’åºï¼›
+ ç„¶åŽï¼Œå–ç¬¬äºŒä¸ªå¢žé‡d2< d1é‡å¤ä¸Šè¿°çš„åˆ†ç»„å’ŒæŽ’åºï¼Œ
+ ç›´è‡³æ‰€å–çš„å¢žé‡dt=1(dt<â€¦< d2< d1)ï¼Œå³æ‰€æœ‰è®°å½•æ”¾åœ¨åŒä¸€ç»„ä¸­è¿›è¡Œç›´æŽ¥æ’å…¥æŽ’åºä¸ºæ­¢ï¼Œ
+ å¢žé‡åºåˆ—å°¤ä¸ºå…³é”®ï¼Œä¸€èˆ¬çš„åˆæ¬¡å–åºåˆ—çš„ä¸€åŠä¸ºå¢žé‡ï¼Œä»¥åŽæ¯æ¬¡å‡åŠï¼Œç›´åˆ°å¢žé‡ä¸º1
 
 
  */
 void ShellSort(int *array)
 {
-    int k = n / 2; //ÔöÁ¿ÐòÁÐ£¨½ö×÷¾ÙÀý£©  10/2=5
+    int k = n / 2; //å¢žé‡åºåˆ—ï¼ˆä»…ä½œä¸¾ä¾‹ï¼‰  10/2=5
     while (k > 0)
     {
         int i, j;
         for (i = k + 1; i <=n; i++)// 6~10
         {
-            if (array[i] < array[i - k])// Ô­ÏÈµÄÖ±½ÓÅÅÐòÊÇÒ»´ÎÈ¡ºóÃæµÄÒ»¸öÔªËØ ÕâÀïÊÇ ¼ä¸ôÒ»¸öÔöÁ¿ 
+            if (array[i] < array[i - k])// åŽŸå…ˆçš„ç›´æŽ¥æŽ’åºæ˜¯ä¸€æ¬¡å–åŽé¢çš„ä¸€ä¸ªå…ƒç´  è¿™é‡Œæ˜¯ é—´éš”ä¸€ä¸ªå¢žé‡ 
             {
-                array[0] = array[i];// 1   1+k£¬2 2+k  ±£´æÈ¡³öÀ´µÄÔªËØ Ð¡ 
+                array[0] = array[i];// 1   1+kï¼Œ2 2+k  ä¿å­˜å–å‡ºæ¥çš„å…ƒç´  å° 
                 for (j = i - k; j > 0 && array[0] < array[j]; j -= k)
                 {
-                    array[j + k] = array[j];//´óµÄÒÆµ½ºóÃæ 
+                    array[j + k] = array[j];//å¤§çš„ç§»åˆ°åŽé¢ 
                 }
                 array[j + k] = array[0];
             }
         }
-        k = k / 2;//ÔöÁ¿¼õÐ¡ 
+        k = k / 2;//å¢žé‡å‡å° 
     }
 }
 
@@ -43,16 +44,16 @@ int main()
 {
     int i;
     int *array;
-    printf("ÇëÊäÈëÊý×éµÄ´óÐ¡£º");
+    printf("è¯·è¾“å…¥æ•°ç»„çš„å¤§å°ï¼š");
     scanf("%d", &n);
     array = (int*) malloc(sizeof(int) * (n + 1));
-    printf("ÇëÊäÈëÊý¾Ý£¨ÓÃ¿Õ¸ñ·Ö¸ô£©£º");
+    printf("è¯·è¾“å…¥æ•°æ®ï¼ˆç”¨ç©ºæ ¼åˆ†éš”ï¼‰ï¼š");
     for (i = 1; i <= n; i++)
     {
         scanf("%d", &array[i]);
     }
     ShellSort(array);
-    printf("ÅÅÐòºóÎª£º");
+    printf("æŽ’åºåŽä¸ºï¼š");
     for (i = 1; i <= n; i++)
     {
         printf("%d ", array[i]);
