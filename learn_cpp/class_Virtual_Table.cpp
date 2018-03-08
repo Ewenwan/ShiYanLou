@@ -1,7 +1,12 @@
+/*
+C++的多态性用一句话概括就是：
+在基类的函数前加上virtual关键字，在派生类中重写该函数，运行时将会根据对象的实际类型来调用相应的函数。
+如果对象类型是派生类，就调用派生类的函数；如果对象类型是基类，就调用基类的函数
+*/
 #include <iostream>
 using namespace std;
  
-//���� Base1
+//基类 Base1
 class Base1 {
 public:
             virtual void f() { cout << "Base1::f" << endl; }
@@ -10,7 +15,7 @@ public:
  
 };
 
-//���� Base2 
+//基类 Base2 
 class Base2 {
 public:
             virtual void f() { cout << "Base2::f" << endl; }
@@ -18,7 +23,7 @@ public:
             virtual void h() { cout << "Base2::h" << endl; }
 };
 
-//���� Base3 
+//基类 Base3 
 class Base3 {
 public:
             virtual void f() { cout << "Base3::f" << endl; }
@@ -26,24 +31,23 @@ public:
             virtual void h() { cout << "Base3::h" << endl; }
 };
  
-//���� �̳��� ���� Base1  Base2  Base3 
+//子类 继承于 父类 Base1  Base2  Base3  子类base 共有 3*（3+1）=12个函数
 class Derive : public Base1, public Base2, public Base3 {
 public:
-            virtual void f() { cout << "Derive::f" << endl; }  //������ ����� ����f()
-            virtual void g1() { cout << "Derive::g1" << endl; }//���е�  ���� ����
+            virtual void f() { cout << "Derive::f" << endl; }  //覆盖了 父类的 函数f()
+            virtual void g1() { cout << "Derive::g1" << endl; }//独有的  子类 函数
 };
  
- 
-typedef void(*Fun)(void);//����ָ��
+typedef void(*Fun)(void);// 类型别名定义 Fun是函数指针 指向一个函数类型为 void(void)的函数，即返回类型为void 形参参数也为void
  
 int main()
 {
-            Fun pFun = NULL;
+            Fun pFun = NULL;//定义函数指针  初始化为 NULL
  
-            Derive d;//����
-            int** pVtab = (int**)&d;// �麯���� ����ָ������
+            Derive d;//子类
+            int** pVtab = (int**)&d;// 虚函数表 函数指针数组
  
-//����Base1�� �麯���� Base1's vtable
+//父类Base1的 虚函数表 Base1's vtable
 //  |Derive::f()|Base1::g()|Base1::h()|Derive::g1()|.|
 
             //pFun = (Fun)*((int*)*(int*)((int*)&d+0)+0);
@@ -63,11 +67,11 @@ int main()
             pFun = (Fun)pVtab[0][3];
             pFun();
  
-           //�麯���� β�� ������ |.|
+           //虚函数表 尾部 结束符 |.|
             pFun = (Fun)pVtab[0][4];
             cout<<pFun<<endl;
  
- // ���� Base2 �麯����
+ // 父类 Base2 虚函数表
  //|Derive::f()|Base2::g()|Base2::h()|.|
  //Base2's vtable
             //pFun = (Fun)*((int*)*(int*)((int*)&d+1)+0);
@@ -86,7 +90,7 @@ int main()
             cout<<pFun<<endl;
  
 
- // ���� Base3 �麯����
+ // 父类 Base3 虚函数表
  //|Derive::f()|Base3::g()|Base3::h()|.|
  //Base3's vtable
             //pFun = (Fun)*((int*)*(int*)((int*)&d+2)+0);
@@ -99,7 +103,7 @@ int main()
             //pFun = (Fun)*((int*)*(int*)((int*)&d+2)+2);
             pFun = (Fun)pVtab[2][2];
             pFun();
-           //�麯���� β�� ������ |.|
+           //虚函数表 尾部 结束符 |.|
             pFun = (Fun)pVtab[2][3];
             cout<<pFun<<endl;
  
