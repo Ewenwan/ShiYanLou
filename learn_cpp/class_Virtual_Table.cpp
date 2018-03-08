@@ -2,6 +2,19 @@
 C++的多态性用一句话概括就是：
 在基类的函数前加上virtual关键字，在派生类中重写该函数，运行时将会根据对象的实际类型来调用相应的函数。
 如果对象类型是派生类，就调用派生类的函数；如果对象类型是基类，就调用基类的函数
+Derive::f// 被覆盖的函数 存在于 对应被覆盖的 父类的 虚函数表中
+Base1::g
+Base1::h
+Derive::g1// 子类新增添的 函数 只存在于 继承源自的 第一个子类的虚函数表中 
+1
+Derive::f// 被覆盖的函数 存在于 对应被覆盖的 父类的 虚函数表中
+Base2::g
+Base2::h
+1
+Derive::f// 被覆盖的函数 存在于 对应被覆盖的 父类的 虚函数表中
+Base3::g
+Base3::h
+0
 */
 #include <iostream>
 using namespace std;
@@ -31,7 +44,7 @@ public:
             virtual void h() { cout << "Base3::h" << endl; }
 };
  
-//子类 继承于 父类 Base1  Base2  Base3  子类base 共有 3*（3+1）=12个函数
+//子类 继承于 父类 Base1  Base2  Base3  子类base  Derive共有 继承自父类的函数 （3-1）*3 和 自己的2个函数
 class Derive : public Base1, public Base2, public Base3 {
 public:
             virtual void f() { cout << "Derive::f" << endl; }  //覆盖了 父类的 函数f()
