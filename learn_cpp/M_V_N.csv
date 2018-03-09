@@ -1,0 +1,940 @@
+devel01_1, 10
+devel01_2, 7
+devel01_3, 4
+devel01_4, 2
+devel01_5, 8
+devel01_6, 1
+devel01_7, 6
+devel01_8, 9
+devel01_9, 3
+devel01_10, 5
+devel01_11, 9 4 4 9
+devel01_12, 6 9 6
+devel01_13, 4 8
+devel01_14, 10 2 8
+devel01_15, 2 3 4 10
+devel01_16, 7 1 9 6 1
+devel01_17, 5 5 2
+devel01_18, 6 9
+devel01_19, 10 10 3 3
+devel01_20, 5 1
+devel01_21, 1 10 7 5 9
+devel01_22, 1 6
+devel01_23, 9 4
+devel01_24, 10 3
+devel01_25, 8 1 5
+devel01_26, 5
+devel01_27, 2
+devel01_28, 10
+devel01_29, 8 7 6 1 7
+devel01_30, 3 7
+devel01_31, 5 7 6 6
+devel01_32, 7
+devel01_33, 8 2 5
+devel01_34, 2 10
+devel01_35, 10 10 8 7 5
+devel01_36, 7
+devel01_37, 4
+devel01_38, 1
+devel01_39, 3
+devel01_40, 3
+devel01_41, 8
+devel01_42, 6
+devel01_43, 9
+devel01_44, 7 5
+devel01_45, 4 7 9
+devel01_46, 7 6 8 1
+devel01_47, 1 10 1
+devel02_1, 7
+devel02_2, 9
+devel02_3, 10
+devel02_4, 3
+devel02_5, 5
+devel02_6, 8
+devel02_7, 6
+devel02_8, 4
+devel02_9, 1
+devel02_10, 2
+devel02_11, 8 7 1 2
+devel02_12, 1 3 7 8 10
+devel02_13, 8 8 4
+devel02_14, 8 5
+devel02_15, 9
+devel02_16, 2 10 9
+devel02_17, 6 1
+devel02_18, 2 6 4 5
+devel02_19, 10
+devel02_20, 3 2 4 6 2
+devel02_21, 4
+devel02_22, 7
+devel02_23, 1
+devel02_24, 1 3 2
+devel02_25, 2 2
+devel02_26, 4 8 10 5
+devel02_27, 3 10 5 9
+devel02_28, 8
+devel02_29, 5
+devel02_30, 4 7
+devel02_31, 4 2 7 1
+devel02_32, 7 8
+devel02_33, 5 9
+devel02_34, 4 5 5
+devel02_35, 10 4 8 1
+devel02_36, 2
+devel02_37, 6
+devel02_38, 3
+devel02_39, 10 6
+devel02_40, 9
+devel02_41, 6 2 8
+devel02_42, 5
+devel02_43, 1 9 6
+devel02_44, 8 3 3 10 9
+devel02_45, 
+devel02_46, 8
+devel02_47, 9 4
+devel03_1, 5
+devel03_2, 1
+devel03_3, 4
+devel03_4, 6
+devel03_5, 8
+devel03_6, 7
+devel03_7, 2
+devel03_8, 3
+devel03_9, 3 2
+devel03_10, 3
+devel03_11, 3
+devel03_12, 3
+devel03_13, 2 7 8
+devel03_14, 2
+devel03_15, 3
+devel03_16, 2 2 2
+devel03_17, 2 3
+devel03_18, 3 2
+devel03_19, 8 2 2
+devel03_20, 7
+devel03_21, 3
+devel03_22, 3
+devel03_23, 3 8 2 2 2
+devel03_24, 2 2
+devel03_25, 2
+devel03_26, 2 2
+devel03_27, 3
+devel03_28, 3 3 3 3 3
+devel03_29, 2 8
+devel03_30, 2
+devel03_31, 3 3 3
+devel03_32, 2
+devel03_33, 2
+devel03_34, 4 7 3
+devel03_35, 2 3 3
+devel03_36, 8 2
+devel03_37, 3
+devel03_38, 3
+devel03_39, 3 2 2 3 2
+devel03_40, 2 3 4 3
+devel03_41, 3 3 3 2
+devel03_42, 3
+devel03_43, 2 2 2
+devel03_44, 8
+devel03_45, 2
+devel03_46, 3 8 3
+devel03_47, 2
+devel04_1, 9
+devel04_2, 6
+devel04_3, 1
+devel04_4, 7
+devel04_5, 5
+devel04_6, 2
+devel04_7, 3
+devel04_8, 10
+devel04_9, 4
+devel04_10, 8
+devel04_11, 3
+devel04_12, 1
+devel04_13, 2 7
+devel04_14, 2 2
+devel04_15, 9 5 4
+devel04_16, 7
+devel04_17, 4 7 3
+devel04_18, 5
+devel04_19, 9 2
+devel04_20, 9 10 4
+devel04_21, 3 1
+devel04_22, 3 8
+devel04_23, 3
+devel04_24, 7
+devel04_25, 5 1 9
+devel04_26, 10 9
+devel04_27, 7 2 2
+devel04_28, 10
+devel04_29, 5
+devel04_30, 9 1 10
+devel04_31, 6
+devel04_32, 7 9
+devel04_33, 4 9
+devel04_34, 5 10 7
+devel04_35, 2 10
+devel04_36, 9
+devel04_37, 8 5 5
+devel04_38, 2 1 5
+devel04_39, 1
+devel04_40, 8 1
+devel04_41, 1 5
+devel04_42, 6 4
+devel04_43, 1 6
+devel04_44, 9 10 10 6
+devel04_45, 8
+devel04_46, 10 10 8
+devel04_47, 4
+devel05_1, 2
+devel05_2, 8
+devel05_3, 4
+devel05_4, 5
+devel05_5, 3
+devel05_6, 1
+devel05_7, 7
+devel05_8, 6
+devel05_9, 5 7
+devel05_10, 4
+devel05_11, 3 2
+devel05_12, 4
+devel05_13, 8 2
+devel05_14, 4 1
+devel05_15, 7
+devel05_16, 3 4 8
+devel05_17, 7 4 1 3 7
+devel05_18, 8 2 3 8 5
+devel05_19, 2 7 5 4 4
+devel05_20, 6
+devel05_21, 5 8 7 4
+devel05_22, 5 7 4
+devel05_23, 1 6
+devel05_24, 2 5 4 2
+devel05_25, 8 6 2
+devel05_26, 5
+devel05_27, 1 8 6
+devel05_28, 6
+devel05_29, 3 6 2 6
+devel05_30, 2 1 3
+devel05_31, 5 8 2 2 2
+devel05_32, 6 2 7
+devel05_33, 3
+devel05_34, 1
+devel05_35, 2 5
+devel05_36, 1 2 1 7
+devel05_37, 2
+devel05_38, 2
+devel05_39, 5
+devel05_40, 3 8
+devel05_41, 7 3 6 8
+devel05_42, 7
+devel05_43, 1 3
+devel05_44, 1
+devel05_45, 7 6
+devel05_46, 8
+devel05_47, 6 4
+devel06_1, 5
+devel06_2, 9
+devel06_3, 6
+devel06_4, 1
+devel06_5, 2
+devel06_6, 7
+devel06_7, 8
+devel06_8, 3
+devel06_9, 10
+devel06_10, 4
+devel06_11, 5
+devel06_12, 9 2 4
+devel06_13, 3 1 9 10
+devel06_14, 6
+devel06_15, 1 3 9
+devel06_16, 10
+devel06_17, 9 8 9 9 8
+devel06_18, 7 2 2 6
+devel06_19, 3
+devel06_20, 2 1
+devel06_21, 8 6
+devel06_22, 9 9
+devel06_23, 1 2
+devel06_24, 9 2 2
+devel06_25, 4
+devel06_26, 9 6 9 4 9
+devel06_27, 4 9
+devel06_28, 9 8
+devel06_29, 6 7 9
+devel06_30, 6
+devel06_31, 2
+devel06_32, 9
+devel06_33, 3 3
+devel06_34, 9
+devel06_35, 5
+devel06_36, 6 10
+devel06_37, 3 9 10
+devel06_38, 4 3 8
+devel06_39, 10 6 6 1
+devel06_40, 4
+devel06_41, 1
+devel06_42, 4
+devel06_43, 2 6 8
+devel06_44, 8
+devel06_45, 6 3 9 6 2
+devel06_46, 8 8 6 9
+devel06_47, 2 4
+devel07_1, 5
+devel07_2, 8
+devel07_3, 2
+devel07_4, 4
+devel07_5, 9
+devel07_6, 3
+devel07_7, 6
+devel07_8, 7
+devel07_9, 1
+devel07_10, 2 8
+devel07_11, 4
+devel07_12, 3 7
+devel07_13, 2
+devel07_14, 7 9 9
+devel07_15, 6 3
+devel07_16, 4 5 6 9 1
+devel07_17, 9
+devel07_18, 1 3 2 3
+devel07_19, 9
+devel07_20, 7 6 6 4
+devel07_21, 7 1
+devel07_22, 3 5 5
+devel07_23, 9 5
+devel07_24, 9 5 8 8
+devel07_25, 4
+devel07_26, 7 2 3 3 7
+devel07_27, 7
+devel07_28, 2
+devel07_29, 1
+devel07_30, 3
+devel07_31, 4
+devel07_32, 8 8 3 3
+devel07_33, 8 9 4 2 6
+devel07_34, 5 9
+devel07_35, 5
+devel07_36, 8 8 7
+devel07_37, 6 2 6
+devel07_38, 8 4
+devel07_39, 2 3 6
+devel07_40, 7
+devel07_41, 2 6 9 3 9
+devel07_42, 8 1 2
+devel07_43, 9 4
+devel07_44, 3 9 7 7
+devel07_45, 8
+devel07_46, 1 2
+devel07_47, 4 4
+devel08_1, 8
+devel08_2, 7
+devel08_3, 11
+devel08_4, 10
+devel08_5, 3
+devel08_6, 1
+devel08_7, 5
+devel08_8, 6
+devel08_9, 2
+devel08_10, 4
+devel08_11, 9
+devel08_12, 5 5 6 5
+devel08_13, 2 6 6
+devel08_14, 8 9
+devel08_15, 4 9 7 3
+devel08_16, 4 2 5 1 7
+devel08_17, 2
+devel08_18, 4
+devel08_19, 8 3 9 5 7
+devel08_20, 5
+devel08_21, 3 2 9 2
+devel08_22, 6 1 3 3 8
+devel08_23, 1
+devel08_24, 10 5 1 7 4
+devel08_25, 7
+devel08_26, 1 3 3 10
+devel08_27, 6 6
+devel08_28, 7 8 9
+devel08_29, 3 10
+devel08_30, 10 5 3
+devel08_31, 10
+devel08_32, 6
+devel08_33, 5 2 4
+devel08_34, 10 4
+devel08_35, 11 6 1 8
+devel08_36, 3
+devel08_37, 7 8
+devel08_38, 2 7
+devel08_39, 1
+devel08_40, 3 9 1
+devel08_41, 9
+devel08_42, 9 7 11
+devel08_43, 9 5
+devel08_44, 10 3
+devel08_45, 8
+devel08_46, 5 10
+devel08_47, 11
+devel09_1, 8
+devel09_2, 6
+devel09_3, 1
+devel09_4, 4
+devel09_5, 2
+devel09_6, 5
+devel09_7, 3
+devel09_8, 9
+devel09_9, 7
+devel09_10, 1
+devel09_11, 4 8
+devel09_12, 8
+devel09_13, 6 1
+devel09_14, 4 9 7
+devel09_15, 7 9
+devel09_16, 9
+devel09_17, 9 7
+devel09_18, 3 1 1 3
+devel09_19, 2 8 6 5 8
+devel09_20, 4
+devel09_21, 6
+devel09_22, 7 7 8 6
+devel09_23, 5 7 8
+devel09_24, 2 3
+devel09_25, 4 9 6 7
+devel09_26, 9
+devel09_27, 7
+devel09_28, 7 8 4
+devel09_29, 3
+devel09_30, 2 2 1
+devel09_31, 8 4
+devel09_32, 2 6 4
+devel09_33, 5
+devel09_34, 1 8 1 4
+devel09_35, 3 7 3
+devel09_36, 7 8 8
+devel09_37, 4 7
+devel09_38, 1 5
+devel09_39, 5 4
+devel09_40, 5 5
+devel09_41, 8
+devel09_42, 3
+devel09_43, 2
+devel09_44, 8 1 5 7 2
+devel09_45, 7
+devel09_46, 1 2
+devel09_47, 3 2
+devel10_1, 9
+devel10_2, 4
+devel10_3, 7
+devel10_4, 8
+devel10_5, 6
+devel10_6, 1
+devel10_7, 2
+devel10_8, 3
+devel10_9, 5
+devel10_10, 4
+devel10_11, 9 8 7 1 2
+devel10_12, 4 6 6 2 8
+devel10_13, 7 8
+devel10_14, 4 8
+devel10_15, 4 7
+devel10_16, 3
+devel10_17, 2 6 8 6
+devel10_18, 1
+devel10_19, 8
+devel10_20, 9 3 3 7
+devel10_21, 8 4 2 4
+devel10_22, 3 3
+devel10_23, 6 5 2 3
+devel10_24, 4
+devel10_25, 8
+devel10_26, 1 2
+devel10_27, 9 9
+devel10_28, 6 7 4
+devel10_29, 8
+devel10_30, 8 6 1
+devel10_31, 9 6 8
+devel10_32, 1 2 6
+devel10_33, 9
+devel10_34, 6
+devel10_35, 9 4 6
+devel10_36, 6 8 8 3 6
+devel10_37, 6
+devel10_38, 8
+devel10_39, 7 7
+devel10_40, 4 8 5
+devel10_41, 2 4
+devel10_42, 4 9 1 5
+devel10_43, 7
+devel10_44, 7 3 3 6 8
+devel10_45, 8 1
+devel10_46, 8 6
+devel10_47, 1
+devel11_1, 8
+devel11_2, 2
+devel11_3, 4
+devel11_4, 1
+devel11_5, 7
+devel11_6, 3
+devel11_7, 5
+devel11_8, 6
+devel11_9, 2 3
+devel11_10, 1 5 3
+devel11_11, 4 8
+devel11_12, 6 5 2 1
+devel11_13, 7 6
+devel11_14, 3 7
+devel11_15, 7 7 6
+devel11_16, 4 1 3 7 5
+devel11_17, 2 3 5
+devel11_18, 7 4 7 7
+devel11_19, 1 6 5 2 2
+devel11_20, 8
+devel11_21, 1
+devel11_22, 6
+devel11_23, 2 8
+devel11_24, 2
+devel11_25, 2 4
+devel11_26, 4
+devel11_27, 3
+devel11_28, 4 1 1
+devel11_29, 1 6 2 2
+devel11_30, 4 2
+devel11_31, 2 3 5 6
+devel11_32, 2 2 6 4
+devel11_33, 7
+devel11_34, 2
+devel11_35, 2
+devel11_36, 5
+devel11_37, 7 7 2 4 2
+devel11_38, 5 6
+devel11_39, 2 6 4
+devel11_40, 3 8 2
+devel11_41, 5
+devel11_42, 2 2 6 6 4
+devel11_43, 6 5
+devel11_44, 4
+devel11_45, 4
+devel11_46, 3
+devel11_47, 5 1
+devel12_1, 1
+devel12_2, 6
+devel12_3, 11
+devel12_4, 2
+devel12_5, 8
+devel12_6, 4
+devel12_7, 3
+devel12_8, 7
+devel12_9, 10
+devel12_10, 9
+devel12_11, 5
+devel12_12, 2 2 3
+devel12_13, 6 8
+devel12_14, 5 11
+devel12_15, 10
+devel12_16, 4 3 8
+devel12_17, 3
+devel12_18, 7
+devel12_19, 7 10 8 5
+devel12_20, 1 6
+devel12_21, 8 3
+devel12_22, 1 5 9
+devel12_23, 6 1 3 11 7
+devel12_24, 10 5
+devel12_25, 9 5 9 4
+devel12_26, 4 1 6 2
+devel12_27, 8 1 10
+devel12_28, 7 9
+devel12_29, 9
+devel12_30, 3 1
+devel12_31, 11 10
+devel12_32, 1
+devel12_33, 4
+devel12_34, 9 4
+devel12_35, 2 10 1 8
+devel12_36, 11
+devel12_37, 8 7 11 1 3
+devel12_38, 6
+devel12_39, 6 8 1
+devel12_40, 2 7
+devel12_41, 5 7 11
+devel12_42, 5
+devel12_43, 5 11 2 1 4
+devel12_44, 5
+devel12_45, 6 3 1 11
+devel12_46, 2
+devel12_47, 5 4 8
+devel13_1, 3
+devel13_2, 8
+devel13_3, 9
+devel13_4, 5
+devel13_5, 2
+devel13_6, 12
+devel13_7, 7
+devel13_8, 10
+devel13_9, 1
+devel13_10, 11
+devel13_11, 4
+devel13_12, 6
+devel13_13, 9 3
+devel13_14, 6 6 3
+devel13_15, 2
+devel13_16, 8
+devel13_17, 2 2 6
+devel13_18, 1 4
+devel13_19, 8 10
+devel13_20, 2 11
+devel13_21, 11
+devel13_22, 10 1
+devel13_23, 7 5
+devel13_24, 12 5 4 7
+devel13_25, 9
+devel13_26, 4 12
+devel13_27, 12
+devel13_28, 8 10 7 10
+devel13_29, 7 8 8 12
+devel13_30, 5 6
+devel13_31, 4
+devel13_32, 11 7
+devel13_33, 10 12 6 4
+devel13_34, 10
+devel13_35, 3 3 12 5 12
+devel13_36, 12 6 1 2
+devel13_37, 3 3 5
+devel13_38, 5
+devel13_39, 3 9
+devel13_40, 3
+devel13_41, 9 1 9
+devel13_42, 5 9 1 9 7
+devel13_43, 7 8 8 6 6
+devel13_44, 4 7 1
+devel13_45, 12 7
+devel13_46, 1
+devel13_47, 12 1 6 8 9
+devel14_1, 4
+devel14_2, 3
+devel14_3, 6
+devel14_4, 2
+devel14_5, 5
+devel14_6, 7
+devel14_7, 1
+devel14_8, 8
+devel14_9, 4
+devel14_10, 3
+devel14_11, 8
+devel14_12, 3 4 5 3
+devel14_13, 8 4
+devel14_14, 2
+devel14_15, 8 2 4 2 8
+devel14_16, 7 3
+devel14_17, 3 4
+devel14_18, 4 4 6
+devel14_19, 8 8 3 7
+devel14_20, 5
+devel14_21, 1 2 8
+devel14_22, 3 8 3
+devel14_23, 1 2
+devel14_24, 4 8
+devel14_25, 1
+devel14_26, 3
+devel14_27, 5 2
+devel14_28, 3
+devel14_29, 1 8 2 4 5
+devel14_30, 4
+devel14_31, 3
+devel14_32, 1 3 2
+devel14_33, 2 1 2
+devel14_34, 2 6
+devel14_35, 4 2 6 4
+devel14_36, 1
+devel14_37, 6
+devel14_38, 3
+devel14_39, 2 8 1
+devel14_40, 2 2 3
+devel14_41, 8 1
+devel14_42, 6 5
+devel14_43, 1 4 5
+devel14_44, 3 4
+devel14_45, 5
+devel14_46, 8 3
+devel14_47, 8
+devel15_1, 4
+devel15_2, 3
+devel15_3, 1
+devel15_4, 6
+devel15_5, 5
+devel15_6, 7
+devel15_7, 2
+devel15_8, 8
+devel15_9, 5
+devel15_10, 8
+devel15_11, 4 2
+devel15_12, 8
+devel15_13, 5
+devel15_14, 8 8
+devel15_15, 7
+devel15_16, 8 8 8 6 2
+devel15_17, 7
+devel15_18, 6 8
+devel15_19, 5 6 4 8 6
+devel15_20, 3 2 1 2 1
+devel15_21, 1 6
+devel15_22, 2
+devel15_23, 6 1
+devel15_24, 4
+devel15_25, 7 8 2
+devel15_26, 3
+devel15_27, 6 4 7
+devel15_28, 3
+devel15_29, 5 6 6
+devel15_30, 8 7 8
+devel15_31, 6
+devel15_32, 4
+devel15_33, 1
+devel15_34, 8 3 4 7
+devel15_35, 7 6 3 5
+devel15_36, 1
+devel15_37, 3 3 3
+devel15_38, 3 3
+devel15_39, 7 7
+devel15_40, 8 5
+devel15_41, 3 8 6 7
+devel15_42, 5 6
+devel15_43, 8 7 5
+devel15_44, 4 4 8 4 4
+devel15_45, 1 4
+devel15_46, 4 5 8 4
+devel15_47, 6 4 5 3
+devel16_1, 11
+devel16_2, 8
+devel16_3, 2
+devel16_4, 4
+devel16_5, 13
+devel16_6, 5
+devel16_7, 3
+devel16_8, 7
+devel16_9, 6
+devel16_10, 10
+devel16_11, 9
+devel16_12, 12
+devel16_13, 1
+devel16_14, 11 10
+devel16_15, 5 2 5 10 13
+devel16_16, 1 12 11
+devel16_17, 1
+devel16_18, 8 3 9 13
+devel16_19, 8
+devel16_20, 1 1 4
+devel16_21, 7
+devel16_22, 9 11 7 9 9
+devel16_23, 12
+devel16_24, 10 13
+devel16_25, 13 7
+devel16_26, 8 6 4 7
+devel16_27, 10
+devel16_28, 12 1 5 8
+devel16_29, 9 1
+devel16_30, 9 4 10
+devel16_31, 2 4
+devel16_32, 13 13 12
+devel16_33, 2
+devel16_34, 11
+devel16_35, 7 9
+devel16_36, 2 1 7
+devel16_37, 4 8 13 4
+devel16_38, 13
+devel16_39, 12 8
+devel16_40, 8 3
+devel16_41, 2 9 1
+devel16_42, 4
+devel16_43, 5 1
+devel16_44, 11 1 2 7 6
+devel16_45, 11 11 12 13
+devel16_46, 10 2 1 1 11
+devel16_47, 1 12
+devel17_1, 8
+devel17_2, 3
+devel17_3, 2
+devel17_4, 6
+devel17_5, 7
+devel17_6, 1
+devel17_7, 5
+devel17_8, 4
+devel17_9, 8 4 2 1
+devel17_10, 2
+devel17_11, 7
+devel17_12, 3
+devel17_13, 4 7 8 6
+devel17_14, 8 6 1 3 1
+devel17_15, 6 8 1 2
+devel17_16, 4 8 6 8 7
+devel17_17, 5
+devel17_18, 2 2 6 3
+devel17_19, 6 6
+devel17_20, 7 8 3
+devel17_21, 3 8
+devel17_22, 5
+devel17_23, 4
+devel17_24, 1 2 5 6 3
+devel17_25, 8
+devel17_26, 2 6
+devel17_27, 2
+devel17_28, 2 1 3 2 8
+devel17_29, 1 5
+devel17_30, 4 3
+devel17_31, 7 2
+devel17_32, 5 5 8
+devel17_33, 6
+devel17_34, 6 4 2
+devel17_35, 1
+devel17_36, 4 3 1
+devel17_37, 6 1
+devel17_38, 5 7
+devel17_39, 3
+devel17_40, 3 5
+devel17_41, 3
+devel17_42, 8 6 4
+devel17_43, 5 5 7
+devel17_44, 7 1 4 5
+devel17_45, 1
+devel17_46, 8 4
+devel17_47, 4
+devel18_1, 3
+devel18_2, 10
+devel18_3, 4
+devel18_4, 5
+devel18_5, 7
+devel18_6, 2
+devel18_7, 8
+devel18_8, 9
+devel18_9, 6
+devel18_10, 1
+devel18_11, 2 2
+devel18_12, 5 5 10 2
+devel18_13, 10 5
+devel18_14, 10 6 7 5 10
+devel18_15, 5 7 5 3
+devel18_16, 1
+devel18_17, 4 4 3
+devel18_18, 4 7
+devel18_19, 6 3
+devel18_20, 7 8 1
+devel18_21, 5 4 5 9
+devel18_22, 5 2 2 4 3
+devel18_23, 7
+devel18_24, 8 5 8 5 5
+devel18_25, 6
+devel18_26, 1 1 6
+devel18_27, 5
+devel18_28, 7
+devel18_29, 9 8 9
+devel18_30, 5
+devel18_31, 4
+devel18_32, 7 4 8
+devel18_33, 1 8
+devel18_34, 7 1
+devel18_35, 5 10
+devel18_36, 3
+devel18_37, 1 2 9
+devel18_38, 6
+devel18_39, 3 6
+devel18_40, 2 8 3 8 5
+devel18_41, 9
+devel18_42, 5 5 7
+devel18_43, 5 9
+devel18_44, 6
+devel18_45, 2
+devel18_46, 6 4
+devel18_47, 2 5 5
+devel19_1, 1
+devel19_2, 9
+devel19_3, 8
+devel19_4, 4
+devel19_5, 2
+devel19_6, 6
+devel19_7, 5
+devel19_8, 3
+devel19_9, 7
+devel19_10, 5 5
+devel19_11, 5
+devel19_12, 9 8
+devel19_13, 9 7 8
+devel19_14, 5
+devel19_15, 5 9 2 3 3
+devel19_16, 9
+devel19_17, 7 8 8 1
+devel19_18, 7
+devel19_19, 4 5 2 5
+devel19_20, 5 7
+devel19_21, 1 2 7 4 9
+devel19_22, 1
+devel19_23, 5 5 8 1 2
+devel19_24, 1 2
+devel19_25, 1 9 5
+devel19_26, 7 8 2
+devel19_27, 3
+devel19_28, 7 7 3 4
+devel19_29, 4 2 7
+devel19_30, 1
+devel19_31, 4 4 1
+devel19_32, 3 1
+devel19_33, 7 5
+devel19_34, 4 7
+devel19_35, 8
+devel19_36, 3 5 3 5
+devel19_37, 2
+devel19_38, 2 5
+devel19_39, 9 5
+devel19_40, 2 5 5 2
+devel19_41, 9 3
+devel19_42, 7
+devel19_43, 9 7 7 8 1
+devel19_44, 5
+devel19_45, 7 7 7
+devel19_46, 7
+devel19_47, 5
+devel20_1, 8
+devel20_2, 4
+devel20_3, 1
+devel20_4, 7
+devel20_5, 5
+devel20_6, 6
+devel20_7, 3
+devel20_8, 2
+devel20_9, 9
+devel20_10, 5
+devel20_11, 9 2
+devel20_12, 3 3 2 8
+devel20_13, 2
+devel20_14, 7 7
+devel20_15, 4
+devel20_16, 6 5
+devel20_17, 3
+devel20_18, 5 3
+devel20_19, 8 8
+devel20_20, 7
+devel20_21, 3
+devel20_22, 2
+devel20_23, 1
+devel20_24, 4 4
+devel20_25, 3 6 3
+devel20_26, 5
+devel20_27, 4
+devel20_28, 6
+devel20_29, 6
+devel20_30, 6
+devel20_31, 4
+devel20_32, 3 8 3
+devel20_33, 1 2 9
+devel20_34, 5 2
+devel20_35, 8 1
+devel20_36, 3 6
+devel20_37, 1 5
+devel20_38, 9 9
+devel20_39, 5 6 3 8 3
+devel20_40, 8 4 7
+devel20_41, 2
+devel20_42, 7 9 3 2
+devel20_43, 2 5 5 4 9
+devel20_44, 9
+devel20_45, 9
+devel20_46, 8 2 1
+devel20_47, 5 9
