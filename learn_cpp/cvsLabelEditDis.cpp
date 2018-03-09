@@ -1,7 +1,7 @@
 /*
  *  minEditDis.cpp
- *  ¼ÆËãÁ½¸ö×Ö·û´®¼äµÄ±à¼­¾àÀëµÄLDscore 
- *  ÍòÓĞÎÄ
+ *  è®¡ç®—ä¸¤ä¸ªå­—ç¬¦ä¸²é—´çš„ç¼–è¾‘è·ç¦»çš„LDscore 
+ *  ä¸‡æœ‰æ–‡
  *  1631684@tongji.edu.cn 
  */
 
@@ -33,26 +33,21 @@ void  GetString( const string& Str, string &Value );
 
 int main(int argc, char *argv[])
 {
-    vector<string> row1,row2;//´æ´¢Ã¿Ò»ĞĞ ×Ö·û´® ¶ººÅ¼äµÄ ×Ö·û´®µÄ ÈİÆ÷ 
-    string label1,label2;// 1,2,3,...,9,10,11,12,13ÕâÖÖ±êÇ©×ª»»³É  1,2,3,...,9,A,B,C,D
-    string line1,line2;// ÎÄ¼şµÄÃ¿Ò»ĞĞ 
-    string temp_str;//  row1,row2; ÖĞµÄµ¥¸ö ×Ö·û´® 
+    vector<string> row1,row2;//å­˜å‚¨æ¯ä¸€è¡Œ å­—ç¬¦ä¸² é€—å·é—´çš„ å­—ç¬¦ä¸²çš„ å®¹å™¨ 
+    string label1,label2;// 1,2,3,...,9,10,11,12,13è¿™ç§æ ‡ç­¾è½¬æ¢æˆ  1,2,3,...,9,A,B,C,D
+    string line1,line2;// æ–‡ä»¶çš„æ¯ä¸€è¡Œ 
+    string temp_str;//  row1,row2; ä¸­çš„å•ä¸ª å­—ç¬¦ä¸² 
     
-    // Ô´ÎÄ¼şÎª cvsÎÄ¼ş 
-    //ifstream sour("D:\\LW\\Sample_code_6_16_2012\\data_lable\\devel09_sour_lable.csv"); //ÉùÃ÷ÎÄ¼şÁ÷ 
-    ifstream sour("D:\\LW\\Sample_code_6_16_2012\\data_lable\\total\\data_sour_lable_total.csv"); //ÉùÃ÷ÎÄ¼şÁ÷ 
-    ifstream predict("D:\\LW\\Sample_code_6_16_2012\\LD score\\M_V_N.csv");   //dtw_19 ÉùÃ÷ÎÄ¼şÁ÷ 
-    //ifstream predict("D:\\LW\\joewan_upload_V2\\results\\my_tmpResults_Kmean3\\dtw_three_22.5_skeleon625_kmean67.csv"); 
-    //ifstream predict("D:\\LW\\joewan_upload_V2\\results\\my_tmpResults_sort\\dtw_three_22.5_skeleon625.csv"); 
-    //ifstream predict("D:\\LW\\joewan_upload_V2\\results\\my_tmpResults_sort\\dtw_three_22.5_skeleon625_opt.csv"); 
-    //ifstream predict("D:\\LW\\joewan_upload_V2\\results\\my_tmpResults_sort\\devel09FFSK_SOMP_SVM__predict.csv"); 
-    //ifstream predict("D:\\LW\\joewan_upload_V2\\results\\my_tmpResults_Kmean2\\devel20FFSK_SOMP_SVM_predict_KMEAN2.csv");
-    //ifstream predict("D:\\LW\\joewan_upload_V2\\results\\my_tmpResults_Kmean2\\dtw_three_22.5_skeleon625_kmean87.csv");
+    // æ–‡ä»¶ä¸º cvsæ–‡ä»¶ 
+    ifstream sour("sour_lable.csv"); //å£°æ˜æ–‡ä»¶æµ 
+    ifstream predict("M_V_N.csv");
+    //ifstream predict("D:\\LW\\Sample_code_6_16_2012\\LD score\\M_V_N.csv");   //dtw_19 å£°æ˜æ–‡ä»¶æµ 
+   
     
     if (sour.fail())  { cout << "Source File not found" <<endl; return 0; }
     if (predict.fail())  { cout << "Predict File not found" <<endl; return 0; }
     long t=1;
-    // µÃµ½ Á½¸öÎÄ¼şµÄ Ã¿Ò»ĞĞ ¶ÔÃ¿Ò»ĞĞ½øĞĞ±È½Ï
+    // å¾—åˆ° ä¸¤ä¸ªæ–‡ä»¶çš„ æ¯ä¸€è¡Œ å¯¹æ¯ä¸€è¡Œè¿›è¡Œæ¯”è¾ƒ
 	// devel01_11	 9 4 4 9
 
      while(getline(sour, line1)  && sour.good()&&getline(predict, line2)  && predict.good() )
@@ -60,30 +55,30 @@ int main(int argc, char *argv[])
     	 // cout <<  line1 << endl; // 	devel01_1,10,, 
     	 // cout << line2 <<endl;
     	 // break;
-          csvline_populate(row1, line1, ',');//  °´¶ººÅ½«×Ö·û´®·Ö³É vector<string>
+          csvline_populate(row1, line1, ',');//  æŒ‰é€—å·å°†å­—ç¬¦ä¸²åˆ†æˆ vector<string>
           csvline_populate(row2, line2, ',');
        // cout << row1[1] <<endl;   // devel01_1,10,,  ------> {"devel01_1", "10"}
        // devel01_11	 9 4 4 9 ------> {"devel01_1", "10 4 4 9"}
        // if(t == 20) break;
 		  
           cout<< t <<"\t";
-          cout<< row1[1] << "\t";//Îª  Ô´±êÇ© 
+          cout<< row1[1] << "\t";//ä¸º  æºæ ‡ç­¾ 
           temp_str=row1[1];
-          GetString(temp_str,label1);// 1,2,3,...,9,10,11,12,13ÕâÖÖ±êÇ©×ª»»³É  1,2,3,...,9,A,B,C,D
+          GetString(temp_str,label1);// 1,2,3,...,9,10,11,12,13è¿™ç§æ ‡ç­¾è½¬æ¢æˆ  1,2,3,...,9,A,B,C,D
           // 10 4 4 9 ------>>  A449 
           for (int it=0;it<label1.size();it++)
-          cout<<label1[it]<<"|";// Êä³ö Ô´  ±êÇ©ĞÅÏ¢ 
+          cout<<label1[it]<<"|";// è¾“å‡º æº  æ ‡ç­¾ä¿¡æ¯ 
           cout<<"\t";
           
           
           cout<< row2[1] << "\t";
           temp_str=row2[1];
           GetString(temp_str,label2);
-          for (int it=0;it<label2.size();it++)// Ê¶±ğ±êÇ© 
+          for (int it=0;it<label2.size();it++)// è¯†åˆ«æ ‡ç­¾ 
           cout<<label2[it]<<"|";
           
-          //string2char* ×Ö·ûÊı×é 
-          // string ÀàĞÍ×ª³É char* ×Ö·ûÊı×é 
+          //string2char* å­—ç¬¦æ•°ç»„ 
+          // string ç±»å‹è½¬æˆ char* å­—ç¬¦æ•°ç»„ 
             char* c1;
             const int len1 = label1.length();
             c1 =new char[len1+1];
@@ -94,19 +89,19 @@ int main(int argc, char *argv[])
             c2 =new char[len2+1];
             strcpy(c2,label2.c_str());
             
-            int d=minStrEditDis(c1,c2); // ¼ÆËãÁ½¸ö ×Ö·û´®Ö®¼äµÄ±à¼­¾àÀë 
-            labellenght +=label1.size();//  ×Ü Ô´±êÇ©³¤¶È 
-            dist+=d;// ×Ü±ê¼Ç¾àÀë 
+            int d=minStrEditDis(c1,c2); // è®¡ç®—ä¸¤ä¸ª å­—ç¬¦ä¸²ä¹‹é—´çš„ç¼–è¾‘è·ç¦» 
+            labellenght +=label1.size();//  æ€» æºæ ‡ç­¾é•¿åº¦ 
+            dist+=d;// æ€»æ ‡è®°è·ç¦» 
             //distance+=dist;
           cout << '\t' << "edit dis: "<< d << endl;
           ++t;    
     }
-    // ¹Ø±ÕÎÄ¼ş 
+    // å…³é—­æ–‡ä»¶ 
     sour.close();
     predict.close();
-    // ¼ÆËã LDscore 
+    // è®¡ç®— LDscore 
     LDSCORE=float(dist)/labellenght;
-    cout<<"======LDscore is£º"<<endl;
+    cout<<"======LDscore isï¼š"<<endl;
 	cout<< LDSCORE <<endl;
     return 0;
     //int editDis=0;
@@ -115,29 +110,29 @@ int main(int argc, char *argv[])
 }
 
 /*
-¼ÆËãÁ½¸ö×Ö·û´®Ö®¼äµÄ±à¼­¾àÀë   
-´Ós2×Ö·û´® µ½ s1×Ö·û´® ĞèÒª¶àÉÙ´Î ²åÈë¡¢É¾³ı¡¢Ìæ»»²Ù×÷ 
+è®¡ç®—ä¸¤ä¸ªå­—ç¬¦ä¸²ä¹‹é—´çš„ç¼–è¾‘è·ç¦»   
+ä»s2å­—ç¬¦ä¸² åˆ° s1å­—ç¬¦ä¸² éœ€è¦å¤šå°‘æ¬¡ æ’å…¥ã€åˆ é™¤ã€æ›¿æ¢æ“ä½œ 
 */
 int minStrEditDis(char* s1, char* s2){
 	int i,j;
 	
-	// Á½¸ö×Ö·û´®µÄ³¤¶È 
+	// ä¸¤ä¸ªå­—ç¬¦ä¸²çš„é•¿åº¦ 
 	int n,m;         
 	n=strlen(s1);
 	m=strlen(s2);	
-	int dis[n+1][m+1] = {INF}};// ´´½¨Ò»¸ö¶şÎ¬Êı×é 
-	dis[0][0]=0;// µÚÒ»¸ö ÈÏÎªÏàµÈ ¾àÀëÎª0 
+	int dis[n+1][m+1] = {INF}};// åˆ›å»ºä¸€ä¸ªäºŒç»´æ•°ç»„ 
+	dis[0][0]=0;// ç¬¬ä¸€ä¸ª è®¤ä¸ºç›¸ç­‰ è·ç¦»ä¸º0 
 
 	for(i=1;i<=n;i++)
 		for(j=1;j<=m;j++)
 		{
-			 dis[i][j] = min(dis[i][j],dis[i-1][j]+1); //delete É¾³ı 
-			 dis[i][j] = min(dis[i][j],dis[i][j-1]+1);//insert  ²åÈë 
+			 dis[i][j] = min(dis[i][j],dis[i-1][j]+1); //delete åˆ é™¤ 
+			 dis[i][j] = min(dis[i][j],dis[i][j-1]+1);//insert  æ’å…¥ 
 
-			//Ìæ»» 
-			if(s1[i-1] != s2[j-1])// ²» ÏàµÈ ¾àÀëÊÇ ÉÏÒ»Æ¥Åäµ½dis[i-1][j-1]µÄ¾àÀë + 1 
-				dis[i][j] = min(dis[i][j],dis[i-1][j-1]+1);// Ìæ»»ËãÁ½¸ö dis[i][j] = min(dis[i][j],dis[i-1][j-1]+2); 	
-			else // ÏàµÈ µÄ»°£¬¾àÀë»¹ÊÇ  ÉÏÒ»Æ¥Åäµ½dis[i-1][j-1]ÎªÖ¹µÄ¾àÀë 
+			//æ›¿æ¢ 
+			if(s1[i-1] != s2[j-1])// ä¸ ç›¸ç­‰ è·ç¦»æ˜¯ ä¸Šä¸€åŒ¹é…åˆ°dis[i-1][j-1]çš„è·ç¦» + 1 
+				dis[i][j] = min(dis[i][j],dis[i-1][j-1]+1);// æ›¿æ¢ç®—ä¸¤ä¸ª dis[i][j] = min(dis[i][j],dis[i-1][j-1]+2); 	
+			else // ç›¸ç­‰ çš„è¯ï¼Œè·ç¦»è¿˜æ˜¯  ä¸Šä¸€åŒ¹é…åˆ°dis[i-1][j-1]ä¸ºæ­¢çš„è·ç¦» 
 				dis[i][j] = min(dis[i][j],dis[i-1][j-1]);
 		}
     return dis[n][m];
@@ -150,12 +145,12 @@ int min_(int a,int b,int c)
 }
 
 int minStrEditDis(char* s1, char* s2){
-	// Á½¸ö×Ö·û´®µÄ³¤¶È 
+	// ä¸¤ä¸ªå­—ç¬¦ä¸²çš„é•¿åº¦ 
 	int n,m;                   //length of the two string
 	n=strlen(s1);
 	m=strlen(s2);
 	
-	int d[n+1][m+1];// ´´½¨Ò»¸ö¶şÎ¬Êı×é 
+	int d[n+1][m+1];// åˆ›å»ºä¸€ä¸ªäºŒç»´æ•°ç»„ 
 	d[0][0]=0;
 	int i,j,k;
     for(i=0;i<=n;i++)  
@@ -166,9 +161,9 @@ int minStrEditDis(char* s1, char* s2){
     {  
         for(j=1;j<=m;j++)  
         {  
-            int cost = (s1[i]==s2[j])? 0 : 1;// Ìæ»» ÏàµÈ ²Ù×÷Î»0  ²»ÏàµÈ²Ù×÷Îª1 
-            int deletion=d[i-1][j]+1; // É¾³ı 
-            int insertion=d[i][j-1]+1;// ²åÈë 
+            int cost = (s1[i]==s2[j])? 0 : 1;// æ›¿æ¢ ç›¸ç­‰ æ“ä½œä½0  ä¸ç›¸ç­‰æ“ä½œä¸º1 
+            int deletion=d[i-1][j]+1; // åˆ é™¤ 
+            int insertion=d[i][j-1]+1;// æ’å…¥ 
             int substitution=d[i-1][j-1] + cost;  
             d[i][j]=min_(deletion,insertion,substitution);  
         }  
@@ -177,33 +172,33 @@ int minStrEditDis(char* s1, char* s2){
 } 
  */
     
-//  °´¶ººÅ½«×Ö·û´®·Ö³É vector<string>
+//  æŒ‰é€—å·å°†å­—ç¬¦ä¸²åˆ†æˆ vector<string>
 // devel01_1,10,,  ------> {"devel01_1", "10"}
 // devel01_11	 9 4 4 9 ------> {"devel01_1", "10 4 4 9"}
 void csvline_populate(vector<string> &record, const string& line, char delimiter)
 {
-    int linepos=0;               //×Ö·û´®µÄË÷Òı 
-    int inquotes=false;          //ÒıºÅ 
-    char c;                      //×Ö·û´®µÄÃ¿¸öÔªËØ char 
+    int linepos=0;               //å­—ç¬¦ä¸²çš„ç´¢å¼• 
+    int inquotes=false;          //å¼•å· 
+    char c;                      //å­—ç¬¦ä¸²çš„æ¯ä¸ªå…ƒç´  char 
     int i;
-    int linemax=line.length();   //Ã¿ĞĞ×Ö·û´®µÄ×Ü³¤¶È 
+    int linemax=line.length();   //æ¯è¡Œå­—ç¬¦ä¸²çš„æ€»é•¿åº¦ 
     string curstring;
     record.clear();
        
-    while(line[linepos]!=0 && linepos < linemax)//×Ö·û´®µÄÃ¿¸öÔªËØ 
+    while(line[linepos]!=0 && linepos < linemax)//å­—ç¬¦ä¸²çš„æ¯ä¸ªå…ƒç´  
     {
        
-        c = line[linepos];       //×Ö·û´®ÖĞµÄ Ã¿¸ö×Ö·û 
+        c = line[linepos];       //å­—ç¬¦ä¸²ä¸­çš„ æ¯ä¸ªå­—ç¬¦ 
        
-        if (!inquotes && curstring.length()==0 && c=='"')//µÚÒ»¸öÒıºÅ 
+        if (!inquotes && curstring.length()==0 && c=='"')//ç¬¬ä¸€ä¸ªå¼•å· 
         {
             //beginquotechar
-            inquotes=true;//ÊÇÒıºÅ 
+            inquotes=true;//æ˜¯å¼•å· 
         }
-        else if (inquotes && c=='"')//ºóÃæµÄÒıºÅ 
+        else if (inquotes && c=='"')//åé¢çš„å¼•å· 
         {
             //quotechar
-            if ( (linepos+1 <linemax) && (line[linepos+1]=='"') )//Ë«ÒıºÅ 
+            if ( (linepos+1 <linemax) && (line[linepos+1]=='"') )//åŒå¼•å· 
             {
                 //encountered 2 double quotes in a row (resolves to 1 double quote)
                 curstring.push_back(c);
@@ -236,23 +231,23 @@ void csvline_populate(vector<string> &record, const string& line, char delimiter
     return;
 }
 
-//ÌáÈ¡³ö×Ö·û´®µÄÄÚÈİ£¬¸ù¾İ¿Õ¸ñ²ğ·Ö²¢´æÈëÈİÆ÷ÖĞÈ¥£º
-//StrÊÇÔ´×Ö·û´®£¬Value´æ·Å¸ù¾İÄ¿±ê×Ö·û´®µÄ¿Õ¸ñÌáÈ¡³öÀ´µÄÃ¿¸ö×Ö·û´®ÄÚÈİ¡£
+//æå–å‡ºå­—ç¬¦ä¸²çš„å†…å®¹ï¼Œæ ¹æ®ç©ºæ ¼æ‹†åˆ†å¹¶å­˜å…¥å®¹å™¨ä¸­å»ï¼š
+//Stræ˜¯æºå­—ç¬¦ä¸²ï¼ŒValueå­˜æ”¾æ ¹æ®ç›®æ ‡å­—ç¬¦ä¸²çš„ç©ºæ ¼æå–å‡ºæ¥çš„æ¯ä¸ªå­—ç¬¦ä¸²å†…å®¹ã€‚
 // "10 4 4 9" ---------> A449
 void  GetString( const string& Str, string &Value )
 {
-   string Temp="";                          //·Ö¸îµÄ×Ö·û´® 
-   int strlength=Str.length();              //Ô´×Ö·û´®³¤¶È 
+   string Temp="";                          //åˆ†å‰²çš„å­—ç¬¦ä¸² 
+   int strlength=Str.length();              //æºå­—ç¬¦ä¸²é•¿åº¦ 
    int Index= 0;
    Value="";
    char  Tmp=' '; 
-   while(Str[Index]!=0 && Index < strlength)//×Ö·û´®µÄÃ¿¸öÔªËØ 
+   while(Str[Index]!=0 && Index < strlength)//å­—ç¬¦ä¸²çš„æ¯ä¸ªå…ƒç´  
     {
-      Tmp = Str[Index];               //×Ö·û´®ÖĞµÄÃ¿¸ö×Ö·û 
-      if( Tmp==' '|| Index == strlength-1)  //¿Õ¸ñµÄ»°»òÕßµ½×îºóÒ»¸ö×Ö·û 
+      Tmp = Str[Index];               //å­—ç¬¦ä¸²ä¸­çš„æ¯ä¸ªå­—ç¬¦ 
+      if( Tmp==' '|| Index == strlength-1)  //ç©ºæ ¼çš„è¯æˆ–è€…åˆ°æœ€åä¸€ä¸ªå­—ç¬¦ 
       {
          if( Index == strlength-1) Temp.push_back(Tmp);
-         if(Temp!="")       //Óöµ½¿Õ¸ñÁË£¬Èç¹û TempÓĞ×Ö·ûµÄ»°¾Í°ÑTemp·ÅÈëÈİÆ÷Àï 
+         if(Temp!="")       //é‡åˆ°ç©ºæ ¼äº†ï¼Œå¦‚æœ Tempæœ‰å­—ç¬¦çš„è¯å°±æŠŠTempæ”¾å…¥å®¹å™¨é‡Œ 
          {
          	if (Temp=="10") Temp="A";
          	if (Temp=="11") Temp="B";
@@ -260,7 +255,7 @@ void  GetString( const string& Str, string &Value )
          	if (Temp=="13") Temp="D";
          	if (Temp=="14") Temp="E";
          Value=Value+Temp;
-         Temp="";         //Çå¿ÕÉÏÒ»´Î±£´æµÄÁÙÊ±×Ö·û´® 
+         Temp="";         //æ¸…ç©ºä¸Šä¸€æ¬¡ä¿å­˜çš„ä¸´æ—¶å­—ç¬¦ä¸² 
          }
         Index++; 
         continue;
