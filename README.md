@@ -1141,4 +1141,13 @@
 	v_p_f.push_back(m_dev);
 	// 打印 容器的 元素
 	for (auto p_f : v_p_f) cout << p_f << endl;
+## IO输入输出
+istream 输入流类型，提供输入操作
+istream 输出流类型，提供输出操作
+cin 	一个istream对象，从标准输入读取数据	
+cout
+cerr
+>> 右入
+<< 左出
+getline()函数
 
