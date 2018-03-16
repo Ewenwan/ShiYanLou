@@ -1142,12 +1142,45 @@
 	// 打印 容器的 元素
 	for (auto p_f : v_p_f) cout << p_f << endl;
 ## IO输入输出
-istream 输入流类型，提供输入操作
-istream 输出流类型，提供输出操作
-cin 	一个istream对象，从标准输入读取数据	
-cout
-cerr
->> 右入
-<< 左出
-getline()函数
+	istream 输入流类型，提供输入操作
+	ostream 输出流类型，提供输出操作
+	iostream 输入输出流
+	ifstream 从文件读取数据
+	ofstream 向文件写入数据
+	fstream  读写文件
+	istringstream 从string读取数据
+	ostringstream 向string写入数据
+	cin 	一个istream对象，从标准输入读取数据	
+	cout
+	cerr
+	>> 右入
+	<< 左出
+	getline()函数
+
+### IO对象无拷贝或赋值操作
+	while(cin >> word) 确保IO操作不发生错误
+	输出缓冲  os << "Please enter a value : ";
+	刷新输出缓冲区 cout << "hi!" << endl; //输出一个 hi 和一个换行，然后刷新缓冲区
+	cout << "hi!" << flush; //输出一个 hi 然后刷新缓冲区
+	cout << "hi!" << ends; //输出一个 hi 和一个空字符，然后刷新缓冲区
+	unitbuf 所有输出操作后，立刻刷新缓冲区 操作符 
+	cout << unitbuf;// 即刻刷新缓冲区模式
+	cout << nounitbuf;//正常模式
+
+### 文件流对象
+	ifstream in(file_name);//打开文件file_name 存入 in 文件流对象内
+	ofstream out(file_output_name);//打开输出文件
+	print(out, 变量);//打印到文件
+	ofstream out2;//输出文件流未关联任何文件
+	out2.open(file_name + ".copy");
+	if(out2) {}//打开成功
+	in.close();//关闭文件
+	in.open("infile2","2");//打开另一个文件
+
+
+
+
+
+
+
 
