@@ -1462,15 +1462,83 @@
 	r = q;  
 	auto q2 = make_shared<int> ()42, r2 = make_shared(100);  
 	r2 = q2;  
-	对于普通指针部分，首先分配了两个int型对象，指针分别保存在p和r中。接下来，将指针q的值赋予了r，这带来两个严重的内存管理问题：
-	1.首先是一个直接的内存泄露的问题，r和q一样都指向42的内存地址，而r中原来保存的地址——100的内存再无指针管理，变成“孤儿内存”，从而造成内存泄漏。
+	对于普通指针部分，首先分配了两个int型对象，指针分别保存在p和r中。
+	接下来，将指针q的值赋予了r，这带来两个严重的内存管理问题：
+	1.首先是一个直接的内存泄露的问题，r和q一样都指向42的内存地址，
+	而r中原来保存的地址——100的内存再无指针管理，变成“孤儿内存”，从而造成内存泄漏。
 
-	2.其次是一个“空悬指针“的问题。由于r和q指向同一个动态对象，如果程序编写不当，很容易产生释放了其中一个指针，而继续使用另一个指针的问题。继续使用的指针指向的是一块已经释放的内存，是一个空悬指针，继续读写它指向的内存可能导致程序崩溃甚至系统崩溃的严重问题。
+	2.其次是一个“空悬指针“的问题。由于r和q指向同一个动态对象，如果程序编写不当，
+	很容易产生释放了其中一个指针，而继续使用另一个指针的问题。
+	继续使用的指针指向的是一块已经释放的内存，是一个空悬指针，
+	继续读写它指向的内存可能导致程序崩溃甚至系统崩溃的严重问题。
 
-	而shared_ptr则可很好地解决这些问题。首先，分配了两个共享的对象，分别由共享指针p2和g2指向，因而它们的引用计数均为1.接下来，将q2赋予r2,。赋值操作会将q2指向的对象地址赋予r2，并将r2原来指向的对象的引用计数减1，将q2指向的对象的引用计数加1。这样，前者的引用计数变为0，其占用的内存空间会被释放，不会造成内存泄露。而后者的引用计数变为2，也不会因为r2和q2之一的销毁而释放它的内存空间，因此也不会造成空悬指针的问题。	
-	
-	
-	
+	而shared_ptr则可很好地解决这些问题。首先，分配了两个共享的对象，
+	分别由共享指针p2和g2指向，因而它们的引用计数均为1.接下来，将q2赋予r2,。
+	赋值操作会将q2指向的对象地址赋予r2，并将r2原来指向的对象的引用计数减1，
+	将q2指向的对象的引用计数加1。这样，前者的引用计数变为0，其占用的内存空间会被释放，
+	不会造成内存泄露。而后者的引用计数变为2，也不会因为r2和q2之一的销毁而释放它的内存空间，
+	因此也不会造成空悬指针的问题。	
+#### shared_ptr 和 new 结合使用  但是更推荐 shared_ptr 和 make_shared结合使用
+	// new 对象返回的是内置指针类型
+	shared_ptr<int> p1 = new int(1024);// 错误 不能讲内置指针隐式转换为一个智能指针
+	shared_ptr<int> p2(new int(1024));//正确 必须使用直接初始化的形式
+	// 函数返回 shared_ptr 也必须显示绑定到 智能指针上
+	shared_ptr<int> clone(int p){
+	   //return new int(p);// 错误
+	   return shared_ptr<int>(new int(p));//必须显示转换
+		}
+#### 智能指针 用来处理 未具有良好析构函数的类的 自动内存管理  传递一个删除器函数
+	#include <iostream>  
+	#include <memory>  
+	using std::cout;  
+	using std::endl;  
+	using std::shared_ptr;  
+
+	struct destination {};// 连接信息 
+	struct connection {};// 连接对象 
+
+	connection connect(destination *pd)  //打开连接  接收连接信息对象 
+	{  
+	    cout<<"open connection"<<endl;  
+	    return connection();//返回 连接对象 类型 
+	}  
+
+	void disconnect(connection c)  //关闭连接   接收 连接对象 
+	{  
+	    cout<<"close connection"<<endl;  
+	}  
+	// 未使用shared_ptr版本  的打开连接处理函数 
+	void f(destination &d)  
+	{  
+	    cout<<"manange connect directly"<<endl;  
+	    connection c = connect(&d);  
+	    // 忘记调用disconnect关闭连接   c就不会被关闭了 
+	    cout<<endl;  
+	} 
+
+	// 提供给shared_ptr智能指针的 删除器函数 
+	void end_connection(connection *p) { disconnect(*p); }  
+	// 使用shared_ptr的版本  
+	void f1(destination &d)  
+	{  
+	    cout<<"use shared_ptr to manage connect"<<endl;  
+	    connection c = connect(&d);  
+	    // shared_ptr<connection> p(&c, [](connection *p){ disconnect(*p);});  
+	     // lambda代替end_connection函数。
+	    shared_ptr<connection> p(&c, end_connection); //创建指针指针 并制定 删除器函数（类似析构函数的功能） 
+	 // 该智能指针管理的内存，不是new 分配的内存，传递一个 删除器函数给他
+	 // new创建的 会带有 构造和析构函数（如果对象有的话）
+	    // 忘记调用disconnect关闭连接   而传递了 删除器函数的 指针指针会自动调用 删除器函数 进行内存释放操作 
+	    cout<<endl;  
+	}    
+	int main(int argc, char *argv[])  
+	{  
+	    destination d;  
+	    f(d); // 普通版本 不会 自动关闭（自动析构） 
+	    f1(d);// 指针指针版本 在小程序运行后 会自动执行删除器函数 
+
+	    return 0;  
+	}  
 
 
 ## 动态数组
