@@ -23,6 +23,7 @@
     pi = &dval;   // 错误， 视图把 double 类型对象的地址 给 int类型的指针 错误  左右两边类型 必须匹配
     
 > 利用指针访问对象 取地址内存储的值 解引用符 来访问向
+
 	int ival = 42; //整形 变量
 	int *p = &ival;//指针变量定义初始化， p 存放着 变量ival 在内存中的地址
 	std::cout << *p;// 表达式里 *p 为 解引用 取的p存放的地址 指向的值
@@ -1196,12 +1197,48 @@
 ## 动态内存 与智能指针
 	类似vector，智能指针也是模板，因此当我们创建一个智能指针时，
 	需要提供额外的信息，指针指向的对象的类型。
+	
 	shared_ptr<string> p1_ptr;// 默认初始化 一个空指针 null
 	shared_ptr<vector<int>> vi_ptr;
 	shared_ptr<list<double>> ld_ptr;
 	unique_ptr<int> i_u_ptr;//
-	if(p) 
+	
+        // shared_ptr 和 new 一起使用
+	boost::shared_ptr<pcl::RangeImage> range_image_ptr(new pcl::RangeImage);//范围图像 深度图像
+	
+	if(p) // 判断p是否初始化为一个实际的地址
+	*p  解引用p 得到其指向的对象
+	p->member  调用p指向对象的成员对象 或函数  等价于 (*p).member
+	p.get()    返回p中保存的指针（地址）
+	swap(q,p) 交换 p 和 q中的指针
+	p.swap(q)
+	
+###  shared_ptr 独有的操作
+	make_shared<T>(args)   返回一个shared_ptr, 指向一个动态分配的类型为T的对象，使用args初始化此对象
+	shared_ptr<T>p(q)          p是shared_ptr类型 q 的拷贝，此操作会递增q中的计数器
+	p = q                      此操作会递减p的引用计数，
+				   而会递增q的引用计数，当p的引用计数变为0时，则将其指向的对象的内存释放
+	p.use_count()  返回与p共享对象的智能指针数量，可能很慢，主要用于调试
+	p.unique()     当p.use_count() 为1时返回 true；否者返回false
 
+###   make_shared函数
+	shared_ptr<int> ip = make_shared<int>(42);// ip 指向一个 值位42的int
+	shared_ptr<srting> sptr = make_shared<string>(10, '9');// sptr指向一个值为 "99999999"的string
+	shared_ptr<int> iptr = make_shared<int>();//iptr指向0
+	auto vsp = make_shared<vector<string>>(); // vsp指向一个动态分配的空的 vector<string>
+###  shared_ptr 的拷贝和赋值 会记录有多少个shared_ptr对象指向了相同的对象
+	auto p = make_shared<int>(42);// p指向的对象只有p一个引用对象
+	auto q(p); // p 和 q指向相同的对象，此对象有两个引用者，此操作会递增q中的计数器
+	auto r = make_shared<int>(45);//  r指向一个int对象
+	r = q; //给r赋值，令它指向另一个地址
+	       //递增q指向对象（shared_ptr 的 int 42）的引用计数
+	       //递减原来r指向的对象 （shared_ptr 的 int 45）的引用计数
+	       // r 原来指向的对象已经没有引用者了，会自动释放，45被释放，通过int类的析构函数执行。
+
+	// 可以认为每一个 shared_ptr对象 都有一个关联的计数器，通常称为引用计数（reference count）
+
+
+	
 ## 动态数组
 
 
