@@ -1234,10 +1234,210 @@
 	       //递增q指向对象（shared_ptr 的 int 42）的引用计数
 	       //递减原来r指向的对象 （shared_ptr 的 int 45）的引用计数
 	       // r 原来指向的对象已经没有引用者了，会自动释放，45被释放，通过int类的析构函数执行。
-
 	// 可以认为每一个 shared_ptr对象 都有一个关联的计数器，通常称为引用计数（reference count）
+        // 
+	StrBlob b1; // 空 Blob
+	{//新 的作用域
+	      StrBlob b2 = {"a", "an", "the"}; //局部对象
+	      b1 = b2;// b1和b2共享相同的元素
+	      b2.push_back("about");  
+	} // b2被销毁了，但是b2指向的元素未被销毁 StrBlob含有动态管理内存实现 
+	// b1 含有 4个string的vector
+	
+#### my_StrBlob.h  使用 shared_ptr 实现 共享 vextor<string> 对象
+
+	#ifndef MY_STRBLOB_H  
+	#define MY_STRBLOB_H  
+	#include <vector> 
+	#include <string> 
+	#include <memory>//shared_ptr 等动态内存管理技术
+	#include <initializer_list>  //函数初始化列表
+	#include <stdexcept> //错误捕捉 
+	using std::vector;  //命名空间 声明
+	using std::string;  
+	using std::shared_ptr;  
+	using std::make_shared;  
+	using std::initializer_list;  
+	using std::out_of_range;  
+
+	class StrBlob{  
+	public:  
+	    typedef vector<string>::size_type size_type;//类型别名
+	    StrBlob();//默认构造 
+	    StrBlob(initializer_list<string> il);  //含有参数列表
+	    size_type size() const { return data->size(); } //显示大小
+	    bool empty() const { return data->empty(); }  // 为 空？
+	    void push_back(const string &t) {data->push_back(t); } //添加元素
+	    void pop_back(); // 删除元素
+	    string& front(); //前置   访问元素
+	    const string& front() const;  
+	    string& back(); // 后置
+	    const string& back() const;  
+
+	private:  
+	    shared_ptr<vector<string>> data;  // 私有变量 共享内存 共享变量
+	    void check(size_type i, const string &msg) const;  
+	}; 
+
+	StrBlob::StrBlob(): data(make_shared<vector<string>>()) { } // 创建动态内存变量 指针 data
+	StrBlob::StrBlob(initializer_list<string> il): data(make_shared<vector<string>> (il)) { }//传入参数
+
+	void StrBlob::check(size_type i, const string &msg) const // 检查 并打印消息
+	{  
+	    if (i >= data->size())  // 大小超过范围
+		throw out_of_range(msg);  
+	}  
+	string& StrBlob::front()  
+	{  
+	    check(0, "front on empty StrBlob");  
+	    return data->front(); // vector的 front()的 方法
+	}  
+	const string& StrBlob::front() const  
+	{  
+	    check(0, "front on empty StrBlob");  
+	    return data->front(); //返回常量引用
+	}  
+	string& StrBlob::back()  
+	{  
+	    check(0, "back on empty StrBlob");  
+	    return data->back();  
+	}  
+	const string& StrBlob::back() const  // 对const 重载 const版本的实现
+	{  
+	    check(0, "back on empty StrBlob");  
+	    return data->back();  
+	}  
+	void StrBlob::pop_back()  // 删除 元素
+	{  
+	    check(0, "pop_back on empty StrBlob"); 
+	    return data->pop_back();  
+	}  
+	#endif  
+
+##### my_StrBlob.cc 
+
+	#include <iostream>  
+	using std::cout;  
+	using std::endl;  
+	#include "my_StrBlob.h"  
+	int main(int argc, char *argv[])  
+	{  
+		StrBlob b1;  
+		{  //新作用域
+			StrBlob b2 = {"a", "an", "the"};  
+			b1 = b2;//b1 和  b3 共享内存  {"a", "an", "the", "about"}
+			b2.push_back("about");  
+			cout<<b2.size()<<endl;  
+		}  
+		cout<<b1.size()<<endl;  
+		cout<<b1.front()<<" "<<b1.back()<<endl;  
+		const StrBlob b3=b1;  
+		cout<<b3.front()<<" "<<b3.back()<<endl;  
+		return 0;  
+	}  
+#### 编写函数，返回一个动态分配的int的vector。将此vector传递给另一个函数。这个函数读取标准输入，将读入的值保存在vector中。再将vector传递给另一个函数，打印读入的值。记得在恰当的时刻delete vector。	
+	#include <iostream>
+	#include <vector>
+	#include <new>
+	using std::cin;
+	using std::cout;
+	using std::endl;
+	using std::vector;
+	using std::nothrow; 
+	vector<int> *new_vector(void)//使用new 创建共享内存
+	{
+	    return new (nothrow) vector<int>; 
+	}
+	void read_ints(vector<int> *pv)// 存储对象
+	{
+	    if(pv == NULL) return;
+	    int v; 
+	    while(cin>>v)
+		pv->push_back(v);
+	}
+	void print_ints(vector<int> *pv)//打印对象
+	{
+	   if(pv == NULL) return;
+	   for (const auto &v : *pv) 
+		cout<<v<<" ";  
+	    cout<<endl;  
+	}  
+
+	int main(int argc, char *argv[])  
+	{  
+	    vector<int>* pv =new_vector();  
+	    if(!pv){  
+			cout<<"Insufficient memory"<<endl;  
+			return -1;  
+	    }  
+	   read_ints(pv);//读入数据
+	   print_ints(pv);//打印数据
+	   delete pv;//释放内存 
+	   //cout << *pv << endl;
+	   //print_ints(pv);// 已经释放了内存 而指针未置空 还进行解引用会造成内存泄漏 ！！！危险 
+	   pv = nullptr;//指针设置为 NULL空 比便出现野指针
+	   print_ints(pv);// 这时候 pv已经为 空指针了 就比较安全了 
+	   return 0;  
+	}
+#### shared_ptr而不是内置指针 实现 动态分配的int的vector
+	#include <iostream>  
+	#include <vector>  
+	#include <memory>  
+	using std::cin;  
+	using std::cout;  
+	using std::endl;  
+	using std::vector;  
+	using std::shared_ptr;  
+	using std::make_shared;  
 
 
+	shared_ptr<vector<int>> new_vector(void)//创建对象 
+	{  
+	    return make_shared<vector<int>>();//make_shared 分配动态内存 
+	}  
+
+	void read_ints(shared_ptr<vector<int>> spv)//读入对象 
+	{  
+	    int v;  
+	    while(cin>>v)  
+		spv->push_back(v);  
+	}  
+
+	void print_ints(shared_ptr<vector<int>> spv)//打印对象 
+	{  
+	    for (const auto &v : *spv)  
+		cout<<v<<" ";  
+	    cout<<endl;  
+	}  
+
+	int main(int argc, char *argv[])  
+	{  
+	    auto spv = new_vector();  
+
+	    read_ints(spv);
+	    print_ints(spv);  
+	    // 不用显示delete 和 赋null shared_ptr 会自动做 
+	    return 0;  
+	}   
+// new 动态分配内存 比较危险
+string* sptr = new string; // sptr指向一个初始化为空的 string，因为string为对象类型，且定义了构造函数
+int* iptr = neew int; // 而int为内置类型 无构造函数， 所有 iptr指向了一个未初始化的 int
+// 创建时 直接初始化
+int* ip = new int(1024);// ip指向的对象值为1024
+string* sp = new string(10, '9');// sp指向的对象为 "999999999"
+// 列表初始化
+vector<int>* vip = new vector<int>{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};//包含10个元素
+// 值初始化 在类型名之后跟一对括号
+string* sp1 = new string;// 默认初始化 为 空string 对象string提供了默认构造函数
+string* sp2 = new string();//值初始化为空 string   还是使用 默认构造函数 初始化
+int* ip1 = new int;// 默认初始化 ip1指向了一个未初始化的int
+int* ip2 = new int();//值初始化为0 *ip2 为 0
+// 使用 auto
+auto p1 = new auto(obj);// p1指向一个与obj类型相同的 对象 若obj为int 则 p1位 int*
+	
+	
+	
+	
 	
 ## 动态数组
 
