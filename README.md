@@ -1346,7 +1346,7 @@
 	using std::nothrow; 
 	vector<int> *new_vector(void)//使用new 创建共享内存
 	{
-	    return new (nothrow) vector<int>; 
+	    return new (nothrow) vector<int>; //如果分配失败，new返回一个空指针 不要抛出 std::bad_alloc 异常
 	}
 	void read_ints(vector<int> *pv)// 存储对象
 	{
@@ -1418,27 +1418,61 @@
 	    print_ints(spv);  
 	    // 不用显示delete 和 赋null shared_ptr 会自动做 
 	    return 0;  
-	}   
-// new 动态分配内存 比较危险
-string* sptr = new string; // sptr指向一个初始化为空的 string，因为string为对象类型，且定义了构造函数
-int* iptr = neew int; // 而int为内置类型 无构造函数， 所有 iptr指向了一个未初始化的 int
-// 创建时 直接初始化
-int* ip = new int(1024);// ip指向的对象值为1024
-string* sp = new string(10, '9');// sp指向的对象为 "999999999"
-// 列表初始化
-vector<int>* vip = new vector<int>{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};//包含10个元素
-// 值初始化 在类型名之后跟一对括号
-string* sp1 = new string;// 默认初始化 为 空string 对象string提供了默认构造函数
-string* sp2 = new string();//值初始化为空 string   还是使用 默认构造函数 初始化
-int* ip1 = new int;// 默认初始化 ip1指向了一个未初始化的int
-int* ip2 = new int();//值初始化为0 *ip2 为 0
-// 使用 auto
-auto p1 = new auto(obj);// p1指向一个与obj类型相同的 对象 若obj为int 则 p1位 int*
+	}   
+#### new 动态分配内存 比较危险
+	string* sptr = new string; // sptr指向一个初始化为空的 string，因为string为对象类型，且定义了构造函数
+	int* iptr = neew int; // 而int为内置类型 无构造函数， 所有 iptr指向了一个未初始化的 int
+	// 创建时 直接初始化
+	int* ip = new int(1024);// ip指向的对象值为1024
+	string* sp = new string(10, '9');// sp指向的对象为 "999999999"
+	// 列表初始化
+	vector<int>* vip = new vector<int>{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};//包含10个元素
+	// 值初始化 在类型名之后跟一对括号
+	string* sp1 = new string;// 默认初始化 为 空string 对象string提供了默认构造函数
+	string* sp2 = new string();//值初始化为空 string   还是使用 默认构造函数 初始化
+	int* ip1 = new int;// 默认初始化 ip1指向了一个未初始化的int
+	int* ip2 = new int();//值初始化为0 *ip2 为 0
+	// 使用 auto
+	auto p1 = new auto(obj);// p1指向一个与obj类型相同的 对象 若obj为int 则 p1位 int*
+	// 使用const
+	const int *cip = new const int(1024);//分配一个常量对象
+	// 内存耗尽  当一个程序用光了它的可用内存 new 表达式就会失败 会跑出一个异常
+	int* ip1 = new int();// 如果分配失败 new 会抛出 std::bad_alloc 异常
+	int* ip2 = new (nothrow) int();//如果分配失败，new返回一个空指针 不要抛出 std::bad_alloc 异常
+	// 我们称这种形式的 new （加了nothrow）为定位 new 可以判断 指针是否为空
+#### delete 释放内存  delete之后记得 赋值为 空 NULL 重置指针  空悬指针（dangling pointer）
+	int i, *ip1 = &i, *ip2 = NULL;
+	double  *dp = new double(33), *dp2 = dp;
+	delete i;//错误 i标志一个指针
+	delete ip1;// 为定义， pil指向一个局部变量，不是动态变量
+	delete dp;//正确 释放动态内存 33 的空间
+	delete dp2;// 未定义， dp2指向的内存以及被释放了
+	delete ip2;//正确, 释放一个空指针，总是没错的
+	const int* cip = new const int(1024);//常量指针
+	delete cip;//正确，释放一个const对象也是合理的
+	//重置指针
+	int* p(new int(42));//p 指向动态内存
+	auto q = p; // q p 指向相同的内存
+	delete p;// p q 均变为无效，指向的内存被释放
+	p = nullptr; // p 重置为空
+	q = nullptr; // q也需要重置为空
+
+####  问题分析
+	int *q = new int (42), *r = new int(100);  
+	r = q;  
+	auto q2 = make_shared<int> ()42, r2 = make_shared(100);  
+	r2 = q2;  
+	对于普通指针部分，首先分配了两个int型对象，指针分别保存在p和r中。接下来，将指针q的值赋予了r，这带来两个严重的内存管理问题：
+	1.首先是一个直接的内存泄露的问题，r和q一样都指向42的内存地址，而r中原来保存的地址——100的内存再无指针管理，变成“孤儿内存”，从而造成内存泄漏。
+
+	2.其次是一个“空悬指针“的问题。由于r和q指向同一个动态对象，如果程序编写不当，很容易产生释放了其中一个指针，而继续使用另一个指针的问题。继续使用的指针指向的是一块已经释放的内存，是一个空悬指针，继续读写它指向的内存可能导致程序崩溃甚至系统崩溃的严重问题。
+
+	而shared_ptr则可很好地解决这些问题。首先，分配了两个共享的对象，分别由共享指针p2和g2指向，因而它们的引用计数均为1.接下来，将q2赋予r2,。赋值操作会将q2指向的对象地址赋予r2，并将r2原来指向的对象的引用计数减1，将q2指向的对象的引用计数加1。这样，前者的引用计数变为0，其占用的内存空间会被释放，不会造成内存泄露。而后者的引用计数变为2，也不会因为r2和q2之一的销毁而释放它的内存空间，因此也不会造成空悬指针的问题。	
 	
 	
 	
-	
-	
+
+
 ## 动态数组
 
 
