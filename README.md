@@ -1592,8 +1592,38 @@
 	}
 
 
-## 动态数组
+## 动态数组  new T[] 一个数组  动态数组    其实不是数组类型
+	int* p = new int[42];//分配一个 42个int的数组，p指向第一个int
+	// 类型别名
+	typedef int arrT[42];// arrT表示一个int的数组类型
+	int* p = new arrT;   // 作用 等同于  int* p = new int[42]; 
+	//初始化
+	int* pia = new int[10]; // 10个未初始化的int
+	int* pia2 = new int[10]();//10个初始化为0的int
+	string *psa = new string[10];//类对象会默认初始化 10个空的string
+	string *psa2 = new string[10]();//显示初始化 10个空的string
+	//列表初始化
+	int* pia = new int[10]{0,1,2,3,4,5,6,7,8,9};
+	string* psa = new string[10]{"a", "an", "the",string(3,'x')};//剩余的进行值初始化为空string
+	//动态数组的释放
+	delete [] pia;//pia指向一个动态分配的数组，按逆序释放数组元素
 
+### 使用智能指针 unique_ptr 来管理动态数组
+	//在类型名后必须跟一对方括号
+	unique_ptr<int[]> upda(new int[10]);
+	//可以使用下标运算符 来 访问 数组中的元素
+	for(size_t i = 0; i != 10; ++i)  upda[i] = i;//位每个元素赋予一个新值
+
+	upda.release();//自动调用 delete[] 来销毁其指针
+
+### 使用智能指针 shared_ptr 来管理动态数组
+	//shared_ptr 不直接支持 管理 动态内存，如果希望使用，必须提供一个自己定义的 删除器函数
+	shared_ptr<int> sp(new int[10], [](int* p){delete[] p});//提供一个lambda定义的删除器函数
+	// 是用get 获取一个内置指针来访问
+	// shared_ptr 不支持 下标运算
+	for(size_t i = 0; i != 10; ++i)  *(sp.get() + i)  = i;//使用get 获取一个内置指针来 间接 访问
+
+### allocator 类
 
 ## 文本查询
 
