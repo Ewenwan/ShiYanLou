@@ -1540,6 +1540,57 @@
 	    return 0;  
 	}  
 
+### unique_ptr 独一无二的智能指针（霸王硬上弓）
+	一个unique_ptr 拥有它所指向的对象，于shared_ptr 不同，某一时刻只能有一个 unique_ptr 指向一个给定的对象。
+	当unique_ptr 被销毁时，它指向的对象也一起被销毁。
+	unique_ptr 没有如unique_ptr指针的 make_shared 标准库函数 可以返回 一个 unique_ptr。
+	unique_ptr 初始化时需要绑定到 一个new返回的指针上。
+	
+	unique_ptr<double> upd;//空
+	unique_ptr<int> upi(new int(42));//upi指向一个值为42 的int
+	// 因为 unique_ptr的 独特性（强占有特性），因此不知 拷贝 和 赋值
+	unique_ptr<T> UPT;
+	unique_ptr<T, D> UPT2;// T为类型  D为一个可调用对象来释放它的指针的对象类型的函数（类似析构函数，删除器）
+	//可以通过release()来清空指针，使用reset来释放源指针指向的内存
+	
+	// 函数返回 unique_ptr<>
+	unique_ptr<int> clone(int p){
+	return unique_ptr<int> (new int(p));// 编译器会执行一种特殊的拷贝
+	}
+	//还可以返回 一个局部对象的拷贝
+	unique_ptr<int> clone2(int p){
+	unique_ptr<int> ret(new int(p));
+	return ret;
+	}
+	
+	// 使用shared_ptr的版本 传递  删除器
+	void f1(destination &d)  
+	{  
+	    cout<<"use shared_ptr to manage connect"<<endl;  
+	    connection c = connect(&d);  
+	    // shared_ptr<connection> p(&c, [](connection *p){ disconnect(*p);});  
+	     // lambda代替end_connection函数。
+	    //shared_ptr<connection> p(&c, end_connection); 
+	    //创建指针指针 并制定 删除器函数（类似析构函数的功能） 
+	    unique_ptr<connection, decltype(end_connection)*> p(&c, end_connection);
+	 // 该智能指针管理的内存，不是new 分配的内存，传递一个 删除器函数给他
+	 // new创建的 会带有 构造和析构函数（如果对象有的话）
+	    // 忘记调用disconnect关闭连接   而传递了 删除器函数的 指针指针会自动调用 删除器函数 进行内存释放操作 
+	    cout<<endl;  
+	}  	
+
+### weak_ptr  是一种 不控制指向对象生存期的智能指针，指向一个由 shared_ptr 管理的对象  不参与管理  
+	将一个  weak_ptr 绑定到一个 shared_ptr 上，不会改变 shared_ptr  的引用计数，
+	一旦最后指向的对象  shared_ptr 被销毁，对象就会被释放，即使有  weak_ptr指向对象，对象也会被销毁
+	
+	// weak_ptr的创建  需要用一个 shared_ptr来初始化
+	auto spi = make_shared<int>(42);
+	weak_ptr<int> wpi(spi);// wpi弱共享spi，spi的引用计数未改变
+	//由于 weak_ptr 指向的对象可能不存在 需要先判断
+	if(shared_ptr<int> np = wpi.lock()){//如果 np不为空，则指向的对象 存在
+	
+	}
+
 
 ## 动态数组
 
