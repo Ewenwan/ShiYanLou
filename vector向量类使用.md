@@ -97,4 +97,59 @@
       v5.front() = 2; // v5 = (2 9 7 7 3)
       return 0;
       }
+## 使用自定义的类  作为 容器的元素  来使用 容器的一些算法
+### 定义自己的类  
+     class Person {
+     public:
+        // 默认构造函数 
+        Person(char *n = "", int a = 0) {
+          name = strdup(n);// 复制字符串
+          age = a;//复制年龄
+        }
+        // 默认析构函数
+        ~Person(){
+         free(name);//释放 字符串指向的空间
+       }
+       // 重载 等号判断 运算符  返回布尔量  输入为常量 的引用 避免拷贝 同时 常量 避免修改
+       bool operator==(const Person& p) const {
+         return strcmp(name,p.name) == 0 && age == p.age;// 名字 和年龄都必须相等
+       }
+       // 重载 小于号  运算符  返回布尔量
+       bool operator<(const Person& p) const {
+         return strcmp(name,p.name) < 0;//这里 使用 名字字符串 来比较
+       }
+       // 重载 大于号  运算符  返回布尔量
+       bool operator>(const Person& p) const {
+         return !(*this == p) && !(*this < p);// 使用了 ==  和 小于号
+        }
+
+     private:// 私有变量
+       char *name;
+       int age;
+       friend bool lesserAge(const Person&, const Person&);//有元函数  使用年龄来比较两个对象的大小
+     };
+
+### 使用向量 容器来 存储 自定义的 Person类
+     vector<Person> vp(1, Person("Golg",26));//Person("Golg",26)使用 默认构造函数创建一类对象存放在向量容器内
+     // 增加两个对象
+      vp.push_back(Person("Any",20));
+      vp.push_back(Person("Bil",30));
+
+     // 使用向量容器的 排序算法  默认需要类对象 提供 小于运算符的重载(比较函数)
+     sort(vp.begin(), vp.end());
+     //  vp=(("Golg",26)("Any",20))("Bil",30)) --> (("Any",20))("Bil",30)("Golg",26))
+     // 逆序排列
+     sort(vp.begin(), vp.end(), greater<Person>());
+     // vp= (("Any",20))("Bil",30)("Golg",26)) --> (("Golg",26)("Bil",30)("Any",20)))
+
+     // 那么如何 使用 年龄来排序呢 1提供比较函数(要是有元函数)  2直接修改 小于运算符的重载 函数 方法
+     // 1提供比较函数(要是有元函数)
+     bool lesserAge(const Person& p1, const Person& p2){
+       return  p1.age < p2.age;//小于时为真
+     }
+     // 传递比较函数
+     sort(vp.begin(), vp.end(), lesserAge);
+     // vp=  (("Golg",26)("Bil",30)("Any",20))) ---> (("Any",20)("Bil",30)("Golg",26)))
+
+
 
