@@ -34,3 +34,26 @@
 ![vector接口](Tsinghua/vector/picture/31删除操作.png)
 
 ### 32单元素删除操作 调用区间删除操作[r,r+1)
+![vector接口](Tsinghua/vector/picture/32单个删除操作.png)
+
+### 33查找元素操作 从后向前依次查找 判等 或大于小于
+![](Tsinghua/vector/picture/33查找元素操作.png)
+
+### 34唯一化操作 在前驱中查找相同 在后驱中删除重复出现的元素 类似插入排序思想 可以先排序提高效率
+![](Tsinghua/vector/picture/34唯一化操作.png)
+
+### 35唯一化操作 算法正确性证明
+![](Tsinghua/vector/picture/35唯一化操作证明.png)
+
+### 36遍历向量元素 传递一个函数对象
+![](Tsinghua/vector/picture/36遍历向量元素 传递一个函数对象.png)
+
+### 37遍历向量元素 传递一个函数对象
+![](Tsinghua/vector/picture/36遍历向量对对象+1.png)
+
+
+
+
+
+
+
