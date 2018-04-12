@@ -46,7 +46,7 @@
 ![](Tsinghua/vector/picture/35唯一化操作证明.png)
 
 ### 36遍历向量元素 传递一个函数对象
-![](Tsinghua/vector/picture/36遍历向量元素 传递一个函数对象.png)
+![](Tsinghua/vector/picture/36遍历向量元素-传递一个函数对象.png)
 
 ### 37遍历向量元素 传递一个函数对象
 ![](Tsinghua/vector/picture/36遍历向量对对象+1.png)
