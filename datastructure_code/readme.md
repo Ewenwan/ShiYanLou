@@ -6,4 +6,31 @@
 ### 0_类结构_用户-接口-类实现
 ![vector接口](Tsinghua/vector/picture/0_类结构_用户-接口-类实现.png)
 
-### 
+### 01_复制构造
+![vector接口](Tsinghua/vector/picture/01_复制构造.png)
+
+### 1_扩容_动态内存管理_金蝉脱壳
+![vector接口](Tsinghua/vector/picture/1_扩容_动态内存管理_金蝉脱壳.png)
+
+### 12_扩容_金蝉脱壳_实现
+![vector接口](Tsinghua/vector/picture/12_扩容_金蝉脱壳_实现.png)
+
+### 13_扩容_容量递增策略复杂度
+![vector接口](Tsinghua/vector/picture/13_扩容_容量递增策略复杂度.png)
+
+### 14容量加倍策略扩容时间复杂度
+![vector接口](Tsinghua/vector/picture/14容量加倍策略扩容时间复杂度.png)
+
+### 15递增扩容和容量加倍策略对比
+![vector接口](Tsinghua/vector/picture/15递增扩容和容量加倍策略对比.png)
+
+### 20向量下标操作符重载访问
+![vector接口](Tsinghua/vector/picture/20向量下标操作符重载访问.png)
+
+### 30插入操作
+![vector接口](Tsinghua/vector/picture/30插入操作.png)
+
+### 31区间删除操作
+![vector接口](Tsinghua/vector/picture/31删除操作.png)
+
+### 32单元素删除操作 调用区间删除操作[r,r+1)
