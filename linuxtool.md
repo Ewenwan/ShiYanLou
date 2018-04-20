@@ -18,3 +18,32 @@
     然后新建一个C项目
 ## 6、激活码激活
     获取  激活码  http://idea.lanyus.com/
+    
+# nfs服务器搭建
+    多台电脑之间创建共享文件夹
+## nfs服务器端配置
+### 1、安装nfs服务
+    sudo apt install nfs-common
+### 2、修改配置文件
+    sudo vim /etc/exports
+    
+    修改内容如下：
+    /home *(rw,sync,no_root_squash)
+
+/home   ：共享的目录
+*       ：指定哪些用户可以访问
+            *  所有可以ping通该主机的用户
+            192.168.1.*  指定网段，在该网段中的用户可以挂载
+            192.168.1.12 只有该用户能挂载
+(ro,sync,no_root_squash)：  权限
+        ro : 只读
+        rw : 读写
+        sync :  同步
+        no_root_squash: 不降低root用户的权限
+    其他选项man 5 exports 查看
+
+### 4、重启nfs服务
+    sudo /etc/init.d/nfs-kernel-server restart　　
+    到此，nfs的服务就搭建好了。 
+
+## 客户端访问配置
