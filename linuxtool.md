@@ -27,7 +27,8 @@
         sudo apt-get install nfs-kernel-server
         (在安装nsf-kernel-server的时候，也会安装nfs-commom。如果没有安装这个软件包，则要执行1.2中的命令了)
     1.2-安装nfs的客户端：
-    sudo apt-get install nfs-common
+    sudo apt-get install nfs-common
+### 2、修改配置文件   
     sudo vim /etc/exports
 
     修改内容如下：
@@ -65,4 +66,5 @@
     ## 客户端访问配置
 
 
-### 2、修改配置文件
+### window  安装 nfs 客户端
+    win10 控制面板 程序和功能 启用或关闭Windows功能 勾选NFS服务 确定后系统进行自动安装
