@@ -59,7 +59,9 @@
         sudo service rpcbind restart restart
     2.3-重启nfs服务：
         sudo service restartnfs-kernel-server restart
-    2.4-测试运行以下命令来显示一下共享出来的目录：
+        
+        sudo /etc/init.d/nfs-kernel-server restart
+    2.4-测试运行以下命令来显示一下共享出来的目录：
         showmount -e
 
 
