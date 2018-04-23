@@ -70,3 +70,11 @@
     win10 控制面板 程序和功能 启用或关闭Windows功能 勾选NFS服务 确定后系统进行自动安装
     打开 cmd 
     mount \\10.65.223.171\目录 x:
+
+### winscp 访问 远程服务器文件 ftp协议
+[百度参考](https://jingyan.baidu.com/article/d621e8da79ee562865913fce.html)
+
+### 远程 命令行登陆服务器 shell
+[Xmanager 服务器远程控制程序 ](https://www.netsarang.com/products/xme_overview.html)
+
+
