@@ -71,6 +71,7 @@
     打开 cmd 
     mount \\10.65.223.171\目录 x:
 
+   挂载 umount x:
 ### winscp 访问 远程服务器文件 ftp协议
 [百度参考](https://jingyan.baidu.com/article/d621e8da79ee562865913fce.html)
 
