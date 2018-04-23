@@ -71,7 +71,17 @@
     打开 cmd 
     mount \\10.65.223.171\目录 x:
 
-   挂载 umount x:
+    挂载 umount x:
+### 客户端 无权 限访问问题
+[参考解决](https://jingyan.baidu.com/article/c910274bfd6800cd361d2df3.html)
+
+    mount查看 客户端设置的访问权限
+    打开注册表编辑器 regedit 
+    HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\ClientForNFS\CurrentVersion\Default
+    下新增两项 DWORD(32位)值D 
+    AnonymousUid = 0
+    AnonymousGid = 0
+
 ### winscp 访问 远程服务器文件 ftp协议
 [百度参考](https://jingyan.baidu.com/article/d621e8da79ee562865913fce.html)
 
