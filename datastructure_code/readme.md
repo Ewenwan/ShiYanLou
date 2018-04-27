@@ -51,8 +51,11 @@
 ### 37遍历向量元素 传递一个函数对象
 ![](Tsinghua/vector/picture/36遍历向量对对象+1.png)
 
+### 40有序向量唯一化
+![](Tsinghua/vector/picture40有序向量唯一化.PNG)
 
-
+### 41有序向量二分查找
+![](41有序向量二分查找.PNG)
 
 
 
