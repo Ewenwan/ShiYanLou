@@ -75,12 +75,29 @@
 ### 47 二分查找_版本c，两个分支，不包含中心点
 ![](Tsinghua/vector/picture/48.二分查找_版本c，两个分支，bu包含中心点.PNG)
 
-### 
-![](Tsinghua/vector/picture/44.黄金比例分割查找.PNG)
+### 48 线性分布数据的 线性插值查找算法
+![](Tsinghua/vector/picture/49.线性分布数据的线性插值查找算法.PNG)
+
+### 49 线性分布数据的线性插值查找实例
+![](Tsinghua/vector/picture/50.线性分布数据的线性插值查找实例.PNG)
+
+### 50 线性分布数据的线性插值查找时间复杂度分析
+![](Tsinghua/vector/picture/51.线性分布数据的线性插值查找时间复杂度分析.PNG)
+
+### 51 线性插值查找_二进制位宽_二分log(log(n))
+![](Tsinghua/vector/picture/52线性插值查找_二进制位宽_二分log(log(n)).PNG)
+
+### 52 无序变有序_冒泡起泡排序
+![](Tsinghua/vector/picture/55.无序变有序_冒泡起泡排序.PNG)
+
+### 53 无序变有序_冒泡起泡排序算法实现
+![](Tsinghua/vector/picture/56.无序变有序_冒泡起泡排序算法实现.PNG)
+
+### 54 无序变有序_冒泡起泡排序算法实现
+![](Tsinghua/vector/picture/57.无序变有序_冒泡起泡排序算法实现.PNG)
+
+### 57 冒泡起泡排序改进跳过有序段
+![](Tsinghua/vector/picture/58.冒泡起泡排序改进跳过有序段.PNG)
 
 ### 
 ![](Tsinghua/vector/picture/44.黄金比例分割查找.PNG)
-
-### 
-![](Tsinghua/vector/picture/44.黄金比例分割查找.PNG)
-
