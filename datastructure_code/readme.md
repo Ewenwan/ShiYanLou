@@ -57,6 +57,30 @@
 ### 41有序向量二分查找
 ![](Tsinghua/vector/picture/41有序向量二分查找.PNG)
 
+### 42_3个分支 有序向量二分查找 时间复杂度 分析
+![](Tsinghua/vector/picture/43.3次比较二分查找时间复杂度.PNG)
 
+### 43 黄金比例分割 0.618 查找 Fibonacci查找
+![](Tsinghua/vector/picture/44.黄金比例分割查找.PNG)
 
+### 44 黄金比例分割查找算法实现
+![](Tsinghua/vector/picture/45.黄金比例分割查找算法实现_还是3个分支.PNG)
+
+### 45 黄金比例分割查找算法时间复杂度分析
+![](Tsinghua/vector/picture/46.黄金比例分割查找算法时间复杂度分析.PNG)
+
+### 46 二分查找_版本b，两个分支，包含中心点
+![](Tsinghua/vector/picture/47.二分查找_版本b，两个分支，包含中心点.PNG)
+
+### 47 二分查找_版本c，两个分支，不包含中心点
+![](Tsinghua/vector/picture/48.二分查找_版本c，两个分支，bu包含中心点.PNG)
+
+### 
+![](Tsinghua/vector/picture/44.黄金比例分割查找.PNG)
+
+### 
+![](Tsinghua/vector/picture/44.黄金比例分割查找.PNG)
+
+### 
+![](Tsinghua/vector/picture/44.黄金比例分割查找.PNG)
 
