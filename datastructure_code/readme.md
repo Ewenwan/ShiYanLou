@@ -99,5 +99,23 @@
 ### 57 冒泡起泡排序改进跳过有序段
 ![](Tsinghua/vector/picture/58.冒泡起泡排序改进跳过有序段.PNG)
 
-### 
-![](Tsinghua/vector/picture/44.黄金比例分割查找.PNG)
+### 60 归并排序_图解 分解到最小单位 一次两两排序后合并 
+![](Tsinghua/vector/picture/60.归并排序_图解.PNG)
+
+### 61 归并排序 主程序 分 分 合 合
+![](Tsinghua/vector/picture/60.归并排序_序列合并图解.PNG)
+
+### 62 2有序数组合并图解 一次比较最小的 最小的放入 总体有序数组内
+![](Tsinghua/vector/picture/2有序数组合并图解.PNG)
+
+### 63 归并排序_两个有序数组合并 算法实现
+![](Tsinghua/vector/picture/60.归并排序_量有序数组合并.PNG)
+
+### 64 归并排序_2有序数组合并_当其中一个为空的情况， 另外一个直接汇入总体数组
+![](Tsinghua/vector/picture/61.归并排序_2有序数组合并_一个为空的情况.PNG)
+
+### 65 两有序序列合并精简版 其中处于总体数组中的有序数组可以省去复制
+![](Tsinghua/vector/picture/60.两有序序列合并精简版.bmp)
+
+### 66 归并排序_时间复杂度分析
+![](Tsinghua/vector/picture/62.归并排序_时间复杂度分析.PNG)
