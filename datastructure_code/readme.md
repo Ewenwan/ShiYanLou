@@ -1,5 +1,24 @@
 # 数据结构 learn  datastructure
-[清华视频教程](http://www.xuetangx.com/courses/course-v1:TsinghuaX+30240184+sp/about)
+
+[数据结构-算法基础](http://www.xuetangx.com/courses/course-v1:TsinghuaX+30240184_p1+sp/about)
+
+[数据结构-向量](http://www.xuetangx.com/courses/course-v1:TsinghuaX+30240184_p2+sp/about)
+
+[清华视频教程 数据结构(上)](http://www.xuetangx.com/courses/course-v1:TsinghuaX+30240184+sp/about)
+
+[清华视频教程 数据结构(下)](http://www.xuetangx.com/courses/course-v1:TsinghuaX+30240184_2X+sp/about)
+
+[计算几何](http://www.xuetangx.com/courses/course-v1:TsinghuaX+70240183x_1+sp/about)
+
+[C++语言程序设计基础](http://www.xuetangx.com/courses/course-v1:TsinghuaX+00740043_1x+2018_T1/about)
+
+[C++语言程序设计进阶](http://www.xuetangx.com/courses/course-v1:TsinghuaX+00740043_2x_2015_T2+sp/about)
+
+[面向对象程序设计（C++）（2018春）](http://www.xuetangx.com/courses/course-v1:TsinghuaX+30240532X+2018_T1/about)
+
+[基于Linux的C++](http://www.xuetangx.com/courses/course-v1:TsinghuaX+20740084X+sp/about)
+
+[汇编语言程序设计](http://www.xuetangx.com/courses/course-v1:TsinghuaX+20240103X+sp/about)
 
 ## 向量 vector 基于数组实现 自动调整大小
 
