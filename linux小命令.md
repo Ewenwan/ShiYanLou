@@ -44,8 +44,8 @@
     rar:
     # rar a all *.jpg
     这条命令是将所有.jpg的文件压缩成一个rar包，名为all.rar，该程序会将.rar 扩展名将自动附加到包名后。
-    # unrar e all.rar
-    这条命令是将all.rar中的所有文件解压出来
+    # sudo unrar e all.rar -y
+    这条命令是将all.rar中的所有文件解压出来
 
 
 # 6、动物文字
