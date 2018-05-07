@@ -88,3 +88,10 @@
         }
     }
 
+# Ubuntu14.04使用su切换到root时提示:Authentication failure
+    这是因为Ubuntu系统默认没有激活root用户，因此需手动激活,操作如下:
+    sudo passwd
+    
+    输入密码
+    确认密码
+    之后就可以了
