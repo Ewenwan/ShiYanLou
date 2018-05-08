@@ -69,6 +69,17 @@
     sudo apt-get install fcitx sogoupinyin 
     sudo apt-get remove fcitx sogoupinyin
 
+# 7.2 fcitx框架下谷歌输入法的安装
+    sudo apt-get install fcitx fcitx-googlepinyin im-config
+    im-config
+    点击OK按钮，再点击Yes按钮，将fcitx设为默认的输入法框架，最后点击OK。
+    然后重启系统。
+    点击fcitx的键盘图标，选择text entry  settings
+    在打开的窗口中点击+号
+    然后在文本框中输入pinyin查找谷歌拼音输入法，将其添加到输入法列表中。
+    如果查找不到，重启系统后再试一次。
+    接下来你就能使用谷歌拼音输入法了。
+    
 # 8、linux 设置默认声卡
     终端里打alsamixer 按 f6 会出现声卡列表 
     一般来说，usb 声卡总是第二位的，声卡编号是1(默认声卡是0) 
