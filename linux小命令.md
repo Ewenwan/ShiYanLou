@@ -30,6 +30,8 @@
 # 5、压缩解压
     zip：
     打包 ：zip something.zip something （目录请加 -r 参数）
+    压缩 oRB_SLAM2文件夹 到 orb_slam.zip
+    zip -q -r orb_slam.zip oRB_SLAM2/
 
     解包：unzip something.zip
     指定路径：-d 参数
@@ -44,8 +46,8 @@
     rar:
     # rar a all *.jpg
     这条命令是将所有.jpg的文件压缩成一个rar包，名为all.rar，该程序会将.rar 扩展名将自动附加到包名后。
-    # sudo unrar e all.rar -y
-    这条命令是将all.rar中的所有文件解压出来
+    # sudo unrar e all.rar -y
+    这条命令是将all.rar中的所有文件解压出来
 
 
 # 6、动物文字
