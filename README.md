@@ -4,6 +4,7 @@
 
 [跟我一起复习C++](https://blog.csdn.net/fk1174/article/details/51841025)
 
+[Leetcode常用五大算法思想](https://blog.csdn.net/x_r_su/article/details/52461557)
 
 # C++ primer5 语言学习记录
 
