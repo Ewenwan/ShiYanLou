@@ -137,30 +137,30 @@
     “客户机操作系统已将 CD-ROM 门锁定，并且可能正在使用 CD-ROM，
     这可能会导致客户机无法识别介质的更改。
     如果可能，请在断开连接之前从客户机内部弹出 CD-ROM。”
-    
-    主要是 CD-ROM 在之前安装时选择的是 ununtu的安装文件
+
+    主要是 CD-ROM 在之前安装时选择的是 ununtu的安装文件
     发现是因为客户机（即虚拟机）的驱动是指向安装Ubuntu的iso的
-    
-    现在安装好了，可以更改回来了
-    先关闭虚拟机，在虚拟机 设置 硬件 中CD/DVD选择自动检测
-    
+
+    现在安装好了，可以更改回来了
+    先关闭虚拟机，在虚拟机 设置 硬件 中CD/DVD选择自动检测
+
     重新打开虚拟机，此时装载即可成功
-    创建 挂载点
-    mkdir /mnt/cdrom  
-    挂载 CD/DVD
-    mount /dev/cdrom /mnt/cdrom  
-    此时可以在 /mnt/cdrom 找到 VMwareTools 的安装文件
-    
-    解压
-    tar -zxvf /mnt/cdrom/VMwareTools-x.x.x-yyyy.tar.gz 
-    生成 vmware-tools-distrib  
-    进入安装
+    创建 挂载点
+    mkdir /mnt/cdrom  
+    挂载 CD/DVD
+    mount /dev/cdrom /mnt/cdrom  
+    此时可以在 /mnt/cdrom 找到 VMwareTools 的安装文件
+
+    解压
+    tar -zxvf /mnt/cdrom/VMwareTools-x.x.x-yyyy.tar.gz 
+    生成 vmware-tools-distrib  
+    进入安装
     cd /mnt/vmware-tools-distrib  
-    sudo ./vmware-install.pl -y
-    
-    设置共享文件夹地址
-    虚拟机 -> 设置-> 选项 -> 共享文件夹 -> 总是启用 添加主机共享文件夹路径
-    
-    在虚拟机文件夹下 /mnt/hgfs  可以查看到 共享文件夹
-    
-     
+    sudo ./vmware-install.pl -y
+
+    设置共享文件夹地址
+    虚拟机 -> 设置-> 选项 -> 共享文件夹 -> 总是启用 添加主机共享文件夹路径
+
+    在虚拟机文件夹下 /mnt/hgfs  可以查看到 共享文件夹
+
+
