@@ -119,16 +119,16 @@
     deb-src http://mirrors.ustc.edu.cn/ubuntu/ precise-updates main restricted
     deb http://mirrors.ustc.edu.cn/ubuntu/ precise universe
     deb-src http://mirrors.ustc.edu.cn/ubuntu/ precise universe
-    
+
     至于怎么修改该文件，可以通过通过SSH Secure File Transfer
     软件打开目录/etc/apt下面的source.list文件通过记事本进行编辑，
     也就是将上面的内容添加到文件的后面。
-    
+
     但是添加完以上网址后，还是出现Could not resolve 'archive.ubuntu.com'的错误，
     这种原因其实是因为还缺少一个步骤，就是讲添加的这几个网址的网址和IP进行映射，
     修改/etc/目录下的host文件，用记事本打开
-    
-    添加链接不上的地址 直接的ip地址
+
+    添加链接不上的地址 直接的ip地址
     10.1.14.235     mirrors.hikvision.com.cn
     
     
