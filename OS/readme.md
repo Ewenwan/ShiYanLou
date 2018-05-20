@@ -1,5 +1,7 @@
 # 操作系统
 
+[uCore OS实验指导书和源码网址 (2017)](https://chyyuu.gitbooks.io/ucore_os_docs/content/)
+
 # ucore实验中的常用工具
 
 在ucore实验中，一些基本的常用工具如下：
