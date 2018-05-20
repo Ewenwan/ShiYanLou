@@ -6,6 +6,8 @@
 
 [Leetcode常用五大算法思想](https://blog.csdn.net/x_r_su/article/details/52461557)
 
+[清华操作系统 github](http://github.com/oscourse-tsinghua)
+
 # C++ primer5 语言学习记录
 
 # 复合类型
