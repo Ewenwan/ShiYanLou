@@ -1,5 +1,7 @@
 # 操作系统
 
+[深入理解计算机系统-笔记-第一章-计算机系统漫游](https://blog.csdn.net/wzmsltw/article/details/52894071)
+
 [uCore OS实验指导书和源码网址 (2017)](https://chyyuu.gitbooks.io/ucore_os_docs/content/)
 
 # ucore实验中的常用工具
