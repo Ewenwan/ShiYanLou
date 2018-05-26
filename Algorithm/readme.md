@@ -149,6 +149,8 @@
 
     // 哈希函数实现的 无序字典 hash_map实现  使用count() 统计元素出现与否
     #include<hash_map>
+    //问题是： ‘hash_map’ was not declared in this scope。
+    //解决 加一个  using namespace __gnu_cxx;
     vector<int> twoSum(vector<int>& nums, int target){
         hash_map<int,int> hash_map_ii;// 原数组的 map字典 哈希表 表示 以空间 换 查找时间
         vector<int> result;// 结果
@@ -163,7 +165,7 @@
              }
             hash_map_ii[nums[i]] = i;// 构建原数组的 字典表示
         }
-        return [];//不写的话 编译器会自动添加
+        return {};//不写的话 编译器会自动添加
         //return result;// 返回
     } 
 
