@@ -17,21 +17,24 @@
         
         时间复杂度：O(n^2)
 #### a) Python版本  主要存储结构为列表List  添加元素方法为 .append()
-    """
-    输入 input:
-       nums:   List[int]
-       target: int
-    输出 output:
-       result: List[int]
-    """
-    def twoSum(nums, target):
-        result = [] # 结果 List
-        for i in range(len(nums)):#每一行
-            for j in range(i+1, len(nums)):#第一个元素后面的  后半列
-                if nums[i] + nums[j] == target:# 条件
-                    result.append(i)# 保存两元素索引
-                    result.append(j)
-                    return result   # 返回
+
+```python
+"""
+输入 input:
+   nums:   List[int]
+   target: int
+输出 output:
+   result: List[int]
+"""
+def twoSum(nums, target):
+    result = [] # 结果 List
+    for i in range(len(nums)):#每一行
+        for j in range(i+1, len(nums)):#第一个元素后面的  后半列
+            if nums[i] + nums[j] == target:# 条件
+                result.append(i)# 保存两元素索引
+                result.append(j)
+                return result   # 返回
+```python
 
 #### b) c++版本 主要存储单元为 向量 vector<int>  添加元素方法为 .push_back()
     
