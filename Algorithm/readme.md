@@ -8,7 +8,7 @@
     给定数组 nums = [2, 7, 11, 15],目标和 target = 9,
     因为    nums[0] + nums[1] = 2 + 7 = 9,
     返回相应的索引 [0, 1]
-### 返回数组中 和为 给定值的 两个数
+### A 返回数组中 和为 给定值的 两个数
     思路一：
         第一个思路就是两次遍历，
         找到第一个元素，
@@ -16,7 +16,7 @@
         如果发现这两个元素的和为target，则保存两元素坐标，并返回。
         
         时间复杂度：O(n^2)
-#### Python版本  主要存储结构为列表List  添加元素方法为 .append()
+#### a) Python版本  主要存储结构为列表List  添加元素方法为 .append()
     """
     输入 input:
        nums:   List[int]
@@ -33,7 +33,7 @@
                     result.append(j)
                     return result   # 返回
 
-#### c++版本 主要存储单元为 向量 vector<int>  添加元素方法为 .push_back()
+#### b) c++版本 主要存储单元为 向量 vector<int>  添加元素方法为 .push_back()
     
     // 这里避免拷贝，函数输入使用了 向量的引用 vector<int>& 
     vector<int> twoSum(vector<int>& nums, int target){
