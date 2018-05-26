@@ -99,13 +99,20 @@
 
 ### 思路三：  
     与思路二类似，主要使用使用 map 字典键值对(c++) python中为dict 存储原数组中的元素
-    这里利用了 字典的底层存储结构是 
-           哈希表 哈希映射 通过哈希表查找元素 
-           时间复杂度为O(1) 而空间复杂度为O(n)
+    这里利用了 map 字典的底层存储结构是 
+           红黑二叉树 (有序字典)
+           查找元素 平均时间复杂度为O(log(n))  
+           以空间换时间
+           
+           也有 hasp_map<>结构 用哈希函数实现(无序字典)
+           查找元素 平均时间复杂度为O(1)  
            以空间换时间
     而第一个遍历 时间复杂度为 O(n)
-    所以总复杂度为 O(n)
-### a) Python版本   存储结构为字典 {} dict  这里字典查找复杂度为O(1)
+    使用map时，总复杂度为 O(n*log(n))
+    
+    而 python中 的 dict 底层为 哈希表实现  平均时间复杂度为O(1)
+    
+### a) Python版本   存储结构为字典 {} dict 哈希函实现  这里字典查找复杂度为O(1)
 
     def twoSum(nums, target):
         #d = {num[i]:i for i in range(len(nums))}# 生成字典 key为数组元素的值 value为元素的索引 复杂度O(n)
@@ -113,21 +120,23 @@
         result = []
         for i in range(len(nums)):# 复杂度O(n)
             toFind = target - nums[i] # 获取差值元素(目标元素)
-            if toFind in d and i != d[toFind]: # 在字典中并且 不是同一个元素的索引
+            if toFind in d and i != d[toFind]: # 在字典中并且 不是同一个元素的索引  平均时间复杂度为O(1)
                  result = [i, d[toFind]]# 返回对应的索引
                  break  # 找到解决方案 结束循环
             d[nums[i]]=i# 生成字典的 键值对元素
         return result   
 
-### b) c++版本 使用 map<int, int> map_ii;映射键值对 存储 和 python的 dict类似
+### b) c++版本 使用 map<int, int> map_ii; 映射键值对 红黑二叉树实现存储   
 
+    // 红黑二叉树实现的 有序字典 map实现 
+    #include<map>
     vector<int> twoSum(vector<int>& nums, int target){
-        map<int,int> map_ii;// 原数组的 map字典 哈希表 表示 以空间 换 查找时间
+        map<int,int> map_ii;// 原数组的 map字典 红黑二叉树实现
         vector<int> result;// 结果
-        for(int i=0; i < nums.size(); i++){
+        for(int i=0; i < nums.size(); i++){// 复杂度O(n)
              int toFind = target - nums[i];// 获取差值元素(目标元素)
              // 这里map 支持 find() 的内置方法
-             if( map_ii.find(toFind) != map_ii.end() ) {// 找到了目标元素 找不到返回end()迭代器 哈希表找直接映射 复杂度O(1)
+             if( map_ii.find(toFind) != map_ii.end() ) {// 找到了目标元素 找不到返回end()迭代器 哈希表找直接映射 复杂度O(log(n)) 
                result.push_back(i);// 保存两元素索引
                result.push_back(map_ii[toFind]);//
                //break;
@@ -135,6 +144,26 @@
              }
              map_ii[nums[i]] = i;// 构建原数组的 字典表示
         }
+        //return result;// 返回
+    } 
+
+    // 哈希函数实现的 无序字典 hash_map实现  使用count() 统计元素出现与否
+    #include<hash_map>
+    vector<int> twoSum(vector<int>& nums, int target){
+        hash_map<int,int> hash_map_ii;// 原数组的 map字典 哈希表 表示 以空间 换 查找时间
+        vector<int> result;// 结果
+        for(int i=0; i < nums.size(); i++){// 复杂度O(n)
+             int toFind = target - nums[i];// 获取差值元素(目标元素)
+             // 这里hash_map 支持 count() 的内置方法
+             if( hash_map_ii.count(toFind)) {// 要么是1(即出现了该元素),要么是0(即没出现这样的元素) 
+               result.push_back(i);// 保存两元素索引
+               result.push_back(hash_map_ii[toFind]);//
+               //break;
+               return result;// 返回
+             }
+            hash_map_ii[nums[i]] = i;// 构建原数组的 字典表示
+        }
+        return [];//不写的话 编译器会自动添加
         //return result;// 返回
     } 
 
