@@ -34,23 +34,25 @@ def twoSum(nums, target):
                 result.append(i)# 保存两元素索引
                 result.append(j)
                 return result   # 返回
-```python
+```
 
 #### b) c++版本 主要存储单元为 向量 vector<int>  添加元素方法为 .push_back()
     
-    // 这里避免拷贝，函数输入使用了 向量的引用 vector<int>& 
-    vector<int> twoSum(vector<int>& nums, int target){
-        vector<int> result;// 结果
-        for(int i=0; i < nums.size(); i++){
-           for(j = i+1; j < nums.size(); j++){// 第一个元素后面的 后半列 
-             if((nums[i] + nums[j]) == target){// 条件
-               result.push_back(i);// 保存两元素索引
-               result.push_back(j);
-               return result;// 返回
-             }
-           }                         
-        }   
-    }
+```c++ 
+// 这里避免拷贝，函数输入使用了 向量的引用 vector<int>& 
+vector<int> twoSum(vector<int>& nums, int target){
+    vector<int> result;// 结果
+    for(int i=0; i < nums.size(); i++){
+       for(j = i+1; j < nums.size(); j++){// 第一个元素后面的 后半列 
+         if((nums[i] + nums[j]) == target){// 条件
+           result.push_back(i);// 保存两元素索引
+           result.push_back(j);
+           return result;// 返回
+         }
+       }                         
+    }   
+}
+```
 
 ### 思路二：
         可以用一次遍历 + 一次查找实现，
@@ -58,7 +60,7 @@ def twoSum(nums, target):
         我们可以通过判断target与某一个元素的差值 是否也在数组之中即可。
         
 ####  a) Python版本 主要存储结构为列表List  查找元素方法 if toFind in nums 得到元素索引方法 j = nums.index(toFind)
-
+```python
     def twoSum(nums, target):
         result = []
         for i in range(len(nums)):
@@ -69,9 +71,10 @@ def twoSum(nums, target):
                     result.append(i)
                     result.append(j)
                     return result
-
+```
 #### b) c++版本 vector<int>::iterator it=find(nums.begin(),nums.end(),toFind);// 查找元素 同时返回索引   
-
+    
+```c++ 
     #include <iostream>
     #include <vector>
     #include <algorithm>
@@ -99,6 +102,7 @@ def twoSum(nums, target):
            cout << vi[id] << endl;
         return 0;
     }     
+```
 
 ### 思路三：  
     与思路二类似，主要使用使用 map 字典键值对(c++) python中为dict 存储原数组中的元素
@@ -116,7 +120,7 @@ def twoSum(nums, target):
     而 python中 的 dict 底层为 哈希表实现  平均时间复杂度为O(1)
     
 ### a) Python版本   存储结构为字典 {} dict 哈希函实现  这里字典查找复杂度为O(1)
-
+```python
     def twoSum(nums, target):
         #d = {num[i]:i for i in range(len(nums))}# 生成字典 key为数组元素的值 value为元素的索引 复杂度O(n)
         d = {}
@@ -128,9 +132,9 @@ def twoSum(nums, target):
                  break  # 找到解决方案 结束循环
             d[nums[i]]=i# 生成字典的 键值对元素
         return result   
-
+```
 ### b) c++版本 使用 map<int, int> map_ii; 映射键值对 红黑二叉树实现存储   
-
+```c++ 
     // 红黑二叉树实现的 有序字典 map实现 
     #include<map>
     vector<int> twoSum(vector<int>& nums, int target){
@@ -149,8 +153,9 @@ def twoSum(nums, target):
         }
         //return result;// 返回
     } 
-
-    // 哈希函数实现的 无序字典 hash_map实现  使用count() 统计元素出现与否
+```
+### c) c++版本 使用 哈希函数实现的 无序字典 hash_map实现  使用count() 统计元素出现与否
+```c++ 
     #include<hash_map>
     //问题是： ‘hash_map’ was not declared in this scope。
     //解决 加一个  using namespace __gnu_cxx;
@@ -171,7 +176,7 @@ def twoSum(nums, target):
         return {};//不写的话 编译器会自动添加
         //return result;// 返回
     } 
-
+```
 
 
 
