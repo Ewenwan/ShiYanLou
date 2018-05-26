@@ -180,4 +180,6 @@ vector<int> twoSum(vector<int>& nums, int target){
 ```
 
 
+### B寻找和为定值的多个数
+[寻找和为定值的多个数](https://github.com/julycoding/The-Art-Of-Programming-By-July/blob/master/ebook/zh/02.03.md)
 
