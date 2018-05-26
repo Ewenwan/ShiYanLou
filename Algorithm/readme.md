@@ -13,7 +13,7 @@
         第一个思路就是两次遍历，
         找到第一个元素，
         二次遍历其后面的元素，
-        如果发现这两个元素的和为target，则保存两元素坐标，并返回。
+        如果发现这两个元素的和为target，则保存两元素索引，并返回。
         
         时间复杂度：O(n^2)
 #### a) Python版本  主要存储结构为列表List  添加元素方法为 .append()
@@ -52,7 +52,7 @@
 ### 思路二：
         可以用一次遍历 + 一次查找实现，
         时间复杂度：O(n) * (O(1)~O(n)) 最坏 O(n^2) 最好 O(n)
-        我们可以通过判断target与某一个元素的差值是否也在数组之中即可。
+        我们可以通过判断target与某一个元素的差值 是否也在数组之中即可。
         
 ####  a) Python版本 主要存储结构为列表List  查找元素方法 if toFind in nums 得到元素索引方法 j = nums.index(toFind)
 
@@ -127,12 +127,13 @@
         for(int i=0; i < nums.size(); i++){
              int toFind = target - nums[i];// 获取差值元素(目标元素)
              // 这里map 支持 find() 的内置方法
-             if( map_ii.find(toFind) != map_ii.end() ) {// 找到了目标元素 从后向前查找 找不到返回end()迭代器
+             if( map_ii.find(toFind) != map_ii.end() ) {// 找到了目标元素 找不到返回end()迭代器 哈希表找直接映射 复杂度O(1)
                result.push_back(i);// 保存两元素索引
-               result.push_back(map[toFind]);//
+               result.push_back(map_ii[toFind]);//
                //break;
                return result;// 返回
              }
+             map_ii[nums[i]] = i;// 构建原数组的 字典表示
         }
         //return result;// 返回
     } 
