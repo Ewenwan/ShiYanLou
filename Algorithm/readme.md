@@ -159,6 +159,7 @@ vector<int> twoSum(vector<int>& nums, int target){
     #include<hash_map>
     //问题是： ‘hash_map’ was not declared in this scope。
     //解决 加一个  using namespace __gnu_cxx;
+    using namespace __gnu_cxx;
     vector<int> twoSum(vector<int>& nums, int target){
         hash_map<int,int> hash_map_ii;// 原数组的 map字典 哈希表 表示 以空间 换 查找时间
         vector<int> result;// 结果
