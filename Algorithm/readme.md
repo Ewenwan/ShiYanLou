@@ -62,6 +62,7 @@ vector<int> twoSum(vector<int>& nums, int target){
 ### 思路二：
         可以用一次遍历 + 一次查找实现，
         时间复杂度：O(n) * (O(1)~O(n)) 最坏 O(n^2) 最好 O(n)
+        如果数列有序，查找使用二分查找，平均复杂度 log(n),总复杂度 O(n*log(n))
         我们可以通过判断target与某一个元素的差值 是否也在数组之中即可。
         
 ####  a) Python版本 主要存储结构为列表List  查找元素方法 if toFind in nums 得到元素索引方法 j = nums.index(toFind)
@@ -188,13 +189,50 @@ vector<int> twoSum(vector<int>& nums, int target){
 ```
 ### 思路四： 
     先排序，然后左右夹逼。
-    排序 O(n*log(n))
-    左右夹逼 O(n)
-    最终O(n*log(n))
+    排序 O(n*log(n))    排序后 就与原来的数组的索引不一样了
+    左右夹逼 O(n) 
+    最终时间复杂度 O(n*log(n))
+    如果数组有序，总时间复杂度 O(n)
+    空间复杂度O(1)
+    
+    这里不能返回原数组中的索引
+    这里只能返回数字
+    后可以使用find在原数组中查找索引
+```c
+vector<int> twoSum(vector<int>& nums, int target){
+// nums.sort() 如果数组无序，先排序，时间复杂度 O(n*log(n))
+vector<int> result;// 结果
+// 两个指针
+int beg=0;
+int end=nums.size()-1;
+while(beg < end){// 从首尾位置向中间扫描夹逼，
+  long currSum = nums[beg]+nums[end];
+  if(currSum == target) {
+      result.push_back(nums[beg]);
+      result.push_back(nums[end]);
+      return result;
+     }
+   else{
+        if (currSum < target)// 和小了
+         beg++;// 小数变大
+        else end--;// 和大了 大数变小
+     }
+  }
+}
+```
+
+### 总结
+    0. 暴力两次遍历,时间复杂度O(n^2),空间复杂度O(1);
+    1. 第一遍遍历，第二次查找(
+                           (红黑树结构map查找时间复杂度O(log(n)) , 空间复杂度O(n);
+                            hash表hash_map查找O(1),              空间复杂度O(n);
+                            二分查找(数组需要有序) 查找时间复杂度O(log(n)) , 排序，时间复杂度 O(n*log(n)), 空间复杂度O(1);
+                            )
+    2.先排序后，从首尾位置向中间扫描夹逼，有序O(N)，无序O(N log N + N)=O(N log N)，空间复杂度都为O(1)。
 
 
 
 
-### B寻找和为定值的多个数
+## B寻找和为定值的多个数
 [寻找和为定值的多个数](https://github.com/julycoding/The-Art-Of-Programming-By-July/blob/master/ebook/zh/02.03.md)
 
