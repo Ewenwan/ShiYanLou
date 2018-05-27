@@ -36,10 +36,10 @@
 
 # 上述工具的使用方法在线信息
 
-(apt-get)[ http://wiki.ubuntu.org.cn/Apt-get%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97]
+[apt-get](http://wiki.ubuntu.org.cn/Apt-get%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97)
 
-( git github1)[http://www.cnblogs.com/cspku/articles/Git_cmds.html]
-( git github2)[http://www.worldhello.net/gotgithub/index.html]
+[git github1](http://www.cnblogs.com/cspku/articles/Git_cmds.html)
+[git github2](http://www.worldhello.net/gotgithub/index.html)
 
 - diff patch
   - http://www.ibm.com/developerworks/cn/linux/l-diffp/index.html
@@ -151,7 +151,7 @@
     严格说来，“栈帧底部”和“栈底”是不同的概念;
     esp所指的栈帧顶部和系统栈的顶部是同一个位置。
 
-## GCC基本内联汇编
+## 3. GCC基本内联汇编
     GCC 提供了两内内联汇编语句（inline asm statements）：
       基本内联汇编语句（basic inline asm statement) 和
       扩展内联汇编语句（extended inline asm statement）。
@@ -188,3 +188,5 @@
     就会产生没有预料的多次赋值，引起严重的后果。
     对于变量 _boo也存在一样的问题。
     为了解决这个问题，就要用到扩展 GCC 内联汇编语法。
+    
+## 4. GCC扩展内联汇编
