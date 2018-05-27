@@ -121,8 +121,11 @@ vector<int> twoSum(vector<int>& nums, int target){
            以空间换时间
     而第一个遍历 时间复杂度为 O(n)
     使用map时，总复杂度为 O(n*log(n))
+    使用hasp_map时，总复杂度为 O(n)
+    空间复杂度 O(n)
     
     而 python中 的 dict 底层为 哈希表实现  平均时间复杂度为O(1)
+    总复杂度为 O(n)
     
 ### a) Python版本   存储结构为字典 {} dict 哈希函实现  这里字典查找复杂度为O(1)
 ```python
@@ -183,6 +186,13 @@ vector<int> twoSum(vector<int>& nums, int target){
         //return result;// 返回
     } 
 ```
+### 思路四： 
+    先排序，然后左右夹逼。
+    排序 O(n*log(n))
+    左右夹逼 O(n)
+    最终O(n*log(n))
+
+
 
 
 ### B寻找和为定值的多个数
