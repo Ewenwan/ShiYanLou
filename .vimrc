@@ -21,3 +21,4 @@ set laststatus=2
 set shortmess=atI
 set formatoptions=tcrqn
 set autoindent 
+set tags=tags＃sudo apt-get install exuberant-ctags
