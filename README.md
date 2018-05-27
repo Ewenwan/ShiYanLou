@@ -29,6 +29,7 @@
 
 		10. 计算机科学
 # 1. 编程技巧 来自  effective stl 
+[effective stl 博客参考](https://blog.csdn.net/u014110320/article/category/6411316)
 ## a)浮点数判等
 	判断两个浮点数a和b是否相等时，不要使用 a==b ,
 	应该判断两者的绝对值之差fabs(a-b)是否小于一个阈值 ，如1e-9
@@ -53,7 +54,7 @@
 	vector<vector<int>> v_i2(row_num,vector<int>(col_num,0));//初始化为一个0矩阵
 	vector<int> m;  
         m.reserve(1000);//提前保留1000的内存
-	使用 reserve 避免不必要的重新分配 
+	//使用 reserve 避免不必要的重新分配 
 ```
 
 # C++ primer5 语言学习记录
