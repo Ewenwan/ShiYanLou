@@ -28,6 +28,33 @@
 		9. 人机工程学
 
 		10. 计算机科学
+# 1. 编程技巧 来自  effective stl 
+## a)浮点数判等
+	判断两个浮点数a和b是否相等时，不要使用 a==b ,
+	应该判断两者的绝对值之差fabs(a-b)是否小于一个阈值 ，如1e-9
+	if(fabs(a-b) < 1e-9)
+## b) char类型用作数组下标需要注意的问题
+	应该先将char 强制转换为 unsigned char后在用作下标。
+	char index_;
+	unsigned char index = (unsigned char)index_;
+## c) 向量vector 和 字符串string 优先于 动态分配的数组new[] delete[]
+	vector 和 string 定义的对象 会自动 构造和析构，不用担心内存泄漏的问题
+	使用new[]分配的动态数组，需要配合 delete[]类释放会造成内存，否者会造成内存泄漏的问题
+
+	例如 定义一个二维数组，指针的指针
+	自己用new实现：
+```c
+	int** arr_pp new int* [row_num];// 定义一个存储指针的数组的指针 行数
+	for(i = 0; i < row_num; ++i)
+	    arr_pp[i] = new int[col_num];// 一个一个new 指针每一行是一个行向量的指针
+```
+	用 vector实现，一行代码搞定，还不到担心内存泄漏的问题
+```c
+	vector<vector<int>> v_i2(row_num,vector<int>(col_num,0));//初始化为一个0矩阵
+	vector<int> m;  
+        m.reserve(1000);//提前保留1000的内存
+	使用 reserve 避免不必要的重新分配 
+```
 
 # C++ primer5 语言学习记录
 
