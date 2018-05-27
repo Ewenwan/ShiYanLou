@@ -35,11 +35,12 @@
 
 
 # 上述工具的使用方法在线信息
-- apt-get
-  - http://wiki.ubuntu.org.cn/Apt-get%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97
-- git github
-  - http://www.cnblogs.com/cspku/articles/Git_cmds.html
-  - http://www.worldhello.net/gotgithub/index.html
+
+(apt-get)[ http://wiki.ubuntu.org.cn/Apt-get%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97]
+
+( git github1)[http://www.cnblogs.com/cspku/articles/Git_cmds.html]
+( git github2)[http://www.worldhello.net/gotgithub/index.html]
+
 - diff patch
   - http://www.ibm.com/developerworks/cn/linux/l-diffp/index.html
   - http://www.cnblogs.com/itech/archive/2009/08/19/1549729.html  
@@ -73,7 +74,7 @@
    - https://github.com/GitbookIO/gitbook  https://www.gitbook.com/
 
 
-# 汇编指令概述　AT&T汇编基本语法 
+# １．　汇编指令概述　AT&T汇编基本语法 
 
     x86汇编的两种语法：intel语法和AT&T语法
     x86汇编一直存在两种不同的语法，在intel的官方文档中使
@@ -105,8 +106,14 @@
     6. 寻址方式 
         AT&T格式:   immed32(basepointer, indexpointer, indexscale)
         Intel格式:  [basepointer + indexpointer × indexscale + imm32)
-    
-    7.中断　系统调用
+    7. 变量
+   　　　 AT&T:  foo                         Intel: [foo]
+         boo是一个全局变量。
+         注意加上$是表示地址引用，不加是表示值引用。
+         对于局部变量，可以通过堆栈指针引用。
+         
+
+    8.中断　系统调用
     　movl $1, %eax     // 成一个立即数1，传送到eax寄存器中。
                         // eax寄存器的值是系统调用号,1表示_exit系统调用
       movl $4, %ebx     // 生成一个立即数4，传送到ebx寄存器中。
@@ -117,5 +124,67 @@
       // 一般在调用结束后CPU再切换回用户模式，继续执行int指令后面的指令，在用户程序看来就像函数的调用和返回一样.
       // _exit这个系统调用会终止掉当前进程,而不会返回它继续执行.
 ```
-# 
+# 2.x86的寄存器
 
+## 2.1 x86的通用寄存器有eax、ebx、ecx、edx、edi、esi。
+    这些寄存器在大多数指令中是可以任意使用的。
+    但有些指令限制只能用其中某些寄存器做某种用途，
+    例如除法指令idivl规定被除数在eax寄存器中，
+    edx寄存器必须是0,而除数可以是任何寄存器中。
+    计算结果的商数保存在eax寄存器中（覆盖被除数），
+    余数保存在edx寄存器。
+  
+## 2.2 x86的特殊寄存器有ebp、esp、eip、eflags。
+    eip是程序计数器。
+    eflags保存计算过程中产生的标志位，
+    包括进位、溢出、零、负数四个标志位，
+    在x86的文档中这几个标志位分别称为CF、OF、ZF、SF。
+    ebp和esp用于维护函数调用的栈帧。
+
+    esp为栈指针，用于指向栈的栈顶（下一个压入栈的活动记录的顶部），
+    而ebp为帧指针，指向当前活动记录的底部。
+    每个函数的每次调用，都有它自己独立的一个栈帧，这个栈帧中维持着所需要的各种信息。
+    寄存器ebp指向当前的栈帧的底部（高地址），
+    寄存器esp指向当前的栈帧的顶部（低地址）。
+
+    注意：ebp指向当前位于系统栈最上边一个栈帧的底部，而不是系统栈的底部。
+    严格说来，“栈帧底部”和“栈底”是不同的概念;
+    esp所指的栈帧顶部和系统栈的顶部是同一个位置。
+
+## GCC基本内联汇编
+    GCC 提供了两内内联汇编语句（inline asm statements）：
+      基本内联汇编语句（basic inline asm statement) 和
+      扩展内联汇编语句（extended inline asm statement）。
+      
+      GCC基本内联汇编很简单，一般是按照下面的格式：
+         asm("statements");
+        例如：
+          asm("nop"); 
+          asm("cli");
+          
+          "asm" 和 "__asm__" 的含义是完全一样的。
+          如果有多行汇编，则每一行都要加上 "\n\t"。
+          其中的 “\n” 是换行符，"\t” 是 tab 符，
+          在每条命令的 结束加这两个符号，
+          是为了让 gcc 把内联汇编代码翻译成一般的
+          汇编代码时能够保证换行和留有一定的空格。
+          
+          本asm语句，GCC编译出来的汇编代码就是双引号里的内容。例如：
+```asm    
+          asm( "pushl %eax\n\t"
+               "movl $0,%eax\n\t"
+               "popl %eax"
+          );
+
+          asm("movl %eax, %ebx");
+          asm("xorl %ebx, %edx");
+          asm("movl $0, _boo);
+```
+
+    在上面的例子中，由于我们在内联汇编中改变了 edx 和 ebx 的值，
+    但是由于 gcc 的特殊的处理方法，即先形成汇编文件，
+    再交给 GAS 去汇编，所以 GAS 并不知道我们已经改变了 edx和 ebx 的值，
+    如果程序的上下文需要 edx 或 ebx 作其他内存单元或变量的暂存，
+    就会产生没有预料的多次赋值，引起严重的后果。
+    对于变量 _boo也存在一样的问题。
+    为了解决这个问题，就要用到扩展 GCC 内联汇编语法。
