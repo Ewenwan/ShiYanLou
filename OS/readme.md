@@ -71,3 +71,51 @@
    - http://pad.haroopress.com/
 - gitbook
    - https://github.com/GitbookIO/gitbook  https://www.gitbook.com/
+
+
+# 汇编指令概述　AT&T汇编基本语法 
+
+    x86汇编的两种语法：intel语法和AT&T语法
+    x86汇编一直存在两种不同的语法，在intel的官方文档中使
+    用intel语法，Windows也使用intel语法，而UNIX平台的汇编器一
+    直使用AT&T语法，所以本书使用AT&T语法。
+
+    AT&T格式的汇编，与Intel格式的汇编有一些不同。二者语法上主要有以下几个不同：
+```c 
+    1. 寄存器命名原则
+        AT&T格式: %eax                      Intel格式: eax
+        寄存器前面加"%"，以便跟符号名区分开。
+    2. 源/目的操作数顺序    -->
+        AT&T格式: movl %eax, %ebx           Intel格式: mov ebx, eax
+        
+    3. 常数/立即数的格式　
+        AT&T格式: movl $_value, %ebx        Intel格式: mov eax, _value
+        CPU内部产生的数称为立即数，在汇编程序中立即数前面加"$" 美元符号
+        movl $1, %eax
+          CPU内部产生一个数字1, 然后传送到eax寄存器中。
+          mov后边的l表示long,说明是32位的传送指令。
+        movl $4, %ebx
+          与上条指令类似，生成一个立即数4，传送到ebx寄存器中。
+          
+    4. 把value的地址放入eax寄存器
+        AT&T格式: movl $0xd00d, %ebx        Intel格式: mov ebx, 0xd00d
+        
+    5. 操作数长度标识 
+        AT&T格式: movw %ax, %bx             Intel格式: mov bx, ax
+    6. 寻址方式 
+        AT&T格式:   immed32(basepointer, indexpointer, indexscale)
+        Intel格式:  [basepointer + indexpointer × indexscale + imm32)
+    
+    7.中断　系统调用
+    　movl $1, %eax     // 成一个立即数1，传送到eax寄存器中。
+                        // eax寄存器的值是系统调用号,1表示_exit系统调用
+      movl $4, %ebx     // 生成一个立即数4，传送到ebx寄存器中。
+      　　　　　　　　  　// ebx的值则是传给_exit系统调用的参数,还可以有ecx、edx做参数，也就是退出状态。
+      int $0x80　　　　  // interupt 
+      // int指令称为软中断指令, CPU从用户模式切换到特权模式，然后跳转到内核代码中执行异常处理程序
+      // int指令中的立即数0x80是一个参数,在linux内核中,int $0x80这种异常称系统调用（System Call）。
+      // 一般在调用结束后CPU再切换回用户模式，继续执行int指令后面的指令，在用户程序看来就像函数的调用和返回一样.
+      // _exit这个系统调用会终止掉当前进程,而不会返回它继续执行.
+```
+# 
+
