@@ -200,7 +200,7 @@ vector<int> twoSum(vector<int>& nums, int target){
     后可以使用find在原数组中查找索引
 ```c
 vector<int> twoSum(vector<int>& nums, int target){
-// nums.sort() 如果数组无序，先排序，时间复杂度 O(n*log(n))
+// sort(nums.begin(), nums.end()) 如果数组无序，先排序，时间复杂度 O(n*log(n))
 vector<int> result;// 结果
 // 两个指针
 int beg=0;
@@ -228,11 +228,37 @@ while(beg < end){// 从首尾位置向中间扫描夹逼，
                             hash表hash_map查找O(1),              空间复杂度O(n);
                             二分查找(数组需要有序) 查找时间复杂度O(log(n)) , 排序，时间复杂度 O(n*log(n)), 空间复杂度O(1);
                             )
-    2.先排序后，从首尾位置向中间扫描夹逼，有序O(N)，无序O(N log N + N)=O(N log N)，空间复杂度都为O(1)。
+    2.先排序后，从首尾位置向中间扫描夹逼，有序O(n)，无序O(n*log(n) + n)=O(n*log(n))，空间复杂度都为O(1)。
 
 
 
 
 ## B寻找和为定值的多个数
 [寻找和为定值的多个数](https://github.com/julycoding/The-Art-Of-Programming-By-July/blob/master/ebook/zh/02.03.md)
+
+### 和为定值的 3个数
+    解法：先排序，再遍历一个数，后再 在首尾位置左右夹逼选出另外两个数
+    先排序 复杂度O(n*log(n))
+    遍历第一个数 O(n)
+    左右夹逼最后两个数 O(n)
+    复杂度 MAX(O( n*log(n)), O(n^2) )
+    
+
+### 和为定值的 4个数
+    解法：先排序，再遍历4-2个数，后再 在首尾位置左右夹逼选出另外两个数
+    先排序 复杂度O(n*log(n))
+    遍历第一个数 O(n)
+    遍历第二个数 O(n)
+    左右夹逼最后两个数 O(n)
+    复杂度 MAX(O( n*log(n)), O(n^3) )
+    
+### 和为定值的 k个数
+    解法：先排序，再遍历k-2个数，后再 在首尾位置左右夹逼选出最后两个数
+    先排序 复杂度O(n*log(n))
+    遍历第一个数 O(n)
+    遍历第二个数 O(n)
+    ...
+    遍历第k-2个数 O(n)
+    左右夹逼最后两个数 O(n)
+    复杂度 MAX(O( n*log(n)), O(n^(k-1)) )
 
