@@ -1,4 +1,6 @@
 # learn python in action
+[以撸代码的形式学习Python](https://github.com/Ewenwan/LearnPython)
+
 # window python 开发环境
 ## 1. anaconda
 [下载](https://www.anaconda.com/download/)
