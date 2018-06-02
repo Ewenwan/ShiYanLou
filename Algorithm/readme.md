@@ -317,7 +317,9 @@ class Solution:
         while l1 and l2:
             # 对应位上的数相加时需要考虑低位上的进位(1/0)
             p.next = ListNode(l1.val + l2.val + carry)
-            #carry  = p.next.val // 10 #  商为进位
+            # carry  = p.next.val // 10 #  商为进位
+            # python 的 ? : 语句 
+            # carry=(1 if(p.next.val>9) else 0)
             if p.next.val>9 : 
                 carry = 1
             else: 
@@ -344,6 +346,27 @@ class Solution:
             p.next = ListNode(1)
         return dummy.next
 ```
-
-
+### 两个循环合并
+```python
+    def addTwoNumbers(self, l1, l2):
+        """
+        :type l1: ListNode
+        :type l2: ListNode
+        :rtype: ListNode
+        """
+        head = ListNode(0)#新建一个头结点 同来保存结果 链表
+        add = head # 节点链表的当前节点
+        sum = 0    # 和
+        # 只要两个加数 还有未 计算的位 以及还有进位
+        while (l1 != None or l2 != None or int(sum / 10)):
+            # 对应加数位上无数据的话 用0代替
+            sum = (l1.val if (l1 != None) else 0) + (l2.val if (l2 != None) else 0) + int(sum / 10)
+            # 结果位 为  求和 - 10 即求和对10的余数
+            add.next = ListNode(sum % 10)
+            # 迭代
+            add = add.next#结果的下一个节点
+            l1 = l1.next if (l1 != None) else l1# 加数的下一个节点 不为空的有
+            l2 = l2.next if (l2 != None) else l2# 
+        return head.next
+```
 
