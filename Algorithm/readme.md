@@ -333,7 +333,7 @@ class Solution:
         # 计算长的数
         rest = l1 or l2 # 合并为长的 或运算获取 长的高位上的数3位数和5为数相加 获取5位数的第4位和第5位
         while rest:
-            p.nest = ListNode(rest.val + carry)#仅有高位上的数 和 低位的进位
+            p.next = ListNode(rest.val + carry)#仅有高位上的数 和 低位的进位
             carry  = p.next.val // 10 #  商为进位
             p.next.val %= 10 # 余数为当前位上的数
             # 结果指向
