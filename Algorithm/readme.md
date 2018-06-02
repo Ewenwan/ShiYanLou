@@ -346,7 +346,7 @@ class Solution:
             p.next = ListNode(1)
         return dummy.next
 ```
-### 两个循环合并
+### 两个循环合并  python
 ```python
     def addTwoNumbers(self, l1, l2):
         """
@@ -369,7 +369,38 @@ class Solution:
             l2 = l2.next if (l2 != None) else l2# 
         return head.next
 ```
-### 两个循环合并简版
+## 对应  c++ 版本
+```asm
+    // 单向链表结构体
+    struct ListNode {
+        int val;// 值
+        ListNode *next;// 指向下一个 节点的指针
+        ListNode(int x) : val(x), next(NULL) {}// 结构体初始化函数
+    };
+    
+	ListNode *addTwoNumbers(ListNode *l1, ListNode *l2) {// 传入的为链表指针 使用->访问成员
+		// 新建一个 链表 头结点 内容为0 没什么用处 但是其next指针可以访问我们的结果链表
+		ListNode preHead(0);// 结果链表 头指针
+		ListNode* p = &preHead;      // 结果链表的 当前节点
+		int carry = 0;      // 进位
+		while (l1 || l2 || carry) {
+			// 求和 对应位上的数相加时需要考虑低位上的进位(1/0)
+			// 对应加数位上无数据的话 用0代替
+			int sum = (l1 ? l1->val : 0) + (l2 ? l2->val : 0) + carry;
+			carry = sum / 10;// 整数除法保留商  为进位 python 为 //
+			p->next = new ListNode(sum % 10);//新建节点 保存 余数 = 和-10
+			// 迭代
+			p = p->next;// 结果的下一个 节点
+			// 两个加数的下一个节点
+			l1 = l1 ? l1->next : l1;// 不为空的有
+			l2 = l2 ? l2->next : l2;
+		}
+		return preHead.next;// 头节点的下一个节点为 结果的开始
+		// 通过这种方式处理头，可以更加简洁的书写链表
+	}
+```
+
+### 两个循环合并简版 python
 ```python
     def addTwoNumbers(self, l1, l2):
         """
@@ -394,4 +425,38 @@ class Solution:
             l3=l3.next # 结果迭代
         return head.next
 ```
-## c++ 解法
+###  c++ 解法
+```asm
+    // 单向链表结构体
+    struct ListNode {
+        int val;// 值
+        ListNode *next;// 指向下一个 节点的指针
+        ListNode(int x) : val(x), next(NULL) {}// 结构体初始化函数
+    };
+	ListNode *addTwoNumbersMy(ListNode* l1, ListNode* l2) {// 传入的为链表指针 使用->访问成员
+		// 新建一个 链表 头结点 内容为0 没什么用处 但是其next指针可以访问我们的结果链表
+		ListNode preHead(0);      // 结果链表 头指针
+		ListNode* res = &preHead; // 结果链表的 当前节点
+		int carry = 0;      // 进位
+		while (l1 || l2 || carry) {
+			int sum = carry;// 求和先保存 进位值
+			if(l1){
+				sum += l1->val;// 求和
+				l1 = l1->next; // 迭代
+			}
+			if(l2){
+				sum += l2->val;// 求和
+				l2 = l2->next; // 迭代
+			}
+			carry = sum / 10;// 整数除法保留商  为进位 python 为 //
+			// carry = (sum>9 ? 1 : 0)
+			// liu = (carry==1 ? (sum - 10): sum)
+			// res->next = new ListNode(liu);
+			res->next = new ListNode(sum % 10);//新建节点 保存 余数 = 和-10
+			// 迭代
+			res = res->next;// 结果的下一个 节点
+		}
+		return preHead.next;// 头节点的下一个节点为 结果的开始
+		// 通过这种方式处理头，可以更加简洁的书写链表
+	}
+```
