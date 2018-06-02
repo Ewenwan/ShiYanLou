@@ -473,4 +473,23 @@ class Solution:
 ## 解法思想：
 	使用 字典存储 字符串中每个字符出现的位置索引，在字典中查找是否重复出现，记录长度
 ## python       
-
+```python
+    def lengthOfLongestSubstring(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        result = 0
+        if s is None or len(s) == 0:
+            return result
+        d = {}
+        start_idx = 0# 非重复字符串起点
+        cur_len = 0#当前长度
+        for i in range(len(s)):
+            if s[i] in d and d[s[i]] >= start_idx:
+                start = d[s[i]] + 1# 重复后 更新起点
+            cur_len = i - start_idx + 1# 当前区间长度
+            d[s[i]] = i# 字典  字符:index
+            result = max(result, cur_len)
+        return result
+```
