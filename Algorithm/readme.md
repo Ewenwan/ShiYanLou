@@ -312,7 +312,7 @@ class Solution:
         """
         # 新建结果保存链表 头节点保存的内容无用 但是其 指针dummy.next可以保存我们的链表
         p = dummy = ListNode(-1)
-        carry = 1 # 初始进位为0
+        carry = 0 # 初始进位为0
         # 计算两个数的共有位的和
         while l1 and l2:
             # 对应位上的数相加时需要考虑低位上的进位(1/0)
