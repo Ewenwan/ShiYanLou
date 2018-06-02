@@ -1,3 +1,20 @@
+/*
+题2 两个数求和 Add Two Numbers
+
+给出两个链表，存储非负数，
+两个链表都是按倒序方式存储数字（个位，十位，百位……）
+要求将两个链表相加并以链表形式返回。
+
+例如：
+Input: (2 -> 4 -> 3) + (5 -> 6 -> 4)
+Output: 7 -> 0 -> 8
+Explanation: 342 + 465 = 807.
+解法思想：
+
+1. 对应位上的数相加时需要考虑低位上的进位(1/0)
+2. 还要考虑到两个数位数不相等时，短的数的高位相当于0
+
+*/
 #include <iostream>
 using namespace std;
 
@@ -10,6 +27,7 @@ struct ListNode {
 
 class Solution {
 public:
+	// 1
 	ListNode *addTwoNumbers(ListNode *l1, ListNode *l2) {// 传入的为链表指针 使用->访问成员
 		// 新建一个 链表 头结点 内容为0 没什么用处 但是其next指针可以访问我们的结果链表
 		ListNode preHead(0);// 结果链表 头指针
@@ -30,7 +48,8 @@ public:
 		return preHead.next;// 头节点的下一个节点为 结果的开始
 		// 通过这种方式处理头，可以更加简洁的书写链表
 	}
-//
+	
+       // 2
 	ListNode *addTwoNumbersMy(ListNode* l1, ListNode* l2) {// 传入的为链表指针 使用->访问成员
 		// 新建一个 链表 头结点 内容为0 没什么用处 但是其next指针可以访问我们的结果链表
 		ListNode preHead(0);      // 结果链表 头指针
@@ -58,6 +77,7 @@ public:
 		// 通过这种方式处理头，可以更加简洁的书写链表
 	}
 	
+	// 3
 	ListNode* addTwoNumbersMy52ms(ListNode* l1, ListNode* l2) {
 		ListNode* ret = new ListNode(0);
 		ListNode* cur = ret;
