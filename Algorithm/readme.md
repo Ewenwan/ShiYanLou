@@ -1,7 +1,4 @@
-# 各种 算法
-
-# 数组系列
-# 例如：求给定序列中 最大子序列的和
+# 各种 算法  数据结构：数组 字符串 链表 树 图 桶 森林 
 
 [leetcode 博客题解](https://blog.csdn.net/liuxiao214/article/details/76032392)
 
@@ -11,6 +8,9 @@
 
 > 小詹学Python 微信公众号等
 
+
+# 数组系列
+# 例如：求给定序列中 最大子序列的和
 
 ## 1.返回数组中 和为 给定值的 两个数 三个数 四个数
     例如：
@@ -460,3 +460,19 @@ class Solution:
 		// 通过这种方式处理头，可以更加简洁的书写链表
 	}
 ```
+# 字符串系列
+# 题3 最长无重复子串 Longest Substring Without Repeating Characters
+	题目大意：
+		给出一个字符串，找到最长的没有重复字符的子字符串，并返回该子字符串的长度。
+	例如：
+		Given "abcabcbb", the answer is "abc", which the length is 3.
+		Given "bbbbb", the answer is "b", with the length of 1.
+		Given "pwwkew", the answer is "wke", with the length of 3. 
+		       Note that the answer must be a substring, 
+		       "pwke" is a subsequence and not a substring.
+	注意 子串 与子序列的区别
+	
+## 解法思想：
+	使用 字典存储 字符串中每个字符出现的位置索引，在字典中查找是否重复出现，记录长度
+## python       
+
