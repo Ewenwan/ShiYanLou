@@ -1,4 +1,6 @@
 # 各种 算法
+
+# 数组系列
 # 例如：求给定序列中 最大子序列的和
 
 [leetcode 博客题解](https://blog.csdn.net/liuxiao214/article/details/76032392)
@@ -274,4 +276,74 @@ while(beg < end){// 从首尾位置向中间扫描夹逼，
     从后向前选择数：
         如果选择最后一个数nums[n],  那么需要从前n-1个数中找出k-1个数使得和为target-nums[n]；
         如果不选择最后一个数nums[n],那么需要从前n-1个数中找出k个数使得和为  target
+
+
+# 链表系列
+
+# 题2 两个数求和 Add Two Numbers
+
+    给出两个链表，存储非负数，
+    两个链表都是按倒序方式存储数字（个位，十位，百位……）
+    要求将两个链表相加并以链表形式返回。
+    
+    例如：
+    Input: (2 -> 4 -> 3) + (5 -> 6 -> 4)
+    Output: 7 -> 0 -> 8
+    Explanation: 342 + 465 = 807.
+    
+## 解法思想：
+    1. 对应位上的数相加时需要考虑低位上的进位(1/0)
+    2. 还要考虑到两个数位数不相等时，短的数的高位相当于0
+    
+## python解法
+```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution:
+    def addTwoNumbers(self, l1, l2):
+        """
+        :type l1: ListNode
+        :type l2: ListNode
+        :rtype: ListNode
+        """
+        # 新建结果保存链表 头节点保存的内容无用 但是其 指针dummy.next可以保存我们的链表
+        p = dummy = ListNode(-1)
+        carry = 1 # 初始进位为0
+        # 计算两个数的共有位的和
+        while l1 and l2:
+            # 对应位上的数相加时需要考虑低位上的进位(1/0)
+            p.next = ListNode(l1.val + l2.val + carry)
+            #carry  = p.next.val // 10 #  商为进位
+            if p.next.val>9 : 
+                carry = 1
+            else: 
+                carry = 0
+            # p.next.val %= 10 # 余数为当前位上的数
+            if carry == 1: 
+                p.next.val = p.next.val - 10
+            # 结果指向
+            p = p.next # 指向下一个节点
+            # 两个求和数指向下一个节点
+            l1 = l1.next
+            l2 = l2.next
+        # 计算长的数
+        rest = l1 or l2 # 合并为长的 或运算获取 长的高位上的数3位数和5为数相加 获取5位数的第4位和第5位
+        while rest:
+            p.nest = ListNode(rest.val + carry)#仅有高位上的数 和 低位的进位
+            carry  = p.next.val // 10 #  商为进位
+            p.next.val %= 10 # 余数为当前位上的数
+            # 结果指向
+            p = p.next # 指向下一个节点 
+            # 长的下一个节点
+            rest = rest.next
+        if carry: #最后还有可能进位
+            p.next = ListNode(1)
+        return dummy.next
+```
+
+
 
