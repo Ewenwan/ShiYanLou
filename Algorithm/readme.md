@@ -465,12 +465,10 @@ class Solution:
 	题目大意：
 		给出一个字符串，找到最长的没有重复字符的子字符串，并返回该子字符串的长度。
 	例如：
-		Given "abcabcbb", the answer is "abc", which the length is 3.
-		Given "bbbbb", the answer is "b", with the length of 1.
-		Given "pwwkew", the answer is "wke", with the length of 3. 
-		       Note that the answer must be a substring, 
-		       "pwke" is a subsequence and not a substring.
-	注意 子串 与子序列的区别
+		给定 "abcabcbb" ，没有重复字符的最长子串是 "abc" ，那么长度就是3。
+		给定 "bbbbb" ，最长的子串就是 "b" ，长度是1。
+		给定 "pwwkew" ，最长子串是 "wke" ，长度是3。请注意答案必须是一个子串，"pwke" 是 子序列  而不是子串。
+			注意 子串 与子序列的区别
 	
 ## 解法思想：
 	使用 字典存储 字符串中每个字符出现的位置索引，在字典中查找是否重复出现，记录长度
