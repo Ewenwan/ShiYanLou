@@ -355,7 +355,7 @@ class Solution:
         :rtype: ListNode
         """
         head = ListNode(0)#新建一个头结点 同来保存结果 链表
-        add = head # 节点链表的当前节点
+        add = head # 结果链表的当前节点
         sum = 0    # 和
         # 只要两个加数 还有未 计算的位 以及还有进位
         while (l1 != None or l2 != None or int(sum / 10)):
@@ -369,4 +369,29 @@ class Solution:
             l2 = l2.next if (l2 != None) else l2# 
         return head.next
 ```
-
+### 两个循环合并简版
+```python
+    def addTwoNumbers(self, l1, l2):
+        """
+        :type l1: ListNode
+        :type l2: ListNode
+        :rtype: ListNode
+        """
+        head=ListNode(0)#新建一个头结点 同来保存结果 链表
+        l3=head# 结果链表的当前节点
+        v=0#进位
+        while l1 or l2 or v:
+            v1=v# 求和值
+            if l1:
+                v1+=l1.val# 求和
+                l1=l1.next# 迭代
+            if l2:
+                v1+=l2.val# 求和
+                l2=l2.next# 迭代
+            v=v1//10# 商   进位
+            v2=v1%10# 余数 留数
+            l3.next=ListNode(v2)# 结果保存
+            l3=l3.next # 结果迭代
+        return head.next
+```
+## c++ 解法
