@@ -10,6 +10,8 @@
 
 [GitHub Pages+Jekyll搭建个人博客](http://www.weixinyu.info/2017/08/Use_GitHubPages_and_Jekyll_build_my_blog/)
 
+[Markdown工具集](http://baixin.io/2016/11/markdownTool/)
+
 [清华操作系统 github](http://github.com/oscourse-tsinghua)
 
 	包含内容：
