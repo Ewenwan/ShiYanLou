@@ -6,6 +6,9 @@
 
 [Leetcode常用五大算法思想](https://blog.csdn.net/x_r_su/article/details/52461557)
 
+[数据结构 博客参考 树 图 队列](https://blog.csdn.net/neu_chenguangq/article/list/3)
+
+
 [清华操作系统 github](http://github.com/oscourse-tsinghua)
 
 	包含内容：
