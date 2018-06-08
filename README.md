@@ -8,6 +8,7 @@
 
 [数据结构 博客参考 树 图 队列](https://blog.csdn.net/neu_chenguangq/article/list/3)
 
+[GitHub Pages+Jekyll搭建个人博客](http://www.weixinyu.info/2017/08/Use_GitHubPages_and_Jekyll_build_my_blog/)
 
 [清华操作系统 github](http://github.com/oscourse-tsinghua)
 
