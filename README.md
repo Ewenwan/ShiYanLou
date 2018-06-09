@@ -14,6 +14,8 @@
 
 [清华操作系统 github](http://github.com/oscourse-tsinghua)
 
+[鱼C工作室 C/C++/Python/Wed/数据结构和算法](http://fishc.com/)
+
 	包含内容：
 		1. c
 
