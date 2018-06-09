@@ -20,6 +20,8 @@
 
 [汇编语言程序设计](http://www.xuetangx.com/courses/course-v1:TsinghuaX+20240103X+sp/about)
 
+[鱼C 数据结构和算法](http://blog.fishc.com/653.html)
+
 ## 向量 vector 基于数组实现 自动调整大小
 
 ### 0_类结构_用户-接口-类实现
