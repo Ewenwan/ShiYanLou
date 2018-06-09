@@ -1,4 +1,7 @@
-# learn C++ in action
+# 学习C++
+
+## 鱼C工作室 C++快速入门
+[鱼C工作室 C++快速入门](http://blog.fishc.com/category/cpp/page/5)
 
 #    C++  泛型技术  泛化技术  增加不确定性  通用性  灵活性
 
