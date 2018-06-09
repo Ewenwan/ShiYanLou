@@ -3,6 +3,8 @@
 
 [鱼C 零基础入门学习Python](http://blog.fishc.com/category/python/page/10)
 
+[鱼C  《极客首选之Python》 ](http://blog.fishc.com/category/geekpython/page/3)
+
 # window python 开发环境
 ## 1. anaconda
 [下载](https://www.anaconda.com/download/)
