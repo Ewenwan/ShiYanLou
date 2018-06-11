@@ -23,11 +23,11 @@
     多台电脑之间创建共享文件夹
 ## nfs服务器端配置
 ### 1、安装nfs服务
-    1.1-安装Ubuntu nfs服务器端：
+    1.1-安装Ubuntu nfs服务器端：
         sudo apt-get install nfs-kernel-server
-        (在安装nsf-kernel-server的时候，也会安装nfs-commom。如果没有安装这个软件包，则要执行1.2中的命令了)
-    1.2-安装nfs的客户端：
-    sudo apt-get install nfs-common
+        (在安装nsf-kernel-server的时候，也会安装nfs-commom。如果没有安装这个软件包，则要执行1.2中的命令了)
+    1.2-安装nfs的客户端：
+    sudo apt-get install nfs-common
 ### 2、修改配置文件   
     sudo vim /etc/exports
 
