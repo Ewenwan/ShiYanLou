@@ -165,3 +165,9 @@
     在虚拟机文件夹下 /mnt/hgfs  可以查看到 共享文件夹
 
 
+# apt-get无法安装 
+    解决方法：强制解锁
+    sudo rm /var/cache/apt/archives/lock3
+    sudo rm /var/lib/dpkg/lock
+    
+    
