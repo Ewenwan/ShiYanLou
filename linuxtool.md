@@ -1,3 +1,5 @@
+[ Linux基础知识 总结](https://blog.csdn.net/cyningsun/article/category/1269142)
+
 #  1、Clion的简单介绍
     CLion是以IntelliJ为基础，专为开发C及C++所设计的跨平台IDE，可以在Windows、Linux及MacOS使用，这里我是在ubuntu 16.0.4基础上安装。
 ## 2、下载 Linux版Clion的.tar.gz的压缩包 
