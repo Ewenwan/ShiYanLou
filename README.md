@@ -18,6 +18,8 @@
 
 [鱼C工作室 C/C++/Python/Wed/数据结构和算法](http://fishc.com/)
 
+[面试算法博客笔记](https://blog.csdn.net/cheese_pop?t=1)
+
 	包含内容：
 		1. c
 
