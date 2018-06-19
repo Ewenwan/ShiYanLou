@@ -193,5 +193,55 @@
      这就是makefile的规则。
      也就是makefile中最核心的内容。
 
+### gdb调试工具的使用
+    gdb 是功能强大的调试程序，可完成如下的调试任务：
+        1. 设置断点
+        2. 监视程序变量的值
+        3. 程序的单步(step in/step over)执行
+        4. 显示/修改变量的值
+        5. 显示/修改寄存器
+        6. 查看程序的堆栈情况
+        7. 远程调试
+        8. 调试线程
+**步骤
 
+    在可以使用 gdb 调试程序之前，必须使用 -g 或 –ggdb编译选项编译源文件。
+    gcc -g hello.c -o hello
+    运行 gdb 调试程序时通常使用如下的命令：
+    gdb hello
     
+**在 gdb 提示符处键入help，将列出命令的分类，主要的分类有：
+
+    1. aliases：    命令别名
+    2. breakpoints：断点定义；
+    3. data：       数据查看；
+    4. files：      指定并查看文件；
+    5. internals：  维护命令；
+    6. running：    程序执行；
+    7. stack：      调用栈查看；
+    8. status：     状态查看；
+    9. tracepoints：跟踪程序执行。
+    键入 help 后跟命令的分类名，可获得该类命令的详细清单。
+
+**gdb的常用命令如下表所示
+
+    break FILENAME:NUM  在特定源文件 特定行(NUM指定) 上设置断点
+    clear FILENAME:NUM  删除设置在特定源文件特定行上的断点
+    run                 运行调试程序
+    step                单步执行调试程序，不会直接执行函数
+    next                单步执行调试程序，会直接执行函数
+    backtrace           显示所有的调用栈帧。该命令可用来显示函数的调用顺序
+    where continue      继续执行正在调试的程序
+    display EXPR        每次程序停止后显示表达式的值,表达式由程序定义的变量组成
+    file FILENAME       装载指定的可执行文件进行调试
+    help CMDNAME        显示指定调试命令的帮助信息
+    info break          显示当前断点列表，包括到达断点处的次数等
+    info files          显示被调试文件的详细信息
+    info func           显示被调试程序的所有函数名称
+    info prog           显示被调试程序的执行状态
+    info local          显示被调试程序当前函数中的局部变量信息
+    info var            显示被调试程序的所有全局和静态变量名称
+    kill                终止正在被调试的程序
+    list                显示被调试程序的源代码
+    quit                退出 gdb
+
