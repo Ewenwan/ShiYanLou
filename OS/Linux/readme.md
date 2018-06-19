@@ -38,7 +38,7 @@
     // 同时还可指定使用某一个寄存器。
     // 参考博客　https://www.cnblogs.com/whutzhou/articles/2638498.html
     
-**寄存器名称限定符
+**寄存器名称限定符**
 
     +---+--------------------+  
     | r |    Register(s)     |  
@@ -50,7 +50,7 @@
     | S |   %esi, %si        |  
     | D |   %edi, %di        |  
     +---+--------------------+  
-**其他一些限定符
+**其他一些限定符**
 
     1. "m"：对内存的操作被允许，用一个合法内存空间来做操作数。
     2. "o"：对内存的操作被允许，但是必须支持地址偏移值，
@@ -67,7 +67,7 @@
     7. "q"：从eax, ebx, ecx, edx分配寄存器。 
     8. "r"：从eax, ebx, ecx, edx, esi, edi分配寄存器。
             
-**最常用的修饰符有：“=”，“&”。
+**最常用的修饰符有：“=”，“&”**
 
     1. “=”，表示此操作数类型是只写，即输出寄存器。
     　　之前的值会被输出数据值替代。
@@ -203,14 +203,14 @@
         6. 查看程序的堆栈情况
         7. 远程调试
         8. 调试线程
-**步骤
+**步骤**
 
     在可以使用 gdb 调试程序之前，必须使用 -g 或 –ggdb编译选项编译源文件。
     gcc -g hello.c -o hello
     运行 gdb 调试程序时通常使用如下的命令：
     gdb hello
     
-**在 gdb 提示符处键入help，将列出命令的分类，主要的分类有：
+**在 gdb 提示符处键入help，将列出命令的分类，主要的分类有**
 
     1. aliases：    命令别名
     2. breakpoints：断点定义；
@@ -223,7 +223,7 @@
     9. tracepoints：跟踪程序执行。
     键入 help 后跟命令的分类名，可获得该类命令的详细清单。
 
-**gdb的常用命令如下表所示
+**gdb的常用命令如下表所示**
 
     break FILENAME:NUM  在特定源文件 特定行(NUM指定) 上设置断点
     clear FILENAME:NUM  删除设置在特定源文件特定行上的断点
@@ -244,4 +244,73 @@
     kill                终止正在被调试的程序
     list                显示被调试程序的源代码
     quit                退出 gdb
+### 示例查找一个错误程序发生错误的地方
+**错误程序输入一个字符串，指针未赋初值，野指针**
+```c
+/*bugging.c*/
+#include <stdio.h>
+#include <stdlib.h>
 
+static char buff [256];
+static char* string;
+int main ()
+{
+    printf ("Please input a string: ");
+    gets (string);
+    printf ("\nYour string is: %s\n", string);
+}
+```
+#### 编译　运行
+    gcc -o bugging -g bugging.c
+    ./bugging >>>>
+    Please input a string: asdf
+    Segmentation fault (core dumped)
+    将出现 "Segment Fault" 段错误　野指针指飞了。
+
+#### gbd调试查找问题
+    1. 加载 bugging 可执行文件
+       gdb bugging 
+    2. 运行程序
+       run
+       >>> 会提示输入一个string
+       >>> trer 随便输入
+       发生段错误
+    3. 查看程序出错的地方
+      where
+       >>> 
+       #0  _IO_gets (buf=0x0) at iogets.c:54   　　　　　　　#显示在gets附近出错
+       #1  0x000000000040059f in main () at bugging.c:10   
+    4. 利用 list 命令查看调用 gets 函数附近的代码
+       list
+       >>> in iogets.c   
+    5. 在源程序中　gets附近添加断点 在第 11 行处设置断点
+      break 11  
+    6. next 继续运行　结束
+    7. run 重新运行
+       程序重新运行到第 11 行处停止
+    8. 打印 string 的值 
+      print string
+      >>> 
+       $1 = 0x0
+       显示为空指针
+    9. kill & quit  结束并退出  
+    
+###  a. 修改程序
+        问题在于string指向的是一个无效指针，
+        修改程序，在10行和11行之间增加一条语句 “string=buff; ”，
+        重新编译程序，然后继续运行，将看到正确的程序运行结果
+```c
+/*bugging.c*/
+#include <stdio.h>
+#include <stdlib.h>
+
+static char buff [256];
+static char* string;
+int main ()
+{
+    printf ("Please input a string: ");
+    string = buff;//　指定地址
+    gets (string);
+    printf ("\nYour string is: %s\n", string);
+}
+```
