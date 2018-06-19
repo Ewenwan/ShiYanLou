@@ -1,0 +1,158 @@
+STM32 时钟配置有2种方式：
+第一使用库自带的SystemInit();函数自动配置；
+第二种：通过stm32f10x_rcc.c文件里的函数配置，
+比如RCC_HCLKConfig(uint32_t RCC_SYSCLK)，
+RCC_PCLK1Config(uint32_t RCC_HCLK），
+RCC_PCLK2Config(uint32_t RCC_HCLK)；
+这种方式可以根据自己需要把HCLK、PLCK1、PLCK2配置成不同的数值。
+
+第一种方式中SystemInit（）这个函数直接把SYSCLK 来源配置为PLLCK ，
+PCLK1=PCLK2=HCLK=SYSCLK。
+PLLCK 时钟来源为外部高速晶振，具体分频关系为HSE/2然后乘以倍频系数（PLLMUL），
+比如外部晶振为8MHZ，设置工作频率为36MHz,则PLLCK=(HSE(8)/2)*9=36MHz。
+工作频率的选取根据所使用的芯片型号来确定，然后在system_stm32f10x.c 函数中定义选取，如下选择的为工作频率36MHz。 
+#if defined (STM32F10X_LD_VL) || (defined STM32F10X_MD_VL) || (defined STM32F10X_HD_VL)
+#define SYSCLK_FREQ_24MHz 24000000
+#else
+#define SYSCLK_FREQ_36MHz 36000000// 选择系统工作频率为36MHz
+#endif
+注意在V3.5.0以上的库文件里SystemInit（）函数已经被添加入启动文件中了，
+也就是库已经自动配置好了 HCLK（AHB总线）、PLCK1（APB1）、PLCK2（APB2）这几个总线的时钟频率，
+一般在36MHz以下的工作频率 HCLK=PLCK1=PLCK2=用户选择的工作频率，在超过36MHz的工作频率HCLK=PLCK2=用户选择的频率，
+而PCKL1因为是低速总线最大只能到36MHz，所以库自动设置PCLK=36MHz。
+在V3.5.0以下的库中，通常在自己写的时钟配置使能函数里加入SystemInit（），
+比如我自己用的RCC_Configuration(void)如下：
+void RCC_Configuration(void)
+{
+SystemInit();//初始化系统时钟
+RCC_ADCCLKConfig(RCC_PCLK2_Div4); //设置ADC 的工作频率为9M 
+RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3| RCC_APB1Periph_TIM2, ENABLE);
+RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1 | RCC_APB2Periph_GPIOA |RCC_APB2Periph_AFIO, ENABLE);
+RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
+RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
+RCC_ClockSecuritySystemCmd(ENABLE);
+}
+ 
+下面是从一处论坛截取的例程，配置时钟为72MHz,使用CPU为STM32F107VC
+我已经定义了STM32F10X_CL，SYSCLK_FREQ_72MHz
+函数调用顺序：
+startup_stm32f10x_cl.s（启动文件） → SystemInit() → SetSysClock () → SetSysClockTo72()
+初始化时钟用到的RCC寄存器复位值：
+RCC_CR = 0x0000 xx83; RCC_CFGR = 0x0000 0000；RCC_CIR = 0x0000 0000; RCC_CFGR2 = 0x0000 0000;
+SystemInit()
+在调用 SetSysClock()之前RCC寄存器的值如下（都是一些与运算，或运算，在此就不赘述了）：
+RCC->CR = 0x0000 0083; RCC->CIR = 0x00FF0000; RCC->CFGR2 = 0x00000000;
+至于这些寄存器都代表着什么意思，详见芯片资料RCC寄存器，该文重点不在此处；
+SetSysClock()函数如下：
+static void SetSysClock(void)
+{
+#ifdef SYSCLK_FREQ_HSE
+ SetSysClockToHSE();
+#elif defined SYSCLK_FREQ_24MHz
+ SetSysClockTo24();
+#elif defined SYSCLK_FREQ_36MHz
+ SetSysClockTo36();
+#elif defined SYSCLK_FREQ_48MHz
+ SetSysClockTo48();
+#elif defined SYSCLK_FREQ_56MHz
+ SetSysClockTo56(); 
+#elif defined SYSCLK_FREQ_72MHz //我的定义的是SYSCLK_FREQ_72MHz，所以调用SetSysClockTo72()
+ SetSysClockTo72();
+#endif
+}
+SetSysClockTo72()函数如下：
+static void SetSysClockTo72(void)
+{
+ __IO uint32_t StartUpCounter = 0, HSEStatus = 0;
+ RCC->CR = ((uint32_t)RCC_CR_HSEON);
+ do
+ {
+ HSEStatus = RCC->CR & RCC_CR_HSERDY;
+ StartUpCounter ; 
+ } while((HSEStatus == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT));
+ if ((RCC->CR & RCC_CR_HSERDY) != RESET)
+ {
+ HSEStatus = (uint32_t)0x01;
+ }
+ else
+ {
+ HSEStatus = (uint32_t)0x00;
+ } 
+ if (HSEStatus == (uint32_t)0x01)
+ {
+ FLASH->ACR = FLASH_ACR_PRFTBE;
+ FLASH->ACR &= (uint32_t)((uint32_t)~FLASH_ACR_LATENCY);
+ FLASH->ACR = (uint32_t)FLASH_ACR_LATENCY_2; 
+ RCC->CFGR = (uint32_t)RCC_CFGR_HPRE_DIV1;
+ RCC->CFGR = (uint32_t)RCC_CFGR_PPRE2_DIV1;
+ RCC->CFGR = (uint32_t)RCC_CFGR_PPRE1_DIV2;
+#ifdef STM32F10X_CL
+ RCC->CFGR2 &= (uint32_t)~(RCC_CFGR2_PREDIV2 RCC_CFGR2_PLL2MUL
+ RCC_CFGR2_PREDIV1 RCC_CFGR2_PREDIV1SRC);
+ RCC->CFGR2 = (uint32_t)(RCC_CFGR2_PREDIV2_DIV5 RCC_CFGR2_PLL2MUL8
+ RCC_CFGR2_PREDIV1SRC_PLL2 RCC_CFGR2_PREDIV1_DIV5);
+ RCC->CR = RCC_CR_PLL2ON;
+ while((RCC->CR & RCC_CR_PLL2RDY) == 0)
+ {
+ }
+ RCC->CFGR &= (uint32_t)~(RCC_CFGR_PLLXTPRE RCC_CFGR_PLLSRC RCC_CFGR_PLLMULL);
+ RCC->CFGR = (uint32_t)(RCC_CFGR_PLLXTPRE_PREDIV1 RCC_CFGR_PLLSRC_PREDIV1 
+ RCC_CFGR_PLLMULL9); 
+#else 
+ RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC RCC_CFGR_PLLXTPRE
+ RCC_CFGR_PLLMULL));
+ RCC->CFGR = (uint32_t)(RCC_CFGR_PLLSRC_HSE RCC_CFGR_PLLMULL9);
+#endif
+ RCC->CR = RCC_CR_PLLON;
+ while((RCC->CR & RCC_CR_PLLRDY) == 0)
+ {
+ }
+ RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
+ RCC->CFGR = (uint32_t)RCC_CFGR_SW_PLL; 
+ while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)0x08)
+ {
+ }
+ }
+ else
+ {
+ }
+}
+1：AHB, APB1，APB2时钟确定
+//HCLK = SYSCLK ,从下面的分析可以得出SYSCLK是使用PLLCLK时钟的，也就是72MHZ（至于72MHZ如何得来，请看下面分析）
+ //那么就是HCLK(AHB总线时钟)=PLLCLK = 72MHZ 
+ //AHB总线时钟等于系统时钟SYSCLK，也就是 AHB时钟 = HCLK = SYSCLK = 72MHZ
+ RCC->CFGR = (uint32_t)RCC_CFGR_HPRE_DIV1;
+ //PLCK2等于HCLK一分频， 所以PCLK2 = HCLK，HCLK = 72MHZ, 那么PLCK2(APB2总线时钟) = 72MHZ 
+ //APB2总线时钟等于HCLK的一分频，也就是不分频；APB2 时钟 = HCLK = SYSCLK = 72MHZ 
+ RCC->CFGR = (uint32_t)RCC_CFGR_PPRE2_DIV1;
+ //PCLK1 = HCLK / 2；PCLK1 等于HCLK时钟的二分频，那么PCLK1(APB1) = 72MHZ / 2 = 36MHZ 
+ //APB1总线时钟等于HCLK的二分频，也就是 APB1时钟= HCLK / 2 = 36MHZ
+ RCC->CFGR = (uint32_t)RCC_CFGR_PPRE1_DIV2;
+2：如何得出SYSCLK（系统时钟）为72MHZ(外部晶振25MHZ)
+//记得参考英文芯片资料的时钟树P115页和RCC时钟寄存器进行理解
+RCC->CFGR2 = (uint32_t)(RCC_CFGR2_PREDIV2_DIV5 RCC_CFGR2_PLL2MUL8 RCC_CFGR2_PREDIV1SRC_PLL2 RCC_CFGR2_PREDIV1_DIV5);
+RCC_CFGR2_PREDIV2_DIV5: PREDIV2 = 5； 5分频
+ 也就是PREDIV2对输入的外部时钟 5分频,那么PLL2和PLL3没有倍频前是25 /5 = 5MHZ
+RCC_CFGR2_PLL2MUL8 : PLL2MUL = 8； 8倍频 
+ 8倍频后,PLL2时钟 = 5 * 8 = 40MHZ; 因此 PLL2CLK = 40MHZ
+RCC_CFGR2_PREDIV1SRC_PLL2 : RCC_CFGR2的第16位为1，选择PLL2CLK 作为PREDIV1的时钟源
+RCC_CFGR2_PREDIV1_DIV5：PREDIV1 = 5；PREDIV1对输入时钟5分频 PREDIV1CLK = PLL2CLK / 5 = 8MHZ
+以上是对RCC_CFGR2进行的配置
+--------------------------------------------------------------------------------------
+RCC->CFGR = (uint32_t)(RCC_CFGR_PLLXTPRE_PREDIV1 RCC_CFGR_PLLSRC_PREDIV1 
+ RCC_CFGR_PLLMULL9); 
+RCC_CFGR_PLLXTPRE_PREDIV1 ：操作的是RCC_CFGR的第17位PLLXTPRE，操作这一位和操作RCC_CFGR2寄存器的位[3:0]中的最低位是相同的效果 
+RCC_CFGR_PLLSRC_PREDIV1 ：选择PREDIV1输出作为PLL输入时钟;PREDIV1CLK = 8MHZ,所以输入给PLL倍频的 时钟源是8MHZ
+RCC_CFGR_PLLMULL9 ：PLLMUL = 9；PLL倍频系数为9，也就是对 PLLCLK = PREDIV1CLK * 8 = 72MHZ
+以上是对RCC_CFGR进行的配置
+---------------------------------------------------------------------------------------------------
+ RCC->CFGR = (uint32_t)RCC_CFGR_SW_PLL; //选择PLLCLK作为系统时钟源 
+--------------------------------------------------------------------------------------------------
+至此基本配置已经完成，配置的时钟如下所述：
+SYSCLK(系统时钟) = 72MHZ
+AHB总线时钟 = 72MHZ
+APB1总线时钟 = 36MHZ
+APB2总线时钟 = 72MHZ
+PLL时钟 = 72MHZ
+PLL2时钟 = 40MHZ
+
