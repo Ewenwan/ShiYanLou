@@ -548,5 +548,47 @@ int main()
 #endif
 ```
 # fock() 子进程
+```c
+/*
+ fock复制子进程 execXXX 接力新进程
+参考　https://github.com/Ewenwan/ShiYanLou/blob/master/learn_c/Head_first/7_2_execXXX_fock.c
+*/
+#include <stdio.h>
+#include <unistd.h>
+void main(void){
+  int child_status, exec_status;
+  int pid = fork(); //创建一个新的进程
+  if(pid == -1) {
+     //fprintf(stderr, "不能复制进程：%s", strerror(errno));
+     fprintf(stderr, "不能复制进程");
+     return; 
+  }
+  else if (pid==0) 
+   { //pid=0为子进程
+    printf("Child: EXEC lec7_1\n");
+    // execXXX 接力新进程
+    // l list 参数列表 ； v vector 参数数组/向量 ；
+    // p 路径 path ; e 环境变量 environment 
+    exec_status=execve("lec7_1",NULL,NULL);
+    printf("Child: Why would I execute?\n");
+  } 
+  else
+   {  // pid =1 是父进程
+    printf("Parent: Whose your daddy?\n");//先打印
+    child_status=wait(pid);// 等待 子进程结束
+    // 上面的子程序结束后　执行后面的
+    printf("Parent: the child %d exit with %d\n",pid, child_status);
+  }
+}
+/*
+打印输出:
+Parent: Whose your daddy?
+Child: EXEC lec7_1
+Child: Why would I execute?
+Parent: the child 15757 exit with -1
+*/
+```
 
 # 通用链表结构相关的Ｃ编程
+
+
