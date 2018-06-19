@@ -145,6 +145,24 @@
     qemu -S -s -hda ucore.img -monitor stdio    # 用于与gdb配合进行源码调试
 
 
-    
-    
-    
+# 常用调试命令
+    qemu中monitor的常用命令： 
+
+        1. help         查看 qemu 帮助，显示所有支持的命令。
+        2. q|quit|exit  退出 qemu。
+        3. stop         停止 qemu。
+        4. c|cont|continue  继续执行。
+        5. x /fmt addr
+        xp /fmt addr 
+                    显示内存内容，其中 'x' 为虚地址，'xp' 为实地址。
+                    参数 /fmt i 表示反汇编，缺省参数为前一次参数。   
+        6. p|print' 　　计算表达式值并显示，例如 $reg 表示寄存器结果。
+        7. memsave addr size file
+        pmemsave addr size file 
+                         将内存保存到文件，memsave 为虚地址，pmemsave 为实地址。
+        8. breakpoint 相关：
+                         设置、查看以及删除 breakpoint，pc执行到 breakpoint，qemu 停止。（暂时没有此功能）
+        9. watchpoint 相关：  设置、查看以及删除 watchpoint, 当 watchpoint 地址内容被修改，停止。（暂时没有此功能）
+        a. s|step            单步一条指令，能够跳过断点执行。
+        b. r|registers       显示全部寄存器内容。
+        c. info 相关操作      查询 qemu 支持的关于系统状态信息的操作。
