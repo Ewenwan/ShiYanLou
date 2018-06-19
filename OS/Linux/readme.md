@@ -314,9 +314,70 @@ int main ()
     printf ("\nYour string is: %s\n", string);
 }
 ```
+# c 函数调用
+```c
+// isone.c
+void X(int b) {
+  if (b==1){
+    printf("X:: b is 1!\n");
+  }else{
+    printf("X:: b is not 1!\n");
+  }
+}
+
+int main(int argc, char * argv){
+    int a=2;
+    X(a);
+}
+```
+**编译流程**
+[目标文件 ELF文件结构](https://www.jianshu.com/p/863b279c941e)
+
+	1. 预处理　
+		gcc -E isone.c -o isone.i
+	2. 编译 编译成汇编语言
+		gcc -s isone.i -o isone.s
+	3. 汇编 编译成机器语言(目标文件 ELF文件结构)
+	     	gcc -c isone.s -o isone.o
+		
+		objdump　反汇编查看：
+	    	objdump -d isone.o  得到汇编格式
+		objdump -s isone.o  得到elf格式
+		
+		readelf 分析目标文件:
+		readelf -a isone.o
+			ELF 头：
+			  Magic：   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00 
+			  类别:                              ELF64
+			  数据:                              2 补码，小端序 (little endian)
+			  版本:                              1 (current)
+			  OS/ABI:                            UNIX - System V
+			  ABI 版本:                          0
+			  类型:                              EXEC (可执行文件)
+			  系统架构:                          Advanced Micro Devices X86-64
+			  版本:                              0x1
+			  入口点地址：               0x400440
+			  程序头起点：          64 (bytes into file)
+			  Start of section headers:          4512 (bytes into file)
+			  标志：             0x0
+			  本头的大小：       64 (字节)
+			  程序头大小：       56 (字节)
+			  Number of program headers:         9
+			  节头大小：         64 (字节)
+			  节头数量：         30
+			  字符串表索引节头： 27
+			  
+		nm分析 目标文件 用于显示二进制目标文件的符号表
+		nm isone.o
+		
+	4. 链接
+		gcc isone.o -o isone.out
+
+
+
 
 # ｃ语言 结构体指针　指针和类型转换相关的Ｃ编程
-｀｀｀c
+```c
 #if 0
 #include <stdio.h>
 
@@ -485,4 +546,7 @@ int main()
 	return 0;
 }
 #endif
-｀｀｀
+```
+# fock() 子进程
+
+# 通用链表结构相关的Ｃ编程
