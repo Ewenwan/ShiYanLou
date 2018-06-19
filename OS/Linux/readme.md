@@ -590,5 +590,18 @@ Parent: the child 15757 exit with -1
 ```
 
 # 通用链表结构相关的Ｃ编程
+```c
+// 双向链表 无内容值
+struct list_entry {
+    struct list_entry *prev, *next;
+};
+typedef struct list_entry list_entry_t;
+//　链表节点+值
+struct entry {
+
+    list_entry_t node;//之前前后的节点
+    int num;// 值
+};
+```
 
 
