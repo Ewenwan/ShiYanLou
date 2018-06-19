@@ -1,0 +1,33 @@
+
+const double epsilon = 0.0001;
+
+  // Special Case #1 : Straight Run
+  if( std::abs(wz) < epsilon ) {
+    radius = 0.0f;
+    speed  = 1000.0f * vx;
+    velocity_mutex.unlock();
+    return;
+  }
+  radius = vx * 1000.0f / wz;
+  // Special Case #2 : Pure Rotation or Radius is less than or equal to 1.0 mm
+  if( std::abs(vx) < epsilon || std::abs(radius) <= 1.0f ) {
+    speed  = 1000.0f * bias * wz / 2.0f;// wz = 2*speed/1000/bias
+    radius = 1.0f;
+    velocity_mutex.unlock();
+    return;
+  }
+
+  // General Case :
+  if( radius > 0.0f ) {
+
+    radius = vx * 1000.0f / wz;
+    
+    speed  = (radius + 1000.0f * bias / 2.0f) * wz;
+// speed  = (vx * 1000.0f / wz + 1000.0f * bias / 2.0f  )* wz
+// 
+
+  } else {
+    radius = vx * 1000.0f / wz;
+    speed  = (radius - 1000.0f * bias / 2.0f) * wz;
+  }
+
