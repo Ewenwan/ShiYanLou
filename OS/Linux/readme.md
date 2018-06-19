@@ -314,3 +314,175 @@ int main ()
     printf ("\nYour string is: %s\n", string);
 }
 ```
+
+# ｃ语言 结构体指针　指针和类型转换相关的Ｃ编程
+｀｀｀c
+#if 0
+#include <stdio.h>
+
+#define STS_IG32        0xE            // 32-bit Interrupt Gate
+#define STS_TG32        0xF            // 32-bit Trap Gate
+
+typedef unsigned uint32_t;
+
+//设置结构体参数
+#define SETGATE(gate, istrap, sel, off, dpl) {          \
+    (gate).gd_off_15_0 = (uint32_t)(off) & 0xffff;      \
+    (gate).gd_ss = (sel);                               \
+    (gate).gd_args = 0;                                 \
+    (gate).gd_rsv1 = 0;                                 \
+    (gate).gd_type = (istrap) ? STS_TG32 : STS_IG32;    \
+    (gate).gd_s = 0;                                    \
+    (gate).gd_dpl = (dpl);                              \
+    (gate).gd_p = 1;                                    \
+    (gate).gd_off_31_16 = (uint32_t)(off) >> 16;        \
+}
+
+ /* Gate descriptors for interrupts and traps */
+// 数据结构　门
+ struct gatedesc {
+    unsigned gd_off_15_0 : 16;   // 偏置　   low 16 bits of offset in segment
+    unsigned gd_ss : 16;         // 段选择器 segment selector
+    unsigned gd_args : 5;        // # args, 0 for interrupt/trap gates
+    unsigned gd_rsv1 : 3;        // reserved(should be zero I guess)
+    unsigned gd_type : 4;        // type(STS_{TG,IG32,TG32})
+    unsigned gd_s : 1;           // must be 0 (system)
+    unsigned gd_dpl : 2;         // descriptor(meaning new) privilege level
+    unsigned gd_p : 1;           // Present
+    unsigned gd_off_31_16 : 16;  // high bits of offset in segment
+ };
+ 
+int
+main(void)
+{
+    unsigned before;
+    unsigned intr;
+    unsigned after;
+    struct gatedesc gintr;//结构体变量
+    intr=8;
+    before=after=0;
+// 取地址　&intr　强制类型转换　(struct gatedesc *)
+// *() 再取地址指针指向的值
+    gintr=*((struct gatedesc *)&intr);
+    printf("befer gintr is 0x%llx\n",gintr);// 0x8
+    printf("befer intr is 0x%x\n",intr);// 0x8
+    SETGATE(gintr, 0,1,2,3);
+    printf("after gintr is 0x%llx\n",gintr);// 0xee0000010002
+    printf("after intr is 0x%x\n",intr);// 0x8
+// 取地址　&intr　强制类型转换　(unsigned *)
+// *() 再取地址指针指向的值
+    intr=*(unsigned *)&(gintr);//低位
+    printf("after 22  intr is 0x%x\n",intr);//　0x10002
+    return 0;
+}
+#endif
+/*
+befer gintr is 0x8
+befer intr is 0x8
+after gintr is 0xee0000010002
+after intr is 0x8
+after 22  intr is 0x10002
+
+*/
+// other examples
+//ex1
+#if 0
+#include <stdlib.h>
+#include <stdio.h>
+//#include <iostream>
+//#include <cstring>
+typedef unsigned uint32_t;
+#define STS_TG32 0xF
+#define STS_IG32 0xE
+//　结构体对象访问成员 .访问
+#define SETGATE( gate, istrap, sel, off, dpl) {         \
+    (gate).gd_off_15_0 = (uint32_t)(off) & 0xffff;      \
+    (gate).gd_ss = (sel);                               \
+    (gate).gd_args = 0;                                 \
+    (gate).gd_rsv1 = 0;                                 \
+    (gate).gd_type = (istrap) ? STS_TG32 : STS_IG32;    \
+    (gate).gd_s = 0;                                    \
+    (gate).gd_dpl = (dpl);                              \
+    (gate).gd_p = 1;                                    \
+    (gate).gd_off_31_16 = (uint32_t)(off) >> 16;        \
+}
+//using namespace std;
+
+struct gatedesc {
+    unsigned gd_off_15_0 : 16;    // low 16 bits of offset in segment
+    unsigned gd_ss : 16;          // segment selector
+    unsigned gd_args : 5;          // # args, 0 for interrupt/trap gates
+    unsigned gd_rsv1 : 3;          // reserved(should be zero I guess)
+    unsigned gd_type : 4;          // type(STS_{TG,IG32,TG32})
+    unsigned gd_s : 1;             // must be 0 (system)
+    unsigned gd_dpl : 2;           // descriptor(meaning new) privilege level
+    unsigned gd_p : 1;             // Present
+    unsigned gd_off_31_16 : 16;    // high bits of offset in segment
+};
+int main()
+{  
+// 定义结构体变量 
+    struct gatedesc intr;
+// 直接对结构体变量中的对象赋值 
+    intr.gd_off_15_0 = 8;
+    intr.gd_ss = 0;
+    intr.gd_args = 0;
+    intr.gd_rsv1 = 0;
+    intr.gd_type = 0;
+    intr.gd_s = 0;
+    intr.gd_dpl = 0;
+    intr.gd_p = 0;
+    intr.gd_off_31_16 = 0;
+    SETGATE( intr, 0,1,2,3);// 0x02 & 0xffff = 0x0002
+    printf( "unsigned intr :%u\r\n",  intr);//无符号 65538
+    printf( "xxxx intr :%x\r\n", intr);//　16进制格式 0x10002
+    return 0;
+}
+#endif
+
+//ex2
+#if 1
+#include "stdlib.h"
+
+struct gatedesc {
+    unsigned gd_off_15_0 : 16;        // low 16 bits of offset in segment
+    unsigned gd_ss : 16;            // segment selector
+    unsigned gd_args : 5;            // # args, 0 for interrupt/trap gates
+    unsigned gd_rsv1 : 3;            // reserved(should be zero I guess)
+    unsigned gd_type : 4;            // type(STS_{TG,IG32,TG32})
+    unsigned gd_s : 1;                // must be 0 (system)
+    unsigned gd_dpl : 2;            // descriptor(meaning new) privilege level
+    unsigned gd_p : 1;                // Present
+    unsigned gd_off_31_16 : 16;        // high bits of offset in segment
+};
+
+typedef struct gatedesc gatedesc;
+typedef unsigned int uint32_t;
+
+#define STS_IG32    0xE     // 32-bit Interrupt Gate
+#define STS_TG32    0xF     // 32-bit Trap Gate
+// 结构体对象指针　访问成员 ->访问  
+#define SETGATE(gate, istrap, sel, off, dpl) {                        \
+    ((gatedesc*)(&gate))->gd_off_15_0 = (uint32_t)(off) & 0xffff;     \
+    ((gatedesc*)(&gate))->gd_ss = (sel);                              \
+    ((gatedesc*)(&gate))->gd_args = 0;                                \
+    ((gatedesc*)(&gate))->gd_rsv1 = 0;                                \
+    ((gatedesc*)(&gate))->gd_type = (istrap) ? STS_TG32 : STS_IG32;   \
+    ((gatedesc*)(&gate))->gd_s = 0;                                   \
+    ((gatedesc*)(&gate))->gd_dpl = (dpl);                             \
+    ((gatedesc*)(&gate))->gd_p = 1;                                   \
+    ((gatedesc*)(&gate))->gd_off_31_16 = (uint32_t)(off) >> 16;       \
+}
+
+int main()
+{
+	unsigned intr;
+	intr=8;
+	SETGATE(intr, 0,1,2,3);// 取地址进行修改　会改变内容 
+                               // 0x02 & 0xffff = 0x10002
+	printf("d intr :%d\r\n", intr);// 65538
+	printf("x intr :%x\r\n", intr);// 0x10002
+	return 0;
+}
+#endif
+｀｀｀
