@@ -109,7 +109,7 @@
 ![](http://nieyong.github.io/wiki_cpu/CPU%E4%BD%93%E7%B3%BB%E6%9E%B6%E6%9E%84-image/mmu/paging.png)
     
 **中断异常陷阱**
-![](https://img-blog.csdn.net/20140702173406812?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvemF0MTEx/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
+![](https://www.crifan.com/files/doc/docbook/interrupt_related/release/htmls/images/interrput_trap_exception.png)
 
 
 # 编译
