@@ -333,6 +333,8 @@ int main(int argc, char * argv){
 **编译流程**
 [目标文件 ELF文件结构](https://www.jianshu.com/p/863b279c941e)
 
+[文件编译过程](https://img-blog.csdn.net/20161022190123798)
+
 	1. 预处理　
 		gcc -E isone.c -o isone.i
 	2. 编译 编译成汇编语言
