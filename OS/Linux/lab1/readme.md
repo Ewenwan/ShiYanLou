@@ -135,7 +135,9 @@
 [makefile文件见](https://github.com/Ewenwan/ucore_os_lab/blob/master/labcodes/lab1/Makefile)
 
 **直接在硬件模拟器上运行**
-    
+
+[硬件模拟器qemu的安装](https://github.com/Ewenwan/ShiYanLou/blob/master/OS/Linux/lab0/qeum_install.md)
+  
     make qemu
 
 
@@ -177,7 +179,50 @@
     target remote :1234
     break kern_init
     continue
-
+    
     可以看到，电脑在运行到kern_init是会触发break，然后又紧接着在下一步continue，
+**执行调试**
 
+    这里需要安装　cgdb：
+    sudo apt-get install cgdb
+    
+**开始调试：**
 
+    make debug
+    
+    会出现一个新的终端，分为上下两个窗口，上面的窗口显示运行到的源码，下面的窗口是gdb调试界面。
+    由上面的分析可知:
+       BIOS的第一条指令的位置为0xffff0
+       
+**我们查看 0xffff0地址内的信息：**
+    
+    　　x/i 0xffff0
+     >>> 0xffff0:     ljmp   $0x3630,$0xf000e05b
+     可以看到，BIOS的第一条指令是一条跳转指令 ljmp，然后程序会跳转到0xf000e05b，开始进行一系列的操作。
+     在截图中我们看到pc：0xfff0，这是因为在x86的机器里面并没有pc这个寄存器，
+     所谓的pc值是通过CS:IP而得到的，因此这里的PC所代表的是eip寄存器里面的值，低 16位的值。
+        
+**设置断点：**
+
+     在gdb命令行中，使用b *[地址]
+     便可以在指定内存地址设置断点，
+     当qemu中的cpu执行到指定地址时，便会将控制权交给gdb。
+     
+    n/s都是C语言级的断点定位。 s会进入C函数内部,
+    　　但是不会进入没有定位信息的函数
+      　（比如没有加-g编译的代码，因为其没有C代码的行数标记，没办法定位），n不会。   
+    ni/si都是汇编级别的断点定位。si会进入汇编和C函数内部,ni不会
+    归纳:
+        当要进入没有调试信息的库函数调试的时候，用si是唯一的方法。      
+        当进入有调试信息的函数，用si和s都可以，但是他们不同，
+        si是定位到汇编级别的第一个语句，但是s是进入到C级别的第一个语句.
+
+**gdb的单步命令:**
+
+    next 单步到程序源代码的下一行，不进入函数。
+    nexti 单步一条机器指令，不进入函数。
+    step 单步到下一个不同的源代码行（包括进入函数）。
+    stepi 单步一条机器指令。
+        
+
+        
