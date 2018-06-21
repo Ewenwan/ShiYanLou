@@ -131,6 +131,13 @@
     # 命令前缀 
     # 前缀 @   :: 只输出命令执行的结果, 出错的话停止执行
     # 前缀 -   :: 命令执行有错的话, 忽略错误, 继续执行
+    
+[makefile文件见](https://github.com/Ewenwan/ucore_os_lab/blob/master/labcodes/lab1/Makefile)
+
+**直接在硬件模拟器上运行**
+    
+    make qemu
+
 
 # 1. 从CPU加电后执行的第一条指令开始，单步跟踪BIOS的执行
     首先在CPU加电之后，CPU里面的ROM存储器会将其里面保存的初始值传给各个寄存器，
