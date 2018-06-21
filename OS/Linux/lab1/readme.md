@@ -102,13 +102,16 @@
           ├── sign.c           // 一个C语言小程序，是辅助工具，用于生成一个符合规范的硬盘主引导扇区。
           └── vector.c         // 生成vectors.S　中断服务例程的入口地址和第一步初步处理实现
           
-**cpu mmu 内存**
+**cpu mmu 内存 关系**
+
 ![](http://nieyong.github.io/wiki_cpu/CPU%E4%BD%93%E7%B3%BB%E6%9E%B6%E6%9E%84-image/mmu/mmu_va2pa.png)
 
 **页地址映射**
+
 ![](http://nieyong.github.io/wiki_cpu/CPU%E4%BD%93%E7%B3%BB%E6%9E%B6%E6%9E%84-image/mmu/paging.png)
     
 **中断异常陷阱**
+
 ![](https://www.crifan.com/files/doc/docbook/interrupt_related/release/htmls/images/interrput_trap_exception.png)
 
 
