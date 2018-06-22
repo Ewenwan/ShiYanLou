@@ -26,6 +26,8 @@
 
 [CPP11新特新 代码实战](https://github.com/Ewenwan/cpp11)
 
+[A Detailed Cplusplus Concurrency Tutorial 《C++ 并发编程指南》](https://github.com/Ewenwan/Cplusplus-Concurrency-In-Practice)
+
 	包含内容：
 		1. c
 
