@@ -21,7 +21,7 @@
 ## 6、激活码激活
     获取  激活码  http://idea.lanyus.com/
     
-# nfs服务器搭建
+# 二、nfs服务器搭建
     多台电脑之间创建共享文件夹
 ## nfs服务器端配置
 ### 1、安装nfs服务
@@ -90,4 +90,6 @@
 ### 远程 命令行登陆服务器 shell
 [Xmanager 服务器远程控制程序 ](https://www.netsarang.com/products/xme_overview.html)
 
-
+ 
+# 三、 linux配置
+[ubuntu大法-快速翻墙装驱动配置开发环境](https://github.com/DragonFive/myblog/blob/master/source/_posts/nvidiaDriverInstall.md)
