@@ -51,6 +51,7 @@ idt_init(void) {
       *     Notice: the argument of lidt is idt_pd. try to find it!
       */
 // 1. 声明__vectors[] 来对应中断描述符表中的256个中断符  tools/vector.c中
+    // vectors 定义在 vector.S 文件中，通过一个工具程序 vector.c 生成
     extern uintptr_t __vectors[];// 代码段偏移量
 // 2. 通过for循环运用SETGATE宏定义函数(类似c++ inline内连函数)  进行 中断门idt[i] 的初始化
     // 在kernel/mm/mmu.h中　#define SETGATE(gate, istrap, sel, off, dpl) {}
@@ -166,7 +167,9 @@ trap_dispatch(struct trapframe *tf) {
     char c;
 
     switch (tf->tf_trapno) {
-    case IRQ_OFFSET + IRQ_TIMER:
+    case IRQ_OFFSET + IRQ_TIMER:// 时钟的初始化函数clock_init（位于kern/driver/clock.c中）
+    // 完成了对时钟控制器8253的初始化：
+    // 设置时钟每秒中断100次 通过中断控制器使能时钟中断
         /* LAB1 YOUR CODE : STEP 3 */
         /* handle the timer interrupt */
         /* (1) After a timer interrupt, you should record this event using a global variable (increase it), such as ticks in kern/driver/clock.c
@@ -177,16 +180,16 @@ trap_dispatch(struct trapframe *tf) {
         ticks++; // 定义在 kern/driver/clock.c 中
         // 2. 判断 ticks的状态, 执行相应的操作
         if(ticks% TICK_NUM == 0)// TICK_NUM 本文件最上面　为100 
-         {// 每当ticks计数达到100时，即出发了100次时钟中断后，时钟中断会print“100 ticks”。
+         {// 每当ticks计数达到100时，即出发了100次时钟中断后，时钟中断会print“100 ticks”。1s
            print_ticks();//向终端打印时间信息  
          }
 
         break;
-    case IRQ_OFFSET + IRQ_COM1://　串口1 中断
+    case IRQ_OFFSET + IRQ_COM1://　串口1 中断 串口的初始化函数serial_init（位于/kern/driver/console.c）
         c = cons_getc();
         cprintf("serial [%03d] %c\n", c, c);
         break;
-    case IRQ_OFFSET + IRQ_KBD://键盘中断
+    case IRQ_OFFSET + IRQ_KBD://键盘中断 键盘的初始化函数kbd_init（位于kern/driver/console.c中）
         c = cons_getc();
         cprintf("kbd [%03d] %c\n", c, c);
         cprintf("keyboard interrupt\n");
