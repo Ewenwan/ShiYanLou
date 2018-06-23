@@ -240,6 +240,8 @@
     2、如何初始化GDT表；
     3、如何使能和进入保护模式。
 
+> 1、为何要开启A20，以及如何开启A20
+
     首先关于A20，我们通过查询资料以及说明文档可以知道早期的8086CPU所提供的地址线只有20位，
     所以可寻址空间为0~2^20(1MB)，但是8086的数据处理位宽16位，无法直接访问1M的地址空间，
     所以8086提供了段地址加偏移地址的转换机制。
@@ -259,12 +261,16 @@
     如果在保护模式下，A20的开关未打开的话，此时我们只能访问奇数兆的内存，
     即只能访问0—1M，2—3M，4—5M……，所以如果我们要进入保护模式，首先就需要把A20开关给打开。
 
+> 2、如何初始化GDT表
+
     接下来我们需要了解下GDT表（全局描述符表），在整个操作系统中我们只有一张GDT表，
     GDT可以放在内存的任意位置，但是CPU必须知道GDT的入口，
     在Intel里面有一个专门的寄存器GDTR用来存放GDT的入口地址，
     程序员将GDT设定在内存的某个位置之后，
     可以通过LGDT指令将GDT的入口地址加载到该寄存器里面，
     以后CPU就可以通过GDTR来访问GDT了。
+
+> 3、如何使能和进入保护模式
 
     最后我们需要了解如何 使能 和 进入 保护模式，
     关于这一点我们需要了解一个寄存器CR0，
@@ -355,7 +361,7 @@ start:
     movw %ax, %es                                   # -> Extra Segment
     movw %ax, %ss                                   # -> Stack Segment
 
-    # Enable A20:
+# 1 Enable A20:
     #  For backwards compatibility with the earliest PCs, physical
     #  address line 20 is tied low, so that addresses higher than
     #  1MB wrap around to zero by default. This code undoes this.
@@ -380,7 +386,7 @@ seta20.2:
     # identical to physical addresses, so that the
     # effective memory map does not change during the switch.
 
-    # load gdt 加载GDT全局描述符  在后面可以看到
+# 2 load gdt 加载GDT全局描述符  在后面可以看到
     lgdt gdtdesc
     # 使能和进入保护模式 
     movl %cr0, %eax      # 首先将cr0寄存器里面的内容取出来
@@ -392,7 +398,7 @@ seta20.2:
     # Jump to next instruction, but in 32-bit code segment.
     # Switches processor into 32-bit mode.
 
-    # 最后通过一个长跳转指令正式进入保护模式。
+# 3 最后通过一个长跳转指令正式进入保护模式。
     ljmp $PROT_MODE_CSEG, $protcseg
 
 .code32                                             # Assemble for 32-bit mode
