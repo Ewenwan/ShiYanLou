@@ -403,7 +403,7 @@ seta20.2:
 
 .code32                                             # Assemble for 32-bit mode
 protcseg:
-    # Set up the protected-mode data segment registers
+    # Set up the protected-mode data segment registers  初始化保护模式的数据段寄存器
     movw $PROT_MODE_DSEG, %ax                       # Our data segment selector
     movw %ax, %ds                                   # -> DS: Data Segment
     movw %ax, %es                                   # -> ES: Extra Segment
@@ -412,9 +412,9 @@ protcseg:
     movw %ax, %ss                                   # -> SS: Stack Segment
 
     # Set up the stack pointer and call into C. The stack region is from 0--start(0x7c00)
-    movl $0x0, %ebp
-    movl $start, %esp
-    call bootmain
+    movl $0x0, %ebp    # 栈底指针
+    movl $start, %esp  # 栈顶指针
+    call bootmain      # 调用bootmain.c函数，进行　加载ELF格式的操作系统OS
 
     # If bootmain returns (it shouldn't), loop.
 spin:
@@ -433,5 +433,29 @@ gdtdesc:
     .long gdt  # 表示的是GDT表的入口地址             # address gdt
 ```
 
+# 分析bootloader加载ELF格式的OS的过程。
+    上面 boot/bootasm.S 的末尾，切换到保护模式，初始化一些段寄存器后，
+    会调用bootmain.c函数，进行　加载ELF格式的操作系统OS。
+>**背景知识**
 
+    对于硬盘来说，我们知道是分成许多扇区的其中每个扇区的大小为512字节。
+    读取扇区的流程我们通过查询指导书可以看到：
+    
+        1、等待磁盘准备好；
+        2、发出读取扇区的命令；
+        3、等待磁盘准备好；
+        4、把磁盘扇区数据读到指定内存。   
+        
+    接下来我们需要了解下如何具体的从硬盘读取数据，
+    因为我们所要读取的操作系统文件是存在0号硬盘上的，
+    所以，我们来看一下关于0号硬盘的I/O端口：
+![](https://img-blog.csdn.net/20170103225040337?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGl1MjAxNA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
 
+    在这里我们可以看到，对于0号硬盘的读取操作是通过一系列的寄存器完成的，
+    所以在读取硬盘时我们也是通过对这些硬盘进行操作从而得到相应的数据。
+    通过上面对硬盘知识的一些了解之后，
+    我们开始观察具体的实现过程：
+    
+    
+
+    
