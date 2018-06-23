@@ -801,17 +801,19 @@ trap_dispatch(struct trapframe *tf) {
          }
 
         break;
-    case IRQ_OFFSET + IRQ_COM1:
+    case IRQ_OFFSET + IRQ_COM1://　串口1 中断
         c = cons_getc();
         cprintf("serial [%03d] %c\n", c, c);
         break;
-    case IRQ_OFFSET + IRQ_KBD:
+    case IRQ_OFFSET + IRQ_KBD://键盘中断
         c = cons_getc();
         cprintf("kbd [%03d] %c\n", c, c);
+        cprintf("keyboard interrupt\n");
         break;
     //LAB1 CHALLENGE 1 : YOUR CODE you should modify below codes.
-    case T_SWITCH_TOU:
-
+    case T_SWITCH_TOU://用户切换 用户到内核
+        panic("T_SWITCH_** ??\n");
+        break;
 
     case T_SWITCH_TOK:
         panic("T_SWITCH_** ??\n");
@@ -828,7 +830,6 @@ trap_dispatch(struct trapframe *tf) {
         }
     }
 }
-
 ```
     
 
