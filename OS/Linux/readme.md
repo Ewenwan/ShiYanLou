@@ -646,9 +646,34 @@ struct entry {
 	通过指导书我们可以了解到，对于我们的UCore来说只有从　用户态　转化为　内核态　时权限是　用户权限，
 	所以我们在进行初始化时只需要将这一点拿出来单独初始化即可。
 	
+kern/trap/trap.c中对中断向量表进行初始化的函数idt_init	
+```c
+void
+idt_init(void) {
+// 1. 声明__vectors[] 来对应中断描述符表中的256个中断符  tools/vector.c中
+    extern uintptr_t __vectors[];// 代码段偏移量
+// 2. 通过for循环运用SETGATE宏定义函数(类似c++ inline内连函数)  进行 中断门idt[i] 的初始化
+    // 在kernel/mm/mmu.h中　#define SETGATE(gate, istrap, sel, off, dpl) {}
+    int i;
+    for(i = 0; i<sizeof(idt)/sizeof(struct gatedesc); i++)
+    {// 0 中断门 1 陷阱门  G
+     // D_KTEXT 内核　代码段起始地址 在kernel/mm/memlayout.h中
+     // __vectors[i]　偏移地址
+     // DPL_KERNEL 内核权限  DPL_USER 用户权限  在kernel/mm/memlayout.h中
+      SETGATE(idt[i], 0, GD_KTEXT, __vectors[i], DPL_KERNEL);
+    }
+// 需要对 用户态 转 内核态 的中断表进行初始化了，
+// 和上面的不同之处只是在于特权值的不同，所以我们的操作如下：
+// T_SWITCH_TOK 121  trap.h 中
+   SETGATE(idt[T_SWITCH_TOK], 0, GD_KTEXT, __vectors[T_SWITCH_TOK], DPL_USER);
+
+// 3.　最后加载idt中断描述符表　 libs/x86.h
+// 将　&idt_pd 首地址 加载到 中断描述符表寄存器 (IDTR)
+    lidt(&idt_pd);
+}
+```
 	
-	
-	
+## c. 完善trap.c中的中断处理函数trap	
 	
 	
 
