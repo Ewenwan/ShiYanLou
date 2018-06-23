@@ -65,18 +65,18 @@ seta20.2:
 
 .code32                                             # Assemble for 32-bit mode
 protcseg:
-    # Set up the protected-mode data segment registers
+    # Set up the protected-mode data segment registers 初始化保护模式的数据段寄存器
     movw $PROT_MODE_DSEG, %ax                       # Our data segment selector
-    movw %ax, %ds                                   # -> DS: Data Segment
-    movw %ax, %es                                   # -> ES: Extra Segment
+    movw %ax, %ds                                   # -> DS: Data Segment  数据段寄存器
+    movw %ax, %es                                   # -> ES: Extra Segment 附加段寄存器
     movw %ax, %fs                                   # -> FS
     movw %ax, %gs                                   # -> GS
-    movw %ax, %ss                                   # -> SS: Stack Segment
+    movw %ax, %ss                                   # -> SS: Stack Segment 栈段
 
     # Set up the stack pointer and call into C. The stack region is from 0--start(0x7c00)
-    movl $0x0, %ebp
-    movl $start, %esp
-    call bootmain
+    movl $0x0, %ebp    # 栈底指针
+    movl $start, %esp  # 栈顶指针
+    call bootmain      # 调用bootmain.c函数 加载elf格式的操作系统OS
 
     # If bootmain returns (it shouldn't), loop.
 spin:
