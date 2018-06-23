@@ -681,6 +681,162 @@ for(i = 0; ebp !=0 && i < STACKFRAME_DEPTH; i++)
 
 ```
 
+# 5. 完善中断初始化和处理
+## a. 中断描述符表
+中断描述符表（也可简称为保护模式下的中断向量表）中一个表项占多少字节？其中哪几位代表中断处理代码的入口？
+
+	中断描述符表一个表项占8字节。
+	其中0~15位和48~63位分别为offset的低16位和高16位。
+	16~31位为段选择子。
+	通过段选择子获得段基址，加上段内偏移量即可得到中断处理代码的入口。
+![](https://img-blog.csdn.net/20170103225941982?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGl1MjAxNA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+## b. 完善kern/trap/trap.c中对中断向量表进行初始化的函数idt_init。
+	在idt_init函数中，依次对所有中断入口进行初始化。
+	使用mmu.h中的SETGATE宏，填充中断描述符表(idt, interrupt description table)数组内容。
+	每个中断的入口由tools/vectors.c生成，
+	使用trap.c中声明的 vectors数组即可。
+	
+	我们需要对所有的中断入口进行初始化，在这里我们首先需要对中断有一个大概的了解.
+	在操作系统中，有三种特殊的中断事件, 中断 (interrupt) , 异常(exception), 陷入中断(trap interrupt)。
+	
+	1. 由CPU外部设备引起的外部事件如I/O中断、时钟中断、控制台中断等是异步产生的（即产生的时刻不确定），
+	   与CPU的执行无关，我们称之为异步中断(asynchronous interrupt)也称外部中断,简称中断 (interrupt)。
+	2. 把在CPU执行指令期间检测到不正常的或非法的条件(如除零错、地址访问越界)所引起的内部事件,
+	   称作同步中断(synchronous interrupt)，也称内部中断，简称异常(exception)。
+	3. 把在程序中使用请求系统服务的系统调用而引发的事件， 
+	    称作陷入中断(trap interrupt)，也称软中断(soft interrupt)，系统调用(system call)简称trap。
+	
+	对于中断描述符表idt来说把每个 中断或异常的编号 和　一个指向中断服务例程　的　描述符联系起来。
+	
+	同GDT(全局描述符表，地址映射)一样，IDT(中断描述符表)是一个8字节的描述符数组，
+	但IDT的第一项可以包含一个描述符。
+	CPU把中断（异常）号乘以8做为 IDT的索引。
+	IDT可以位于内存的任意位置，CPU通过IDT寄存器（IDTR）的内容来寻址IDT的起始地址。
+	指令LIDT和SIDT用来操作IDTR。
+	两条指令都有一个显示的操作数：一个6字节表示的内存地址。 
+	
+	根据中断的分类我们可以了解到，我们在进行初始化时是需要对　中断进行分类处理的，
+	针对不同的权限进行不同的初始化，因此我们在编写代码时需要注意　内核权限　和　用户权限的区分，
+	通过指导书我们可以了解到，对于我们的UCore来说只有从　用户态　转化为　内核态　时权限是　用户权限，
+	所以我们在进行初始化时只需要将这一点拿出来单独初始化即可。
+	
+kern/trap/trap.c中对中断向量表进行初始化的函数idt_init	
+```c
+void
+idt_init(void) {
+// 1. 声明__vectors[] 来对应中断描述符表中的256个中断符  tools/vector.c中
+    extern uintptr_t __vectors[];// 代码段偏移量
+// 2. 通过for循环运用SETGATE宏定义函数(类似c++ inline内连函数)  进行 中断门idt[i] 的初始化
+    // 在kernel/mm/mmu.h中　#define SETGATE(gate, istrap, sel, off, dpl) {}
+    int i;
+    for(i = 0; i<sizeof(idt)/sizeof(struct gatedesc); i++)
+    {// 0 中断门 1 陷阱门  G
+     // D_KTEXT 内核　代码段起始地址 在kernel/mm/memlayout.h中
+     // __vectors[i]　偏移地址
+     // DPL_KERNEL 内核权限  DPL_USER 用户权限  在kernel/mm/memlayout.h中
+      SETGATE(idt[i], 0, GD_KTEXT, __vectors[i], DPL_KERNEL);
+    }
+// 需要对 用户态 转 内核态 的中断表进行初始化了，
+// 和上面的不同之处只是在于特权值的不同，所以我们的操作如下：
+// T_SWITCH_TOK 121  trap.h 中
+   SETGATE(idt[T_SWITCH_TOK], 0, GD_KTEXT, __vectors[T_SWITCH_TOK], DPL_USER);
+
+// 3.　最后加载idt中断描述符表　 libs/x86.h
+// 将　&idt_pd 首地址 加载到 中断描述符表寄存器 (IDTR)
+    lidt(&idt_pd);
+}
+```
+	
+## c. 完善trap.c中的中断处理函数trap_dispatch 中关于时钟中断得处理
+
+    使操作系统每遇到100次时钟中断后，调用print_ticks子程序，向屏幕上打印一行文字”100 ticks”。
+    在上面我们已经将idt中断向量符表完成了初始化的操作，所以我们在这里可以直接对其进行调用即可，
+    在这里我们需要了解下调用中断的一个大体流程：
+    中断描述符表 idt 是一个表项占用8字节，
+    其中2-3字节是段选择子，
+    0-1字节和6-7字节拼成位移，
+    两者联合便是中断处理程序的入口地址。
+![](https://img-blog.csdn.net/20170103230456355?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGl1MjAxNA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+    我们可以看到当出发了中断之后，
+    我们可以通过IDTR寄存器来查找到相应的中断号，
+    我们可以
+    通过 IDT.base + 8*n 可以找到相应中断的地址，然
+    后跳转到具体中断的执行程序中就可以完成中断处理。
+    所以在第三问我们需要调用时钟中断，并且完成对于时钟中断的相关操作。
+    
+trap_dispatch() 
+```c
+#define TICK_NUM 100 //　每隔多长时间打印时间信息
+
+// 打印 时钟信息
+static void print_ticks() {
+    cprintf("hello linux, times %d ticks\n",TICK_NUM);
+#ifdef DEBUG_GRADE
+    cprintf("End of Test.\n");
+    panic("EOT: kernel seems ok.");
+#endif
+}
+
+// 各种中断响应处理
+static void
+trap_dispatch(struct trapframe *tf) {
+    char c;
+
+    switch (tf->tf_trapno) {
+    case IRQ_OFFSET + IRQ_TIMER:
+        /* LAB1 YOUR CODE : STEP 3 */
+        /* handle the timer interrupt */
+        /* (1) After a timer interrupt, you should record this event using a global variable (increase it), such as ticks in kern/driver/clock.c
+         * (2) Every TICK_NUM cycle, you can print some info using a funciton, such as print_ticks().
+         * (3) Too Simple? Yes, I think so!
+         */
+        // 1.记录时钟中断
+        ticks++; // 定义在 kern/driver/clock.c 中
+        // 2. 判断 ticks的状态, 执行相应的操作
+        if(ticks% TICK_NUM == 0)// TICK_NUM 本文件最上面　为100 
+         {// 每当ticks计数达到100时，即出发了100次时钟中断后，时钟中断会print“100 ticks”。
+           print_ticks();//向终端打印时间信息  
+         }
+
+        break;
+    case IRQ_OFFSET + IRQ_COM1:
+        c = cons_getc();
+        cprintf("serial [%03d] %c\n", c, c);
+        break;
+    case IRQ_OFFSET + IRQ_KBD:
+        c = cons_getc();
+        cprintf("kbd [%03d] %c\n", c, c);
+        break;
+    //LAB1 CHALLENGE 1 : YOUR CODE you should modify below codes.
+    case T_SWITCH_TOU:
+
+
+    case T_SWITCH_TOK:
+        panic("T_SWITCH_** ??\n");
+        break;
+    case IRQ_OFFSET + IRQ_IDE1:
+    case IRQ_OFFSET + IRQ_IDE2:
+        /* do nothing */
+        break;
+    default:
+        // in kernel, it must be a mistake
+        if ((tf->tf_cs & 3) == 0) {
+            print_trapframe(tf);
+            panic("unexpected trap in kernel.\n");
+        }
+    }
+}
+
+```
+    
+
+
+
+	
+	
+
 
 
 
