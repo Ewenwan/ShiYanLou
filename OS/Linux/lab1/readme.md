@@ -433,7 +433,7 @@ gdtdesc:
     .long gdt  # 表示的是GDT表的入口地址             # address gdt
 ```
 
-# 分析bootloader加载ELF格式的OS的过程。
+# 3. 分析bootloader加载ELF格式的OS的过程。
     上面 boot/bootasm.S 的末尾，切换到保护模式，初始化一些段寄存器后，
     会调用bootmain函数在bootmain.c中　，进行　加载ELF格式的操作系统OS。
 >**背景知识**
@@ -585,3 +585,7 @@ bad:
 ```
 
     
+# 4. 实现函数调用堆栈跟踪函数 
+
+
+
