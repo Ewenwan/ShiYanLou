@@ -625,16 +625,61 @@ bad:
     最后在函数调用结束后我们只需要将ebp还原，并且跳转到返回地址即可。
     接下来我们来观察具体实现的代码：
 
-    我们需要在lab1中完成kdebug.c中函数print_stackframe的实现，
+    我们需要在lab1中完成kernel/kdebug.c中函数print_stackframe的实现，
     可以通过函数print_stackframe来跟踪函数调用堆栈中记录的返回地址。
     在如果能够正确实现此函数，
     可在lab1中执行 “make qemu”后，
     在qemu模拟器中得到类似如下的输出：
     ……
-    ebp:0x00007b28 eip:0x00100992 args:0x00010094 0x00010094 0x00007b58 0x00100096
-        kern/debug/kdebug.c:305: print_stackframe+22
+    ebp:0x00007b08 eip:0x001009a6 args:0x00010094 0x00000000 0x00007b38 0x00100092 
+        kern/debug/kdebug.c:308: print_stackframe+21
+        
+kernel/kdebug.c 最后的 print_stackframe() 函数　打印函数堆栈调用信息
+```c
+void
+print_stackframe(void) {
+     /* LAB1 YOUR CODE : STEP 1 */
+     /* (1) call read_ebp() to get the value of ebp. the type is (uint32_t);
+      * (2) call read_eip() to get the value of eip. the type is (uint32_t);
+      * (3) from 0 .. STACKFRAME_DEPTH
+      *    (3.1) printf value of ebp, eip
+      *    (3.2) (uint32_t)calling arguments [0..4] = the contents in address (uint32_t)ebp +2 [0..4]
+      *    (3.3) cprintf("\n");
+      *    (3.4) call print_debuginfo(eip-1) to print the C calling function name and line number, etc.
+      *    (3.5) popup a calling stackframe
+      *           NOTICE: the calling funciton's return addr eip  = ss:[ebp+4]
+      *                   the calling funciton's ebp = ss:[ebp]
+      */
+// 1.首先通过两个函数得到寄存器ebp和eip的值，并存到变量里。
+uint32_t ebp = read_ebp();
+// 2. eip的值 存储返回地址
+uint32_t eip = read_eip();
+// 3.　通过一个for循环来循环输出栈内的相关参数
+//for(int i = 0; ebp !=0 && i < STACKFRAME_DEPTH; i++)
+int i,j;
+for(i = 0; ebp !=0 && i < STACKFRAME_DEPTH; i++)
+// 这里　变量定义需要在最上面, 这里在中间定义，是 c99　才支持的
+ {
+  // 3.1打印ebp的值
+  cprintf("ebp:0x%08x eip:0x%08x args:", ebp, eip);// cprintf()打印 格式%08x
+  // 3.2 打印函数参数 第一个参数存在ebp+8的位置
+  uint32_t* args = (uint32_t*)ebp + 2;//这里的2代表两个整形数地址范围也就是2*4=8
+  // uint32_t* args =(uint32_t*)(ebp + 8);
+  for( j =0; j<4; j++)
+  {
+    cprintf("0x%08x ",args[j]);//打印函数的调用参数 参数1 参数2 参数3 参数4
+  }
+  // 3.3 打印换行符号
+  cprintf("\n");//　打印换行符号
+  // (3.4) 
+  print_debuginfo(eip-1);
+  // 3.5 原ebp的值就存在ebp的位置，eip的值存在ebp+4的位置，所以在这里通过数组的操作实现具体功能。
+  ebp = ((uint32_t*)ebp)[0];
+  eip = ((uint32_t*)ebp)[1];
+ }
+}
 
-
+```
 
 
 
