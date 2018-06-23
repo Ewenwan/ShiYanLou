@@ -436,6 +436,13 @@ gdtdesc:
 # 3. 分析bootloader加载ELF格式的OS的过程。
     上面 boot/bootasm.S 的末尾，切换到保护模式，初始化一些段寄存器后，
     会调用bootmain函数在bootmain.c中　，进行　加载ELF格式的操作系统OS。
+    
+> ELF文件格式
+![](https://img-blog.csdn.net/20150614214629434?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvY3NfYXNzdWx0/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
+
+> 读取elf
+![](https://img-blog.csdn.net/20150614214634475?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvY3NfYXNzdWx0/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
+    
 >**背景知识**
 
     对于硬盘来说，我们知道是分成许多扇区的其中每个扇区的大小为512字节。
