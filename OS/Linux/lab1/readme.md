@@ -140,9 +140,36 @@
 [硬件模拟器qemu的安装](https://github.com/Ewenwan/ShiYanLou/blob/master/OS/Linux/lab0/qeum_install.md)
   
     make qemu
-
-
+    
 # 1. 从CPU加电后执行的第一条指令开始，单步跟踪BIOS的执行
+
+	单步调试和查看BIOS代码
+		如果你是想看BIOS的汇编，可试试如下方法： 练习2可以单步跟踪，方法如下：
+
+	1. 修改 lab1/tools/gdbinit,
+		set architecture i8086
+		target remote :1234
+
+	2. 在 lab1目录下，执行
+		make debug
+
+	这时gdb停在BIOS的第一条指令处：
+	0xffff0: ljmp $0xf000,$0xe05b
+
+	3 在看到gdb的调试界面(gdb)后，执行如下命令，就可以看到BIOS在执行了
+	si
+	si
+	...
+	4 此时的CS=0xf000, EIP=0xfff0，如果想看BIOS的代码
+		x/2i 0xffff0
+
+	应该可以看到
+		0xffff0: ljmp $0xf000,$0xe05b
+		0xffff5: xor %dh,0x322f
+	进一步可以执行
+		x/10i 0xfe05b
+	可以看到后续的BIOS代码。
+	
     首先在CPU加电之后，CPU里面的ROM存储器会将其里面保存的初始值传给各个寄存器，
     其中CS:IP = 0Xf000 : fff0（CS：代码段寄存器；IP：指令寄存器），
     这个值决定了我们从内存中读数据的位置，PC = 16*CS + IP。
