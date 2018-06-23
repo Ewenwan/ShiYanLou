@@ -1,3 +1,4 @@
+# 本文件名称实际为　bootasm.S
 #include <asm.h>
 
 # Start the CPU: switch to 32-bit protected mode, jump into C.
