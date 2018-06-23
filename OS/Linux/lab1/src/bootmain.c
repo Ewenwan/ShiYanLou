@@ -8,7 +8,7 @@
  2. 在加载操作开始之前我们需要对ELFHDR进行判断，观察是否是一个合法的ELF头
  3. 通过循环读取每个段，并且将每个段读入相应的虚存p_va 程序块中
  4. 最后调用ELF header表头中的内核入口地址, 实现 内核链接地址 转化为 加载地址，无返回值。
- 
+    就转跳到ucore操作系统在内存中的入口位置（kern/init.c中的kern_init函数的起始地址）   
 */
 #define SECTSIZE        512   // 一个扇区的大小
 #define ELFHDR          ((struct elfhdr *)0x10000)// scratch space 虚拟地址va(virtual address)
