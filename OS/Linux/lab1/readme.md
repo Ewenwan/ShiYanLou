@@ -460,10 +460,17 @@ gdtdesc:
 #include <defs.h>
 #include <x86.h>
 #include <elf.h>// elf文件格式定义
-//　加载elf格式的 操作系统os
+/*
+通过bootmain函数从硬盘中 加载elf格式的 操作系统os 到内存中使用程序块方式存储
 
-#define SECTSIZE        512
-#define ELFHDR          ((struct elfhdr *)0x10000)      // scratch space
+ 1. 将一些OS的ELF文件从硬盘中读到内存的ELFHDR里面 格式在elf.h中定义
+ 2. 在加载操作开始之前我们需要对ELFHDR进行判断，观察是否是一个合法的ELF头
+ 3. 通过循环读取每个段，并且将每个段读入相应的虚存p_va 程序块中
+ 4. 最后调用ELF header表头中的内核入口地址, 实现 内核链接地址 转化为 加载地址，无返回值。
+ 
+*/
+#define SECTSIZE        512   // 一个扇区的大小
+#define ELFHDR          ((struct elfhdr *)0x10000)// scratch space 虚拟地址va(virtual address)
 
 /* 等待磁盘准备好
 waitdisk - wait for disk ready */
@@ -543,11 +550,11 @@ bootmain(void) {
     // 第二个是count（我们所要读取的数据的大小 512*8），
     // 第三个是offset（偏移量）
     // SECTSIZE的定义我们通过追踪可以看到是512，即一个扇区的大小
-    // 将一些OS的ELF文件读到ELFHDR里面 格式在elf.h中定义
+// 1. 将一些OS的ELF文件从硬盘中读到内存的ELFHDR里面 格式在elf.h中定义
     readseg((uintptr_t)ELFHDR, SECTSIZE * 8, 0);//　调用readseg函数从ELFHDR处读取8个扇区的大小。
 
     // is this a valid ELF?
-    // 在加载操作开始之前我们需要对ELFHDR进行判断，观察是否是一个合法的ELF头
+// 2. 在加载操作开始之前我们需要对ELFHDR进行判断，观察是否是一个合法的ELF头
     if (ELFHDR->e_magic != ELF_MAGIC) {
         goto bad;//加载到错误得操作系统, 跳转到
     }
@@ -558,13 +565,13 @@ bootmain(void) {
     ph = (struct proghdr *)((uintptr_t)ELFHDR + ELFHDR->e_phoff);//首地址=基地址+偏移量
     eph = ph + ELFHDR->e_phnum;// 末地址 = 首地址+elf大小
 
-    // 通过循环读取每个段，并且将每个段读入相应的虚存p_va中
+//　3. 通过循环读取每个段，并且将每个段读入相应的虚存p_va 程序块中
     for (; ph < eph; ph ++) {
         readseg(ph->p_va & 0xFFFFFF, ph->p_memsz, ph->p_offset);
     }
 
     // call the entry point from the ELF header
-// 最后调用ELF header表头中的内核入口地址, 实现 内核链接地址 转化为 加载地址，无返回值。
+// 4. 最后调用ELF header表头中的内核入口地址, 实现 内核链接地址 转化为 加载地址，无返回值。
     ((void (*)(void))(ELFHDR->e_entry & 0xFFFFFF))();
 
 bad:
