@@ -113,6 +113,7 @@ bootmain(void) {
 
     // call the entry point from the ELF header
 // 4. 最后调用ELF header表头中的内核入口地址, 实现 内核链接地址 转化为 加载地址，无返回值。
+// 就转跳到ucore操作系统在内存中的入口位置（kern/init.c中的kern_init函数的起始地址）
     ((void (*)(void))(ELFHDR->e_entry & 0xFFFFFF))();
 
 bad:
