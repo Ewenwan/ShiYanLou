@@ -28,6 +28,8 @@
 
 [A Detailed Cplusplus Concurrency Tutorial 《C++ 并发编程指南》](https://github.com/Ewenwan/Cplusplus-Concurrency-In-Practice)
 
+[哈希学习](https://blog.csdn.net/LeeWei4939/article/details/78806230)
+
 	包含内容：
 		1. c
 
