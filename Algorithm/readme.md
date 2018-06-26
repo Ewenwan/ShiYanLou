@@ -10,6 +10,10 @@
 
 [算法辅导在线视频直播课程](https://www.jiuzhang.com/?source=soulmachine)
 
+[博客排序算法详解  动图](https://blog.csdn.net/shuzfan/article/details/54619868)
+
+[各种排序算法动画演示及对比](https://www.toptal.com/developers/sorting-algorithms)
+
 # 数组系列
 # 例如：求给定序列中 最大子序列的和
 
