@@ -38,7 +38,31 @@ void BubbleSort(int data[], int n)
 }
 ```
 ## 改进2 跳过整体有序 + 跳过部分有序
-
-
+```c
+// 冒泡排序
+void BubbleSort(int data[], int n)  
+{  
+    bool  swapped;// 有交换的标志 未出现有序的序列
+    int temp_data;// 条换
+    for(int i=n-1; i>=0; i--)// n行大排序
+    {
+        int last = i;
+        for(int j=0; j<i; j++)// i次交换排序
+        {
+            if (data[j+1] < data[j])// 前面的大，需要交换，移到后面
+            {
+                // 交换数据
+                temp_data = data[j+1];
+                data[j+1] = data[j];
+                data[j] = temp_data;
+                // swapped = true;// 设置 未出现有序的序列 标志， 还需要继续执行
+                last = j;
+            }
+        }
+        i = last;// 直接跳过后面已经有序的部分
+        //if(false == swapped) break;
+    }
+}
+```
 ## 改进3 鸡尾酒排序 左到右找最大，再从右到左找最小
 
