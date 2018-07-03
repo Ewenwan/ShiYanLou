@@ -9,7 +9,7 @@
         蓝色表示当前处理项；
         红色表示当前最小值
         
-![]()
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/Algorithm/img/select_sort.gif)
 
 ```c
 #include  <iostream>
