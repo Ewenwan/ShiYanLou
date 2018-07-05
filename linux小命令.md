@@ -1,3 +1,7 @@
+# 查询文件夹大小
+    du -h 所有子文件大小
+    du -h -d 1  当前1级目录大小
+
 # 1、输出字符 banner   全#号
     sudo apt-get install sysvbanner
 
