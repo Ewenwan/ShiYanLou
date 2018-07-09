@@ -1,5 +1,8 @@
 # 数据结构 learn  datastructure
 
+[数据结构与算法系列 目录 博客整理 强烈推荐](http://www.cnblogs.com/skywang12345/p/3603935.html)
+
+
 [数据结构-算法基础](http://www.xuetangx.com/courses/course-v1:TsinghuaX+30240184_p1+sp/about)
 
 [数据结构-向量](http://www.xuetangx.com/courses/course-v1:TsinghuaX+30240184_p2+sp/about)
