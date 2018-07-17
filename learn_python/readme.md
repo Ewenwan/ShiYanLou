@@ -5,6 +5,9 @@
 
 [鱼C  《极客首选之Python》 ](http://blog.fishc.com/category/geekpython/page/3)
 
+[Python抓取股票信息](http://jinjaysnow.github.io/blog/2014-10/Python%E6%8A%93%E5%8F%96%E8%82%A1%E7%A5%A8%E4%BF%A1%E6%81%AF.html)
+
+
 # window python 开发环境
 ## 1. anaconda
 [下载](https://www.anaconda.com/download/)
