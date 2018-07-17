@@ -1,10 +1,13 @@
-# 各种 算法  数据结构：数组 字符串 链表 树 图 桶 森林 
+# 各种 算法 数学建模算法 群体智能算法  数据结构：数组 字符串 链表 树 图 桶 森林 
 
 [leetcode 博客题解](https://blog.csdn.net/liuxiao214/article/details/76032392)
 
 [编程之法：面试和算法心得](https://github.com/julycoding/The-Art-Of-Programming-By-July)
 
 [CLRS算法](https://github.com/Ewenwan/CLRS)
+
+[群体智能/集群智能](http://jinjaysnow.github.io/blog/2016-01/%E9%9B%86%E7%BE%A4%E6%99%BA%E8%83%BD.html)
+
 
 > 小詹学Python 微信公众号等
 
