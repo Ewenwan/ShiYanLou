@@ -29,7 +29,17 @@
 
 [清华操作系统 github](http://github.com/oscourse-tsinghua)
 
+[博客专栏 Linux环境编程](https://blog.csdn.net/column/details/tennysonsky-linux.html)
+
+[博客专栏 Linux网络编程](https://blog.csdn.net/tennysonsky/article/category/2835083)
+
+[博客专栏 一步步学习C++](https://blog.csdn.net/column/details/tennysonsky.html)
+
+[博客专栏 C语言](https://blog.csdn.net/column/details/15161.html)
+
 [鱼C工作室 C/C++/Python/Wed/数据结构和算法](http://fishc.com/)
+
+[图形界面编程](https://blog.csdn.net/tennysonsky/article/category/1438449)
 
 [面试算法博客笔记](https://blog.csdn.net/cheese_pop?t=1)
 
