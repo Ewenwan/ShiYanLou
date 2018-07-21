@@ -93,3 +93,46 @@
  
 # 三、 linux配置
 [ubuntu大法-快速翻墙装驱动配置开发环境](https://github.com/DragonFive/myblog/blob/master/source/_posts/nvidiaDriverInstall.md)
+
+# 四、Linux环境编程
+[博客专栏](https://blog.csdn.net/column/details/tennysonsky-linux.html)
+## ubuntu下添加新用户、解决远程登录问题
+###  添加新用户
+    添加新用户
+
+    sudo useradd ewenwan -d /home/ewenwan -m
+    # 第一个ewenwan，指用户名
+    # -d /home/ewenwan 指定用户登录系统时的主目录，宿主目录
+    # -m 如果/home/ewenwan 路径不存在，自动创建
+    
+    查看新建的用户
+    cat /etc/passwd | grep ewenwan
+    
+    给用户设置密码
+    sudo passwd ewenwan
+    
+    新用户增加sudo权限
+    修改/etc/sudoers权限
+    sudo chmod u+w /etc/sudoers
+    #增加写权限
+    
+    通过编辑/etc/sudoers文件 也可以实现
+    sudo vi /etc/sudoers
+![](https://img-blog.csdn.net/20180104160715584?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdGVubnlzb25za3k=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+    
+    root ALL=(ALL:ALL) ALL
+    ewenwan ALL=(ALL:ALL) ALL
+    
+    
+    恢复原来/etc/sudoers权限
+    sudo chmod u-w /etc/sudoers
+    
+### 解决远程登录问题
+    
+    修改/etc/passwd文件
+    sudo vim /etc/passwd
+    找到新增的用户ewenwan，添加如下内容： 
+    
+    ewenwan:x:1001:1001::/home/ewenwan:/bin/bash
+    
+    
