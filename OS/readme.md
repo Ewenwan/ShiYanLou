@@ -19,6 +19,25 @@
   - 源码比较和打补丁工具：diff、meld，用于比较不同目录或不同文件的区别, patch是打补丁工具
     - diff, patch是命令行工具，使用简单
     - meld是图形界面的工具，功能相对直观和方便，类似的工具还有 kdiff3、diffmerge、P4merge
+    - Beyond Compare window 下的文件比较工具  http://www.beyondcompare.cc/  需要激活
+    
+    - BC 2.0 KEY:
+    
+          urKH3mXZVDiTNgCKQnFnfvaQB5tTtahv
+          tUr5HqwT9YZu50+b3T9bkzYKwKsfjhhi
+          DgzR9Dr5qbmJ2EmNzYfSAq4ocM7E8B0D
+          kDvyvawgHd0gV-nFnVNBsqMgnxcKoJfZ
+          6WrrQotEiqs6H14Jk9Wjz+SLvovnUksb
+          gT5K1ey7T7AV2C32NLt4gjavcM5tzDR0
+          GUbvAou+MKzhMHebccC+3fB0wwwKNPs0
+          fwCz3Xh16S6yB4xxeD2bS6JFV9JPZwkA
+          
+    - BC 3.0 KEY: 
+
+          mv1nPlXAywBDCdhxFc9QOVv6TBcQHLAXBQUAKTh3ie4fqSEOnWrPsnVkF
+          yt0wAkJHweoExRJWWVwwCniKNROSdJzJXE6YVapYW7f+tRRXRFI4yn4Nj
+          jZ0RiiqGRCTVzwComUcXB-eiFWRBY6JpSsCNkmIxL5KsRCo442djHhTZE 
+
   - 开发编译调试工具：gcc 、gdb 、make
     - gcc：C语言编译器
     - gdb：执行程序调试器
