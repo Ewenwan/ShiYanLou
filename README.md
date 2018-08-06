@@ -49,6 +49,10 @@
 
 [A Detailed Cplusplus Concurrency Tutorial 《C++ 并发编程指南》](https://github.com/Ewenwan/Cplusplus-Concurrency-In-Practice)
 
+[基于C++11新标准的并发和多线程编程深度指南 C++ Concurrency In Action](https://github.com/xiaoweiChen/Cpp_Concurrency_In_Action)
+
+[《C++17 STL cookbook》英文版的中文翻译 ](https://github.com/Ewenwan/CPP-17-STL-cookbook)
+
 [哈希学习](https://blog.csdn.net/LeeWei4939/article/details/78806230)
 
 # 包含内容：
