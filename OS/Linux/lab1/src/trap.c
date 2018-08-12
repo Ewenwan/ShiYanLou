@@ -51,7 +51,6 @@ idt_init(void) {
       *     Notice: the argument of lidt is idt_pd. try to find it!
       */
 // 1. 声明__vectors[] 来对应中断描述符表中的256个中断符  tools/vector.c中
-    // vectors 定义在 vector.S 文件中，通过一个工具程序 vector.c 生成
     extern uintptr_t __vectors[];// 代码段偏移量
 // 2. 通过for循环运用SETGATE宏定义函数(类似c++ inline内连函数)  进行 中断门idt[i] 的初始化
     // 在kernel/mm/mmu.h中　#define SETGATE(gate, istrap, sel, off, dpl) {}
@@ -160,6 +159,55 @@ print_regs(struct pushregs *regs) {
     cprintf("  eax  0x%08x\n", regs->reg_eax);
 }
 
+static void
+lab1_print_cur_status(void) {
+    static int round = 0;
+    uint16_t reg1, reg2, reg3, reg4;
+    asm volatile (
+            "mov %%cs, %0;"
+            "mov %%ds, %1;"
+            "mov %%es, %2;"
+            "mov %%ss, %3;"
+            : "=m"(reg1), "=m"(reg2), "=m"(reg3), "=m"(reg4));// =m  结合上面的mov语句，输出寄存器的值
+    cprintf("%d: @ring %d\n", round, reg1 & 3);
+    cprintf("%d:  cs = %x\n", round, reg1);
+    cprintf("%d:  ds = %x\n", round, reg2);
+    cprintf("%d:  es = %x\n", round, reg3);
+    cprintf("%d:  ss = %x\n", round, reg4);
+    round ++;
+}
+
+// 我们首先要知道内核态和用户态指的究竟是什么。
+// 它们即ring0和ring3，指的是当前代码运行的特权等级。这个特权级由cs中标识特权级的几位声明。
+// 访问数据段时，数据段的特权级（DPL）必须大于等于代码段的特权级（CPL），
+// 同时还有一个东西叫做i/o特权级（IOPL），其作用方式同上。
+static void
+lab1_switch_to_user(void) {
+    //LAB1 CHALLENGE 1 : TODO
+asm volatile (
+   "sub $0x8, %%esp \n"  // 保存内核态 栈指针
+   "int %0 \n"           // 调用 T_SWITCH_TOU 中断  在 trap.c 内 需要修改
+   "movl %%ebp, %%esp"   // 恢复栈指针
+   :
+   : "i"(T_SWITCH_TOU)   //最后作为参数传送给trap函数, 转到用户态 .
+);
+}
+
+static void
+lab1_switch_to_kernel(void) {
+    //LAB1 CHALLENGE 1 :  TODO
+  	asm volatile (
+	    "int %0 \n"  // 保存内核态 栈指针
+	    "movl %%ebp, %%esp \n"// 恢复栈指针
+	    : 
+	    : "i"(T_SWITCH_TOK) //最后作为参数传送给trap函数, 转到内核态 .
+	);
+}
+
+
+/* temporary trapframe or pointer to trapframe */
+struct trapframe switchk2u, *switchu2k;
+
 /* trap_dispatch - dispatch based on what type of trap occurred */
 // 各种中断响应处理
 static void
@@ -167,9 +215,7 @@ trap_dispatch(struct trapframe *tf) {
     char c;
 
     switch (tf->tf_trapno) {
-    case IRQ_OFFSET + IRQ_TIMER:// 时钟的初始化函数clock_init（位于kern/driver/clock.c中）
-    // 完成了对时钟控制器8253的初始化：
-    // 设置时钟每秒中断100次 通过中断控制器使能时钟中断
+    case IRQ_OFFSET + IRQ_TIMER:
         /* LAB1 YOUR CODE : STEP 3 */
         /* handle the timer interrupt */
         /* (1) After a timer interrupt, you should record this event using a global variable (increase it), such as ticks in kern/driver/clock.c
@@ -180,27 +226,79 @@ trap_dispatch(struct trapframe *tf) {
         ticks++; // 定义在 kern/driver/clock.c 中
         // 2. 判断 ticks的状态, 执行相应的操作
         if(ticks% TICK_NUM == 0)// TICK_NUM 本文件最上面　为100 
-         {// 每当ticks计数达到100时，即出发了100次时钟中断后，时钟中断会print“100 ticks”。1s
+         {// 每当ticks计数达到100时，即出发了100次时钟中断后（1s），时钟中断会print“100 ticks”。
            print_ticks();//向终端打印时间信息  
          }
 
         break;
-    case IRQ_OFFSET + IRQ_COM1://　串口1 中断 串口的初始化函数serial_init（位于/kern/driver/console.c）
+    case IRQ_OFFSET + IRQ_COM1://　串口1 中断
         c = cons_getc();
         cprintf("serial [%03d] %c\n", c, c);
         break;
-    case IRQ_OFFSET + IRQ_KBD://键盘中断 键盘的初始化函数kbd_init（位于kern/driver/console.c中）
+    case IRQ_OFFSET + IRQ_KBD://键盘中断
         c = cons_getc();
         cprintf("kbd [%03d] %c\n", c, c);
         cprintf("keyboard interrupt\n");
+	if(c == 'k') {
+	   cprintf("+++ switch to  kernel  mode +++\n");
+	  lab1_switch_to_kernel();
+          lab1_print_cur_status();
+	}
+	else if(c == 'u'){
+	      cprintf("+++ switch to  user  mode +++\n");
+	      lab1_switch_to_user();
+              lab1_print_cur_status();
+	     cprintf("+++ switch to  kernel  mode +++\n");
+	     lab1_switch_to_kernel();
+             lab1_print_cur_status();
+	}
         break;
     //LAB1 CHALLENGE 1 : YOUR CODE you should modify below codes.
     case T_SWITCH_TOU://用户切换 用户到内核
-        panic("T_SWITCH_** ??\n");
+       //  panic("T_SWITCH_ to user\n");
+      // Panic()函数（实际上是User::Panic()）是当系统发现无法继续运行下去的故障时将调用它，会导致程序中止，然后由系统显示错误号。 
+       // 在 trap_dispatch 当中对应部分加入:
+	if (tf->tf_cs != USER_CS){// 如果是非用户态 则 切换访问级别
+// 从内核态切换到用户态只能通过iret指令修改cs的值, 这个特权级由cs中标识特权级的几位声明
+	  switchk2u = *tf;
+	  /*
+	   tf->tf_cs = USER_CS;
+	   tf->tf_ss = USER_DS;
+	   tf->tf_ds = USER_DS;
+	   tf->tf_es = USER_DS;
+	  // tf->tf_fs = USER_DS;
+	  // tf->tf_gs = USER_DS;
+	   
+	   tf->tf_esp = (uint32_t)tf + sizeof(struct trapframe) - 8;
+	   
+	   tf->tf_eflags |= FL_IOPL_MASK;  // i/o特权级（IOPL）
+	   
+	   *((uint32_t *)tf - 1) = (uint32_t)tf;//设置临时堆栈？？
+	   */
+            switchk2u.tf_cs = USER_CS;
+            switchk2u.tf_ds = switchk2u.tf_es = switchk2u.tf_ss = USER_DS;
+            switchk2u.tf_esp = (uint32_t)tf + sizeof(struct trapframe) - 8;
+		
+            // set eflags, make sure ucore can use io under user mode.
+            // if CPL > IOPL, then cpu will generate a general protection.
+            switchk2u.tf_eflags |= FL_IOPL_MASK;
+		
+            // set temporary stack
+            // then iret will jump to the right stack
+            *((uint32_t *)tf - 1) = (uint32_t)&switchk2u;
+	}
         break;
 
-    case T_SWITCH_TOK:
-        panic("T_SWITCH_** ??\n");
+    case T_SWITCH_TOK://切换到内核态
+       // panic("T_SWITCH_** ??\n");
+	if (tf->tf_cs != KERNEL_CS) {//如果当前不是内核态
+            tf->tf_cs = KERNEL_CS;
+            tf->tf_ds = tf->tf_es = KERNEL_DS;
+            tf->tf_eflags &= ~FL_IOPL_MASK;
+            switchu2k = (struct trapframe *)(tf->tf_esp - (sizeof(struct trapframe) - 8));
+            memmove(switchu2k, tf, sizeof(struct trapframe) - 8);
+            *((uint32_t *)tf - 1) = (uint32_t)switchu2k;
+        }
         break;
     case IRQ_OFFSET + IRQ_IDE1:
     case IRQ_OFFSET + IRQ_IDE2:
