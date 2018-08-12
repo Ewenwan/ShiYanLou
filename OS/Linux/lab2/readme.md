@@ -53,6 +53,7 @@
      d. 初始化物理内存管理
         pmm_init();        // init physical memory management   kernel/mm/ppm.c
         --->gdt_init();    // 初始化默认的全局描述符表
+        ---> page_init();// 内存管理等函数  ===============比lab1多的部分=================
 
      e. 初始化中断控制器，
         pic_init();        // 初始化 8259A 中断控制器   kernel/driver/picirq.c
@@ -181,7 +182,7 @@ cont:
 finish_probe:
 ``` 
 # 程序流程图
-![]()
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/OS/Linux/lab2/BIOS_INT0x15_mem_layout.png)
 
 # 练习1：实现 first-fit 连续物理内存分配算法（需要编程）
     在实现first fit 内存分配算法的回收函数时，要考虑地址连续的空闲块之间的合并操作。
@@ -296,57 +297,69 @@ finish_probe:
     由ucore的 page_init函数 来根据 struct e820map的memmap（定义了起始地址为0x8000）
     来完成对整个机器中的物理内存的总体管理。
     
-## 物理内存空间管理的初始化
-    当我们在bootloader中完成对物理内存空间的探测后， 
+## 物理内存空间管理的初始化  mm/pmmc --->  pmm_init();
+    当我们在bootloader 中完成对物理内存空间的 探测后（知己知彼，百战不殆）， 
     我们就可以根据得到的信息来对可用的内存空间进行管理。
-    在ucore中， 我们将物理内存空间按照页的大小(4KB)进行管理， 
+    
+    在ucore中， 我们将物理内存空间按照 页page 的大小(4KB，  PGSIZE =4 kb)进行管理， 
     页的信息用Page这个结构体来保存。
     对整个计算机的每一个物理页的属性用结构Page.
     Page的定义在kern/mm/memlayout.h中。以页为单位的物理内存分配管理的实现在kern/default_pmm.[ch].
 ```c
 struct Page {
-    int ref;        // 映射此物理页的虚拟页个数 表示这页被页表的引用记数 page frame's reference counter
-    uint32_t flags; // 描述物理页属性的flags array of flags that describe the status of the page frame
-    unsigned int property;// 优先权 the num of free block, used in first fit pm manager
-    list_entry_t page_link;// 双向链接各个Page结构的page_link双向链表  free list link
+    int ref;        // 映射此 物理页的 虚拟页个数，表示该 物理页 被 页表 的引用记数 page frame's reference counter
+    uint32_t flags; // 描述 物理页 属性的标志flags数组， array of flags that describe the status of the page frame
+    unsigned int property; // 优先权 the num of free block, used in first fit pm manager
+    list_entry_t page_link;// 双向链接 各个Page结构的 page_link 双向链表  free list link
 };
 ```
-## 物理内存空间管理的初始化的过程
+## 物理内存空间管理的初始化的过程 mm/pmmc --->  pmm_init() ---> page_init() 
 物理内存空间的初始化可以分为以下4步：
 
     1. 根据物理内存空间探测的结果， 找到最后一个可用空间的结束地址(或者Kernel的结束地址，选一个小的)，
-       根据这个结束地址计算出整个可用的物理内存空间一共有多少个页。
-    2. 找到Kernel的结束地址(end)，这个地址是在kernel.ld中定义的， 
-       我们从这个地址所在的下一个页开始(pages)写入系统页的信息(将所有的Page写入这个地址)。
-    3. 从pages开始，将所有页的信息的flag都设置为reserved(不可用)。
-    4. 找到free页的开始地址， 并初始化所有free页的信息(free页就是除了kernel和页信息外的可用空间，
-       初始化的过程会reset flag中的reserved位)。
+       根据这个 结束地址 计算出整个 可用的物理内存 空间一共有多少个页 npage。
+       
+    2. 找到Kernel的结束地址(end)，这个地址是在kernel.ld 中定义的， 
+       我们从这个地址所在的 下一个页开始(pages = roundup(end/PGSIZE) )写入系统页的信息(将所有的Page写入这个地址，信息页)。
+       
+    3. 从pages开始，将所有页的信息的flag 都设置为reserved(不可用)。
+    
+    4. 找到free页的开始地址， 并初始化所有free页的信息(free页就是除了kernel 和 页信息外的可用空间，
+       初始化的过程会reset flag中的 reserved位)。
        
      上面这几部中提到了很多地址空间， 下面我用一幅图来说明：   
 ![](https://sfault-image.b0.upaiyun.com/295/946/295946239-592131eae426e_articlex)
-
-    end指的就是BSS的结束处；
-    pages指的是BSS结束处 - 空闲内存空间的起始地址；
-    free页是从空闲内存空间的起始地址 - 实际物理内存空间结束地址。
+ 
+    end   指的就是 BSS 的结束处；
+    pages 指的是 BSS结束处 - 空闲内存空间的起始地址；
+    free 页是从 空闲内存空间的起始地址 - 实际物理内存空间结束地址。
 
     有了这幅图，这些地址就很容易理解了。 
 
-    物理页数数量：
-        我们首先根据bootloader给出的内存布局信息找出最大的物理内存地址maxpa（定义在page_init函数中的局部变量），
-        由于x86的起始物理内存地址为0，所以可以得知需要管理的物理页个数为：
+    物理页数 数量：
+        我们首先根据 bootloader 给出的 内存布局信息 找出 最大的物理内存地址 maxpa
+        （定义在 page_init() (函数中的局部变量，maxpa = end;），
+        
+        由于x86 的 起始物理内存地址为0，
+        每个页的大小为 PGSIZE = 4KB， 
+        所以可以得知需要管理的物理页个数为：
         npage = maxpa / PGSIZE
-
-    内存管理结构体page需要的内存数量：
-        这样，我们就可以预估出管理页级物理内存空间所需的Page结构的内存空间所需的内存大小为：
+        
+    每个物理也都需要一个 结构体 Page 来进行记录，
+    所以内存管理结构体 Page 需要的内存数量：
+        这样，我们就可以预估出 管理 页级 物理内存空间 所需的 Page结构 的 内存空间 所需的 内存大小为：
+        
         sizeof(struct Page) * npage
 
-    内存管理处的起始管理结构体page：
-        由于bootloader加载ucore的结束地址（用全局指针变量end记录）以上的空间没有被使用，
-        所以我们可以把end按页大小为边界取整后，作为管理页级物理内存空间所需的Page结构的内存空间，记为：
-        pages = (struct Page *)ROUNDUP((void *)end, PGSIZE);
-
+    内存管理处 的 起始管理结构体page：
+        由于 bootloader 加载 ucore的 结束地址（用 全局指针变量end记录）以上的空间 没有被使用，
+        所以我们可以把end 按页大小为 边界取整 后，作为 管理页级物理内存空间所需的Page结构的内存空间，记为：
+     
+        pages = (struct Page *)ROUNDUP((void *)end, PGSIZE);//  除去操作系统后的需要管理的内存的起始页地址
+        
     空闲物理空间起始地址 free：
-        内存管理处的起始地址page + 内存管理所需的内存数量，之后为空闲地址。
+        内存管理处的起始地址page + 内存管理所需的内存数量，
+        之后为空闲地址。
         uintptr_t freemem = PADDR((uintptr_t)pages + sizeof(struct Page) * npage);
 
     标记内存管理page：
@@ -360,33 +373,33 @@ struct Page {
         ...
         init_memmap(pa2page(begin), (end - begin) / PGSIZE);
         // 是把空闲物理页对应的Page结构中的flags和引用计数ref清零，
-        // 并加到free_area.free_list指向的双向列表中，为将来的空闲页管理做好初始化准备工作。
+        // 并加到 free_area.free_list 指向的双向列表中，为将来的空闲页管理做好初始化准备工作。
         // 从pages开始保存了所有物理页的信息(严格来讲， 在pages处保存的npage个页的信息并不一定是所有的物理页信息，
-        // 它还包括各种外设地址，ROM地址等。不过因为它包含了所有可用free页的信息，我们就可以使用pages来找到任何free页的信息)。 
-        // 那如何将free页的信息和free页联系起来呢？很简单， 我们用地址的物理页号(pa的高20bit)作为index来定位free页的信息。
+        // 它还包括各种外设地址，ROM地址等。不过因为它包含了所有可用free页的信息，我们就可以使用 pages来找到任何free页的信息)。 
+        // 那如何将free页的信息和free页联系起来呢？很简单， 我们用地址的物理页号(pa 的高 20bit)作为index来定位free页的信息。
         // 因为pages处保存了系统中的第一个物理页的页信息，只要我们知道某个页的物理地址， 我们就可以很容易的找到它的页号(pa >> 12)。 
         // 有了页号，我们就可以通过pages[页号]来定位其页的信息了。在本lab中， 获取页的信息是由 pa2page() 来完成的。
         // 在初始化free页的信息时， 我们只将连续多个free页中第一个页的信息连入free_list中， 
         // 并且只将这个页的property设置为连续多个free页的个数。 其他所有页的信息我们只是简单的设置为0。
 
-        相应的实现在default_pmm.c中的default_alloc_pages函数和default_free_pages函数，
+        相应的实现在 default_pmm.c 中的 default_alloc_pages 函数和 default_free_pages() 函数，
         相关实现很简单，这里就不具体分析了，直接看源码，应该很好理解。
     物理内存页管理器框架: 
 
         在内存分配和释放方面最主要的作用是建立了一个物理内存页管理器框架，这实际上是一个函数指针列表，定义如下：
 ```c
 struct pmm_manager {
-            const char *name;    //物理内存页管理器的名字
-            void (*init)(void);  //初始化内存管理器
-            void (*init_memmap)(struct Page *base, size_t n); //初始化管理空闲内存页的数据结构
-            struct Page *(*alloc_pages)(size_t n);            //分配n个物理内存页
-            void (*free_pages)(struct Page *base, size_t n);  //释放n个物理内存页
-            size_t (*nr_free_pages)(void);                    //返回当前剩余的空闲页数
-            void (*check)(void); //用于检测分配/释放实现是否正确的辅助函数
+            const char *name;                                 // 物理内存页管理器的名字
+            void (*init)(void);                               // 初始化内存管理器
+            void (*init_memmap)(struct Page *base, size_t n); // 初始化管理空闲内存页的数据结构
+            struct Page *(*alloc_pages)(size_t n);            // 分配n个物理内存页
+            void (*free_pages)(struct Page *base, size_t n);  // 释放n个物理内存页
+            size_t (*nr_free_pages)(void);                    // 返回当前剩余的空闲页数
+            void (*check)(void);                              // 用于检测分配/释放实现是否正确的辅助函数
 };
 ```
     
-    重点是实现init_memmap/ alloc_pages/ free_pages这三个函数。
+    重点是实现 init_memmap/ alloc_pages / free_pages这三个函数。
 
 
 ## 内存段页式管理
@@ -395,9 +408,9 @@ struct pmm_manager {
 ![](https://sfault-image.b0.upaiyun.com/419/087/4190879442-592131eaad948_articlex)
     
     我们可以看到，在这种模式下，
-    逻辑地址先通过段机制转化成线性地址， 
-    然后通过两种页表(页目录和页表)来实现线性地址到物理地址的转换。 
-    有一点需要注意，在页目录和页表中存放的地址都是物理地址。
+    逻辑地址 先通过 段机制 转化成 线性地址， 
+    然后通过两种 页表(页目录和页表) 来实现 线性地址 到 物理地址的转换。 
+    有一点需要注意，在 页目录 和 页表中 存放的地址都是 物理地址。
     
     下面是页目录表项：
 ![](https://sfault-image.b0.upaiyun.com/122/930/1229303217-5921324e8c4ef_articlex)
@@ -405,16 +418,10 @@ struct pmm_manager {
     下面是页表表项:
 ![](https://sfault-image.b0.upaiyun.com/386/565/3865659503-5921324e5d6d9_articlex)
     
-    在X86系统中，页目录表的起始物理地址存放在cr3 寄存器中， 
-    这个地址必须是一个页对齐的地址，也就是低 12 位必须为0。在ucore 用boot_cr3（mm/pmm.c）记录这个值。
+    在X86系统中，页目录表 的起始物理地址存放在 cr3 寄存器中， 
+    这个地址必须是一个 页对齐 的地址，也就是低 12 位必须为0。
+    在ucore 用boot_cr3（mm/pmm.c）记录这个值。
     
     在ucore中，线性地址的的高10位作为页目录表的索引，之后的10位作为页表的的索引，
     所以页目录表和页表中各有1024个项，每个项占4B，所以页目录表和页表刚好可以用一个物理的页来存放。
-    
-    
-
-    
-    
-    
-    
-
+  
