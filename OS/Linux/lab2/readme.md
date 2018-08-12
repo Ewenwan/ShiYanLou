@@ -17,24 +17,195 @@
     本实验里面实现的内存管理还是非常基本的，并没有涉及到对实际机器的优化，比如针对 cache(缓冲区)的优化等。
     如果大家有余力，尝试完成扩展练习。
 ![](https://img-blog.csdn.net/20170903193711721?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZm91eV95dW4=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
+
+# 程序执行顺序
+    1. boot/bootasm.S  | bootasm.asm（修改了名字，以便于彩色显示）
+     a. 开启A20   16位地址线 实现 20位地址访问  芯片版本兼容
+        通过写 键盘控制器8042  的 64h端口 与 60h端口。
+         
+     ab.物理内存探测  通过 BIOS 中断获取内存布局 ==========比lab1多的部分===========
+     
+     b. 加载GDT全局描述符 lgdt gdtdesc
+     c. 使能和进入保护模式 置位 cr0寄存器的 PE位 (内存分段访问) PE+PG（分页机制）
+        movl %cr0, %eax 
+        orl $CR0_PE_ON, %eax  或操作，置位 PE位 
+        movl %eax, %cr0
+     d. 调用载入系统的函数 call bootmain  # 转而调用 bootmain.c 
+
+    2. boot/bootmain.c -> bootmain 函数
+     a. 调用readseg函数从ELFHDR处读取8个扇区大小的 os 数据。
+     b. 将输入读入 到 内存中以 进程(程序)块 proghdr 的方式存储
+     c. 跳到ucore操作系统在内存中的入口位置（kern/init.c中的kern_init函数的起始地址）
+
+    3. kern/init.c
+     a. 初始化终端 cons_init(); init the console   kernel/driver/consore.c
+         显示器初始化       cga_init();    
+         串口初始化         serial_init(); 
+         keyboard键盘初始化 kbd_init();
+
+     b. 打印内核信息 & 欢迎信息 
+        print_kerninfo();          //  内核信息  kernel/debug/kdebug.c
+        cprintf("%s\n\n", message);//　欢迎信息 const char *message = “qwert”
+
+     c. 显示堆栈中的多层函数调用关系 切换到保护模式，启用分段机制
+        grade_backtrace();
+
+     d. 初始化物理内存管理
+        pmm_init();        // init physical memory management   kernel/mm/ppm.c
+        --->gdt_init();    // 初始化默认的全局描述符表
+
+     e. 初始化中断控制器，
+        pic_init();        // 初始化 8259A 中断控制器   kernel/driver/picirq.c
+
+     f. 设置中断描述符表
+        idt_init();        // kernel/trap/trap.c 
+        // __vectors[] 来对应中断描述符表中的256个中断符  tools/vector.c中
+
+     g. 初始化时钟中断，使能整个系统的中断机制  8253定时器 
+        clock_init();      // 10ms 时钟中断(1s中断100次)   kernel/driver/clock.c
+        ----> pic_enable(IRQ_TIMER);// 使能定时器中断 
+
+     h. 使能整个系统的中断机制 enable irq interrupt
+        intr_enable();     // kernel/driver/intr.c
+        // sti();          // set interrupt // x86.h
+
+     i. lab1_switch_test();// 用户切换函数 会 触发中断用户切换中断
+
+    4. kernel/trap/trap.c 
+       trap中断(陷阱)处理函数
+        trap() ---> trap_dispatch()   // kernel/trap/trap.c 
+
+        a. 10ms 时钟中断处理 case IRQ_TIMER：
+           if((ticks++)%100==0) print_ticks();//向终端打印时间信息（1s打印一次）
+
+        b. 串口1 中断    case IRQ_COM1: 
+           获取串口字符后打印
+
+        c. 键盘中断      case IRQ_KBD: 
+           获取键盘字符后打印
+
+        d. 用户切换中断
+# 新添加的代码分析
+
+    # 机器启动后有2种方式探测物理内存：直接探测、通过BIOS中断探测。 
+    # 这里我们关注如何通过BIOS的0x15中断探测物理内存。
+    # 由于BIOS中断需要在实模式下调用，所以我们在bootloader中探测物理内存比较合适(切换至 保护模式 之前)。
+    ## BIOS的0x15中断有3个子功能：e820h、e801h、88h。这三个子功能区别是：
+    ### e820h返回内存布局，信息量大，这是功能最强大的子功能，使用也最复杂。
+    ### e801h返回内存容量
+    ### 88h最简单，功能也最弱
+    ### e820将物理内存探测的结果以 地址范围描述符 的格式放在内存中。
+    # 地址范围描述符共计20字节，格式是：
+    #     其具体表示如下：
+    #       Offset      Size    Description
+    #        00h 0~7    8字节   base address               # 内存块基地址
+    #        08h 8~15   8字节   length in bytes            # 这块内存的大小
+    #        10h 16~20  4字节   type of address range      # 这块内存的类型（共有4种类型）
+    # 
     
+## 通过中断获取的一个一个内存块的信息会存入一个缓冲区中 e820map结构体
+    
+```c
+    /* memlayout.h */
+    #define E820MAX 20
+    struct e820map {
+    int nr_map; // 表示数组元素个数，该字段是为了方便后续OS，不是BIOS访问的
+    struct {
+        long long addr;
+        long long size;
+        long type;
+    } map[E820MAX];
+    };
+```
+# e820h的调用参数
+    显然在保护模式下用int $0x15来调用15h中断。
+    
+    但在这之前我们要将参数放置在寄存器中：
+    
+        eax：子功能编号，这里我们填入0xe820
+        edx：534D4150h(ascii字符”SMAP”)，签名，约定填”SMAP”
+        ebx：每调用一次int $0x15，ebx会加1。当ebx为0表示所有内存块检测完毕。（重要！看后面的案例会明白如何使用）
+        ecx：存放地址范围描述符的内存大小，至少要设置为20。
+        es:di：告诉BIOS要把地址描述符写到这个地址。
+        
+    中断的返回值如下：
+    
+        CF标志位：若中断执行失败，则置为1。
+        eax：     值是534D4150h(“SMAP”)
+        es:di：   中断不改变该值，值与参数传入的值一致
+        ebx：     下一个中断描述符的计数值（见后面的案例）
+        ecx：     返回BIOS写到cs:di处的地址描述符的大小（应该就是20吧？）
+        ah：      若发生错误，表示错误码
+
+## boot/bootasm.S ab.物理内存探测  通过 BIOS 中断获取内存布局 ==========比lab1多的部分===========
+```asm
+ .set SMAP,                  0x534d4150    # 设置变量(即4个ASCII字符“SMAP”)
+ 
+# 第一步： 设置一个存放内存映射地址描述符的物理地址(这里是0x8000)
+probe_memory:
+    # 约定在bootloader中将内存探测结果放到0x8000地址处。
+    # 在0x8000处存放struct e820map, 并清除 e820map 中的 nr_map 记录了内存块的个数
+    movl $0, 0x8000 # 对0x8000处的32位单元清零,即给位于0x8000处的struct e820map的成员变量 nr_map 清零
+    xorl %ebx, %ebx # 清理 %ebx, 异或,相同为0，不同为1
+    
+    # 0x8004 处将用于存放第一个内存映射地址描述符 
+    movw $0x8004, %di # 表示设置调用INT 15h BIOS中断后，BIOS返回的映射地址描述符的起始地址
+                      # 中断前需要传递的参数， es:di：告诉BIOS要把地址描述符写到这个地址。
+                      
+# 第二步： 将e820作为参数传递给INT 15h中断
+start_probe:
+  # 传入0xe820 作为INT 15h中断的参数 
+    movl $0xE820, %eax  #  INT 15的中断调用参数 eax：子功能编号，这里我们填入0xe820
+  # 内存映射地址描述符的大小 
+    movl $20, %ecx      # 设置地址范围描述符的大小为20字节，其大小等于struct e820map的成员变量map的大小
+                        # 存放地址范围描述符的内存大小，至少要设置为20
+    movl $SMAP, %edx    # 设置edx为534D4150h (即4个ASCII字符“SMAP”)，这是一个约定
+  # 调用INT 15h中断 
+    int $0x15 # 中断参数0xe820，要求BIOS返回一个用地址范围描述符表示的内存段信息
+    
+# 通过检测 eflags 的CF位来判断探测是否结束。
+# 如果没有结束， 设置存放下一个内存映射地址描述符的物理地址，然后跳到步骤2；如果结束，则程序结束
+    # 如果eflags的CF位为0，则表示还有内存段需要探测 
+    jnc cont # 如果发生错误，CF位为1。那么可以尝试使用其它子功能进行探测，或者就直接关机（连内存容量都没探测肯定无法启动OS了）
+    movw $12345, 0x8000 # 在ucore中表示出错，与BIOS无关
+    jmp finish_probe
+cont:
+  # 继续探测 设置下一个内存映射地址描述符的起始地址 
+    addw $20, %di   # 设置下一个BIOS返回的映射地址描述符的起始地址
+                    # 控制BIOS该将“地址描述符”写到哪里
+  # e820map中的nr_map加1 
+    incl 0x8000     # 递增struct e820map的成员变量nr_map # nr_map成员自增1，该变量与BIOS无关
+  # 如果还有内存段需要探测则继续探测, 否则结束探测 
+    cmpl $0, %ebx   # 每调用一次int $0x15，ebx会加1。当ebx为0表示所有内存块检测完毕。
+    jnz start_probe
+finish_probe:
+``` 
+# 程序流程图
+![]()
+
 # 练习1：实现 first-fit 连续物理内存分配算法（需要编程）
     在实现first fit 内存分配算法的回收函数时，要考虑地址连续的空闲块之间的合并操作。
     提示:在建立空闲页块链表时，需要按照空闲页块起始地址来排序，形成一个有序的链表。
-    可能会修改default_pmm.c中的default_init，default_init_memmap，default_alloc_pages， default_free_pages等相关函数。
+    可能会修改default_pmm.c 中的 default_init，default_init_memmap，default_alloc_pages， default_free_pages等相关函数。
     请仔细查看和理解default_pmm.c中的注释。
+    
 ## 软件了解硬件实际物理内存(物理内存如何分布的，哪些可用，哪些不可用)
-    探测物理内存分布和大小的方法, 基本方法是通过BIOS中断调用来帮助完成的。
+
+    探测物理内存分布和大小的方法, 基本方法是通过 BIOS 中断调用 来帮助完成的。
+    
     其中BIOS中断调用必须在实模式下进行，所以在bootloader进入保护模式前完成这部分工作相对比较合适。
-    所以需要修改bootloader软件。这些部分由boot/bootasm.S中从probe_memory处到finish_probe处的代码部分完成。
+    
+    所以需要修改bootloader软件。这些部分由boot/bootasm.S 中从 probe_memory 处到 finish_probe 处的代码部分完成。
+    
     通过BIOS中断获取内存可调用参数为e820h的INT 15h BIOS中断。
-    BIOS通过系统内存映射地址描述符（Address Range Descriptor）格式来表示系统物理内存布局。
+    
+    BIOS通过 系统内存映射地址描述符（Address Range Descriptor）格式来 表示 系统物理 内存布局。
     
     其具体表示如下：
         Offset  Size    Description
-        00h     8字节   base address               #系统内存块基地址
-        08h     8字节   length in bytes            #系统内存大小
-        10h     4字节   type of address range      #内存类型
+        00h     8字节   base address               # 系统内存块基地址
+        08h     8字节   length in bytes            # 系统内存大小
+        10h     4字节   type of address range      # 内存类型
     
     看下面的 系统内存映射地址类型
         Values for System Memory Map address type:
@@ -54,23 +225,25 @@
         es:di：指向保存地址范围描述符结构的缓冲区，BIOS把信息写入这个结构的起始地址。
 
     此中断的返回值为:
-        eflags的CF位：若INT 15中断执行成功，则不置位，否则置位；
-        eax：534D4150h ('SMAP') ；
+        eflags 的CF位：若INT 15中断执行成功，则不置位，否则置位；
+        eax：  534D4150h ('SMAP') ；
         es:di：指向保存地址范围描述符的缓冲区,此时缓冲区内的数据已由BIOS填写完毕
-        ebx：下一个地址范围描述符的计数地址
-        ecx    ：返回BIOS往ES:DI处写的地址范围描述符的字节大小
-        ah：失败时保存出错代码
+        ebx：  下一个地址范围描述符的计数地址
+        ecx：  返回BIOS往ES:DI处写的地址范围描述符的字节大小
+        ah：   失败时保存出错代码
         
     这样，我们通过调用INT 15h BIOS中断，递增di的值（20的倍数），
-    让BIOS帮我们查找出一个一个的内存布局entry，
+    让BIOS帮我们查找出一个一个的内存布局 entry，
     并放入到一个保存地址范围描述符结构的 缓冲区 中，
     供后续的ucore进一步进行物理内存管理。
     
     这个缓冲区结构定义在memlayout.h中：
+    
 ```c
     /* memlayout.h */
+    #define E820MAX 20
     struct e820map {
-    int nr_map;
+    int nr_map; // 表示数组元素个数，该字段是为了方便后续OS，不是BIOS访问的
     struct {
         long long addr;
         long long size;
@@ -80,6 +253,7 @@
 ```
     
     bootasm.S 需要做的修改，再使能A20之后，线进行物理内存的探测保存一些信息后，再加载全局描述符表后进入保护模式。
+    
 ```asm
 # bootasm.S
 # 2. 物理内存探测  通过 BIOS 中断获取内存布局
