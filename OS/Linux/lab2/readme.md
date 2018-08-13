@@ -306,12 +306,33 @@ finish_probe:
     对整个计算机的每一个物理页的属性用结构Page.
     Page的定义在kern/mm/memlayout.h中。以页为单位的物理内存分配管理的实现在kern/default_pmm.[ch].
 ```c
+// 每一个物理页的属性结构===============
 struct Page {
     int ref;        // 映射此 物理页的 虚拟页个数，表示该 物理页 被 页表 的引用记数 page frame's reference counter
+                    // 一旦某页表中有一个页表项设置了虚拟页到这个Page管理的物理页的映射关系，就会把Page的ref加一。
+                    // 反之，若是解除，那就减一。
     uint32_t flags; // 描述 物理页 属性的标志flags数组， array of flags that describe the status of the page frame
-    unsigned int property; // 优先权 the num of free block, used in first fit pm manager
+      // 表示此物理页的状态标记，有两个标志位，第一个表示是否被保留，如果被保留了则设为1（比如内核代码占用的空间）。
+      // 第二个表示此页是否是free的。
+      // 如果设置为1，表示这页是free的，可以被分配；
+      // 如果设置为0，表示这页已经被分配出去了，不能被再二次分配。
+      
+    unsigned int property; //  the num of free block, used in first fit pm manager
+                           // 用来记录某连续内存空闲块的大小，
+                           // 这里需要注意的是用到此成员变量的这个Page一定是连续内存块的开始地址（第一页的地址）。
+                           
     list_entry_t page_link;// 双向链接 各个Page结构的 page_link 双向链表  free list link
+    // list_entry_t 是便于把多个连续内存空闲块链接在一起的 双向链表指针，
+    // 连续内存空闲块利用这个页的 成员变量 page_link 来链接比它地址小和大的其他连续内存空闲块.
 };
+
+// 然后是下面这个结构。
+// 一个双向链表，负责管理所有的 连续内存 空闲块，便于分配和释放==============
+typedef struct {
+    list_entry_t free_list;         //  是一个list_entry结构的双向链表指针 the list header
+    unsigned int nr_free;           //  记录当前空闲页的个数, of free pages in this free list
+} free_area_t;
+
 ```
 ## 物理内存空间管理的初始化的过程 mm/pmmc --->  pmm_init() ---> page_init() 
 物理内存空间的初始化可以分为以下4步：
@@ -425,3 +446,14 @@ struct pmm_manager {
     在ucore中，线性地址的的高10位作为页目录表的索引，之后的10位作为页表的的索引，
     所以页目录表和页表中各有1024个项，每个项占4B，所以页目录表和页表刚好可以用一个物理的页来存放。
   
+# 实验1
+    我们第一个实验需要完成的主要是default_pmm.c中的
+    1. default_init()       ， 空闲内存页记录初始化，nr_free=0，总的空闲内存块先初始化为0；
+    2. default_init_memmap()， 初始化空闲页链表，初始化每一个空闲页，并计算空闲页的总数；
+    3. default_alloc_pages()， 分配内存大小为n的内存，遍历内容空闲页链表，找到第一块内存大小大于n的块，
+                               然后分配出来，把它从空闲页链表中除去，
+                               然后如果有多余的内存，把分完剩下的部分再次加入会空闲页链表中即可。
+    4. default_free_pages() ， 释放大小为n的内存
+    
+    
+    
