@@ -135,4 +135,7 @@
     
     ewenwan:x:1001:1001::/home/ewenwan:/bin/bash
     
-    
+# 命令行 翻译工具
+    安装 sudo pip install dict-cli
+    使用 dict test 
+
