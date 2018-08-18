@@ -1,0 +1,248 @@
+Ubuntu 14.04 LTS
+
+笔者同时也进行了Ubuntu上的环境搭建。跟随大流，笔者安装了Ubutnu 14.04 LTS虚拟机，64位操作系统。
+
+在Ubuntu上搭建环境相对简单许多，按照PX4中文维基官网的教程即可。
+工具链安装
+
+    权限设置
+
+把用户添加到用户组　“dialout”（如果这步没做，会导致很多用户权限问题）:
+
+sudo usermod -a -G dialout $USER
+
+  
+然后注销后，重新登录，因为重新登录后所做的改变才会有效
+
+    安装CMake
+
+sudo add-apt-repository ppa:george-edison55/cmake-3.x -y
+sudo apt-get update
+# 必备软件(python、git、qt)
+sudo apt-get install python-argparse git-core wget zip \
+    python-empy qtcreator cmake build-essential genromfs -y
+# 仿真工具
+sudo add-apt-repository ppa:openjdk-r/ppa
+sudo apt-get update
+sudo apt-get install openjdk-8-jre
+sudo apt-get install ant protobuf-compiler libeigen3-dev libopencv-dev openjdk-8-jdk openjdk-8-jre clang-3.5 lldb-3.5 -y
+
+
+    卸载模式管理器
+
+Ubuntu配备了一系列代理管理，这会严重干扰任何机器人相关的串口（或usb串口），卸载掉它也不会有什么影响。
+
+sudo apt-get remove modemmanager
+
+  
+
+ 更新包列表和安装下面的依赖包
+
+sudo add-apt-repository ppa:terry.guo/gcc-arm-embedded -y
+sudo add-apt-repository ppa:team-gcc-arm-embedded/ppa
+sudo apt-get update
+sudo apt-get install python-serial openocd \
+    flex bison libncurses5-dev autoconf texinfo build-essential \
+    libftdi-dev libtool zlib1g-dev \
+    python-empy gcc-arm-none-eabi -y
+
+
+代码编译
+根据PX4中文维基官网教程。
+
+    安装Git
+
+sudo apt-get install git-all
+
+
+    下载代码
+
+mkdir -p ~/src
+cd ~/src
+git clone https://github.com/PX4/Firmware.git
+  
+
+    初始化
+    先进入Firmware文件夹，进而进行初始化、更新子模块操作，耐心的等待……
+
+cd Firmware
+git submodule update --init --recursive
+cd ..
+
+
+现在到时候由源代码编译二进制代码了。但在直接使用硬件前，推荐先进行仿真。喜欢在图形界面开发环境工作的用户也应该继续完成下面部分。
+   
+    编译
+    在上一步的操作结束之后，即可进行编译：
+基于NuttX / Pixhawk的硬件板
+make px4fmu-v2_default
+
+  
+注意到“make”是一个字符命令编译工具，“px4fmu-v2”是硬件版本，“default”是默认配置，所有的PX4编译目标遵循这个规则。
+
+与Windows环境中相同，这里也可能因为gcc-arm-none-eabi版本不对，需要进行版本升级到4.9.4，方法如下
+
+下载gcc-arm-none-eabi 4.9.4，对于的文件夹命名为arm-none-eabi-4_9-2014**q3**
+
+wget https://launchpad.net/gcc-arm-embedded/4.9/4.9-2015-q3-update/+download/gcc-arm-none-eabi-4_9-2015q3-20150921-linux.tar.bz2
+
+pushd .
+
+# => 卸载新版的gcc-arm-none-eabi
+sudo apt-get remove gcc-arm-none-eabi
+# => 安装下载好的gcc-arm-none-eabi
+tar -jxf gcc-arm-none-eabi-4_9-2015q3-20150921-linux.tar.bz2
+sudo mv gcc-arm-none-eabi-4_9-2015q3 /opt
+exportline="export PATH=/opt/gcc-arm-none-eabi-4_9-2015q3/bin:\$PATH"
+if grep -Fxq "$exportline" ~/.profile; then echo nothing to do ; else echo $exportline >> ~/.profile; fi
+# => 使路径生效
+. ~/.profile
+
+popd
+
+arm-none-eabi-gcc --version
+
+
+cmake >= 3.2
+
+如果你想自己编译安装，步骤如下：
+
+sudo apt-get install build-essential
+wget http://www.cmake.org/files/v3.2/cmake-3.2.2.tar.gz
+tar xf cmake-3.2.2.tar.gz
+cd cmake-3.2.2
+./configure
+make
+
+sudo apt-get install checkinstall
+sudo checkinstall
+sudo make install
+
+
+
+sudo apt-get install python-jinja2 
+or 
+sudo pip install jinja2
+
+
+
+
+
+Ninja
+
+Ninja比Make更快，并且PX4的CMake生成器可以支持它。不幸的是，Ubuntu目前只支持一个非常过时的版本。
+
+这里博主下载二进制文件并添加到系统路径来安装最新版本的Ninja：
+
+mkdir -p $HOME/ninja
+cd $HOME/ninja
+wget https://github.com/martine/ninja/releases/download/v1.6.0/ninja-linux.zip
+unzip ninja-linux.zip
+rm ninja-linux.zip
+exportline="export PATH=$HOME/ninja:\$PATH"
+if grep -Fxq "$exportline" ~/.profile; then echo nothing to do ; else echo $exportline >> ~/.profile; fi
+. ~/.profile
+
+ 
+
+    按上面的方法配置好ninja之后，以后每次一make都会调用它，这样编译速度会更快。
+
+    如果不想使用ninja的话，可以将其从’~/.profile’中注释掉。
+
+#export PATH=/home/fantasy/ninja:$PATH
+
+
+
+PX4Firmware有非常多的发行版，可以从这里看到
+~$:cd ~/src/Firmware
+# 查看标签（版本）
+git tag
+
+# 新建一个工作分区并切换到目标版本
+git checkout -b branch_name tag_name
+
+git checkout -b bbb v1.6.1
+这样就可以使用你想要的任意版本固件进行开发了。（因为可能有的版本确实不太稳定）
+
+
+
+Makefile只是将参数传递给cmake。所有与make相关的指令都可以在这里找到，也可以自定义编译指令，比如
+
+#  explicity set default build target
+fantasy: px4fmu-v2_default
+
+于是博主编译固件变成下面这个样子：
+
+~$:~/src/Firmware $ make fantasy
+PX4 CONFIG: px4fmu-v2_default
+ninja: no work to do.
+
+
+
+
+基于NuttX / Pixhawk的硬件板
+cd Firmware
+make px4fmu-v2_default             编译成功的文件存在于  build_px4fmu_default\src\firmware\nuttx\nuttx-px4fmu-v2-default.px4
+
+通过在命令后面添加‘upload’，编译的二进制程序就会通过USB上传到飞控硬件:
+
+make px4fmu-v2_default upload
+
+
+
+
+
+Raspberry Pi 2 开发板   主机编译上传
+以下命令编译生成Raspbian（posix_pi2_release）版本的固件。
+
+cd Firmware
+make posix_rpi2_release # for cross-compiler build
+"mainapp"可执行文件位于目录build_posix_rpi2_release/src/firmware/posix下。 将其复制到RPi（用你的RPi的IP或主机名替换YOUR_PI，关于如何访问你的RPi，查看介绍)
+
+然后使用以下命令设置你的RPi的IP（或主机名）：
+
+export AUTOPILOT_HOST=192.168.X.X
+并上传：
+
+cd Firmware
+make posix_rpi_cross upload # for cross-compiler build
+然后，通过ssh连接并运行它（以root权限）：
+
+sudo ./px4 px4.config
+
+
+
+Raspberry Pi 2 开发板    在 Raspberry Pi 上编译
+
+如果你要直接在Pi上编译，则需要在本地编译固件（posix_rpi_native）。
+
+cd Firmware
+make posix_rpi_native # for native build
+“px4”可执行文件位于目录build_posix_rpi_native/src/firmware/posix中。直接运行：
+
+sudo ./build_posix_rpi_native/src/firmware/posix/px4 ./posix-configs/rpi/px4.config
+px4成功执行的情况如下：
+
+
+______  __   __    ___
+| ___ \ \ \ / /   /   |
+| |_/ /  \ V /   / /| |
+|  __/   /   \  / /_| |
+| |     / /^\ \ \___  |
+\_|     \/   \/     |_/
+
+px4 starting.
+
+
+pxh>
+自启动
+
+要自动启动px4，在exit 0之前，请将以下内容添加到文件/etc/rc.local中（如果使用本机构建，请相应调整）：
+
+cd /home/pi && ./px4 -d px4.config > px4.log
+
+
+
+
+
+

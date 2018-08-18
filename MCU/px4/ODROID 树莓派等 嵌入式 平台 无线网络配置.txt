@@ -1,0 +1,76 @@
+配置WiFi接入点
+
+本节说明如何设置ODROID C1一个数据接入点。内容在原有 教程 上作一些小的改进。 启动视频流从摄像头的通过到地面站，运行在计算机则不需要遵循本节。然而，这里表示是因为建立ODROID C1像允许以一个独立的方式使用系统的数据接入点。TP-LINK TL-WN722N使用像WiFi模块。在随后的步骤它是假定指定名称的ODROID系列C1 WLAN 0到你的WiFi模块。改变WLAN 0的所有事件如果相应接口不同（如wlan1）。
+机载计算机作为接入点
+
+在深入的解释更多，你可以看看 RPI-Wireless-Hotspot
+安装必要的软件
+sudo apt-get install hostapd udhcpd
+配置 DHCP. 编辑文件 /etc/udhcpd.conf
+start 192.168.2.100 # This is the range of IPs that the hostspot will give to client devices.
+end 192.168.2.200
+interface wlan0 # The device uDHCP listens on.
+remaining yes
+opt dns 8.8.8.8 4.2.2.2 # The DNS servers client devices will use (if routing through the ethernet link).
+opt subnet 255.255.255.0
+opt router 192.168.2.1 # The Onboard Computer's IP address on wlan0 which we will set up shortly.
+opt lease 864000 # 10 day DHCP lease time in seconds
+所有其他的“选择”条目应该被禁用或如果你知道你在做如何配置正确。
+编辑文件 /etc/default/udhcpd 和修改行:
+DHCPD_ENABLED="no"
+为
+
+#DHCPD_ENABLED="no"
+您需要给机载计算机一个静态的IP地址 编辑文件 /etc/network/interfaces 和代替行 iface wlan0 inet dhcp (or iface wlan0 inet manual) 为:
+auto wlan0
+iface wlan0 inet static
+address 192.168.2.1
+netmask 255.255.255.0
+network 192.168.2.0
+broadcast 192.168.2.255
+wireless-power off
+停用原有（无线客户端）自动配置。 修改行 (注意：它们可能不会全部在同一个地方，也许是分开的，甚至可能根本不存在):
+allow-hotplug wlan0
+wpa-roam /etc/wpa_supplicant/wpa_supplicant.conf
+iface default inet dhcp
+为:
+
+#allow-hotplug wlan0
+#wpa-roam /etc/wpa_supplicant/wpa_supplicant.conf
+#iface default inet dhcp
+如果你遵循 Odroid C1 教程 建立无线网络连接， 您已经创建的文件 /etc/network/intefaces.d/wlan0. 请注释在该文件中的所有行，使得这些配置不再有任何效果。
+配置 HostAPD: 创建 WPA-secured 网络, 编辑文件 /etc/hostapd/hostapd.conf (如果它不存在就新创建) 和 加上跟随行:
+auth_algs=1
+channel=6            # Channel to use
+hw_mode=g
+ieee80211n=1          # 802.11n assuming your device supports it
+ignore_broadcast_ssid=0
+interface=wlan0
+wpa=2
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=TKIP
+rsn_pairwise=CCMP
+# Change the to the proper driver
+driver=nl80211
+# Change these to something else if you want
+ssid=OdroidC1
+wpa_passphrase=QGroundControl
+改变 ssid=, channel=, 和 wpa_passphrase= 你选的值. SSID 是传播到其他设配热点名, 通道是热点运行在什么频率，wpa_passphrase是无线网络密码。为更多的选项看到文件。 /usr/share/doc/hostapd/examples/hostapd.conf.gz. 寻找一个在这个区域没有使用的通道， 你可以使用的工具如wavemon。
+E编辑文件 /etc/default/hostapd 修改行:
+#DAEMON_CONF=""
+为:
+
+DAEMON_CONF="/etc/hostapd/hostapd.conf"
+你的机载电脑现在应该是主持一个无线热点。 要获得启动启动的热点，运行这些额外的命令：
+sudo update-rc.d hostapd enable
+sudo update-rc.d udhcpd enable
+作为一个数据接入点要有足够同时接入机载计算机和允许你的地面站连接. 如果你真的想让它作为一个真正的接入点 (WiFi机载计算机的以太网连接路由的流), 我们需要配置路由和网络地址翻译（NAT）。启用内核中的IP转发：
+sudo sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward"
+启动内核，运行下面命令:
+sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+sudo iptables -A FORWARD -i eth0 -o wlan0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+sudo iptables -A FORWARD -i wlan0 -o eth0 -j ACCEPT
+调整参数, 运行下面命令:
+sudo sh -c "iptables-save > /etc/iptables.ipv4.nat"
+编辑文件 /etc/network/interfaces 和在文件最下方加上这一行:
+up iptables-restore < /etc/iptables.ipv4.nat

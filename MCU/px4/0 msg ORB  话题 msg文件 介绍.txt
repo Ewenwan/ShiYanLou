@@ -1,0 +1,762 @@
+Firmware\msg   ORB进程话题 定义
+
+uORB是一种用于进程间进行异步发布和订阅的消息机制API。
+
+
+由于很多应用都是基于uORB的，因此在系统刚启动时uORB就自动运行了。
+uORB通过uorb start启动。可以使用uorb test进行单位测试。
+
+
+D:\PX4\px4download\Firmware\src\modules\uORB
+
+uORB(Micro Object Request Broker,微对象请求代理器)是PX4/Pixhawk系统中非常重要且关键的一个模块，
+它肩负了整个系统的数据传输任务，所有的传感器数据、GPS、PPM信号等都要从芯片获取后通过uORB进行传输到各个模块进行计算处理。
+实际上uORB是一套跨「进程」 的IPC通讯模块。在Pixhawk中， 所有的功能被独立以进程模块为单位进行实现并工作。
+而进程间的数据交互就由为重要，必须要能够符合实时、有序的特点。 
+??Pixhawk使用的是NuttX实时ARM系统，uORB实际上是多个进程打开同一个设备文件，
+进程间通过此文件节点进行数据交互和共享。进程通过命名的「总线」交换的消息称之为「主题」(topic)，
+在Pixhawk 中，一个主题仅包含一种消息类型，通俗点就是数据类型。每个进程可以「订阅」或者「发布」主题，
+可以存在多个发布者，或者一个进程可以订阅多个主题，但是一条总线上始终只有一条消息。
+
+
+2.2 文件/目录说明
+topics : 系统通用接口定义的标准主题,比如电池电量转态、GPS的位置参数等 
+module.mk : uORB模块makefile文件 
+objects_common.cpp: 通用接口标准主题定义集合，如添加新主题在这里定义 
+ORBMap.hpp : 对象请求器节点链表管理（驱动节点） 
+ORBSet.hpp : 对象请求器节点管理（非驱动节点） 
+Publication.cpp : 在不同的发布中遍历使用 
+Publication.hpp : 在不同的发布中遍历使用 
+Subscription.cpp : 在不同的订阅中遍历使用 
+Subscription.hpp : 在不同的订阅中遍历使用 
+uORB.cpp : uORB的实现 
+uORB.h : uORB头文件 
+uORBCommon.hpp : uORB公共部分变量定义实现 
+uORBCommunicator.hpp : 远程订阅的接口实现，实现了对不同的通信通道管理，如添加/移除订阅者，可以基于TCP/IP或fastRPC;传递给通信链路的实现，以提供在信道上接收消息的回调。 
+uORBDevices.hpp : 
+uORBDevices_nuttx.cpp : 节点操作，close,open,read,write 
+uORBDevices_nuttx.hpp : 
+uORBDevices_posix.cpp : 
+uORBDevices_posix.hpp : 
+uORBMain.cpp : uORB入口 
+uORBManager.hpp : uORB功能函数实现头文件 
+uORBManager_nuttx.cpp : uORB功能函数实现(Nuttx) 
+uORBManager_posix.cpp : uORB功能函数实现(Posix) 
+uORBTest_UnitTest.cpp : uORB测试 
+uORBTest_UnitTest.hpp : uORB测试头文件，包括主题定义和声明等 
+uORBUtiles.cpp : 
+uORBUtiles.hpp :
+
+###############################################
+3 常用函数功能解析
+uORBManager.hpp : uORB功能函数实现头文件 内
+###############################################
+
+###############################################
+int poll(struct pollfd fds[], nfds_t nfds, int timeout)
+功能：监控文件描述符（多个）；
+说明：timemout=0,poll()函数立即返回而不阻塞；timeout=INFTIM(-1),poll()会一直阻塞下去，直到检测到return > 0；
+参数：
+    fds:struct pollfd结构类型的数组；
+    nfds:用于标记数组struct pollfd结构类型的数组；
+    timeout:是poll函数调用阻塞的时间，单位：毫秒；
+返回值：
+    >0：数组fds中准备好读、写或出错状态的那些socket描述符的总数量；
+    ==0:poll()函数会阻塞timeout所指定的毫秒时间长度之后返回;
+    -1:poll函数调用失败；同时会自动设置全局变量errno；
+	
+###############################################	
+int orb_subscribe(const struct orb_metadata *meta)
+功能：订阅主题（topic）;
+说明：即使订阅的主题没有被公告，但是也能订阅成功；但是在这种情况下，却得不到数据，直到主题被公告；
+参数：
+    meta:uORB元对象，可以认为是主题id，一般是通过ORB_ID(主题名)来赋值；
+返回值：
+    错误则返回ERROR;成功则返回一个可以读取数据、更新话题的句柄；如果待订阅的主题没有定义或声明则会返回-1，然后会将errno赋值为ENOENT;
+eg:
+    int fd = orb_subscribe(ORB_ID(topicName));
+
+###############################################
+int orb_copy(const struct orb_metadata *meta, int handle, void *buffer)
+功能：从订阅的主题中获取数据并将数据保存到buffer中；
+参数：
+    meta:uORB元对象，可以认为是主题id，一般是通过ORB_ID(主题名)来赋值;
+    handle:订阅主题返回的句柄；
+    buffer:从主题中获取的数据；
+返回值：
+    返回OK表示获取数据成功，错误返回ERROR;否则则有根据的去设置errno;
+eg:
+    struct sensor_combined_s raw;
+    orb_copy(ORB_ID(sensor_combined), sensor_sub_fd, &raw);
+
+###############################################
+orb_advert_t orb_advertise(const struct orb_metadata *meta, const void *data)
+功能：公告发布者的主题；
+说明：在发布主题之前是必须的；否则订阅者虽然能订阅，但是得不到数据；
+参数：
+    meta:uORB元对象，可以认为是主题id，一般是通过ORB_ID(主题名)来赋值;
+    data:指向一个已被初始化，发布者要发布的数据存储变量的指针；
+返回值：错误则返回ERROR;成功则返回一个可以发布主题的句柄；如果待发布的主题没有定义或声明则会返回-1，然后会将errno赋值为ENOENT;
+eg:
+    struct vehicle_attitude_s att; //定义一个 与话题 相符合的 数据类型变量 
+    memset(&att, 0, sizeof(att));  // 初始化为 0
+    int att_pub_fd = orb_advertise(ORB_ID(vehicle_attitude), &att);
+
+###############################################	
+int orb_publish(const struct orb_metadata *meta, orb_advert_t handle, const void *data)
+功能：发布新数据到主题；
+参数：
+    meta:uORB元对象，可以认为是主题id，一般是通过ORB_ID(主题名)来赋值;
+    handle:orb_advertise函数返回的句柄；
+    data:指向待发布数据的指针；
+返回值：OK表示成功；错误返回ERROR；否则则有根据的去设置errno;
+eg: 
+              发布前需要 传入消息内容 
+				att.q[0] = raw.accelerometer_m_s2[0];
+				att.q[1] = raw.accelerometer_m_s2[1];
+				att.q[2] = raw.accelerometer_m_s2[2];
+    orb_publish(ORB_ID(vehicle_attitude), att_pub_fd, &att);
+
+	
+###############################################		
+int orb_set_interval(int handle, unsigned interval)
+功能：设置订阅的最小时间间隔；
+说明：如果设置了，则在这间隔内发布的数据将订阅不到；需要注意的是，设置后，第一次的数据订阅还是由起初设置的频率来获取，
+参数：
+    handle:orb_subscribe函数返回的句柄；
+    interval:间隔时间，单位ms;
+返回值：OK表示成功；错误返回ERROR；否则则有根据的去设置errno;
+eg:
+    orb_set_interval(sensor_sub_fd, 1000);
+	
+###############################################		
+orb_advert_t orb_advertise_multi(const struct orb_metadata *meta, const void *data, int *instance, int priority)
+功能：设备/驱动器的多个实例实现公告，利用此函数可以注册多个类似的驱动程序；
+说明：例如在飞行器中有多个相同的传感器，那他们的数据类型则类似，不必要注册几个不同的话题；
+参数：
+    meta:uORB元对象，可以认为是主题id，一般是通过ORB_ID(主题名)来赋值;
+    data:指向一个已被初始化，发布者要发布的数据存储变量的指针；
+    instance:整型指针，指向实例的ID（从0开始）；
+    priority:实例的优先级。如果用户订阅多个实例，优先级的设定可以使用户使用优先级高的最优数据源；
+返回值：
+    错误则返回ERROR;成功则返回一个可以发布主题的句柄；如果待发布的主题没有定义或声明则会返回-1，然后会将errno赋值为ENOENT;
+eg:
+    struct orb_test t;
+    t.val = 0;
+    int instance0;
+    orb_advert_t pfd0 = orb_advertise_multi(ORB_ID(orb_multitest), &t, &instance0, ORB_PRIO_MAX);
+	
+###############################################		
+int orb_subscribe_multi(const struct orb_metadata *meta, unsigned instance)
+功能：订阅主题（topic）;
+说明：通过实例的ID索引来确定是主题的哪个实例；
+参数：
+    meta:uORB元对象，可以认为是主题id，一般是通过ORB_ID(主题名)来赋值;
+    instance:主题实例ID;实例ID=0与orb_subscribe()实现相同；
+返回值：
+    错误则返回ERROR;成功则返回一个可以读取数据、更新话题的句柄；如果待订阅的主题没有定义或声明则会返回-1，然后会将errno赋值为ENOENT;
+eg:
+    int sfd1 = orb_subscribe_multi(ORB_ID(orb_multitest), 1);
+	
+###############################################		
+int orb_unsubscribe(int handle)
+功能：取消订阅主题；
+参数：
+    handle:主题句柄；
+返回值：
+    OK表示成功；错误返回ERROR;否则则有根据的去设置errno;
+eg:
+    ret = orb_unsubscribe(handle);
+	
+###############################################		
+int orb_check(int handle, bool *updated)
+功能：订阅者可以用来检查一个主题在发布者上一次更新数据后，有没有订阅者调用过ob_copy来接收、处理过；
+说明：如果主题在在被公告前就有人订阅，那么这个API将返回“not-updated”直到主题被公告。可以不用poll，只用这个函数实现数据的获取。
+参数：
+    handle:主题句柄；
+    updated:如果当最后一次更新的数据被获取了，检测到并设置updated为ture;
+返回值：
+    OK表示检测成功；错误返回ERROR;否则则有根据的去设置errno;
+eg:
+    if (PX4_OK != orb_check(sfd, &updated)) {
+        return printf("check(1) failed");
+    }
+    if (updated) {
+        return printf("spurious updated flag");
+    }
+
+    //or
+
+    bool updated;
+    struct random_integer_data rd;
+
+    /* check to see whether the topic has updated since the last time we read it */
+    orb_check(topic_handle, &updated);
+
+    if (updated) {
+        /* make a local copy of the updated data structure */
+        orb_copy(ORB_ID(random_integer), topic_handle, &rd);
+        printf("Random integer is now %d\n", rd.r);
+    }
+	
+	
+###############################################		
+int orb_stat(int handle, uint64_t *time)
+功能：订阅者可以用来检查一个主题最后的发布时间；
+参数：
+    handle:主题句柄；
+    time:存放主题最后发布的时间；0表示该主题没有发布或公告；
+返回值：
+    OK表示检测成功；错误返回ERROR;否则则有根据的去设置errno;
+eg:
+    ret = orb_stat(handle,time);
+		
+###############################################		
+int orb_exists(const struct orb_metadata *meta, int instance)
+功能：检测一个主题是否存在；
+参数：
+    meta:uORB元对象，可以认为是主题id，一般是通过ORB_ID(主题名)来赋值;
+    instance:ORB 实例ID;
+返回值：
+    OK表示检测成功；错误返回ERROR;否则则有根据的去设置errno;
+eg:
+    ret = orb_exists(ORB_ID(vehicle_attitude),0);
+	
+###############################################		
+int orb_priority(int handle, int *priority)
+功能：获取主题优先级别；
+参数：
+    handle:主题句柄；
+    priority:存放获取的优先级别；
+返回值：
+    OK表示检测成功；错误返回ERROR;否则则有根据的去设置errno;
+eg:
+    ret = orb_priority(handle,&priority);
+
+	
+	
+	
+###############################################
+4 例程
+###############################################
+
+添加一个新的模块
+在Firmware/src/modules中添加一个新的文件夹，命名为px4_simple_app
+在px4_simple_app文件夹中创建module.mk文件，(已更新为 makefile文件)并输入以下内容： 
+MODULE_COMMAND = px4_simple_app
+SRCS = px4_simple_app.c
+在px4_simple_app文件夹中创建px4_simple_app.c文件
+
+
+/**
+ * @file px4_simple_app.c
+ * Minimal application example for PX4 autopilot.
+ */
+
+#include <nuttx/config.h>
+#include <stdio.h>
+#include <errno.h>
+
+__EXPORT int px4_simple_app_main(int argc, char *argv[]);
+
+int px4_simple_app_main(int argc, char *argv[])
+{
+    printf("Hello Sky!\n");
+    return OK;
+}
+
+注册新添加的应用到NuttShell中，并编译上传 
+
+Firmware/makefiles/config_px4fmu-v2_default.mk文件中添加如下内容： 
+MODULES += modules/px4_simple_app
+
+已更新为 
+Pixhawk v1/2: Firmware/cmake/configs/nuttx_px4fmu-v2_default.cmake
+Pixracer: Firmware/cmake/configs/nuttx_px4fmu-v4_default.cmake
+在你的应用程序的下面的文件中添加一行：
+examples/px4_simple_app
+
+编译 
+make clean
+make px4fmu-v2_default
+上传到板子中 
+make upload px4fmu-v2_default
+在QGC 中的Terminal(终端)中运行新应用 
+nsh > px4_simple_app
+?接下来的代码修改均是基于此应用。
+
+
+###############################################
+4.2 订阅主题
+?sensor_combined主题是官方提供的通用接口标准主题。
+/**
+ * @file px4_simple_app.c
+ * Minimal application example for PX4 autopilot
+ */
+
+#include <nuttx/config.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <poll.h>
+
+#include <uORB/uORB.h>
+#include <uORB/topics/sensor_combined.h>
+
+__EXPORT int px4_simple_app_main(int argc, char *argv[]);
+
+int px4_simple_app_main(int argc, char *argv[])
+{
+    printf("Hello Sky!\n");
+
+    /*订阅sensor_combined 主题*/
+    int sensor_sub_fd = orb_subscribe(ORB_ID(sensor_combined));
+
+     /*一个应用可以等待多个主题，在这里只等待一个主题*/
+    struct pollfd fds[] = {
+        { .fd = sensor_sub_fd,   .events = POLLIN },
+        /* 这里可以添加更多的文件描述符；
+         * { .fd = other_sub_fd,   .events = POLLIN },
+         */
+    };
+
+    int error_counter = 0;
+
+    while (true) {
+        /*poll函数调用阻塞的时间为1s*/
+        int poll_ret = poll(fds, 1, 1000);
+
+        /*处理poll返回的结果 */
+        if (poll_ret == 0) {
+            /* 这表示时间溢出了，在1s内没有获取到发布者的数据 */
+            printf("[px4_simple_app] Got no data within a second\n");
+        } else if (poll_ret < 0) {
+            /* 出现问题 */
+            if (error_counter < 10 || error_counter % 50 == 0) {
+                /* use a counter to prevent flooding (and slowing us down) */
+                printf("[px4_simple_app] ERROR return value from poll(): %d\n"
+                    , poll_ret);
+            }
+            error_counter++;
+        } else {
+
+            if (fds[0].revents & POLLIN) {
+                /*从文件描述符中获取订阅的数据*/
+                struct sensor_combined_s raw;
+                /* copy sensors raw data into local buffer */
+                orb_copy(ORB_ID(sensor_combined), sensor_sub_fd, &raw);
+                printf("[px4_simple_app] Accelerometer:\t%8.4f\t%8.4f\t%8.4f\n",
+                    (double)raw.accelerometer_m_s2[0],
+                    (double)raw.accelerometer_m_s2[1],
+                    (double)raw.accelerometer_m_s2[2]);
+            }
+            /* 如果有更多的文件描述符，可以这样：
+             * if (fds[1..n].revents & POLLIN) {}
+             */
+        }
+    }
+
+    return 0;
+}
+
+测试需要在QGC终端启动uORB和初始化该传感器，最后运行应用：
+    nsh > uorb start
+    nsh > sh /etc/init.d/rc.sensors
+    nsh > px4_simple_app &
+
+	
+###############################################	
+4.3 订阅和发布主题
+?sensor_combined主题是官方提供的通用接口标准主题。 
+?vehicle_attitude主题是官方提供的通用接口标准主题。	
+
+
+/**
+ * @file px4_simple_app.c
+ * Minimal application example for PX4 autopilot
+ */
+
+#include <nuttx/config.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <poll.h>
+
+#include <uORB/uORB.h>
+#include <uORB/topics/sensor_combined.h>
+#include <uORB/topics/vehicle_attitude.h>
+
+__EXPORT int px4_simple_app_main(int argc, char *argv[]);
+
+int px4_simple_app_main(int argc, char *argv[])
+{
+    printf("Hello Sky!\n");
+
+    /* 订阅 sensor_combined 主题 */
+    int sensor_sub_fd = orb_subscribe(ORB_ID(sensor_combined));
+    orb_set_interval(sensor_sub_fd, 1000);
+
+    /* 公告 attitude 主题 */
+    struct vehicle_attitude_s att;
+    memset(&att, 0, sizeof(att));
+    int att_pub_fd = orb_advertise(ORB_ID(vehicle_attitude), &att);
+
+    /*一个应用可以等待多个主题，在这里只等待一个主题*/
+    struct pollfd fds[] = {
+        { .fd = sensor_sub_fd,   .events = POLLIN },
+        /* there could be more file descriptors here, in the form like:
+         * { .fd = other_sub_fd,   .events = POLLIN },
+         */
+    };
+
+    int error_counter = 0;
+
+    while (true) {
+        /* wait for sensor update of 1 file descriptor for 1000 ms (1 second) */
+        int poll_ret = poll(fds, 1, 1000);
+
+        /* handle the poll result */
+        if (poll_ret == 0) {
+            /* this means none of our providers is giving us data */
+            printf("[px4_simple_app] Got no data within a second\n");
+        } else if (poll_ret < 0) {
+            /* this is seriously bad - should be an emergency */
+            if (error_counter < 10 || error_counter % 50 == 0) {
+                /* use a counter to prevent flooding (and slowing us down) */
+                printf("[px4_simple_app] ERROR return value from poll(): %d\n"
+                    , poll_ret);
+            }
+            error_counter++;
+        } else {
+
+            if (fds[0].revents & POLLIN) {
+                /* obtained data for the first file descriptor */
+                struct sensor_combined_s raw;
+                /* copy sensors raw data into local buffer */
+                orb_copy(ORB_ID(sensor_combined), sensor_sub_fd, &raw);
+                printf("[px4_simple_app] Accelerometer:\t%8.4f\t%8.4f\t%8.4f\n",
+                    (double)raw.accelerometer_m_s2[0],
+                    (double)raw.accelerometer_m_s2[1],
+                    (double)raw.accelerometer_m_s2[2]);
+
+                /* 赋值 att 并且发布这些数据给其他的应用 */
+                att.roll = raw.accelerometer_m_s2[0];
+                att.pitch = raw.accelerometer_m_s2[1];
+                att.yaw = raw.accelerometer_m_s2[2];
+                orb_publish(ORB_ID(vehicle_attitude), att_pub_fd, &att);
+            }
+            /* there could be more file descriptors here, in the form like:
+             * if (fds[1..n].revents & POLLIN) {}
+             */
+        }
+    }
+
+    return 0;
+}
+
+运行程序
+    nsh > uorb start
+    nsh > sh /etc/init.d/rc.sensors
+    nsh > px4_simple_app 
+
+	
+###############################################
+五 、 添加新的自己的主题(topic)
+####################################################
+官方提供的通用接口标准主题都放在了topics文件夹下了。如果要定义我们自己的主题，
+比如我们新添加了超声波传感器，为了将超声波传感器的数据发布出去给其他需要的应用订阅，
+那么就需要创建我们的主题了。
+
+要想增加新的topic，你需要在msg/目录下创建一个新的.msg 文件
+并在msg/CMakeLists.txt下添加该文件。这样C/C++编译器自动在程序中添相应的代码 编译一些定义话题头文件 存到 uORB/topics/topic_name.h  下。
+     
+自动产生的文件类似一下形式：
+ 
+ 主题头文件（mytopic.h） 
+ORB_DECLARE(myTopicName);//声明一个主题
+定义一个存放发布数据的结构体；
+
+主题源文件（mytopic.c） 
+ORB_DEFINE(myTopicName);//定义一个主题
+初始化发布数据
+公告主题
+发布主题数据
+
+#######################################
+mytopic.h
+/* 声明自定义主题，名字可以自定义，不过最好具有一定的意义，如下为随机产生整数数据 */
+ORB_DECLARE(random_integer);
+
+/* 定义要发布的数据结构体 */
+struct random_integer_data {
+    int r;
+};
+
+################################
+mytopic_publish.c
+#include <topic.h>
+/* 定义主题 */
+ORB_DEFINE(random_integer);
+
+/* 待发布的主题句柄 */
+static int topic_handle;
+
+// 初始化发布数据  公告主题
+int init()
+{
+    /* 随机产生一个数初始化数据结构体 */
+    struct random_integer_data rd = { .r = random(), };
+
+    /* 公告主题 */
+    topic_handle = orb_advertise(ORB_ID(random_integer), &rd);
+}
+// 发布主题数据
+int update_topic()
+{
+    /* 产生新的数据 */
+    struct random_integer_data rd = { .r = random(), };
+
+    /* 发布主题，更新数据 */
+    orb_publish(ORB_ID(random_integer), topic_handle, &rd);
+}
+
+###########################################################################
+对于订阅者来说，就可以参考主题「4.2 订阅例程」了。不过这里还是提供下简单处理例程：
+
+mytopic_subscriber.c
+
+#include <topic.h>
+
+/* 订阅主题的句柄*/
+static int topic_handle;
+
+int init()
+{
+    /* 订阅主题 */
+    topic_handle = orb_subscribe(ORB_ID(random_integer));
+}
+
+void check_topic()
+{
+    bool updated;
+    struct random_integer_data rd;
+
+    /* check to see whether the topic has updated since the last time we read it */
+    orb_check(topic_handle, &updated);
+
+    if (updated) {
+        /* make a local copy of the updated data structure */
+        orb_copy(ORB_ID(random_integer), topic_handle, &rd);
+        printf("Random integer is now %d\n", rd.r);
+    }
+}
+
+
+
+
+<uORB/topics/sensor_combined.h> 
+可以先看看现有的msg文件了解下都支持那些类型。一个消息也可以嵌套在其他消息当中。
+
+每一个生成的C/C++结构体中，会多出一个uint64_t timestamp 字段（时间戳）。这个变量用于将消息记录到日志当中。
+
+
+为了在代码中使用"topic"需要添加头文件:
+#include <uORB/topics/topic_name.h>
+
+
+首先需要在文件.msg中，通过添加类似如下的一行代码,一个消息定义就可以用于多个独立的主题.
+# TOPICS mission offboard_mission onboard_mission
+
+【按】这里这一步将产生三个主题ID- mission、 offboard_mission 、以及 onboard_mission (第一个ID务必与.msg文件名相同)
+
+
+然后在代码中, 把它们作为主题ID用:ORB_ID(offboard_mission).
+
+
+示例  sensor_combined.msg
+
+#
+# Sensor readings in SI-unit form.
+#
+# These fields are scaled and offset-compensated where possible and do not
+# change with board revisions and sensor updates.
+#
+
+int32 RELATIVE_TIMESTAMP_INVALID = 2147483647 # (0x7fffffff) If one of the relative timestamps is set to this value, it means the associated sensor values are invalid
+
+# 时间戳可用于判断 消息是否更新
+# gyro timstamp is equal to the timestamp of the message -> timstamp(默认每个话题消息 都有的自身的时间戳)
+float32[3] gyro_rad			# 陀螺仪数据 角速度average angular rate measured in the XYZ body frame in rad/s over the last gyro sampling period
+float32 gyro_integral_dt	# 角速度采样周期  gyro measurement sampling period in s
+
+int32 accelerometer_timestamp_relative	# 时间戳 timestamp + accelerometer_timestamp_relative = Accelerometer timestamp
+float32[3] accelerometer_m_s2		# 加速度数据 average value acceleration measured in the XYZ body frame in m/s/s over the last accelerometer sampling period
+float32 accelerometer_integral_dt	# 加速度采样周期 accelerometer measurement sampling period in s
+
+int32 magnetometer_timestamp_relative	# 时间戳timestamp + magnetometer_timestamp_relative = Magnetometer timestamp
+float32[3] magnetometer_ga		# 磁力计消息 Magnetic field in NED body frame, in Gauss
+
+int32 baro_timestamp_relative		# 气压计timestamp + baro_timestamp_relative = Barometer timestamp
+float32 baro_alt_meter			# 海拔高度数据 Altitude, already temp. comp.
+float32 baro_temp_celcius		# 温度数据     Temperature in degrees celsius
+
+
+
+
+示例2  safety.msg
+
+类型 ：  消息类型
+bool safety_switch_available		# Set to true if a safety switch is connected
+bool safety_off			            # Set to true if safety is off
+
+
+示例3  sensor_accel.msg
+
+uint64 integral_dt  	# integration time
+uint64 error_count
+float32 x		# acceleration in the NED X board axis in m/s^2
+float32 y		# acceleration in the NED Y board axis in m/s^2
+float32 z		# acceleration in the NED Z board axis in m/s^2
+float32 x_integral	# velocity in the NED X board axis in m/s over the integration time frame
+float32 y_integral	# velocity in the NED Y board axis in m/s over the integration time frame
+float32 z_integral	# velocity in the NED Z board axis in m/s over the integration time frame
+float32 temperature	# temperature in degrees celsius
+float32 range_m_s2	# range in m/s^2 (+- this value)
+float32 scaling
+
+int16 x_raw
+int16 y_raw
+int16 z_raw
+int16 temperature_raw
+
+uint32 device_id	# unique device ID for the sensor that does not change between power cycles
+
+
+
+##################################
+二、发布话题
+#####################################
+
+ 在系统的任何地方都可以发布（public）一个话题（topic）, 包括在中断上下文中(被hrt_call接口调用的函数). 
+ 但是, 公告/订阅(advertise)一个话题（topic）仅限于在中断上下文之外.
+ 
+orb_advertise() 发布话题
+
+一个话题（topic）只能由同一个进程进行公告/订阅(subscriber), 并作为其之后的发布(publish).
+ 
+ orb_subscribe() 默认 订阅 话题  的 第一个实例
+ 
+ 
+##################################
+三、查看话题  监听话题
+#####################################
+
+ 列出所有主题并进行监听
+
+接收者(listener)命令仅在Pixracer（FMUv4）以及Linux/OS X上可用。
+
+要列出所有话题（topic）, 先列出文件句柄:
+ls /obj                                           //  rostopic  list
+要 列出一个主题中的5个消息, 执行以下监听命令:
+listener sensor_accel 5                           //  rostopic  echo topic_name     rostopic  info topic_name
+
+listener topic_name  num_of_times
+
+得到的输出就是关于该主题的n次内容:
+TOPIC: sensor_accel #3
+timestamp: 84978861
+integral_dt: 4044
+error_count: 0
+x: -1
+y: 2
+z: 100
+x_integral: -0
+y_integral: 0
+z_integral: 0
+temperature: 46
+range_m_s2: 78
+scaling: 0
+
+TOPIC: sensor_accel #4
+timestamp: 85010833
+integral_dt: 3980
+error_count: 0
+x: -1
+y: 2
+z: 100
+x_integral: -0
+y_integral: 0
+z_integral: 0
+temperature: 46
+range_m_s2: 78
+scaling: 0
+ 
+ 
+ ##################################
+四、列出所有话题  实时  
+#####################################
+命令：
+ uorb top
+
+ 更新周期     话题总数
+update: 1s, num topics: 77
+
+ 话题名 multi-instance index 索引(INST) 订阅者数量（SUB, number of subscribers）   
+                                           发布频率，publishing frequency in Hz
+										         丢失的消息数量，LOST  number of lost messages (all subscribers combined)
+												       话题发布的队列大小（缓冲区） queue size 
+TOPIC NAME                        INST #SUB #MSG #LOST #QSIZE
+actuator_armed                       0    6    4     0 1
+actuator_controls_0                  0    7  242  1044 1
+battery_status                       0    6  500  2694 1
+commander_state                      0    1   98    89 1
+control_state                        0    4  242   433 1
+ekf2_innovations                     0    1  242   223 1
+ekf2_timestamps                      0    1  242    23 1
+estimator_status                     0    3  242   488 1
+mc_att_ctrl_status                   0    0  242     0 1
+sensor_accel                         0    1  242     0 1
+sensor_accel                         1    1  249    43 1
+sensor_baro                          0    1   42     0 1
+sensor_combined                      0    6  242   636 1
+
+
+话题 多发布实例机制 应对  多相同传感器（） 消息不会混合在一起
+
+Multi-instance   多实例？？  发布同一主题 的 多实例（备份的概念 鲁棒性  还有相同 类型传感器  发布到同一个话题  但是不同实例） 独立 机制    
+
+使用  orb_advertise_multi()  广播/多实例话题 发布 API。
+              uORB provides a mechanism to publish multiple independent instances of the same topic through orb_advertise_multi.
+			  
+它将向发布者返回一个实例索引。   It will return an instance index to the publisher.
+订阅者 可以 通过 API  orb_subscribe_multi()   来指定  订阅 一个特定的 实例
+
+
+   orb_advertise_multi()  //广播/发布  多实例话题
+   orb_subscribe_multi()  // 订阅话题的 特定的 一个实例 话题     orb_subscribe() 默认 订阅 话题  的 第一个实例
+			  
+
+			  
+函数具体调用形式：   			  
+src/modules/uORB/uORBManager.hpp.
+
+
+
+故障排除和常见故障
+     Troubleshooting and common Pitfalls
+
+    1 发布不了 话题    确保每个调用的ORB_ID() 的匹配。 同样重要的是，orb_subscribe和orb_unsubscribe是从与orb_publish相同的任务调用的
+	       这适用于px4_task_spawn_cmd()，但也适用于使用工作队列（work_queue()）。
+		   
+	2 确保清理：使用orb_unsubscribe()  和  orb_unadvertise()  。
+	
+    3 一个成功的   orb_check()  或px4_poll()  调用需要一个orb_copy() ，否则下一个轮询将立即返回。
+	
+	4 在任何节点 （进程）发布话题 orb_publish() 之前，请 调用 orb_subscribe()  。
+	
+	5 对于在orb_subscribe()  之后完成的发布orb_publish()，orb_check() 和 px4_poll() 将返回true。
+	  这对于没有定期发布的主题很重要。
+	  如果订阅者 需要先前的数据，则应该在orb_subscribe() 之后立即执行 无条件的 orb_copy()
+	  
+	  （请注意，如果没有 发布者，则orb_copy()  将失败）。
+	  
+	  
+	

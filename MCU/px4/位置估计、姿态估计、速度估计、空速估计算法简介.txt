@@ -1,0 +1,231 @@
+0、 概述
+
+名词解释
+
+1、陀螺仪
+陀螺仪，测量角速度，具有高动态特性，它是一个间接测量角度的器件。
+它测量的是角度的导数，即角速度，要将角速度对时间积分才能得到角度。
+由于噪声等误差影响，在积分作用下不断积累，最终导致陀螺仪的低频干扰和漂移。
+
+
+2、加速度计
+输出当前加速度（包含重力加速度 g）的方向【也叫重力感应器】，在悬停时，输出为 g。
+由其测量原理导致的高频信号敏感，使得加速度计在振动环境中高频干扰较大。
+
+3、磁力计
+输出为当前机体与地磁场的夹角。测量原理与指南针相似。低频特性较好，易受周围磁场干扰。 
+磁力计的工作原理参考：WalkAnt的博客
+
+4、坐标系
+导航坐标系：在多旋翼中，又叫地球坐标系、地理坐标系。通常，采用北东地（NED）构成坐标系的 X,Y,Z 轴。
+机体坐标系 ：固联在多旋翼飞行器上，即，坐标系原点定位于飞行器中心点（假设中心点与重心点重合）。
+关于航空导航用到的坐标系，请参考 AIAA 系列丛书。在多旋翼中，因为只在低空飞行，且时间较短，只需要以上两个。
+
+
+5、姿态表示
+欧拉角 ：较直观，描述刚体在三维欧式空间中的姿态。此时，坐标系为机体坐标系，随着刚体的旋转而旋转。缺点：万向节锁。 
+四元数：由一组四维向量，表示刚体的三维旋转。适合用于计算机计算。 
+方向余弦矩阵DCM：用欧拉角余弦值或四元数，表示的坐标系的旋转。
+
+6、mahony 滤波原理
+互补滤波要求两个信号的干扰噪声处在不同的频率，通过设置两个滤波器的截止频率，确保融合后的信号能够覆盖需求频率。 
+在 IMU 的姿态估计中，互补滤波器对陀螺仪（低频噪声）使用高通滤波；对加速度/磁力计（高频噪声）使用低频滤波。 
+（此处尚未对传感器数据实测，噪声和有用频率未知。。。。待后期补足）
+
+互补滤波中，两个滤波器的截止频率一致，此时就需要根据有用频率的值对其进行取舍。
+机体水平时，加速度计无法测量绕 Z 轴的旋转量，即偏航角。磁力计也有同样问题，无法测得要磁轴的旋转量。
+故，需要加速度计和磁力计同时对陀螺仪进行校正。
+
+
+
+几种位置估计:
+
+#######################一##################################
+INAV position estimator【组合导航位置估计器 integrated navigation】 
+The INAV position estimator is a complementary filter for 3D position and velocity states.
+互补滤波器  对于三维空间位置 和 速度 状态
+\Firmware\src\modules\position_estimator_inav  源码位置
+\Firmware\msg\distance_sensor.msg   测距传感器消息 雷达 超声 红外
+
+# DISTANCE_SENSOR message data
+float32 min_distance		# 分辨率 最小极限   Minimum distance the sensor can measure (in m)
+float32 max_distance		# 最大极限          Maximum distance the sensor can measure (in m)
+float32 current_distance	# 当前的距离        Current distance reading (in m)
+float32 covariance		    # 测量方差          Measurement covariance (in m), 0 for unknown / invalid readings
+
+uint8 type			        # Type from MAV_DISTANCE_SENSOR enum
+uint8 MAV_DISTANCE_SENSOR_LASER = 0      # 激光雷达
+uint8 MAV_DISTANCE_SENSOR_ULTRASOUND = 1 # 超声
+uint8 MAV_DISTANCE_SENSOR_INFRARED = 2   # 红外
+uint8 MAV_DISTANCE_SENSOR_RADAR = 3      # 无线电 雷达
+
+uint8 id			    # Onboard ID of the sensor
+uint8 orientation		# Direction the sensor faces from MAV_SENSOR_ORIENTATION enum
+
+
+
+#######################二##################################
+LPE position estimator【本地位置估计器  Local position estimator】 
+The LPE position estimator is an extended kalman filter for 3D position and velocity states.
+扩展卡尔曼滤波器 对于三维空间位置 和 速度 状态
+
+
+
+
+
+
+#######################三##################################
+EKF2 attitude, position and wind states estimator 
+EKF2 is an extended kalman filter estimating attitude, 3D position / velocity and wind states.
+扩展卡尔曼滤波器 估计姿态(roll pich yaw) 、三维空间位置 / 速度 以及 空速状态
+
+
+
+
+
+#######################四##################################
+Q Estimator	 四元素互补滤波姿态解算滤波器
+   陀螺仪动态响应特性良好，但计算姿态时会产生累积误差。 
+   磁力计和加速度计测量姿态没有累积误差，但动态响应较差。因此他们在频域上特性互补，
+   所以采用互补滤波器融合这三种传感器的数据，提高测量精度和系统的动态性能。
+\Firmware\src\modules\attitude_estimator_q
+\Firmware\msg\vehicle_attitude.msg          xyz轴角速度 和 姿态四元素 
+
+# This is similar to the mavlink message ATTITUDE_QUATERNION, but for onboard use
+float32 rollspeed	# x轴角速度  Angular velocity about body north axis (x) in rad/s
+float32 pitchspeed	# y轴角速度  Angular velocity about body east axis (y) in rad/s
+float32 yawspeed	# z轴角速度  Angular velocity about body down axis (z) in rad/s
+float32[4] q		# 姿态四元素 Quaternion (NED)
+
+# TOPICS vehicle_attitude vehicle_attitude_groundtruth
+
+
+
+位置估计切换
+
+配置 SYS_MC_EST_GROUP：
+
+SYS_MC_EST_GROUP	Q Estimator	   INAV	  LPE 	EKF2
+0	                       1	    1		
+1	                       1		       1	
+2			                                  	 1
+
+
+组合导航位置估计器 INAV 原理
+
+预测函数：
+
+s += v*t+1/2 * a * t*t
+
+v += a*t
+校正部分：
+
+没看懂。。。。。 
+这部分应该是在用 二阶低通滤波 ，不过具体过程并没有推导出来，数学基础有待提升啊。。。
+
+【有兴趣的同学可以从二阶低通滤波的复频域形式进行推导】，也希望有思路的同学不吝赐教~~~
+另：
+
+主程序中，在最后也大量使用了这种滤波，对加速度偏差信息进行校正； 
+不过默认参数 INAV_W_XY_GPS_P=1，INAV_W_XY_GPS_V = 2，在滤波中位置信息权重很诡异；有待研究。
+
+发布信息
+
+orb_publish(ORB_ID(vehicle_local_position), vehicle_local_position_pub, &local_pos);
+
+orb_publish(ORB_ID(vehicle_global_position), vehicle_global_position_pub, &global_pos); 
+
+########################################################
+// inertial_filter.cpp
+#include "px4_defines.h"
+#include "inertial_filter.h"
+#include <cmath>
+
+// 惯性 滤波器  预测 牛顿第二定律
+/*
+输入参数：
+ dt：  估计 周期时间
+ x[0]：距离  位置 
+ x[1]：速度
+ acc： 加速度 
+*/ 
+void inertial_filter_predict(float dt, float x[2], float acc)
+{
+	if (PX4_ISFINITE(dt)) {
+		if (!PX4_ISFINITE(acc)) {
+			acc = 0.0f;//异常情况 加速度设置为 0 
+		}
+
+		x[0] += x[1] * dt + acc * dt * dt / 2.0f;  // s  = s +  v * t  + a * t * t 
+		x[1] += acc * dt;                          // v  = v + a * t 
+	}
+}
+
+
+// 惯性 滤波器  校正  二阶低通滤波
+/*
+输入参数：
+ e     误差  传感器更新误差 
+ dt：  估计 周期时间
+ x[0]：距离  位置 
+ x[1]：速度
+ i:    校正对象选择  
+ w：   权重 
+*/ 
+void inertial_filter_correct(float e, float dt, float x[2], int i, float w)
+{
+	if (PX4_ISFINITE(e) && PX4_ISFINITE(w) && PX4_ISFINITE(dt)) {
+		float ewdt = e * w * dt;
+		x[i] += ewdt; //低通滤波;
+
+		if (i == 0) { //若上面是 位置 校正，则同时进行 速度 校正；
+			x[1] += w * ewdt;
+		}
+	}
+}
+
+
+#######################################################
+position_estimator_inav_params.cpp
+
+#include "position_estimator_inav_params.h"
+PARAM_DEFINE_FLOAT(INAV_W_Z_BARO, 0.5f);//气压计 z轴 权重（截止频率） Z axis weight for barometer
+PARAM_DEFINE_FLOAT(INAV_W_Z_GPS_P, 0.005f);//GPS z轴 位置  权重（截止频率）
+PARAM_DEFINE_FLOAT(INAV_W_Z_GPS_V, 0.0f);//GPS z轴速度 权重（截止频率）
+PARAM_DEFINE_FLOAT(INAV_W_Z_VIS_P, 5.0f);//视觉 z轴 位置 权重（截止频率） Z axis weight for vision
+PARAM_DEFINE_FLOAT(INAV_W_Z_LIDAR, 3.0f);//lidar（激光雷达） z轴 权重（截止频率）
+PARAM_DEFINE_FLOAT(INAV_W_XY_GPS_P, 1.0f);// GPS xy轴位置 权重（截止频率） 
+PARAM_DEFINE_FLOAT(INAV_W_XY_GPS_V, 2.0f);//GPS xy轴速度 权重（截止频率）
+PARAM_DEFINE_FLOAT(INAV_W_XY_VIS_P, 7.0f);//视觉 xy轴位置 权重（截止频率）
+PARAM_DEFINE_FLOAT(INAV_W_XY_VIS_V, 0.0f);//视觉 xy轴速度 权重（截止频率）
+PARAM_DEFINE_FLOAT(INAV_W_MOC_P, 10.0f);//动作捕捉系统 位置 权重  motion capture
+PARAM_DEFINE_FLOAT(INAV_W_XY_FLOW, 0.8f);//光流 xy轴 权重 FLOW
+PARAM_DEFINE_FLOAT(INAV_W_XY_RES_V, 0.5f);// 速度重置 xy轴 权重  resetting velocity
+PARAM_DEFINE_FLOAT(INAV_W_GPS_FLOW, 0.1f);//启用光流时 GPS xy轴 权重因子
+PARAM_DEFINE_FLOAT(INAV_W_ACC_BIAS, 0.05f);// 加速度计 偏差估计 权重  0 to disable.
+PARAM_DEFINE_FLOAT(INAV_FLOW_K, 1.35f);//光流 缩放因子 Optical flow scale factor
+PARAM_DEFINE_FLOAT(INAV_FLOW_Q_MIN, 0.3f);// 光流质量 下限 Minimal acceptable optical flow quality
+PARAM_DEFINE_FLOAT(INAV_LIDAR_ERR, 0.2f);// 超声波 最大偏差；超过该阈值并稳定，则接受为新平面；【疑似与参数不匹配】
+PARAM_DEFINE_FLOAT(INAV_LAND_T, 3.0f);//着陆检测时间  Land detector time
+PARAM_DEFINE_FLOAT(INAV_LAND_DISP, 0.7f);// 着陆检测高度阈值 Land detector altitude dispersion threshold
+PARAM_DEFINE_FLOAT(INAV_LAND_THR, 0.2f);// 着陆检测 油门阈值  Land detector throttle threshold
+PARAM_DEFINE_FLOAT(INAV_DELAY_GPS, 0.2f);// GPS 延迟补偿  GPS delay compensation
+PARAM_DEFINE_FLOAT(INAV_FLOW_DIST_X, 0.0f);// 光流模块安装位置（x）偏差
+PARAM_DEFINE_FLOAT(INAV_FLOW_DIST_Y, 0.0f);//光流模块安装位置（y）偏差  Flow module offset (center of rotation) in Y direction
+PARAM_DEFINE_FLOAT(INAV_DISAB_MOCAP, 0);//禁用启用 动作捕捉
+PARAM_DEFINE_FLOAT(INAV_LIDAR_EST, 0);//激光雷达 lidar 高度估计  altitude estimation
+PARAM_DEFINE_FLOAT(INAV_LIDAR_OFF, 0.0f);// lidar 校准偏差  LIDAR calibration offset
+PARAM_DEFINE_INT32(CBRK_NO_VISION, 0);// 禁用视觉输入
+
+
+
+
+
+
+
+
+
+
+
+
+

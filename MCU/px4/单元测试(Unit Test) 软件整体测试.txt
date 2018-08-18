@@ -1,0 +1,572 @@
+测试是贯穿整个整个软件工程的始末，做好测试对软件的质量会有一个质的保证，减少查找BUG的工作量，
+所以作为一个开发者需要了解各种测试流程以及核心思想，
+然而这次的单元测试是我们开发者必须要具备的技能，
+这次就让我们走进单元测试(Unit Test)！
+
+　1.个人对单元测试的初识　　
+
+　　　　①坚持的开发中编写单元测试，并把它培养成一种习惯！
+
+　　　　②写出高效的单元测试，这种能力需要在实践中慢慢积累！
+
+　　　　③提高对单元测试的认识高度，把它和编码工作同等对待！
+
+ 
+
+　2.什么是单元测试？
+
+　　　　通俗讲单元测试就是检查一个函数执行后它的返回结果或者它对系统数据造成的影响(或者其它方面的影响)
+是否跟你的期望一致，也就是为了证明代码的行为和我期望的一致！
+
+
+3.我们为什么要使用单元测试？
+
+　　　　①最直接的原因是保证我们函数的正确性，如果这个函数在没有保证正确的情况下就被上层代码调用，
+          那么随着项目的深入，调用层次会越来越深，就很容易产生严重的BUG问题，从而增加开发难度，降低开发效率！
+　　　　②根本原因是减轻我们开发人员的工作量，使我们的工作变的轻松(这只是一个相对说法)！
+
+ 
+
+　4.单元测试的内涵
+
+　　　　如果把单元测试上升到一定程度后，它可以把我们的代码变的更加完美和简洁！
+
+ 
+
+　5.单元测试的本质
+
+　　　　请记住一点，不是为工作而编写单元测试，单元测试是方便我们开发人员的，可以使我们的工作变的轻松！
+　　　　单元测试可以减少我们花在解决不必要的BUG之上(并不是说没有BUG，而是说减少不必要的BUG)，而把大量时间专注于业务需求上！
+
+ 
+
+　6.函数的行为和预期的一致吗？
+
+　　　　如果测试只考虑在正确的环境下造成正确的影响，那么这样的单元测试是不及格的！
+　　　　做测试就要考虑全面，各个方面都要涉及的到，如：环境因素(也可以是系统所处在的环境)，
+各种异常，边界值等等，所以尽可能的考虑特殊情况，做到做到百密而无一疏(尽自己的最大努力达到)！
+
+ 　　
+
+　7.需要依赖单元测试吗？　　　　
+
+　　　　答案是肯定的！
+       　   当你很自信的认为你写的函数是绝对正确的且没有测试代码做为依据的时候
+	   往往会出现意想不到的错误，因为你会疏忽了其它的一些情况，
+	   所以编写单元测试来保证我们函数的准确性是非常有必要的！
+       　   注：后面会说明测试应该测哪些情况！
+
+　　
+
+ 　8.单元测试干了什么，作用是什么？
+　　　　①最直接的是保证了函数的正确性(这个大家都知道)！
+　　　  ②还有我们可以根据单元测试来判断此函数是用来干什么的，
+也就说单元测试类似于一个可执行文档，其它开发人员可以通过看单元测试就会明白你测试的函数是用来干嘛的！
+
+ 　　
+
+　9.如何进行单元测试？
+　　　　 这边我们使用的VS2008，2010自带的单元测试框架！ 　　　　
+ ①  使用VS自带的Unit Test，简单易学！
+ ②  测试要全面！
+ ③  保证所有测试都能通过，不管旧的还是新的测试代码，都要通过！
+ ④  保证所有测试没有对系统中任何模块产生影响(这个很重要)！
+ ⑤  及时运行测试代码，查看运行结果，保证系统的运行正常！
+
+　10.不要为没写测试代码找借口　　　　
+　　　一般情况的看来当你写的一个函数已经不太需要修改了，你就应该编写这个函数的单元测试代码！
+      大多数情况下开发人员的大量时间都是修改BUG，如果能尽早的做单元测试将会减轻你的工作量
+	  (虽然不可能没有BUG，但写Unit Test却对你是有益无害的)，即使在以后的时间里出现BUG，我想你能很快的定位产生BUG的位置！
+
+    最后写Unit Test千万不要放在项目末期，如果此时写单元测试的人还是一个刚进项目新手的话，
+	写单元测试就是扯淡，这样的方式是不能体现单元测试的核心观念的，而我就刚好处于这个状态，
+	真的很后怕，所以还需要多多加油，努力了解系统流程！
+
+ 
+
+　11.如果真的没有时间写单元测试，请思考下面几个问题？
+　　　　①对于你所编写的代码，你花在调试上面的时间有多少？
+　　　　②你目前认为你的代码正确无比，但很有可能在系统中却存在严重隐患，你是否花了很多时间来查找这些隐患？
+　　　　③对于一个新的BUG，你花了多长时间来定位这个BUG在源码中的位置？
+　　　   总结：随着项目的深入，你的函数会被调用的越来越深，那么特殊情况就会经常发生，
+万一出现什么情况你将会耗费很多的精力来解决它，另一方面，适当的单元测试代码会很大程度上减少你的工作量，这是经过实践检验的！
+
+
+
+走进单元测试二：测试需要从哪些方面着手
+
+　　前言
+　　笼统的来说测试条件无非就是两个方面：① 正向测试 ，② 反向测试！
+　　如果单从这两个方面来思考，肯定出现丢三落四的情况，也就是说不全面，所以应该在上面两种情况的基础上再进行具体划分，
+那么只要我们能够遵循这些条件基本上就能做到全面(如果能做到，大约80%的问题应该都解决了)，于是就出现了下面要说的六个方面内容！
+　　前辈们把这些测试条件总结为：Right – BICEP
+
+　1.Right - 做正确的事，可以说是“正向测试”
+　　　　这种测试前期任务是要准备足够的正确数据（前提是要保证数据的正确性，这个很重要），
+        运行代码后返回的值或产生的影响是要跟自己的预期是一致的！
+
+　　注意：如果准备的数据太大或容易丢失，建议把它放在数据文件中，然后让单元测试读取这个文件，这种方法会在下一篇会说到！
+
+ 
+
+　2.B - 边界条件(Boundary)
+　　　　边界条件是测试里面的重中之重，必须要有足够的认识和重视！
+　　　　而它又被分为七个方面的子条件，下面就让我们来一一熟悉它！
+
+　　　　①一致性(Conformance)
+　　　　　　数据是否符合我规定的格式（也可以说是非法字符吧）！
+　　　　　　案例：比如我传入的参数文件名需要的格式是：文件名 + 日期(yy-mm-dd) + 扩展名，
+            那么我就要写一个测试传入的文件名为 ：“sa#$#$#$#”这样的格式！
+
+　　　　②有序性(Ordering)
+　　　　　　这方面主要是对涉及到数组和集合的数据，而且对数据的顺序有严格要求的函数，需要对它们里面数据的顺序进行测试！
+　　　　　　比如：点菜系统菜谱中每道菜的顺序，或者去银行办理业务的排队系统等等！
+
+　　　　③范围，区间性(Range)
+　　　　　值是否存在于一个最大值和一个最小值之间，主要是对值类型的数据做的测试！
+　　　　　这里面还有一个重要的测试点是 → 对数组，集合，以及Table，DataSet中的索引值进行测试，
+          比如索引值不能为负，不能超出索引的范围等等情况！
+　　　　　比如：一个通过ID来搜索信息的函数，应该对这个ID进行最大值和最小值的测试！
+
+　　　　④引用，耦合性(Reference)
+　　　　　这方面主要是：代码是否引用了一些不受本身代码控制的外部因素(比如：调用第三方接口，调用其它模块的接口等等)！
+　　　　　对于这些情况我们是没有办法控制的，所以在测试的时候只能模拟，而在模拟时我们会用到“Mole”技术，
+          让它来帮助我们创建一个模拟环境(下一篇会介绍)！
+　　　　　比如：有的项目会调用银行接口，这种情况下只能先创造一个虚拟银行接口，然后再进行测试！
+
+　　　　⑤存在性(Exist)
+　　　　　　固定的测试，如Null，Empty，非零等等，这些都是必须考虑的！
+
+　　　　⑥基数性(Cardinality)
+　　　　　　对于这个测试说起来还是蛮难理解，这个测试只有在特定的场合下才会去考虑它！
+　　　　　　它遵循一个原则：“0-1-N”！ 　　　　　　
+
+　　　　⑦时间性(Timer)
+　　　　　　对时间比较有依赖的软件或系统应该在这个方面着重测试！
+　　　　　　主要考虑：事情是否按时间的顺序执行，是否在正确的时间执行，是否出现执行事情延误了！
+                  相对时间：网站超时，数据更新超时等等！
+                  绝对时间：不同的client间的时间是否同步！
+                  并发问题在时间性测试中比较重要！　　　
+
+　3.I - 反向关联(Inversion)　　　　　　
+　　　　在准备数据或者验证数据时的一种反向思维，涉及到个人的思维方式问题了！
+　　　　比如：有个函数对数据库进行了操作，但是它没任何返回值也没有任何提示，
+        如果你是对正确的数据进行了测试，那么你要怎么知道测试结果跟你的预期一致呢，
+        这里你就应该去查找数据库，看数据库里面的数据是否有真的改动，这就是一种反向的思维方式！
+
+
+　4.C - 交叉检查(Cross)
+　　　　用一种数量检查另一种数量(需要考虑的情况不是很多)！
+
+　5.E - 强制产生错误(Error)
+　　　　通过代码强制产生软件在运行过程中出现的特殊情况!
+　　　　可以参考下面几种测试方面：内存耗光，磁盘用满，断电，正在执行更新数据时出现断网现象，网络负载严重导致瘫痪，系统时间出现导致和国际时间不一致等等一些情况！
+
+
+　6.P - 性能特性(Property)
+
+　　　　性能测试工具的使用，没具体研究过性能测试工具，知道的朋友可以说下你们的经验！
+
+        进行压力测试，一点一点的加大数据量，10000条，100000条，1000000条这样进行压力测试！
+
+
+
+		
+1.好的单元测试应该具备的特点　　　　　　　　　　　　　　　　
+
+　　　　一个好的单元测试一定有它具备的特点，下面就来说说那些主要的特点！
+　　　　主要概括为 → A-TRIP原则：
+
+　　　　自动化　　→ Automatic
+　　　　彻底性　　→ Thorough
+　　　　可重复性   → Repeatable
+　　　　独立性　　→ Indepentdent
+　　　　专业性　　→ Professional
+
+　　　　恰到好处的单元测试会使你的工作轻松，代码整洁干净，乱用，没有准则的用会浪费你大量的时间，
+不但没有效果还会是工期延误，所有了解单元测试很重要！ 
+
+ 
+
+　　　　① 自动化
+　　　　　　a) 不需要人的参与，有的时候只是轻轻的点击一个按钮就能自动执行，所以自动化的标志是不能比点击一个按钮的过程还要复杂！
+　　　　　　b) 在签入其它的测试代码时不能对现有的代码造成影响！
+　　　　　　c) 能够自动识别测试是失败还是成功(VS2008以后的版本都集成了这个功能)！
+　　　　　　d) 在任何时候，任何地方都能自动运行(所以“Moles”技术就是关键)！
+
+　　　　　　核心：执行测试代码和检查测试结果都必须自动化(VS2008以后版本都实现这个功能了)！
+　　　 　　 总结：I，不要引入一个由于需要手动步骤而打破单元测试的自动化模型的测试！
+				  II，对于测试所需要的任何条件(大部分是数据库)都应该让它成为自动化测试的一部分，如果有需要可以使用Mole技术！
+
+　　　
+　　　　② 彻底性
+　　　　　　所谓的彻底性就是说你的测试案例必须要考虑的全面，应该把可能出现的问题都做成测试案例！
+　　　　　　具体从哪些方面着手，可以参数这篇：走进单元测试二：测试需要从哪些方面着手
+
+ 
+　　　　③ 可重复性
+　　　　　　a) 每个测试案例应该独立于所有的其它测试，而且必须独立于周围的(系统)环境！
+　　　　　　b) 测试代码能够一次又一次的运行，在不修改代码的前提下都能产生一样的结果，否则有BUG！
+　　　　　　c) 不要把测试代码写死，应该写的更加灵活一点，运用封装，重构等等的思想！
+　　　　　　d) 不要让测试本身也出现BUG，确保测试代码的正确性！
+
+ 
+
+　　　　④独立的
+　　　　　　a) 每个测试应该有很强的针对性，也就说一个测试只能测试一个方面的内容！
+　　　　　　b) 每个测试应该独立于环境(软件所处的系统环境)和其它测试！
+　　　　　　总结：I，每个测试都不能够依赖于其它测试，你可以在任何时间运行这个测试而不受其它测试的影响，
+                  每一个测试都应该是一座孤岛！
+　　　　　　　　　II，所以测试一个函数都有很多个测试方法，只有这样才是真正的测试！
+
+ 
+
+　　　　⑤专业的
+　　　　　　a) 所谓的专业就是你的测试代码应该跟你的开发代码保持一样的风格，如：简洁明了，封装，解耦，
+               不要出现“Hard Core”，要灵活一点！
+　　　　　　b) 拒绝编写冗余的测试代码，千万要小心不要掉进这个陷阱，因为像我们这样的新手在初期都不会注意到这样的问题，
+               所以我们要牢记在心里！
+　　　　　　c) 遵循普遍规则：1.维护封装 2.降低耦合！
+　　　　　　总结：不管怎么样你都应该认认真真的对待单元测试，代码的质量要求都应该跟开发代码同等水平，这是作为开发者必备的素质！
+
+ 
+
+　2.单元测试的命名规范　　　　　　　　　　　　　　　　　　　　
+　　　　在我们项目的中，可能需要测试的方法有成千上百个，而每一个测试方法都有可能写三个以上的测试案例，
+             那么怎么来维护这么测试案例呢？
+　　　　所以我们应该规范方法的命名方式，那么其他人在阅读你的测试代码时，直接通过方法名就能知道你的测试案例是测试哪个方面的了！
+　　　　Note：单元测试案例类似于一个可执行文档，可以帮助其它的开发人员了解方法的作用！
+　　　　在我们的项目中是这样规定的：方法名 + _ + 你测试是哪个方面的内容 + _ + 产生的结果！
+　　　　下面我就举个列子，下面的测试方法命名就是针对这个函数来命名的，如：　　　
+　　
+
+
+4.单元测试带给我的思考和感悟　　　　　　　　　　　　　　　　　　　　　
+
+　　　　①感悟
+　　　　　　说实话从一开始做单元测试的时候，我对它真的很鄙视，我觉得它的含金量很少，编写单元测试代码太枯燥了，
+         导致了那时候我的心态是多么的浮躁，以至于在思想方面出现了偏差，感兴趣的朋友可以看看这篇文章 → 工作的思考，是走还是留！
+　　　　　　经过一段时间的自我反省，也确实让我慢慢的走上了正轨，感兴趣的朋友可以看看 → 迷茫后的感悟！
+　　　　　　a) 做任何一件事都应该专心，戒骄戒躁，这是我深有体会的！
+　　　　　　b) 事无大小，不要认为你的事很无聊，很枯燥，很不值得一提，但是一旦你做好做精之后你就发现原来你不知道的还有这么多啊！
+　　　　　　c) 努力 + 学习方法 + 工作态度 → 是我这段时间感悟比较深的一件事！
+
+ 
+　　　　②思考
+　　　　　　前提：我们做的单元测试是在项目后期写，而且我对我负责的模块是一窍不通的(我是刚刚进这个项目组的)，业务流程根本不懂！
+　　　　　　在这样的前提下，每天先熟悉下流程，看一下代码，找带头大哥帮我讲解讲解，然后才开始写单元测试代码，由此我有了下面三点的思考：
+　　　　　　a) 单元测试不应该在后期做，应该在项目的开发时期去完成它，这个可能跟我们的项目本身有原因把！
+　　　　　　b) 对于找一个还不懂业务流程的人来做单元测试自我感觉是有点不合理的，至少会花费更多的时间来熟悉流程。然后再做单元测试！
+　　　　　　c) 项目过程中的代码编写习惯也是很重要的，这是我应该要加强和思考的，也是我需要培养的习惯！
+
+
+
+python  unittest  单元测试 
+
+
+单元测试作为任何语言的开发者都应该是必要的，因为时隔数月后再回来调试自己的复杂程序时，
+其实也是很崩溃的事情。虽然会很快熟悉内容，但是修改和调试将是一件痛苦的事情，
+如果你在修改了代码后出现问题的话，而单元测试可以帮助我们很快准确的定位到问题的位置，
+出现问题的模块和单元。所以这是一件很愉快的事情，因为我们知道其它修改或没有修改的地方仍然是正常工作的，
+而我们目前的唯一问题就是搞定眼前这个有点问题的“家伙”。所以工作会在轻松中开始，并且很快将会结束，因为你已经知道很多信息了。
+ 
+单元测试自然是对程序中最小的可测试模块--函数来进行测试；因为单元测试的对象是函数，
+也就是说你得被测试对象一定要有输出结果，哪怕就是异常输出，也得有输出，以便单元测试模块能够捕获返回值，
+并且与预期值进行比较，从而得出测试通过与否。
+ 
+ 
+单元测试的加载方式有2种：一种是通过unittest.main()来启动单元测试的测试模块；
+一种是添加到testsuite集合中再加载所有的被测试对象，而testsuit里存放的就是单元测试的用例，下面分别列出了2种方法的使用。
+
+
+1.1 测试模块中的函数：
+被测模块：  myclass.py
+#!/usr/bin/env python  
+#encoding: utf-8  
+      
+def sum( x, y):  
+        return x+y     
+def sub( x, y):  
+        return x-y   
+
+单元测试模块：
+mytest.py
+#!/usr/bin/env python  
+#encoding: utf-8  
+  
+import unittest  
+import myclass  
+  
+class mytest(unittest.TestCase):       
+    ##初始化工作  
+    def setUp(self):  
+        pass  
+		
+    #退出清理工作  
+    def tearDown(self):  
+        pass  
+      
+    #具体的测试用例，一定要以test开头  
+    def testsum(self):  
+        self.assertEqual(myclass.sum(1, 2), 2, 'test sum fail')                 
+    def testsub(self):  
+        self.assertEqual(myclass.sub(2, 1), 1, 'test sub fail')     
+                
+if __name__ =='__main__':  
+    unittest.main()  	
+	
+	测试结果：【F表示一个fail， F前的点表示一个通过，有E的话表示程序自身异常】
+[python] view plain copy
+.F  
+======================================================================  
+FAIL: testsum (__main__.mytest)  
+----------------------------------------------------------------------  
+Traceback (most recent call last):  
+  File "C:\Users\xiaowu\workspace\mypython\unitTest.py", line 19, in testsum  
+    self.assertEqual(myclass.sum(1, 2), 2, 'test sum fail')  
+AssertionError: test sum fail  
+  
+----------------------------------------------------------------------  
+Ran 2 tests in 0.001s  
+FAILED (failures=1) 	
+		
+	
+	
+	
+	
+1.2 测试 模块类 中的函数：
+被测模块：
+myclass.py
+#!/usr/bin/env python  
+#encoding: utf-8  
+  
+class myclass:  
+    def __init__(self):  
+        pass       
+      
+    def sum(self, x, y):  
+        return x+y      
+      
+    def sub(self, x, y):  
+        return x-y   
+		
+单元测试模块：
+mytest.py
+
+#!/usr/bin/env python  
+#encoding: utf-8  
+  
+import unittest  
+import myclass  
+  
+class mytest(unittest.TestCase):  
+      
+    ##初始化工作  
+    def setUp(self):  
+        self.tclass = myclass.myclass()   ##实例化了被测试模块中的类  
+      
+    #退出清理工作  
+    def tearDown(self):  
+        pass  
+      
+    #具体的测试用例，一定要以test开头  
+    def testsum(self):  
+        self.assertEqual(self.tclass.sum(1, 2), 3)  #正确
+          
+          
+if __name__ =='__main__':  
+    unittest.main()  
+	
+	运行结果：
+[python] view plain copy
+.  
+----------------------------------------------------------------------  
+Ran 1 test in 0.000s  
+  
+OK 
+
+这种方式执行单个测试文件时使用-v参数可以获得更多的测试结果信息。如：mytest.py -v 
+
+2 加载测试套件
+好吧，在运用测试套件进行单元测试之前，我想还是稍微研究一下unittest模块的内容有哪些，
+其大概的运行方式是什么样的。而后在给出根据各种情况如何制定单元测试套件。
+首先，自然是查看unittest模块有哪些成员啦！
+
+>>import unittest  
+>>dir(unittest)  
+['FunctionTestCase', 'TestCase', 'TestLoader', 'TestProgram', 'TestResult', 'Tes  
+tSuite', 'TextTestRunner', '_CmpToKey', '_TextTestResult', '_WritelnDecorator',  
+'__all__', '__author__', '__builtins__', '__doc__', '__email__', '__file__', '__  
+metaclass__', '__name__', '__package__', '__unittest', '__version__', '_makeLoad  
+er', '_strclass', 'defaultTestLoader', 'findTestCases', 'getTestCaseNames', 'mai  
+n', 'makeSuite', 'os', 'sys', 'time', 'traceback', 'types']  
+
+
+可以看到其自身的成员也不是很多，大概包括有：
+['FunctionTestCase', 'TestCase', 'TestLoader', 'TestProgram', 'TestResult',
+ 'TestSuite','TextTestRunner', '_CmpToKey', '_TextTestResult', '_WritelnDecorator',
+ 'defaultTestLoader','findTestCases', 'getTestCaseNames', 'main', 'makeSuite']
+
+好吧,我们大概看看具体都是干什么的
+[python] view plain copy
+>>memblist = ['FunctionTestCase', 'TestCase', 'TestLoader', 'TestProgram', 'TestResult',\  
+'TestSuite','TextTestRunner', 'defaultTestLoader','findTestCases', 'getTestCaseNames', \  
+'main', 'makeSuite']  
+>>for memb in memblist:  
+..  cur = getattr(unittest, memb)  
+..  print help(cur)  
+ 
+ 'FunctionTestCase': 函数测试用例，即给一个函数作为参数，返回一个testcase实例，可选参数有set-up，tear-down方法
+ 'TestCase'：        所有测试用例的基本类，给一个测试方法的名字，返回一个测试用例实例
+ 'TestLoader'：      测试用例加载器，其包括多个加载测试用例的方法。返回一个测试套件
+ loadTestsFromModule(self, module)：          根据给定的模块实例来获取测试用例套件
+ loadTestsFromName(self, name, module=None)： 根据给定的字符串来获取测试用例套件，字符串可以是模块名，测试类名，测试类中的测试方法名，或者一个可调用的是实例对象
+ 这个实例对象返回一个测试用例或一个测试套件
+ loadTestsFromNames(self, names, module=None) ：和上面功能相同，只不过接受的是字符串列表
+ loadTestsFromTestCase(self, testCaseClass)：   根据给定的测试类，获取其中的所有测试方法，并返回一个测试套件
+'TestProgram'：                命令行进行单元测试的调用方法，作用是执行一个测试用例。其实unittest.main()方法执行的就是这个命令，
+而这个类实例时默认加载当前执行的作为测试对象，原型为 __init__(self, module='__main__', defaultTest=None, argv=None, testRunner=xx, testLoader=xx)
+其中module='__main__'就是默认加载自身
+'TestResult'：         测试用例的结果保存实例，通常有测试框架调用
+ 'TestSuite'：         组织测试用例的实例，支持测试用例的添加和删除，最终将传递给testRunner进行测试执行
+ 'TextTestRunner'：    进行测试用例执行的实例，其中Text的意思是以文本形式显示测试结果。显示测试名称，即完成的测试结果，其过同执行单元测试脚本时添加-v参数
+ 'defaultTestLoader':  其实就是TestLoader
+ 'findTestCases', 'getTestCaseNames'：这个2个就不用解释了
+ 'main':              其实就是TestProgram
+ 'makeSuite'：        通常是由单元测试框架调用的，用于生产testsuite对象的实例
+ 
+ 
+ 
+ 
+ 至此，我们知道了。其实整个单元测试框架的逻辑出来了。
+ 分三步走：
+ 第一步testloader根据传入的参数获得相应的测试用例，即对应具体的测试方法，
+ 
+ 然后makesuite在把所有的测试用例组装成testsuite，
+ 
+ 最后把testsiute传给testrunner进行执行。
+ 
+ 而我们通常执行的unittest.main()，其实就是unittest.testprom方法，其执行的功能就是上面分析的三步，
+ 在第一步中其传入的参数是自身的模块__main__；
+ 在第二步中把自身模块中的所有测试类中中的测试方法提取出来，并生成测试套件；
+ 最后再把测试套件传递给testrunner进行具体的测试。
+ 
+ 最后给出一个完整的单元测试组织代码，把该代码放到单元测试用例文件的同一个目录后执行该脚本，即可执行所有的测试用例文件
+ 
+ 【测试用例文件必须为test开头，如：testxxx.py, 当然这个文件本身是一个单元测试的文件】
+ 
+ #!/usr/bin/env python  
+#encoding: utf-8  
+#该代码源自深入python  
+import unittest  
+import myclass  
+import re  
+import os  
+import sys  
+  
+def testAllinCurrent():  
+    path = os.path.abspath(os.path.dirname(sys.argv[0]))     
+    files = os.listdir(path)                                 
+    test = re.compile("test\.py{1}quot;, re.IGNORECASE)            
+    files = filter(test.search, files)                       
+    filenameToModuleName = lambda f: os.path.splitext(f)[0]  
+    moduleNames = map(filenameToModuleName, files)           
+    modules = map(__import__, moduleNames)     
+                    
+    load = unittest.defaultTestLoader.loadTestsFromModule    
+    return unittest.TestSuite(map(load, modules))  
+  
+if __name__ == "__main__":                     
+    unittest.main(defaultTest="regressionTest")  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ px4 中 的 MAVROS测试 (Python)  基于 机器人操作系统 ROS 的单元测试 
+ 
+ 1.) 创建新的测试脚本
+
+测试脚本位于integrationtests/python_src/px4_it/mavros/，可以参考这些脚本文件。
+或者查阅ROS官方文档学习如何使用unittest   http://wiki.ros.org/unittest
+
+
+
+
+ 1. 空的测试框架:
+#!/usr/bin/env python
+# [... LICENSE ...]
+
+#
+# @author Example Author <author@example.com>
+#
+PKG = 'px4'
+
+import unittest
+import rospy
+import rosbag
+
+from sensor_msgs.msg import NavSatFix    # 消息类型 库
+
+class MavrosNewTest(unittest.TestCase):
+    """
+    Test description   测试描述
+    """
+    def setUp(self):
+        rospy.init_node('test_node', anonymous=True)     # 初始化节点
+        rospy.wait_for_service('mavros/cmd/arming', 30)  # 等待服务启动
+
+        rospy.Subscriber("mavros/global_position/global", NavSatFix, self.global_position_callback) #订阅话题  回调函数
+        self.rate = rospy.Rate(10)      # 频率 10hz
+        self.has_global_pos = False
+    #退出清理工作  
+    def tearDown(self):
+        pass
+
+    ## 通用的 用于测试的 回调函数 
+    def global_position_callback(self, data):
+        self.has_global_pos = True
+
+    def test_method(self):
+        """测试方法描述"""
+        # FIXME: hack to wait for simulation to be ready
+        while not self.has_global_pos:
+            self.rate.sleep()
+
+        # TODO: execute test
+
+if __name__ == '__main__':
+    import rostest
+    rostest.rosrun(PKG, 'mavros_new_test', MavrosNewTest)
+ 
+ 
+2.) 只运行新的测试
+
+ 
+# 启动仿真
+cd <Firmware_clone>
+source integrationtests/setup_gazebo_ros.bash $(pwd)
+roslaunch px4 mavros_posix_sitl.launch
+ 
+# 运行测试 test (在新的 shell中):
+cd <Firmware_clone>
+source integrationtests/setup_gazebo_ros.bash $(pwd)
+rosrun px4 mavros_new_test.py
+
+
+3.) 添加新的测试结点到launch文件
+
+在Firmware/launch/mavros_posix_tests_irisl.launch中的测试组中添加新的条目：
+    <group ns="$(arg ns)">
+        [...]
+        <test test-name="mavros_new_test" pkg="px4" type="mavros_new_test.py" />
+    </group>
+ 
+ 
+ 
+ 
+ 
+ 
+ 

@@ -1,0 +1,600 @@
+介绍
+
+
+
+1、  对自动控制系统的基本要求：
+        稳、准、快：
+        稳定性（P和I降低系统稳定性，D提高系统稳定性）：在平衡状态下，系统受到某个干扰后，经过一段时间其被控量可以达到某一稳定状态；
+        准确性（P和I提高稳态精度，D无作用）：系统处于稳态时，其稳态误差；
+        快速性（P和D提高响应速度，I降低响应速度）：系统对动态响应的要求。一般由过渡时间的长短来衡量。
+2、  稳定性：当系统处于平衡状态时，受到某一干扰作用后，如果系统输出能够恢复到原来的稳态值，那么系统就是稳定的；否则，系统不稳定。
+3、  动态特性（暂态特性，由于系统惯性引起）：系统突加给定量（或者负载突然变化）时，其系统输出的动态响应曲线。延迟时间、上升时间、峰值时间、调节时间、超调量和振荡次数。
+通常：    上升时间和峰值时间用来评价系统的响应速度；
+                超调量用来评价系统的阻尼程度；
+                调节时间同时反应响应速度和阻尼程度；
+4、  稳态特性：在参考信号输出下，经过无穷时间，其系统输出与参考信号的误差。影响因素：系统结构、参数和输入量的形式等
+5、  比例（P）控制规律：具有P控制的系统，其稳态误差可通过P控制器的增益Kp来调整：Kp越大，稳态误差越小；反之，稳态误差越大。但是Kp越大，其系统的稳定性会降低。
+
+6、 比例微分（PD）控制规律：可以反应输入信号的变化趋势，具有某种预见性，可为系统引进一个有效的早期修正信号，以增加系统的阻尼程度，而从提高系统的稳定性。
+如果系统中存在较大时滞的环节，则输出变化总是落后于当前误差的变化，解决的方法就是使抑制误差的作用变化“超前”，增强系统的稳定性。
+
+7、  积分（I）控制规律：由于采用了积分环节，若当前误差e(t)为0，则其输出信号m(t)有可能是一个不为0的常量。需要注意的是，引入积分环节，可以提到系统型别，使得系统可以跟踪更高阶次的输入信号，以消除稳态误差。
+
+8、 比例积分（PI）控制规律：在保证系统稳定的前提下，引入PI控制器可以提高它的稳态控制质量，消除其稳态误差。
+ 积分调节可以消除静差，但有滞后现象，比例调节没有滞后现象，但存在静差。
+        PI调节就是综合P、I两种调节的优点，利用P调节快速抵消干扰的影响，同时利用I调节消除残差。
+
+9、 比例积分微分（PID）控制规律：除了积分环节提高了系统型别，微分环节提高了系统的动态性能
+
+    Kp * err  +  Ki * err_sum  +  Kd  * (err  - err_last)
+
+观察PID的公式可以发现：Kp乘以误差e(t)，用以消除当前误差；积分项系数Ki乘以误差e(t)的积分，
+用于消除历史误差积累，可以达到无差调节；微分项系数Kd乘以误差e(t)的微分，用于消除误差变化，
+也就是保证误差恒定不变。由此可见，P控制是一个调节系统中的核心，用于消除系统的当前误差，然后，
+I控制为了消除P控制余留的静态误差而辅助存在，对于D控制，所占的权重最少，只是为了增强系统稳定性，
+增加系统阻尼程度，修改PI曲线使得超调更少而辅助存在。
+
+10、P控制对系统性能的影响：
+开环增益越大，稳态误差减小（无法消除，属于有差调节）
+过渡时间缩短
+稳定程度变差
+
+11、I控制对系统性能的影响：
+消除系统稳态误差（能够消除静态误差，属于无差调节）
+稳定程度变差
+
+12、D控制对系统性能的影响：
+减小超调量
+减小调节时间（与P控制相比较而言）
+增强系统稳定性
+增加系统阻尼程度
+
+13、PD控制对系统性能的影响：
+减小调节时间
+减小超调量
+增大系统阻尼，增强系统稳定性
+增加高频干扰
+
+14、PI控制对系统性能的影响：
+提高系统型别，减少系统稳态误差
+增强系统抗高频干扰能力
+调节时间增大
+
+15、P调节、I调节降低系统稳定性
+        D调节增强系统稳定性
+        所以PI调节器的P比P调节器的P要小一些，PD调节器的P比P调节器的P要大一些
+
+16、位置式PID表达式（数字PID）：
+    
+   Kp * err  +  Ki * err_sum  +  Kd  * (err  - err_last)
+
+17、消除随机干扰的措施：
+
+   1)  反馈值均值滤波   几个采样时刻的采样值求平均后代替本次的采样值 
+
+   2)  微分项的四点中心差分(e(n)-e(n-3)+3e(n-1)-3e(n-2))*1/(6Ts)
+   
+   3） 矩形积分改为梯形积分    err_sum —>    sum((err+ err_last)/2)
+
+18、PID调试一般原则
+在输出不振荡时，增大比例增益P
+在输出不振荡时（能消除静态误差就行），减小积分时间常数Ti
+在输出不振荡时，增大微分时间常数Td
+
+19、描述比例Kp的性能：比例带。比例带就是Kp的倒数：比例带越大，Kp越小，无超调，稳态误差大，调节时间长；
+比例带越小，Kp越大，系统会有超调，甚至发散，稳态 误差减小，调节时间缩短
+
+20、描述积分Ki的性能：积分时间常数Ti。与积分系数Ki也是倒数关系：
+积分时间常数Ti越大，积分系数Ki越小，系统稳定性增加，但是调节速度变慢；
+积分时间常数Ti越小， 积分系数Ki越大，系统稳定性降低，甚至振荡发散。
+无论增大还是减小积分时间常数Ti，被调量最后都没有静差。
+
+21、描述微分Kd的性能：微分时间常数Td。主要用于克服调节对象有较大的时滞。
+Td越大，微分作用越强，系统阻尼程度增加。
+
+22、比例P调节作用：
+系统一旦出现偏差，比例调节立即产生调节作用用以减少偏差
+比例作用大，可以加快调节，减少调节时间，减少稳态误差
+过大的比例作用，使系统的稳定性下降
+
+
+23、积分I调节作用：
+消除稳态误差
+系统稳定性下降，动态响应变慢
+
+
+24、微分D调节作用：
+具有预见性，能预见偏差变化趋势，有超前的控制作用，增强系统动态性能
+减少超调量，减少调节时间
+
+
+25、比例积分PI调节器
+引入积分消除了稳态误差，但是降低了原有系统的稳定性
+超调趋势随着Kp增大、积分时间Ti减小而增大
+
+
+26、积分分离的措施：（在系统启动，结束或者大幅度增减时，短时间系统输出会有很大偏差，
+造成PID运算的积分积累，致使控制量超过执行结构可能允许的最大动作范围， 引起系统较大的超调，甚至振荡）
+当误差大于某个阈值时，采用PD控制，当误差在该阈值范围内，采用PID控制
+注意：阈值的选取，过大，则达不到积分分离的目的；过小，则会导致无法进入积分区
+
+
+27、抗积分饱和的措施：
+限制PI调节器的输出（这样有可能在正常操作中不能消除系统的余差）
+积分分离法：误差在某个范围内开启积分调节（既不会积分饱和又能在小偏差时利用积分作用消除偏差）
+遇限削弱积分法：调节器输出大于某个值后，只累加负误差（可避免控制量长时间停留在饱和区）
+
+
+28、比例微分PD调节器
+仍然属于有差调节
+提高了系统的稳定性，因为微分D的作用总是试图抑制被调量的振荡，所以也增加了系统的阻尼程度
+因为提高了系统的稳定性，所以可以适当加大Kp
+D只是辅助作用，主要还是P控制
+
+
+
+33、
+
+整定比例带：
+
+
+方法：逐渐加大比例作用，一直到系统发生等幅振荡，记录下此时的比例增益，乘以0.6~0.8即可
+
+注意1：比例作用很强时的振荡周期很有规律，基本上呈正弦波；
+而在极弱比例作用参数下的系统有时也会呈现出有规律的振荡，但是往往参杂了几个小波峰。
+现象：最终整定的系统，其调节效果应该是被调量波动小而平缓。在一个扰动过来之后，
+
+被调量的波动应该呈现“一大一小两个波”（波形高度差4:1）
+
+注意2：如果看不到这种被调量的周期特征，那说明参数整定的很好。即满足快速性，也不会超调
+
+
+整定积分时间：
+
+方法：主调的作用是为了消除静态偏差，当比例作用整定好的时候，就需要逐渐加强积分作用
+（调小积分时间Ti或者增大积分项系数Ki），直到消除静差为止。
+也就是说， 积分作用只是辅助比例作用进行调节，它仅仅是为了消除静态偏差。
+
+
+整定微分作用：
+方法：逐渐加强微分作用（增加微分时间Td或者增加微分项系数Kd），直到PID输出毛刺过多
+
+
+34、串级调节系统，一般而言，主调的比例弱，积分强，以消除静差；副调的比例强，积分弱，以消除干扰。但是不绝对！
+
+35、不完全微分PID控制：微分控制对高频干扰非常敏感，为了避免在误差扰动突变时的微分控制的不足，
+在微分项通道前加一个低通滤波器可以使得系统性能得到改善
+
+36、微分先行PID控制：只对被调量进行微分，而不对给定值进行微分。这样的处理在改变给定值时，
+输出不会改变，被控量的变化通常比较缓和，适用于给定值频繁升降的场合。
+
+
+
+
+常用四轴的两种PID算法讲解(单环PID、串级PID)
+
+
+1) 单环PID
+        这里主要讲解的PID算法属于一种线性控制器，这种控制器被广泛应用于四轴上。
+要控制四轴，显而易见的是控制它的角度，那么最简单，
+同时也是最容易想到的一种控制策略就是角度单环PID控制器，系统框图如图所示：
+
+   
+  期望角度        error                     控制量                   三维姿态
+—————> 差值——————> PID控制器———————>   飞行器——————————
+	     |					  |
+	     |_____________惯性测量单元IMU________|
+
+上述角度单环PID控制算法仅仅考虑了飞行器的角度信息，如果想增加飞行器的稳定性(增加阻尼)并提高它的控制品质，
+我们可以进一步的控制它的角速度，于是角度/角速度-串级PID控制算法应运而生。
+在这里，相信大多数朋友已经初步了解了角度单环PID的原理，但是依旧无法理解串级PID究竟有什么不同。
+其实很简单：它就是两个PID控制算法，只不过把他们串起来了(更精确的说是套起来)。
+那这么做有什么用？答案是，它增强了系统的抗干扰性(也就是增强稳定性)，因为有两个控制器控制飞行器，
+它会比单个控制器控制更多的变量，使得飞行器的适应能力更强。
+为了更为清晰的讲解串级PID，这里笔者依旧画出串级PID的原理框图，如图所示：
+
+
+2) 串级PID
+
+  期望角度        error                 期望角速度                    控制量                三维姿态
+—————> 差值————> 角度PID控制器—————>   角速度PID控制器———————> 飞行器——————————
+	     |					  	     |		               |
+	     |_____________惯性测量单元IMU___________________|_________________________|
+
+
+而笔者在整定串级PID时的经验则是：先整定内环PID，再整定外环P。
+内环P：从小到大，拉动四轴越来越困难，越来越感觉到四轴在抵抗你的拉动；
+到比较大的数值时，四轴自己会高频震动，肉眼可见，此时拉扯它，它会快速的振荡几下，过几秒钟后稳定；
+继续增大，不用加人为干扰，自己发散翻机。
+特别注意：只有内环P的时候，四轴会缓慢的往一个方向下掉，这属于正常现象。这就是系统角速度静差。
+内环I：前述PID原理可以看出，积分只是用来消除静差，因此积分项系数个人觉得没必要弄的很大，
+因为这样做会降低系统稳定性。从小到大，四轴会定在一个位置不动，不再往下掉；继续增加I的值，
+四轴会不稳定，拉扯一下会自己发散。
+特别注意：增加I的值，四轴的定角度能力很强，拉动他比较困难，似乎像是在钉钉子一样，但是一旦有强干扰，
+它就会发散。这是由于积分项太大，拉动一下积分速度快，给  的补偿非常大，因此很难拉动，给人一种很稳定的错觉。
+内环D：这里的微分项D为标准的PID原理下的微分项，即本次误差-上次误差。在角速度环中的微分就是角加速度，
+原本四轴的震动就比较强烈，引起陀螺的值变化较大，此时做微分就更容易引入噪声。
+因此一般在这里可以适当做一些滑动滤波或者IIR滤波。从小到大，飞机的性能没有多大改变，
+只是回中的时候更加平稳；继续增加D的值，可以肉眼看到四轴在平衡位置高频震动(或者听到电机发出滋滋的声音)。
+前述已经说明D项属于辅助性项，因此如果机架的震动较大，D项可以忽略不加。
+外环P：当内环PID全部整定完成后，飞机已经可以稳定在某一位置而不动了。
+此时内环P，从小到大，可以明显看到飞机从倾斜位置慢慢回中，用手拉扯它然后放手，它会慢速回中
+，达到平衡位置；继续增大P的值，用遥控器给不同的角度给定，可以看到飞机跟踪的速度和响应越来越快；
+继续增加P的值，飞机变得十分敏感，机动性能越来越强，有发散的趋势。
+
+
+
+
+
+PX4中的 multirotor_att_control 应用程序执行外环姿态控制器的外环，取决于以下参数：
+横滚角度比例控制 (MC_ROLL_P)
+俯仰角度比例控制 (MC_PITCH_P)
+偏航角度比例控制 (MC_YAW_P)
+
+同时内环通过三个独立的PID控制器来控制姿态角速度：
+横滚角速度控制(MC_ROLLRATE_P, MC_ROLLRATE_I, MC_ROLLRATE_D)
+俯仰角速度控制(MC_PITCHRATE_P, MC_PITCHRATE_I, MC_PITCHRATE_D)
+偏航角速度控制 (MC_YAWRATE_P, MC_YAWRATE_I, MC_YAWRATE_D)
+
+外环输出的是期望的机体角度(例如：如果多旋翼应该处于水平，但是当前存在30度的横滚角，那么控制输出就将产生60度每秒的角速度)。
+内环(即角速度控制环)改变电机的输出以使飞行器按照期望的角速度旋转。
+增益实际上有一个直观的意义，例如：如果将MC_ROLL_P增益值设置为6.0并且姿态角存在0.5弧度的偏移（大约30度)，
+那么飞行器将尝试以6倍的角速度来进行补偿，也就是3.0弧度每秒(rad/s)或者约170度每秒(deg/s)。对于内环来说，
+如果将MC_ROLLRATE_P增益设置成0.1，那么推力对横滚角的输出将会是3*0.1 = 0.3，这意味着飞行器一侧的电机将减速30%，
+同时另一侧的电机加速，以此来诱导角动量以便是飞行器回到水平状态。
+
+
+参数MC_YAW_FF反映的是用户输入对偏航速度控制器的前馈比例。值为0代表极慢的响应速度，仅当偏航位置误差出现时，
+控制器才开始偏航运动；值为1代表响应非常灵敏的控制，但有一些超调，控制器将立刻进行偏航运动并始终保持偏航误差接近零，。
+电机带限（Motor Band / Limiting）
+
+如上述所示，在某些条件下，一个电机可能获得高于其最大速度的输入，而另一个电机获得低于零的输入。如果发生这种情况，由电机产生的力将违反控制模型，多旋翼飞行器很可能会翻转。为了防止这种情况发生，PX4上的多旋翼混控器使用了一个带限。如果有一个电机超出了安全范围，系统的总推力会被降低，使得控制器输出的相对百分比能得到满足。因此，多旋翼飞行器可能不会爬升，甚至稍微掉高，但它绝不会翻转。同样对于下侧，即使命令的横滚角度很大，它也将被缩放到一个不超过命令总推力的值，并且飞行器将不会在接近零推力起飞时发生翻转。
+第1步：准备
+
+首先将所有的参数都设置为初始值：
+1、将所有的MC_XXX_P设置为 0(ROLL, PITCH, YAW)
+2、除了MC_ROLLRATE_P 和 MC_PITCHRATE_P之外，将所有的MC_XXXRATE_P、 MC_XXXRATE_I、 MC_XXXRATE_D设置为0
+3、将MC_ROLLRATE_P和MC_PITCHRATE_P设置为一个比较小的值，例如0.02
+4、将MC_YAW_FF设置为0.5
+所有的增益都应该缓慢的增加，每次增加20%~30%，在最终微调时甚至应该降至10%。注意，增益太大(即使只比最优增益值大了1.5-2倍)
+可能会导致非常危险的振荡！
+
+
+第2步:： 稳定横滚(ROLL)和俯仰(PITCH)角速度
+P 增益调节
+参数： MC_ROLLRATE_P，MC_PITCHRATE_P
+如果飞行器是对称的，那么ROLL和PITCH的值应该是相同的；如果不是——则应该分别进行调节。
+用手牢牢抓住多旋翼并将油门推到大约50%，使飞机的重量几乎为零。用手让飞机在横滚或俯仰方向上倾斜，并观察其响应。
+飞机应该会温和的对抗该运动，但它不会试图回到水平。如果飞机发生了振荡，则需要将RATE_P调低。一旦控制响应变慢但是正确了，
+则继续增加RATE_P直到飞机再次开始振荡。接下来降低RATE_P直到飞机只有轻微的振荡或者完全没有振荡(降低大约10%)，只剩下超调。
+典型值约为0.1。
+
+D 增益调节
+参数：MC_ROLLRATE_D， MC_PITCHRATE_D
+假设增益处于多旋翼振荡的状态下，并且RATE_P略微减小。从0.01开始慢慢增加RATE_D，直到消除最后一点振荡。如果电机发生颤抖，
+那么说明RATE_D太大了，需要将其调低。通过调节RATE_P和 RATE_D的大小，飞机的响应能够达到恰到好处。典型值大约在0.01~0.02之间。
+在QGroundControl地面站中，你可以画出横滚和俯仰角速度图(ATTITUDE.rollspeed/pitchspeed)。这里曲线不会振荡，
+但是有一些超调(10%~20%)是没有关系的。
+
+I 增益调节
+如果横滚和俯仰角速度始终达不到设定值，并且存在漂移，从MC_ROLLRATE_P增益值的5%-10%处开始，将MC_ROLLRATE_I和MC_PITCHRATE_I 
+增益相加
+
+
+第3步： 稳定横滚和俯仰角
+P增益调节
+参数 ： MC_RATE_P， MC_RATE_P
+将MC_ROLL_P以及MC_PITCH_P设置为一个较小的值，例如设置为3。
+用手牢牢抓住多旋翼并将油门推到大约50%，使飞机的重量几乎为零。用手让飞机在横滚或俯仰方向上倾斜，并观察其响应。
+飞机应该会缓慢地回到水平。如果飞机发生振荡，则应该将P调低。一旦控制响应变慢但是正确了，则继续增加P直到飞机再次开始振荡。
+最优的响应是带有一些超调(大约10%~20%)。在得到稳定的响应之后再次对RATE_P，RATE_D进行微调。
+在QGroundControl地面站中，你可以画出横滚和俯仰角示意图 (ATTITUDE.roll/pitch)以及控制输出(ctrl0, ctrl1)。
+姿态角的超调量应该不超过10-20%。
+
+
+第4步： 稳定偏航角速度
+P增益调节
+参数： MC_YAWRATE_P
+将MC_YAWRATE_P设置为一个较小的值，例如设置为0.1。
+用手牢牢抓住多旋翼并将油门推到大约50%，使飞机的重量几乎为零。用手让飞机在偏航方向上转动，并观察其响应。
+电机的声音应该会发生改变，同时飞机应该会对抗这个偏航转动。飞机的响应将基本上弱于横滚和俯仰运动，这是正常的。
+如果飞机发生振荡或者颤抖，则需要将RATE_P调低。如果对于很小的运动(油门到顶vs空转螺旋桨)飞机的响应也非常剧烈，
+则继续减少RATE_P。典型值大约在0.2~0.3之间。
+如果偏航角速度控制非常灵敏或者发生振荡，可能会恶化横滚和俯仰响应。可以通过转向、横滚、俯仰和偏航检查系统的总响应。
+
+
+第5步： 稳定偏航角
+P增益调节
+参数： MC_YAW_P
+将MC_YAW_P设置为一个较低的值，例如设置为1。
+用手牢牢抓住多旋翼并将油门推到大约50%，使飞机的重量几乎为零。用手让飞机在偏航方向上转动，并观察其响应。
+飞机应该会慢慢地回到初始航向上。如果飞机发生振荡，则需要将MC_YAW_P调低。一旦控制响应变慢但是正确了，
+则需要增加MC_YAW_P直到响应变得稳定，同时不能有振荡。典型值大约在2~3之间。
+可以在QGroundControl地面站中查看ATTITUDE.yaw偏航角曲线。偏航角的超调应该不超过2~5%。
+
+
+前馈调节
+参数：MC_YAW_FF
+此参数不是特别重要并且可以在飞行过程中调节，在最坏的情况下，偏航响应将会滞后或者太快。
+调节前馈参数FF以获得一个舒适的响应。有效范围在0~1之间。典型值为0.8....0.9。
+(对于航拍视频，为获得平滑的响应，最佳值可能小得多)
+可以在QGroundControl地面站中查看ATTITUDE.yaw偏航角曲线。偏航角的超调应该不超过2~5%。
+
+
+
+/********************************************************************************* 
+函数名：void IMUupdata(float gx, float gy, float gz, float ax, float ay, float az) 
+说明：IMU单元数据融合，更新姿态四元数 
+入口：      float gx 陀螺仪x分量 
+            float gy    陀螺仪y分量 
+            float gz    陀螺仪z分量 
+            float ax    加速度计x分量 
+            float ay    加速度计y分量 
+            float az    加速度计z分量 
+出口：无 
+备注：核心思想:利用陀螺仪来计算高速动态下的姿态,利用加速度计来进行角度修正 
+**********************************************************************************/  
+void IMUupdata(float gx, float gy, float gz, float ax, float ay, float az)  
+{  
+    float recipNorm;                //平方根的倒数  
+    float halfvx, halfvy, halfvz;           //在当前载体坐标系中，重力分量在三个轴上的分量  
+    float halfex, halfey, halfez;           //当前加速度计测得的重力加速度在三个轴上的分量与当前姿态在三个轴上的重力分量的误差,这里采用差积的方式  
+    float qa, qb, qc;  
+      
+        gx = gx * PI / 180;                             //转换为弧度制  
+        gy = gy * PI / 180;  
+        gz = gz * PI / 180;  
+      
+    //如果加速度计处于自由落体状态，可能会出现这种情况，不进行姿态解算，因为会产生分母无穷大的情况  
+    if(!((ax == 0.0f) && (ay == 0.0f) && (az == 0.0f)))   
+    {  
+        //单位化加速度计,意义在于在变更了加速度计的量程之后不需要修改Kp参数,因为这里归一化了  
+        recipNorm = invSqrt(ax * ax + ay * ay + az * az);  
+        ax *= recipNorm;  
+        ay *= recipNorm;  
+        az *= recipNorm;  
+  
+        //将当前姿态的重力在三个轴上的分量分离出来  
+        //就是方向余弦旋转矩阵的第三列,注意是地理坐标系(n系)到载体坐标系(b系)的,不要弄反了.如果书上是b系到n系,转置即可  
+        //惯性测量器件测量的都是关于b系的值，为了方便，我们一般将b系转换到n系进行导航参数求解。但是这里并不需要这样做，因为这里是对陀螺仪进行补偿  
+        halfvx = g_q1 * g_q3 - g_q0 * g_q2;  
+        halfvy = g_q0 * g_q1 + g_q2 * g_q3;  
+        halfvz = g_q0 * g_q0 - 0.5f + g_q3 * g_q3;  
+      
+        //计算由当前姿态的重力在三个轴上的分量与加速度计测得的重力在三个轴上的分量的差,这里采用三维空间的差积(向量积)方法求差  
+        //计算公式由矩阵运算推导而来 公式参见http://en.wikipedia.org/wiki/Cross_product 中的Mnemonic部分  
+        halfex = (ay * halfvz - az * halfvy);  
+        halfey = (az * halfvx - ax * halfvz);  
+        halfez = (ax * halfvy - ay * halfvx);  
+  
+        //积分求误差,关于当前姿态分离出的重力分量与当前加速度计测得的重力分量的差值进行积分消除误差  
+        if(g_twoKi > 0.0f)   
+        {  
+            g_integralFBx += g_twoKi * halfex * CNTLCYCLE;      //Ki积分  
+            g_integralFBy += g_twoKi * halfey * CNTLCYCLE;  
+            g_integralFBz += g_twoKi * halfez * CNTLCYCLE;  
+            gx += g_integralFBx;        //将积分误差反馈到陀螺仪上，修正陀螺仪的值  
+            gy += g_integralFBy;  
+            gz += g_integralFBz;  
+        }  
+        else        //不进行积分运算，只进行比例调节  
+        {  
+            g_integralFBx = 0.0f;  
+            g_integralFBy = 0.0f;  
+            g_integralFBz = 0.0f;  
+        }  
+          
+        //直接应用比例调节，修正陀螺仪的值  
+        gx += g_twoKp * halfex;  
+        gy += g_twoKp * halfey;  
+        gz += g_twoKp * halfez;  
+    }  
+      
+    //以下为四元数微分方程.将陀螺仪和四元数结合起来，是姿态更新的核心算子  
+    //计算方法由矩阵运算推导而来  
+    //  .   1        
+    //  q = - * q x Omega    式中左边是四元数的倒数,右边的x是四元数乘法,Omega是陀螺仪的值(即角速度)  
+    //      2  
+    //   .  
+    //  [q0]    [0  -wx -wy -wz]    [q0]  
+    //   .                
+    //  [q1]    [wx   0 wz      -wy]    [q1]  
+    //   .   =                   *   
+    //  [q2]    [wy  -wz     0  wx ]    [q2]  
+    //   .            
+    //  [q3]    [wz      wy -wx 0  ]    [q3]  
+    gx *= (0.5f * CNTLCYCLE);  
+    gy *= (0.5f * CNTLCYCLE);  
+    gz *= (0.5f * CNTLCYCLE);  
+    qa = g_q0;  
+    qb = g_q1;  
+    qc = g_q2;  
+    g_q0 += (-qb * gx - qc * gy - g_q3 * gz);  
+    g_q1 += ( qa * gx + qc * gz - g_q3 * gy);  
+    g_q2 += ( qa * gy - qb * gz + g_q3 * gx);  
+    g_q3 += ( qa * gz + qb * gy -   qc * gx);  
+      
+    //单位化四元数,意义在于单位化四元数在空间旋转时是不会拉伸的,仅有旋转角度.这类似与线性代数里面的正交变换  
+    recipNorm = invSqrt(g_q0 * g_q0 + g_q1 * g_q1 + g_q2 * g_q2 + g_q3 * g_q3);  
+    g_q0 *= recipNorm;  
+    g_q1 *= recipNorm;  
+    g_q2 *= recipNorm;  
+    g_q3 *= recipNorm;  
+      
+    //四元数到欧拉角转换，转换顺序为Z-Y-X,参见<Representing Attitude: Euler Angles, Unit Quaternions, and Rotation Vectors>.pdf一文,P24  
+    //注意此时的转换顺序是1-2-3，即X-Y-Z。但是由于画图方便，作者这里做了一个转换，即调换Z和X，所以顺序没变  
+    g_Yaw = atan2(2 * g_q1 * g_q2 + 2 * g_q0 * g_q3, g_q1 * g_q1 + g_q0 * g_q0 - g_q3 * g_q3 - g_q2 * g_q2) * 180 / PI; //Yaw  
+    g_Roll = asin(-2 * g_q1 * g_q3 + 2 * g_q0* g_q2) * 180 / PI;                                //Roll  
+    g_Pitch = atan2(2 * g_q2 * g_q3 + 2 * g_q0 * g_q1, -2 * g_q1 * g_q1 - 2 * g_q2* g_q2 + 1) * 180 / PI;           //Pitch  
+}  
+
+
+
+
+// 简单的小四轴PID控制
+/************************************************************************************************ 
+函数名：void Quadrotor_Control(const float Exp_Pitch, const float Exp_Roll, const float Exp_Yaw) 
+说明：四旋翼控制函数，用于PWM计算和输出 
+入口：const float Exp_Pitch         期望倾仰角  俯仰角  绕y轴 
+            const float Exp_Roll    期望横滚角          绕x轴
+            const float Exp_Yaw     期望偏航角          绕z轴
+出口：无 
+备注：当前控制环为姿态控制环 
+其中有    大角度放弃控制    和    悬停黄灯指示 
+************************************************************************************************/  
+void Quadrotor_Control(const float Exp_Pitch, const float Exp_Roll, const float Exp_Yaw)  
+{  
+    s16 outputPWM_Pitch, outputPWM_Roll, outputPWM_Yaw;  
+      
+    // --- 得到当前系统的误差-->利用期望角度减去当前角度  
+    g_Attitude_Error.g_Error_Pitch = Exp_Pitch - g_Pitch;  
+    g_Attitude_Error.g_Error_Roll = Exp_Roll - g_Roll;  
+    g_Attitude_Error.g_Error_Yaw = Exp_Yaw - g_Yaw;  
+      
+    // --- 倾角太大，放弃控制   俯仰角和横滚角过大  超过 55度
+    if (fabs(g_Attitude_Error.g_Error_Pitch) >= 55 || fabs(g_Attitude_Error.g_Error_Roll) >= 55)  
+    {  
+        PWM2_LED = 0;                       //蓝灯亮起  
+        PWM_Set(0, 0, 0, 0);                //停机  
+        return ;  
+    }  
+    PWM2_LED = 1;                           //蓝灯熄灭  
+      
+    // --- 稳定指示灯,黄色.当角度值小于3°时，判定为基本稳定,黄灯亮起  
+    if (fabs(g_Attitude_Error.g_Error_Pitch) <= 3 && fabs(g_Attitude_Error.g_Error_Roll) <= 3)  
+        PWM4_LED = 0;  
+    else  
+        PWM4_LED = 1;  
+ 
+
+     
+// --- 积分运算与积分误差限幅    过积分分离与抗积分饱和处理后 
+    if (fabs(g_Attitude_Error.g_Error_Pitch) <= 20)  //积分分离-->在姿态误差角小于20°时引入积分  
+    {   //Pitch    俯仰
+        //累加误差  
+        g_Attitude_Error.g_ErrorI_Pitch += g_Attitude_Error.g_Error_Pitch;  
+  
+        //积分限幅  
+        if (g_Attitude_Error.g_ErrorI_Pitch >= PITCH_I_MAX)  
+            g_Attitude_Error.g_ErrorI_Pitch = PITCH_I_MAX;  
+        else if (g_Attitude_Error.g_ErrorI_Pitch <= -PITCH_I_MAX)  
+            g_Attitude_Error.g_ErrorI_Pitch = -PITCH_I_MAX;   
+    }  
+    if (fabs(g_Attitude_Error.g_Error_Roll) <= 20)  
+    {   //Roll      横滚
+        //累加误差        
+        g_Attitude_Error.g_ErrorI_Roll += g_Attitude_Error.g_Error_Roll;  
+          
+        //积分限幅        
+        if (g_Attitude_Error.g_ErrorI_Roll >= ROLL_I_MAX)  
+            g_Attitude_Error.g_ErrorI_Roll = ROLL_I_MAX;  
+        else if (g_Attitude_Error.g_ErrorI_Roll <= -ROLL_I_MAX)  
+            g_Attitude_Error.g_ErrorI_Roll = -ROLL_I_MAX;         
+    }  
+
+
+  
+    // --- PID运算-->这里的微分D运算并非传统意义上的利用前一次的误差减去上一次的误差得来  
+    // --- 而是直接利用陀螺仪的值来替代微分项,这样的处理非常好,因为巧妙利用了硬件设施,陀螺仪本身就是具有增量的效果  
+    outputPWM_Pitch = (s16)(g_PID_Kp * g_Attitude_Error.g_Error_Pitch +   
+g_PID_Ki * g_Attitude_Error.g_ErrorI_Pitch - g_PID_Kd * g_MPU6050Data_Filter.gyro_x_c);  
+    outputPWM_Roll = (s16)(g_PID_Kp * g_Attitude_Error.g_Error_Roll +   
+g_PID_Ki * g_Attitude_Error.g_ErrorI_Roll - g_PID_Kd * g_MPU6050Data_Filter.gyro_y_c);  
+    outputPWM_Yaw = (s16)(g_PID_Yaw_Kp * g_Attitude_Error.g_Error_Yaw);  
+  
+        // --- 给出PWM控制量到四个电机-->X模式控制  
+        //特别注意，这里输出反相了，因为误差是反的  
+        g_motor1_PWM = g_BasePWM + outputPWM_Pitch + outputPWM_Roll + outputPWM_Yaw;  
+        g_motor2_PWM = g_BasePWM - outputPWM_Pitch + outputPWM_Roll - outputPWM_Yaw;  
+        g_motor3_PWM = g_BasePWM - outputPWM_Pitch - outputPWM_Roll + outputPWM_Yaw;  
+        g_motor4_PWM = g_BasePWM + outputPWM_Pitch - outputPWM_Roll - outputPWM_Yaw;  
+  
+    // --- PWM反向清零,因为没有反转  
+    if (g_motor1_PWM < 0)  
+        g_motor1_PWM = 0;  
+    if (g_motor2_PWM < 0)  
+        g_motor2_PWM = 0;  
+    if (g_motor3_PWM < 0)  
+        g_motor3_PWM = 0;  
+    if (g_motor4_PWM < 0)  
+        g_motor4_PWM = 0;  
+      
+    // --- PWM限幅  
+    if (g_motor1_PWM >= g_MaxPWM)  
+        g_motor1_PWM = g_MaxPWM;  
+    if (g_motor2_PWM >= g_MaxPWM)  
+        g_motor2_PWM = g_MaxPWM;  
+    if (g_motor3_PWM >= g_MaxPWM)  
+        g_motor3_PWM = g_MaxPWM;  
+    if (g_motor4_PWM >= g_MaxPWM)  
+        g_motor4_PWM = g_MaxPWM;  
+          
+    if (g_Fly_Enable)           //允许起飞,给出PWM  
+        PWM_Set(g_motor1_PWM, g_motor2_PWM, g_motor3_PWM, g_motor4_PWM);  
+    else  
+        PWM_Set(0, 0, 0, 0);        //停机  
+}  
+
+
+
+
+/************************************************** 
+函数名：void IMU_Filter(void) 
+说明：IMU滤波，包括加速度计的滑动滤波和陀螺仪的标定 
+入口：无 
+出口：无 
+备注：采用窗口滑动滤波法，长度为ACC_FILTER_DELAY 
+用控制周期3ms*ACC_FILTER_DELAY得到滞后时间常数 
+属于一阶滞后的FIR滤波器，具体的之后环节 
+有待对加速度计采样观察后FFT查看频谱后给出 
+滞后的时间常数 
+**************************************************/  
+void IMU_Filter(void)  
+{  
+    s32 resultx = 0;  
+    static s32 s_resulttmpx[ACC_FILTER_DELAY] = {0};  
+    static u8 s_bufferCounterx = 0;  
+    static s32 s_totalx = 0;  
+      
+    s32 resulty = 0;  
+    static s32 s_resulttmpy[ACC_FILTER_DELAY] = {0};  
+    static u8 s_bufferCountery = 0;  
+    static s32 s_totaly = 0;  
+      
+    s32 resultz = 0;  
+    static s32 s_resulttmpz[ACC_FILTER_DELAY] = {0};  
+    static u8 s_bufferCounterz = 0;  
+    static s32 s_totalz = 0;  
+  
+    //加速度计滤波  
+    s_totalx -= s_resulttmpx[s_bufferCounterx];             //从总和中删除头部元素的值，履行头部指针职责  
+    s_resulttmpx[s_bufferCounterx] = g_MPU6050Data.accel_x;         //将采样值放到尾部指针处，履行尾部指针职责  
+    s_totalx += g_MPU6050Data.accel_x;                              //更新总和  
+  
+    resultx = s_totalx / ACC_FILTER_DELAY;                          //计算平均值，并输入到一个固定变量中  
+    s_bufferCounterx++;                                     //更新指针  
+    if (s_bufferCounterx == ACC_FILTER_DELAY)                       //到达队列边界  
+            s_bufferCounterx = 0;  
+    g_MPU6050Data_Filter.accel_x_f = resultx;  
+              
+    s_totaly -= s_resulttmpy[s_bufferCountery];  
+    s_resulttmpy[s_bufferCountery] = g_MPU6050Data.accel_y;  
+    s_totaly += g_MPU6050Data.accel_y;  
+  
+    resulty = s_totaly / ACC_FILTER_DELAY;  
+    s_bufferCountery++;  
+    if (s_bufferCountery == ACC_FILTER_DELAY)  
+            s_bufferCountery = 0;  
+    g_MPU6050Data_Filter.accel_y_f = resulty;  
+      
+    s_totalz -= s_resulttmpz[s_bufferCounterz];  
+    s_resulttmpz[s_bufferCounterz] = g_MPU6050Data.accel_z;  
+    s_totalz += g_MPU6050Data.accel_z;  
+  
+    resultz = s_totalz / ACC_FILTER_DELAY;  
+    s_bufferCounterz++;  
+    if (s_bufferCounterz == ACC_FILTER_DELAY)  
+            s_bufferCounterz = 0;  
+    g_MPU6050Data_Filter.accel_z_f = resultz;  
+}  
+

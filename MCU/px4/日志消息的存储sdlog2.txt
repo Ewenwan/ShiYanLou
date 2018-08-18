@@ -1,0 +1,133 @@
+
+\Firmware 系统\Tools\sdlog2  为分析 日志文件的  matlab脚本文件  以及  python脚本文件
+
+sdlog2 这个应用程序是用来将FMU的飞行数据记录到SD卡中作为日志文件。
+该日志文件的格式与APM的二进制日志格式兼容，但是''sdlog2'' 使用强制消息''TIME'' 来写时间戳。
+
+1、 使用
+
+每当 sdlog2 开始记录时， 会在 SD卡的 log 文件夹中创建一个新的目录。
+ 如果设置了选项-t 同时有一个GPS的时间戳可用的话，文件夹的命名是基于当前的日期的(例如， log/2014-01-19)。
+ 
+ 否则，文件夹就会被命名为 ''sessXXX''，这里XXX代表一个序列号。
+ 
+ 如果可能并且可以使用t选项的话，文件名的创建与使用当前时间命名的方式相似(例如，log/2014-01-19/19_37_52.bin) 
+ 
+ 否则这个文件就命名为 log.XXX.bin ，再次使用序列号。
+ 
+ 
+ 根据给定的选项开始记录日志，要么当 sdlog2 应用程序启动，要么当系统解锁，或者通过mavlink命令。
+ 
+ 
+ 
+ 命令行用法
+ 
+usage: sdlog2 {start|stop|status} [-r <log rate>] [-b <buffer size>] -e -a
+
+        -r      记录日志频率         Log rate in Hz, 0 means unlimited rate
+        -b      日志大小             Log buffer size in KBytes, default is 8  也是 中间缓冲区 的大小 
+        -e      app启动时开始记录    Enable logging on app start (if not, can be started by command)
+        -a      飞机解锁时开始记录   Log only when armed (can be still overriden by command)
+        -t      加入GPS的时间戳信息  Use GPS timestamps to create folder and file names
+		
+该日志记录的性能取决于所使用的microSD卡。建议使用高质量的SD卡以避免遗漏数据。 
+虽说不会对飞行性能产生负面的影响，但是全速运行"sdlog2"应用程序（即不加-l选项）可能会引起巨大的CPU负载。
+然而，所需的全速可能无法得到满足，日志记录也将会跳过一些消息。
+
+
+
+2、开始记录日志
+
+在一般情况下，飞行器解锁之后就会开始记录日志，因为只有激活了的飞行才值得分析。
+如果要手动启动日志记录，可以在console控制台输入以下指令：
+# 先停止
+sdlog2 stop
+# 开始  加入GPS的时间戳信息  频率200Hz  app启动时开始记录  日志大小 16 K Bytes
+sdlog2 start -t -r 200 -e -b 16
+要停止记录则输入:
+sdlog2 stop
+
+
+
+3、分析日志文件
+
+要读取二进制文件并将其转换为CSV，可以使用Python工具 \Firmware\Tools\sdlog2\sdlog2_dump.py  。
+同样的目录中包含着运行转换器和绘制大量核心信息的MATLAB脚本 \Firmware\Tools\sdlog2\logconv.m 。
+
+例如：要读取TIME和IMU的消息，SENS消息中的BaroAlt和BaroTemp数据，请使用下面的指令：
+python sdlog2_dump.py log001.px4log -t TIME -m TIME -m IMU -m SENS.BaroAlt,BaroTemp
+
+要创建CSV直接重定向输出到文件：
+python sdlog2_dump.py log001.px4log -t TIME -m TIME -m IMU -m SENS.BaroAlt,BaroTemp > log.csv
+
+CSV文件中的列将与参数具有相同的顺序。选项t显著的减少了输出的重复数据，应该始终被sdlog2生成的日志记录文件使用。
+但是不要用在原来的APM日志文件中。
+
+
+消息类型举例
+
+TIME - 时间戳
+ATT - 飞行器的姿态         attitude   
+ATSP - 飞行器的姿态设定值  attitude  set  point    PV  process variable  过程值也就是测量值  SP  set point  设定值   CV  controlled variable 被控变量值
+IMU - IMU传感器            Inertial measurement unit   观星测量单元 
+SENS - 其他传感器          sens 传感器
+LPOS - 本地位置估计        local position
+LPSP - 本地位置设定值      local position  set  point
+GPS - GPS位置              Global Positioning System（全球定位系统）
+ATTC - 姿态控制 (actuator_0 output)   执行器0输出  attitude  control
+STAT - 飞行器的状态        status 状态
+RC - 遥控输入通道          遥控  Remote Control 
+OUT0 - Actuator_0 output
+AIRS - 空速                 air speed 
+ARSP - 角速度设定值         angular rotational 
+FLOW - 光流
+GPOS - 全球位置估计          Global Positioning
+GPSP - 全球位置设定值       Global Positioning  set point    
+ESC - 电调状态              Electronic Speed Control   电子调速器
+GVSP - 全球速度设定值       Global  velocity  set point 
+
+
+
+消息类型有时是可以改变的。为了找出包含在日志文件中的实际消息列表，可以使用以下的指令：
+python sdlog2_dump.py log001.bin -v
+
+
+
+
+4、发现并修理故障
+
+为了防止在飞行过程中有大量的IO操作时关键的应用程序终止， sdlog2在接收消息和将日志写到SD卡之间设置了一个缓冲区 。
+如果缓冲器在一些点溢出了，一些日志消息将被被跳过。跳过的消息数可以通过在控制台中使用sdlog2 status指令进行检查。
+以及关闭日志文件时打印的统计数字，即，在解锁时使用的-a选项。如果跳过的消息数不是0，就可以通过在-b选项中增加缓冲器大小进行修复。
+以下指令将设置日志缓冲区的大小为16KiB,而不是默认的8KiB:
+
+sdlog2 start -t -r 100 -e -b 16
+
+
+
+
+5、负载测试
+
+为了测试microSD的带宽，以200Hz的频率32KB的缓冲区开启该应用程序，键入-e标志立刻开始记录日志。
+
+#首先停止正在运行的实例
+
+sdlog2 stop
+sdlog2 start -t -r 200 -e -b 32
+
+# 运行perf命令以查看sdlog2产生的负载
+# (注意：性能 performance 计数器仅在日志记录期间存在)
+
+perf
+
+# 或者直接运行top(在Ubuntu用用来查看当前系统资源)
+
+top
+
+# 停止应用程序以清理文件描述符和文件系统
+
+sdlog2 stop
+
+
+
+

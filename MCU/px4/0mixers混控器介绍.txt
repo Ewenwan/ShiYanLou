@@ -1,0 +1,227 @@
+
+PX4的架构保证了不同机身布局，核心控制器不需要进行特定情况的处理。
+
+混合器意味着采取强制命令（比如右转），把它们转化为控制电机或者伺服驱动器的指令。
+
+对于带有一个伺服/副翼，这意味着它们一个高，另一个就低。同样，对于直升机：俯仰向前需要改变所有电机的转速。
+
+混合器逻辑从实际姿态控制器中分离开来，极大提高了可重用性。
+
+
+  mixers 混控器 输入命令 解析得到  或者方程 个电机PWM
+
+ type :  mixer  arguments
+ 
+ 
+ type  有  M 代表简单求和 加法 混控器  R 代表多旋翼混控器
+ 
+ 例如
+# Tricopter Y-Configuration Mixer
+# Yaw Servo +Output ==> +Yaw Vehicle Rotation
+
+# Motors
+R: 3y 10000 10000 10000 0
+
+# Yaw Servo
+M: 1
+O:      10000  10000      0 -10000  10000
+S: 0 2  10000  10000      0 -10000  10000
+
+ 
+ 
+ 空  混控器 
+ 
+ 不接受输入控制  产生单个动作的作动器输出  恒为 0
+ 可以用作 占位
+ 
+ Z :  
+ 
+ 
+ 
+简单混控器
+
+简单混控器将0个或多个控制输入混合为单个作动器输出。
+所有输入被缩放后，经过混合函数得到混合后的输入，最后再经过输出缩放产生输出信号。
+
+简单混控器定义如下：
+M: <control count>
+O: <-ve scale> <+ve scale> <offset> <lower limit> <upper limit>
+
+如果 <control count> 为0，那么混合结果实际上为0，混控器将输出一个定值，这个值是在<lower limit>和<upper limit>限制下的<offset>。
+
+第二行用前文讨论过的缩放参数定义了输出缩放器。
+计算以浮点操作被执行，存储在定义文件中的值经过了因子10000的缩放，即偏移量-0.5会被存储为-5000。
+
+紧跟在<control count>词目之后的定义描述了控制输入以及它们的缩放，形式如下：
+S: <group> <index> <-ve scale> <+ve scale> <offset> <lower limit> <upper limit>
+<group>值标示了控制输入来源，缩放器从中读取控制量，<index>值则是控制量在组内的序号。这些值对读取混控器定义的设备而言都是特定的。
+
+当用来混合载体控制时，控制组0是载体姿态控制组，序号0到3通常对应滚转，俯仰，偏航和油门。
+混控器定义行中剩下的域则用来配置缩放器，参数如前文讨论。
+计算以浮点操作被执行，存储在定义文件中的值经过了因子10000的缩放，即偏移量-0.5会被存储为-5000。
+
+M: 1
+O:      10000  10000      0 -10000  10000
+S: 0 2  10000  10000      0 -10000  10000
+
+
+
+多旋翼混控器
+
+多旋翼混控器将4个控制输入（滚转，俯仰，偏航，油门）混合至一组作动器输出，这些作动器用来驱动电机转速控制器。
+多旋翼混控器定义如下所示：
+R: <geometry> <roll scale> <pitch scale> <yaw scale> <deadband>
+支持的构型包括：
+4x - X型布局四旋翼
+4+ - +型布局四旋翼
+6x - X型布局六旋翼
+6+ - +型布局六旋翼
+8x - X型布局八旋翼
+8+ - +型布局八旋翼
+每个滚转，俯仰，偏航缩放值定义了滚转，俯仰，偏航控制相对于油门控制的缩放。
+计算以浮点操作被执行，存储在定义文件中的值经过了因子10000的缩放，即偏移量-0.5会被存储为-5000。
+
+滚转，俯仰和偏航输入的范围为-1.0到1.0，而油门输入的范围为0.0到1.0，执行器输出范围为-1.0到1.0。
+当某个执行器饱和时，为保证该执行器值不超出范围，所有的执行器值都会被重新缩放。
+
+
+
+# Motors
+R: 3y 10000 10000 10000 0
+
+
+
+
+
+
+
+整体实例
+
+This mixer assumes that the aileron servos are set up correctly mechanically;
+depending on the actual configuration it may be necessary to reverse the scaling
+factors (to reverse the servo movement) and adjust the offset, scaling and
+endpoints to suit.
+
+As there is only one output, if using two servos adjustments to compensate for
+differences between the servos must be made mechanically.  To obtain the correct
+motion using a Y  cable, the servos can be positioned reversed from one another.
+
+Alternatively, output 2 could be used as a second aileron servo output with
+separate mixing.
+
+M: 1
+O:      10000  10000      0 -10000  10000
+S: 0 0  10000  10000      0 -10000  10000
+
+Elevator mixer
+------------
+Two scalers total (output, roll).
+
+This mixer assumes that the elevator servo is set up correctly mechanically;
+depending on the actual configuration it may be necessary to reverse the scaling
+factors (to reverse the servo movement) and adjust the offset, scaling and
+endpoints to suit.
+
+M: 1
+O:       10000   10000      0 -10000  10000
+S: 0 1  -10000  -10000      0 -10000  10000
+
+Output 2
+--------
+This mixer is empty.
+
+Z:
+
+Motor speed mixer
+-----------------
+Two scalers total (output, thrust).
+
+This mixer generates a full-range output (-1 to 1) from an input in the (0 - 1)
+range.  Inputs below zero are treated as zero.
+
+M: 1
+O:      10000  10000      0 -10000  10000
+S: 0 3      0  20000 -10000 -10000  10000
+
+
+
+
+
+
+控制组（Control Groups）
+
+PX4 有输入组和输出组的概念.顾名思义：控制输入组（如：姿态attitude），就是用于核心的飞行姿态控制，（如：云台 gimbal ）就是用于挂载控制. 一个输出组就是一个物理总线，如前8个PWM组成的总线用于舵机控制，组内带8个归一化（-1..+1）值,一个混合就是用于输入和输出连接方式（如:对于四轴来说,输入组有俯仰，翻滚，偏航等，对于于向前打俯仰操作，就需要改变输出组中的4个电调的PWM输出值，前俩个降低转速，后两个增加转速，飞机就向前）。
+对于简单的固定翼来说，输入0（roll），就直接连接到输出的0（副翼）。对于多旋翼来说就不同了，输入0（roll）需要连接到所有的4个电机。
+Control Group #0 (Flight Control)
+
+0: roll (-1..1)
+1: pitch (-1..1)
+2: yaw (-1..1)
+3: throttle (0..1 normal range, -1..1 for variable pitch / thrust reversers)
+4: flaps (-1..1)
+5: spoilers (-1..1)
+6: airbrakes (-1..1)
+7: landing gear (-1..1)
+Control Group #1 (Flight Control VTOL/Alternate)
+
+0: roll ALT (-1..1)
+1: pitch ALT (-1..1)
+2: yaw ALT (-1..1)
+3: throttle ALT (0..1 normal range, -1..1 for variable pitch / thrust reversers)
+4: reserved / aux0
+5: reserved / aux1
+6: reserved / aux2
+7: reserved / aux3
+Control Group #2 (Gimbal)
+
+0: gimbal roll
+1: gimbal pitch
+2: gimbal yaw
+3: gimbal shutter
+4: reserved
+5: reserved
+6: reserved
+7: reserved (parachute, -1..1)
+Control Group #3 (Manual Passthrough)
+
+0: RC roll
+1: RC pitch
+2: RC yaw
+3: RC throttle
+4: RC mode switch
+5: RC aux1
+6: RC aux2
+7: RC aux3
+Control Group #6 (First Payload)
+
+0: function 0 (default: parachute)
+1: function 1
+2: function 2
+3: function 3
+4: function 4
+5: function 5
+6: function 6
+7: function 7
+Virtual Control Groups
+
+These groups are NOT mixer inputs, but serve as meta-channels to feed fixed wing and multicopter controller outputs into the VTOL governor module.
+Control Group #4 (Flight Control MC VIRTUAL)
+
+0: roll ALT (-1..1)
+1: pitch ALT (-1..1)
+2: yaw ALT (-1..1)
+3: throttle ALT (0..1 normal range, -1..1 for variable pitch / thrust reversers)
+4: reserved / aux0
+5: reserved / aux1
+6: reserved / aux2
+7: reserved / aux3
+Control Group #5 (Flight Control FW VIRTUAL)
+
+0: roll ALT (-1..1)
+1: pitch ALT (-1..1)
+2: yaw ALT (-1..1)
+3: throttle ALT (0..1 normal range, -1..1 for variable pitch / thrust reversers)
+4: reserved / aux0
+5: reserved / aux1
+6: reserved / aux2
+7: reserved / aux3
