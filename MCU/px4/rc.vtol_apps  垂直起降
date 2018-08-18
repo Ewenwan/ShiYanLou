@@ -1,0 +1,51 @@
+#!nsh
+# \Firmware\ROMFS\px4fmu_common\init.d\rc.vtol_apps  多旋翼 固定翼 垂直起降  姿态位置估计与控制 启动
+# Standard apps for vtol:
+# att & pos estimator, att & pos control.
+#
+#
+
+
+#---------------------------------------
+# Estimator group selction
+#
+# INAV (deprecated)
+if param compare SYS_MC_EST_GROUP 0
+then
+	echo "ERROR [init] Estimator INAV deprecated. Using LPE"
+	param set SYS_MC_EST_GROUP 1
+	param save
+fi
+
+# LPE
+if param compare SYS_MC_EST_GROUP 1
+then
+	# Try to start LPE. If it fails, start EKF2 as a default
+	# Unfortunately we do not build it on px4fmu-v2 duo to a limited flash.
+	if attitude_estimator_q start       # 四元素 互补滤波 求姿态
+	then
+		local_position_estimator start  # 本地位置估计 EKF
+	else
+		ekf2 start                       # EKF 的 位置 和姿态 估计
+	fi
+fi
+
+# EKF
+if param compare SYS_MC_EST_GROUP 2
+then
+	ekf2 start
+fi
+#---------------------------------------
+
+
+vtol_att_control start  # 垂直起降 姿态控制
+mc_att_control start    # 多旋翼控制器 姿态控制器
+mc_pos_control start    # 多旋翼控制器 位置控制器
+fw_att_control start    # 固定翼 姿态控制器
+fw_pos_control_l1 start # 固定翼 位置控制器
+
+#
+# Start Land Detector
+# Multicopter for now until we have something for VTOL
+#
+land_detector start vtol  #垂直起降下 的 着陆检测

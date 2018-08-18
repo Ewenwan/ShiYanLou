@@ -1,0 +1,20 @@
+#!nsh
+#
+# Standard apps for fixed wing
+#
+
+#
+# Start the attitude and position estimator
+#
+ekf2 start  #  EKF 位置和姿态估计器
+
+#
+# Start attitude controller
+#
+fw_att_control start    #固定翼 姿态控制器
+fw_pos_control_l1 start #固定翼 位置控制器
+
+#
+# Start Land Detector
+#
+land_detector start fixedwing # 固定翼的 着陆检测

@@ -1,0 +1,849 @@
+######################
+#编译后 \Firmware\build_px4fmu-v2_default\build_px4fmu-v2_default\tmp\ROMFS\px4fmu_common\init.d\rsC
+#原始   \Firmware\ROMFS\px4fmu_common\init.d\rsC
+############################
+mount -t procfs /proc#进程文件系统   列出进程
+if sercon
+then
+fi  #结束 if then 的条件判断
+set MODE autostart #设置启动变量模式  
+set TUNE_ERR ML<<CP4CP4CP4CP4CP4
+set LOG_FILE /fs/microsd/bootlog.txt
+if mount -t vfat /dev/mmcsd0 /fs/microsd #挂载SD卡，失败成功声音不同
+then
+echo "[i] microSD mounted: /fs/microsd"
+if hardfault_log check
+then
+tone_alarm error
+if hardfault_log commit
+then
+hardfault_log reset
+tone_alarm stop
+fi
+else
+tone_alarm start
+fi #结束 if then 的条件判断
+else
+tone_alarm MBAGP
+if mkfatfs /dev/mmcsd0
+then
+if mount -t vfat /dev/mmcsd0 /fs/microsd
+then
+echo "INFO  [init] MicroSD card formatted"
+else
+echo "ERROR [init] Format failed"
+tone_alarm MNBG
+set LOG_FILE /dev/null
+fi #结束 if then 的条件判断
+else
+set LOG_FILE /dev/null
+fi
+fi
+set FRC /fs/microsd/etc/rc.txt
+if [ -f $FRC ]     #找SD卡上的启动文件，如果发现，转入custom mode
+then
+echo "INFO  [init] Executing script: ${FRC}"
+sh $FRC
+set MODE custom
+fi
+unset FRC
+if [ $MODE == autostart ] #如果是autostart mode，尝试得到USB指令，新版本将其放到了这，系统启动就可以接受usb指令
+then
+uorb start #启动uorb  uorb为系统间非常重要的消息传递机制
+set PARAM_FILE /fs/microsd/params #设置参数文件的路径，默认在SD卡里面
+if mtd start          #如果EEPROM启动成功，将参数设置路径设置到EEPROM中，PIXhawk中有  #EEPROM，这就是在内存卡中无参数配置文件的原因
+then
+set PARAM_FILE /fs/mtd_params#如果EEPROM启动成功，将参数设置路径设置到EEPROM中，PIXhawk中有  #EEPROM，这就是在内存卡中无参数配置文件的原因
+fi
+param select $PARAM_FILE  #加载参数
+if param load
+then
+else
+if param reset
+then
+fi
+fi
+if rgbled start
+then
+else
+if blinkm start
+then
+blinkm systemstate
+fi
+fi
+if param compare SYS_AUTOCONFIG 1         #如果SYS_AUTOCONFIG 是1
+then
+param reset_nostart RC* LND_FLIGHT_T_*
+set AUTOCNF yes
+else
+set AUTOCNF no
+if param compare BAT_N_CELLS 0
+then
+param set BAT_N_CELLS 3
+fi
+fi
+set HIL no                  #设置一些默认参数，后面会被改动，不一一列举
+set VEHICLE_TYPE none
+set MIXER none
+set MIXER_AUX none
+set OUTPUT_MODE none
+set PWM_OUT none
+set PWM_RATE p:PWM_RATE
+set PWM_DISARMED p:PWM_DISARMED
+set PWM_MIN p:PWM_MIN
+set PWM_MAX p:PWM_MAX
+set PWM_AUX_OUT none
+set PWM_AUX_RATE none
+set PWM_ACHDIS none
+set PWM_AUX_DISARMED p:PWM_AUX_DISARMED
+set PWM_AUX_MIN p:PWM_AUX_MIN
+set PWM_AUX_MAX p:PWM_AUX_MAX
+set FAILSAFE_AUX none
+set MK_MODE none
+set FMU_MODE pwm
+set AUX_MODE pwm
+set MAVLINK_F default
+set MAVLINK_COMPANION_DEVICE /dev/ttyS2
+set EXIT_ON_END no
+set MAV_TYPE none
+set FAILSAFE none
+set USE_IO yes
+set LOGGER_BUF 16
+if param compare SYS_USE_IO 1    #如果SYS_USE_IO 1 是1
+then
+if ver hwcmp PX4FMU_V4
+then
+set USE_IO no
+fi
+if ver hwcmp PX4FMU_V5
+then
+set USE_IO no
+set MAVLINK_COMPANION_DEVICE /dev/ttyS3
+fi
+if ver hwcmp MINDPX_V2
+then
+set USE_IO no
+fi
+if ver hwcmp CRAZYFLIE
+then
+set USE_IO no
+if param compare SYS_AUTOSTART 0  #如果SYS_AUTOSTART是0
+then
+param set SYS_AUTOSTART 4900
+set AUTOCNF yes
+fi
+fi
+if ver hwcmp AEROFC_V1
+then
+set USE_IO no
+fi
+if ver hwcmp AEROCORE2
+then
+set USE_IO no
+fi
+else
+set USE_IO no
+fi
+if ver hwcmp AEROFC_V1
+then
+if param compare SYS_AUTOSTART 0
+then
+set AUTOCNF yes
+fi
+param set SYS_AUTOSTART 4070
+fi
+if param compare SYS_AUTOSTART 0
+then
+ekf2 start
+else
+sh /etc/init.d/rc.autostart #遥控
+fi
+unset MODE
+if param compare MNT_MODE_IN -1
+then
+else
+if param compare MNT_MODE_OUT 0
+then
+set MIXER_AUX mount
+fi
+fi
+if ver hwcmp PX4FMU_V4
+then
+set MIXER_AUX none
+fi
+if ver hwcmp PX4FMU_V5
+then
+set MIXER_AUX none
+fi
+if ver hwcmp AEROFC_V1
+then
+set MIXER_AUX none
+fi
+set FCONFIG /fs/microsd/etc/config.txt
+if [ -f $FCONFIG ]
+then
+echo "Custom: ${FCONFIG}"
+sh $FCONFIG
+fi
+unset FCONFIG
+if [ $AUTOCNF == yes ]    #如果AUTOCNF为1，清零SYS_AUTOCONFIG
+then
+if ver hwcmp PX4FMU_V4
+then
+param set CBRK_IO_SAFETY 22027
+fi
+param set SYS_AUTOCONFIG 0
+fi
+unset AUTOCNF
+set IO_PRESENT no     #初始化IO_PRESENT为0
+if [ $USE_IO == yes ]   #如果USE_IO为1，对Firmware更新
+then
+if [ -f /etc/extras/px4io-v2.bin ]
+then
+set IO_FILE /etc/extras/px4io-v2.bin
+else
+set IO_FILE /etc/extras/px4io-v1.bin
+fi
+if px4io checkcrc ${IO_FILE}
+then
+echo "[init] PX4IO CRC OK" >> $LOG_FILE
+set IO_PRESENT yes
+else
+tone_alarm MLL32CP8MB
+if px4io start
+then
+if px4io safety_on
+then
+else
+px4io stop
+fi
+fi
+if px4io forceupdate 14662 ${IO_FILE}
+then
+usleep 10000
+if px4io checkcrc ${IO_FILE}
+then
+echo "PX4IO CRC OK after updating" >> $LOG_FILE
+tone_alarm MLL8CDE
+set IO_PRESENT yes
+else
+echo "PX4IO update failed" >> $LOG_FILE
+tone_alarm ${TUNE_ERR}
+fi
+else
+echo "PX4IO update failed" >> $LOG_FILE
+tone_alarm ${TUNE_ERR}
+fi
+fi
+unset IO_FILE
+if [ $IO_PRESENT == no ]
+then
+echo "PX4IO not found" >> $LOG_FILE
+tone_alarm ${TUNE_ERR}
+fi
+fi
+if [ $OUTPUT_MODE == none ] #判断OUTPUT_MODE，初始化为none，最终执行结果将 OUTPUT_MODE 设置成了fmu
+then
+if [ $USE_IO == yes ]
+then
+set OUTPUT_MODE io
+else
+set OUTPUT_MODE fmu
+fi
+fi
+if [ $OUTPUT_MODE == io -a $IO_PRESENT != yes ]  #设置FMU mode
+then
+set OUTPUT_MODE none
+if ver hwcmp PX4FMU_V1
+then
+set FMU_MODE serial
+fi
+fi
+if [ $OUTPUT_MODE == ardrone ]
+then
+set FMU_MODE gpio_serial
+fi
+if [ $OUTPUT_MODE == tap_esc ]
+then
+set FMU_MODE rcin
+fi
+if [ $HIL == yes ]
+then
+set OUTPUT_MODE hil
+if ver hwcmp PX4FMU_V1
+then
+set FMU_MODE serial
+fi
+else
+gps start
+fi
+set DATAMAN_OPT ""
+if ver hwcmp AEROFC_V1
+then
+set DATAMAN_OPT -i
+fi
+if ver hwcmp AEROCORE2
+then
+set DATAMAN_OPT "-f /fs/mtd_dataman"
+fi
+if dataman start $DATAMAN_OPT
+then
+fi
+unset DATAMAN_OPT
+if [ $HIL == yes ]
+then
+sensors start -hil
+else
+sh /etc/init.d/rc.sensors                  #启动各种传感器
+fi
+unset HIL
+if [ $OUTPUT_MODE == hil ]
+then
+commander start -hil
+else
+commander start
+fi
+if send_event start_listening
+then
+fi
+load_mon start
+set TTYS1_BUSY no
+if param greater UAVCAN_ENABLE 2
+then
+set OUTPUT_MODE uavcan_esc
+fi
+if param compare SENS_EN_LL40LS 1
+then
+set FMU_MODE pwm4
+set AUX_MODE pwm4
+fi
+if param greater TRIG_MODE 0
+then
+if param compare TRIG_PINS 56
+then
+set FMU_MODE pwm4
+set AUX_MODE pwm4
+else
+set FMU_MODE none
+set AUX_MODE none
+fi
+camera_trigger start
+param set CAM_FBACK_MODE 1
+camera_feedback start
+fi
+if [ $OUTPUT_MODE != none ]
+then
+if [ $OUTPUT_MODE == uavcan_esc ]
+then
+if param compare UAVCAN_ENABLE 0
+then
+echo "OVERRIDING UAVCAN_ENABLE = 3" >> $LOG_FILE
+param set UAVCAN_ENABLE 3
+fi
+fi
+if [ $OUTPUT_MODE == io -o $OUTPUT_MODE == uavcan_esc ]
+then
+if px4io start
+then
+sh /etc/init.d/rc.io                       #IO口初始化
+else
+echo "PX4IO start failed" >> $LOG_FILE
+tone_alarm $TUNE_ERR
+fi
+fi
+if [ $OUTPUT_MODE == fmu -o $OUTPUT_MODE == ardrone ]
+then
+if fmu mode_$FMU_MODE
+then
+else
+echo "FMU start failed" >> $LOG_FILE
+tone_alarm $TUNE_ERR
+fi
+if ver hwcmp PX4FMU_V1                        #判断版本，启动pwm
+then
+if [ $FMU_MODE == pwm -o $FMU_MODE == gpio ]
+then
+set TTYS1_BUSY yes
+fi
+if [ $FMU_MODE == pwm_gpio -o $OUTPUT_MODE == ardrone ]
+then
+set TTYS1_BUSY yes
+fi
+fi
+fi
+if [ $OUTPUT_MODE == mkblctrl ]
+then
+set MKBLCTRL_ARG ""
+if [ $MKBLCTRL_MODE == x ]
+then
+set MKBLCTRL_ARG "-mkmode x"
+fi
+if [ $MKBLCTRL_MODE == + ]
+then
+set MKBLCTRL_ARG "-mkmode +"
+fi
+if mkblctrl $MKBLCTRL_ARG
+then
+else
+echo "MK start failed" >> $LOG_FILE
+tone_alarm $TUNE_ERR
+fi
+unset MKBLCTRL_ARG
+fi
+unset MK_MODE
+if [ $OUTPUT_MODE == hil ]
+then
+if pwm_out_sim mode_pwm16
+then
+else
+tone_alarm $TUNE_ERR
+fi
+fi
+if [ $IO_PRESENT == yes ]
+then
+if [ $OUTPUT_MODE != io ]
+then
+if px4io start
+then
+sh /etc/init.d/rc.io
+else
+echo "PX4IO start failed" >> $LOG_FILE
+tone_alarm $TUNE_ERR
+fi
+fi
+else
+if [ $OUTPUT_MODE != fmu -a $OUTPUT_MODE != ardrone ]
+then
+if fmu mode_${FMU_MODE}
+then
+else
+echo "FMU mode_${FMU_MODE} start failed" >> $LOG_FILE
+tone_alarm $TUNE_ERR
+fi
+if ver hwcmp PX4FMU_V1
+then
+if [ $FMU_MODE == pwm -o $FMU_MODE == gpio ]
+then
+set TTYS1_BUSY yes
+fi
+if [ $FMU_MODE == pwm_gpio -o $OUTPUT_MODE == ardrone ]
+then
+set TTYS1_BUSY yes
+fi
+fi
+fi
+fi
+fi
+if [ $MAVLINK_F == default ]                        #下面几行启动MSVLINK   上下位机通讯
+then
+if [ $TTYS1_BUSY == yes ]
+then
+set MAVLINK_F "-r 1200 -d /dev/ttyS0"
+set EXIT_ON_END yes
+else
+set MAVLINK_F "-r 1200"
+if ver hwcmp PX4FMU_V4    #如果板子版本为V4,
+then
+set MAVLINK_F "-r 1200 -d /dev/ttyS1"
+mavlink start -r 20000 -m config -b 921600 -d /dev/ttyS0
+fi
+if ver hwcmp AEROFC_V1    #如果板子版本为V1,
+then
+set MAVLINK_F "-r 1200 -d /dev/ttyS4"
+fi
+fi
+if ver hwcmp CRAZYFLIE
+then
+set MAVLINK_F none
+fi
+fi
+if [ "x$MAVLINK_F" == xnone ]
+then
+else
+mavlink start ${MAVLINK_F}
+fi
+unset MAVLINK_F
+if ver hwcmp PX4FMU_V1
+then
+else
+if param compare SYS_COMPANION 10
+then
+frsky_telemetry start -d ${MAVLINK_COMPANION_DEVICE}
+fi
+if param compare SYS_COMPANION 20
+then
+syslink start
+mavlink start -d /dev/bridge0 -b 57600 -m osd -r 40000
+fi
+if param compare SYS_COMPANION 921600                                    #检测mavlink存在，如果在则启动,这个不知道是啥
+then
+mavlink start -d ${MAVLINK_COMPANION_DEVICE} -b 921600 -m onboard -r 80000 -x
+fi
+if param compare SYS_COMPANION 57600                                     #检测mavlink存在，如果在则启动，数传
+then
+mavlink start -d ${MAVLINK_COMPANION_DEVICE} -b 57600 -m onboard -r 5000 -x
+fi
+if param compare SYS_COMPANION 460800 
+then
+mavlink start -d ${MAVLINK_COMPANION_DEVICE} -b 460800 -m onboard -r 5000 -x
+fi
+if param compare SYS_COMPANION 157600                                   #检测mavlink存在，如果则启动，USB
+then
+mavlink start -d ${MAVLINK_COMPANION_DEVICE} -b 57600 -m osd -r 1000
+fi
+if param compare SYS_COMPANION 257600
+then
+mavlink start -d ${MAVLINK_COMPANION_DEVICE} -b 57600 -m magic -r 5000 -x
+fi
+if param compare SYS_COMPANION 319200
+then
+mavlink start -d ${MAVLINK_COMPANION_DEVICE} -b 19200 -r 1000
+fi
+if param compare SYS_COMPANION 338400
+then
+mavlink start -d ${MAVLINK_COMPANION_DEVICE} -b 38400 -r 1000
+fi
+if param compare SYS_COMPANION 357600
+then
+mavlink start -d ${MAVLINK_COMPANION_DEVICE} -b 57600 -r 1000
+fi
+if param compare SYS_COMPANION 3115200
+then
+mavlink start -d ${MAVLINK_COMPANION_DEVICE} -b 115200 -r 1000
+fi
+if param compare SYS_COMPANION 419200
+then
+iridiumsbd start -d /dev/ttyS2
+mavlink start -d /dev/iridium -b 19200 -m iridium -r 10
+fi
+if param compare SYS_COMPANION 1921600
+then
+mavlink start -d ${MAVLINK_COMPANION_DEVICE} -b 921600 -r 20000
+fi
+if param compare SYS_COMPANION 1500000
+then
+mavlink start -d ${MAVLINK_COMPANION_DEVICE} -b 1500000 -m onboard -r 10000 -x
+fi
+fi
+unset MAVLINK_COMPANION_DEVICE
+if param greater UAVCAN_ENABLE 0
+then
+if uavcan start
+then
+set LOGGER_BUF 7
+uavcan start fw
+else
+tone_alarm ${TUNE_ERR}
+fi
+fi
+if param compare SENS_EN_LL40LS 1  #检测某个距离传感器，官网上有介绍    PMW接口
+then
+if pwm_input start
+then
+if ll40ls start pwm
+then
+fi
+fi
+fi
+if param compare SENS_EN_LL40LS 2   #I2C接口
+then
+if ll40ls start i2c
+then
+fi
+fi
+if param compare SENS_EN_SF0X 0
+then
+else
+if sf0x start
+then
+fi
+fi
+if param compare SENS_EN_SF1XX 0
+then
+else
+if sf1xx start
+then
+fi
+fi
+if param compare SENS_EN_MB12XX 1
+then
+if mb12xx start
+then
+fi
+fi
+if param compare SENS_EN_TRONE 1
+then
+if trone start
+then
+fi
+fi
+if ver hwcmp PX4FMU_V4
+then
+frsky_telemetry start -d /dev/ttyS6
+fi
+if ver hwcmp MINDPX_V2
+then
+frsky_telemetry start -d /dev/ttyS6
+fi
+if ver hwcmp PX4FMU_V2
+then
+px4flow start &
+fi
+if ver hwcmp PX4FMU_V4
+then
+px4flow start &
+fi
+if ver hwcmp MINDPX_V2
+then
+px4flow start &
+fi
+if ver hwcmp AEROFC_V1
+then
+else
+mavlink start -r 800000 -d /dev/ttyACM0 -m config -x
+fi
+if ver hwcmp PX4FMU_V1
+then
+if sdlog2 start -r 30 -a -b 2 -t
+then
+fi
+else
+if param compare SYS_LOGGER 0
+then
+if param greater EKF2_REC_RPL 0
+then
+if sdlog2 start -r 500 -e -b 18 -t
+then
+fi
+else
+if sdlog2 start -r 100 -a -b 9 -t
+then
+fi
+fi
+else
+set LOGGER_ARGS ""
+if ver hwcmp PX4FMU_V5
+then
+set LOGGER_BUF 64
+param set SDLOG_MODE 3
+fi
+if param compare SDLOG_MODE 1
+then
+set LOGGER_ARGS "-e"
+fi
+if param compare SDLOG_MODE 2
+then
+set LOGGER_ARGS "-f"
+fi
+if param compare SDLOG_MODE 3
+then
+set LOGGER_ARGS "-f"
+fi
+if ver hwcmp AEROFC_V1
+then
+set LOGGER_ARGS "-m mavlink"
+fi
+if logger start -b ${LOGGER_BUF} -t ${LOGGER_ARGS}
+then
+fi
+unset LOGGER_BUF
+unset LOGGER_ARGS
+fi
+fi
+if [ $OUTPUT_MODE == ardrone ]
+then
+ardrone_interface start -d /dev/ttyS1
+fi
+if [ $VEHICLE_TYPE == fw ]                 #固定翼的设置，暂时不是研究对象
+then
+if [ $MIXER == none ]
+then
+set MIXER AERT
+fi
+if [ $MAV_TYPE == none ]
+then
+set MAV_TYPE 1
+fi
+param set MAV_TYPE ${MAV_TYPE}
+sh /etc/init.d/rc.interface  # 接口
+sh /etc/init.d/rc.fw_apps    # 应用程序
+fi
+if [ $VEHICLE_TYPE == mc ]                 #多旋翼设置
+then
+if [ $MIXER == none ]
+then
+echo "Mixer undefined"
+fi
+if [ $MAV_TYPE == none ]
+then
+if [ $MIXER == quad_x -o $MIXER == quad_+ ]
+then
+set MAV_TYPE 2
+fi
+if [ $MIXER == quad_w -o $MIXER == quad_dc ]
+then
+set MAV_TYPE 2
+fi
+if [ $MIXER == quad_h ]
+then
+set MAV_TYPE 2
+fi
+if [ $MIXER == tri_y_yaw- -o $MIXER == tri_y_yaw+ ]
+then
+set MAV_TYPE 15
+fi
+if [ $MIXER == hexa_x -o $MIXER == hexa_+ ]
+then
+set MAV_TYPE 13
+fi
+if [ $MIXER == hexa_cox ]
+then
+set MAV_TYPE 13
+fi
+if [ $MIXER == octo_x -o $MIXER == octo_+ ]
+then
+set MAV_TYPE 14
+fi
+if [ $MIXER == octo_cox -o $MIXER == octo_cox_w ]
+then
+set MAV_TYPE 14
+fi
+if [ $MIXER == coax ]
+then
+set MAV_TYPE 3
+fi
+fi
+if [ $MAV_TYPE == none ]
+then
+echo "Unknown MAV_TYPE"
+param set MAV_TYPE 2
+else
+param set MAV_TYPE ${MAV_TYPE}
+fi
+sh /etc/init.d/rc.interface  #接口      #PWM的设置和接口
+sh /etc/init.d/rc.mc_apps    #应用程序  #核心中的核心，在这里启动了位置和高度的计算算法，具体看这个文件
+fi
+if [ $VEHICLE_TYPE == vtol ] #垂直起降机神马的云云，本人只研究四旋翼
+then
+if [ $MIXER == none ]
+then
+echo "VTOL mixer undefined"
+fi
+if [ $MAV_TYPE == none ]
+then
+if [ $MIXER == caipirinha_vtol ]
+then
+set MAV_TYPE 19
+fi
+if [ $MIXER == firefly6 ]
+then
+set MAV_TYPE 21
+fi
+if [ $MIXER == quad_x_pusher_vtol ]
+then
+set MAV_TYPE 22
+fi
+fi
+if [ $MAV_TYPE == none ]
+then
+echo "Unknown MAV_TYPE"
+param set MAV_TYPE 19
+else
+param set MAV_TYPE ${MAV_TYPE}
+fi
+sh /etc/init.d/rc.interface
+sh /etc/init.d/rc.vtol_apps  # 垂直起降 应用程序
+fi
+if [ $VEHICLE_TYPE == rover ]                       #无关飞机类型
+then
+set MAV_TYPE 10
+sh /etc/init.d/rc.interface
+sh /etc/init.d/rc.axialracing_ax10_apps
+param set MAV_TYPE 10
+fi
+if [ $VEHICLE_TYPE == passthrough ]
+then
+mavlink stop-all
+commander stop
+if mc_att_control stop
+then
+fi
+if ver hwcmp PX4FMU_V2
+then
+snapdragon_rc_pwm start -d /dev/ttyS1
+px4io start
+fi
+if ver hwcmp PX4FMU_V4
+then
+snapdragon_rc_pwm start -d /dev/ttyS2
+fmu mode_pwm4
+fi
+pwm failsafe -c 1234 -p 900
+pwm disarmed -c 1234 -p 900
+pwm arm
+pwm rate -a -r 400
+fi
+unset MIXER
+unset MAV_TYPE
+unset OUTPUT_MODE
+navigator start                   #启动导航
+if [ $VEHICLE_TYPE == none ]
+then
+echo "No autostart ID found"
+fi
+set FEXTRAS /fs/microsd/etc/extras.txt
+if [ -f $FEXTRAS ]
+then
+echo "Addons script: ${FEXTRAS}"
+sh $FEXTRAS
+fi
+unset FEXTRAS
+if ver hwcmp CRAZYFLIE
+then
+else
+if ver hwcmp AEROCORE2
+then
+else
+if [ $LOG_FILE == /dev/null ]
+then
+tone_alarm error
+fi
+fi
+fi
+set TEMP_CALIB_ARGS ""
+if param compare SYS_CAL_GYRO 1
+then
+set TEMP_CALIB_ARGS "${TEMP_CALIB_ARGS} -g"
+param set SYS_CAL_GYRO 0
+fi
+if param compare SYS_CAL_ACCEL 1
+then
+set TEMP_CALIB_ARGS "${TEMP_CALIB_ARGS} -a"
+param set SYS_CAL_ACCEL 0
+fi
+if param compare SYS_CAL_BARO 1
+then
+set TEMP_CALIB_ARGS "${TEMP_CALIB_ARGS} -b"
+param set SYS_CAL_BARO 0
+fi
+if [ "x$TEMP_CALIB_ARGS" != "x" ]
+then
+send_event temperature_calibration ${TEMP_CALIB_ARGS}
+fi
+unset TEMP_CALIB_ARGS
+if param compare MNT_MODE_IN -1
+then
+else
+if vmount start
+then
+fi
+fi
+fi
+unset TUNE_ERR
+mavlink boot_complete
+if [ $EXIT_ON_END == yes ]
+then
+echo "NSH exit"
+exit
+fi
+unset EXIT_ON_END
