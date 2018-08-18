@@ -1,0 +1,773 @@
+1、vnc远程连接
+
+A:没有屏幕和键盘，只要你有一根最大负载至少750ma的5V电源适配器和一根网线，
+你就可以使用电脑通过SSH连上树莓派。这里，我要说明的是，树莓派官方系统Raspbian
+自2012-9-18版本之后，均设置了ssh服务随系统自动启动，我使用的是最新的2012-10-28版本的
+。插上SD卡，插上网线，上电，树莓派启动约30秒之后，应该就启动完成了。
+
+我们只需要一个SSH客户端来连接树莓派就可以。这里推荐putty.exe这个小巧的ssh客户端软件，
+整个程序就一个exe文件，很精简。 
+
+
+IP地址填上树莓的IP，其他设置不用更改，点击OPEN。
+这时会提示需要输入账号和密码，树莓派的默认账号是pi,默认密码是raspberry,
+注意密码输入的时候是没有*号来告诉你输了几位的。
+仅有cmd交互界面
+
+
+linux 下可直接使用 终端 ssh登陆
+
+ssh pi@192.168.1.176     用户名@IP地址
+输入密码 raspberry （注意密码不回显） 回车即可登陆
+
+
+
+
+！！！！！！！重要提示，有时树莓派关机重启后，屏幕显示一直停在了启动界面，左上角 只有一个光标键
+不是系统坏了，是系统的默认开启图形.
+
+解决方案 putty.exe ssh 用户名 pi 密码 raspberry 登录
+ cd  /home/pi/LCD-show  进入 LCD屏幕驱动执行文件夹
+
+根据自己屏幕的大小执行相应的文件即可还原屏幕显示
+
+如我的是3.5寸的屏幕
+则执行 ./LCD35-show
+
+安装完触摸驱动后，可以通过运行以下命令修改屏幕旋转方向。
+
+旋转0度：
+cd LCD-show/
+./LCD35-show 0
+旋转90度：
+cd LCD-show/
+./LCD35-show 90
+旋转180度：
+cd LCD-show/
+./LCD35-show 180
+旋转270度：
+cd LCD-show/
+./LCD35-show 270
+
+
+
+安装 tightvncserver
+
+sudo apt-get install tightvncserver
+
+tightvncserver
+
+卸载
+sudo apt-get remove tightvncserver
+
+结束服务
+tightvncserver -kill 
+
+
+
+设置8位密码
+
+选择n     y会有错误
+
+电脑vcn远程登陆   192.168.31.47:1   后面需要添加:1
+
+
+   设置树莓派固定ip
+    设定成固定IP后，方便日后操作，不需要每次先读取到IP才能工作。
+  设定方法很简单，通过修改文件sudo vi /etc/network/interfaces文件完成，
+
+无线网络的修改
+
+复制代码
+auto lo
+
+iface lo inet loopback
+iface eth0 inet dhcp
+
+allow-hotplug wlan0
+iface wlan0 inet manual
+    wpa-roam /etc/wpa_supplicant/wpa_supplicant.conf
+iface default inet static
+address 192.168.1.123
+netmask 255.255.255.0
+gateway 192.168.1.1
+
+修改成功后，IP地址换为192.168.1.123。
+
+   vi 编辑器使用
+        a       //在当前光标位置的右边添加文本
+        i        //在当前光标位置的左边添加文本
+        A      //在当前行的末尾位置添加文本
+        I       //在当前行的开始处添加文本(非空字符的行首)
+        O     //在当前行的上面新建一行
+        o     //在当前行的下面新建一行
+        R     //替换(覆盖)当前光标位置及后面的若干文本
+        J     //合并光标所在行及下一行为一行(依然在命令模式)
+
+
+        :w                  //保存文件
+        :q                  //退出编辑器，如果文件已修改请使用下面的命令
+        :q!                 //退出编辑器，且不保存
+        :wq               //退出编辑器，且保存文件
+
+   设置VNC 开机自启动
+     配置vnc自启动服务，在/etc/init.d下新建文件tightvncserve
+     sudo touch /etc/init.d/tightvncserver
+ 
+
+### BEGIN INIT INFO
+# Provides:          tightvncserver
+# Required-Start:    $local_fs
+# Required-Stop:     $local_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start/stop tightvncserver
+### END INIT INFO
+ 
+# More details see:
+# http://www.penguintutor.com/linux/tightvnc
+ 
+### Customize this entry
+# Set the USER variable to the name of the user to start tightvncserver under
+export USER='pi'
+### End customization required
+ 
+eval cd ~$USER
+ 
+case "$1" in
+  start)
+    # 启动命令行。此处自定义分辨率、控制台号码或其它参数。
+    su $USER -c '/usr/bin/tightvncserver -depth 16 -geometry 800x600 :1'
+    echo "Starting TightVNC server for $USER "
+    ;;
+  stop)
+    # 终止命令行。此处控制台号码与启动一致。
+    su $USER -c '/usr/bin/tightvncserver -kill :1'
+    echo "Tightvncserver stopped"
+    ;;
+  *)
+    echo "Usage: /etc/init.d/tightvncserver {start|stop}"
+    exit 1
+    ;;
+esac
+exit 0
+
+
+#然后给tightvncserver文件加执行权限，并更新开机启动列表。
+sudo chmod 755 /etc/init.d/tightvncserver
+sudo update-rc.d tightvncserver defaults
+
+
+取消开机启动也很简单，就一行代码：
+sudo update-rc.d -f tightvncserver remove
+
+
+2、安装摄像头
+sudo raspi-config
+camera-> Enable
+
+树莓派原装摄像头插入后在raspi-config中打开即可使用，但不会有/dev/video0节点
+
+拍摄照片：
+raspistill -v -o image.jpg
+
+raspistill常用参数
+-v：调试信息查看。
+-w：图像宽度
+-h：图像高度
+-rot：图像旋转角度，只支持 0、90、180、270 度
+-o：图像输出地址，例如image.jpg，如果文件名为“-”，将输出发送至标准输出设备
+-t：获取图像前等待时间，默认为5000，即5秒
+-tl：多久执行一次图像抓取。
+
+raspistill -o image%d.jpg -rot 180 -w 1024 -h 768 -t 20000 -tl 5000 -v
+
+截取一张宽1024px，高768px，旋转180度的图片，抓取的总时长为20秒，并且每5秒抓取一张，保存的文件名为image1.jpg,image2.jpg以此类推。
+
+
+拍摄视频：
+
+想要用摄像头模块拍一段视频的话，可以从命令行运行 raspivid 工具。下面这句命令会按照默认配置(长度5秒，分辨率1920x1080，比特率 17Mbps)拍摄一段视频。
+raspivid -o mykeychain.h264 
+
+摄像头节点更改：
+树莓派中的camera module是放在/boot/目录下以固件的形式加载的，不是一个标准的v4l2的摄像头ko驱动，所以加载起来之后会找不到/dev/video0的设备节点。这是因为这个驱动是在底层的，v4l2这个驱动框架还没有加载，所以要在/etc/下面的modules-load.d/rpi-camera.conf里面添加一行bcm2835-v4l2(是4L2，不是4一2，小写的L)，这句话意思是在系统启动之后会加载bcm2835-v4l2这个模块，这个模块在树莓派系统的/lib/modules/xxx/xxx/xxx下面，添加之后重启系统，就会在/dev/下面发现video0设备节点了。
+
+bcm2835-v4l2
+
+此时可以使用mplayer来看摄像头实时图像了。
+sudo apt-get install mplayer  
+
+sudo mplayer tv://
+
+
+
+3、树莓派系统盘大小更改
+无论多大的卡，一开始默认都是4G的系统盘，更改 linux主分区大小
+
+fdisk <存储设备名>  //如: fdisk /dev/sda    %% fdisk /dev 按table自动补全设备名称
+
+进入fdisk 后，使用单键命令
+m 显示Help
+p 列出所有分区
+d 删除分区
+n 新建分区
+w 存盘退出
+q 不存盘退出
+
+按 p 键 列出所有分区，可见有两个或三个分区或两个
+第一个分区是 FAT32分区，是引导用的
+第二个分区是Linux 主分区
+第三个分区是Linux Swap交换文件分区(虚拟机中可能没有)
+用笔记下 Linux 主分区的Start Sector号 (我的img文件中是131072) 原linux主分区起始地址
+按 d 键 Partition Number (分区号) 选 2, 删除linux主分区（第2个区）如果有linuxSwap分区，再按d键 Partition Number (分区号) 选 3, 删除linuxSwap分区（第3个区）
+按 p 键 列出所有分区，可见只剩第一个分区了
+按 n 键，重新创建linux主分区
+Partition Type(分类类型) 选 P (Primary)
+Partition Number (分区号) 选 2
+First Sector(起始Sector) 一定要输入刚才记下来的Start Sector号(我的是122880)
+Last Sector (终止Sector)用默认值，直接回车
+按 p 键 列出所有分区，可见有两个分区，linux主分区在第2个，起始位置是原位置
+按 w 键 存盘退出fdisk
+接下来，立即重启，不要做任何其它事情
+sudo reboot
+重启并登录后，立即用以下命令
+sudo resize2fs /dev/mmcblk0p2
+该命令将把第二个分区扩展到新的空间中
+查看一下硬盘使用情况，OK了
+df -h
+
+
+4、安装中文字体
+
+  好在有一个中文字体是免费开源使用的。ssh中输入以下命令
+
+ sudo apt-get install ttf-wqy-zenhei
+
+ 中文字库安装完成之后，还需要安装一个中文输入法。输入如下命令
+
+ sudo apt-get install scim-pinyin
+
+ sudo raspi-config  -> international opyions ->  change_locale
+
+ 操作提示：按空格键在前面打勾或去掉勾（星号=勾），PageUp PageDown快速翻页，Tab键跳到OK按钮上
+去掉en_GB.UTF-8 UTF-8，勾上：“en_US.UTF-8 UTF-8”、“zh_CN.UTF-8 UTF-8”、“zh_CN.GBK GBK”
+
+<OK>，下一屏幕默认语言选zh_CN.UTF-8。
+
+5、更新软件源
+
+ 在修改之前先把源列表备份，然后再修改sources.list
+    cd /etc/apt
+    cp sources.list sources.list_back
+【修改】
+    sudo nano sources.list
+
+   例如使用大连东软信息学院软件源镜像，修改之后的内容如下：
+    【wheezy版本】deb http://mirrors.neusoft.edu.cn/raspbian/raspbian wheezy main contrib non-free rpi 
+    【jessie版本】deb http://mirrors.neusoft.edu.cn/raspbian/raspbian jessie main contrib non-free rpi
+
+
+ 更新软件源和软件
+    # 更新软件源
+    sudo apt-get update
+    # 更新软件
+    sudo apt-get upgrade
+
+
+卸载office
+sudo apt-get remove --purge libreoffice*
+
+
+
+5、OpenCV 3.0安装
+
+
+5.1、搭建C/C++编译环境：
+sudo apt-get install build-essential
+
+5.2、安装依赖库：
+$ sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
+$ sudo apt-get install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libt gitiff-dev libjasper-dev libdc1394-22-dev
+
+
+5.3、获得源代码
+    在树莓派用户目录中建立opencv文件夹
+mkdir opencv
+
+    通过sourceforge网站获取opencv源代码，本文选择2.4.9版本。下载过程可能比较缓慢，请耐心等待。  或者直接进网站下载到相应的文件夹解压
+wget http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/3.0.0/opencv-3.0.0.zip/download opencv-3.0.0.zip
+    解压源代码，获得一个名为opencv-3.0.0的文件夹
+unzip opencv-3.0.0.zip
+
+5.4、编译源代码
+    进入opencv源代码目录，在该目录中新建一个名为release的文件夹。
+cd ~/opencv/opencv-3.0.0
+mkdir release
+cd release
+    使用cmake工具在该文件夹中生成makefile文件，指定opencv的安装目录为/usr/local，opencv的源代码位于上一层目录。
+cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local ..
+    编译源代码并安装（编译源代码的时间非常的长，make之后我便睡去，第二天早上才执行install）
+make                       %%时间很长
+sudo make install          %%
+    更新搜索动态链接库
+sudo ldconfig
+
+
+5.5 makefile文件编写
+  功能类似编译器 ide
+一般来说，无论是C还是C++，首先要把源文件编译成中间代码文件，
+在Windows下也就是 .obj 文件，UNIX下是 .o 文件，即 Object File，
+这个动作叫做编译（compile），一般来说，每个源文件都应该对应于一个中间目标文件
+（O文件或是OBJ文件）。然后再把大量的Object File合成执行文件，
+这个动作叫作链接（link）。
+
+
+
+
+6、c++  int main(int argc, char**argv[])
+
+argc  argument counter  参数(命令行字符串个数)计数器  
+argv  argument vector   字符串数组 参数集合
+argv[0]  指向程序运行的全路径名
+argv[1]  指向执行程序运行后的第一个参数
+。。
+argv[n]  指向执行程序运行后的第n个参数
+
+
+printf、sprintf与fprintf 的用法区分：
+6、1  fprintf
+int fprintf( FILE *stream, const char *format, ... );
+fprintf()函数根据指定的format(格式)发送信息(参数)到由stream(流)指定的文件.因此fprintf()可以使得信息输出到指定的文件
+eg:fprintf( stream, "%s%c", s, c );
+
+6、2  sprintf
+sprintf是格式化输出到一个字符串，fprintf是格式化输出到一个stream，通常是到文件。
+int   sprintf(   char   *buffer,   const   char   *format   [,  argument]   ...   )
+
+6、3  printf
+ 格式输出函数   format
+
+int printf(const char *format,...)  
+int printf("格式控制字符串"，输出列表)
+
+
+6、4 opencv使用
+#include "opencv2/core/core.hpp"        //opencv核心类型等
+#include "opencv2/higugui/highgui.hpp"  //高层GUI图形用户界面模块
+using  namespace cv;
+
+1）imread()函数  读取图像
+Mat   //保存图像以及 其他矩阵数据的数据结构  类似 1.0版本 IplImage  
+Mat = imread("constant string& filename", int flags=1 )
+flags =-1 //<0   返回包含 Alpha通道的图像
+flags =0  //=0   返回包含 gray图像 灰度图像
+flags =1  //>0   返回包含 3通道彩色图像
+
+2）imshow()函数  显示图像
+
+void imshow(const string& winname, InputArray mat)
+winname     //显示的窗口的标识名称
+InputArray  mat//图像
+
+3）nameWindow() 事先创建一个窗口
+void nameWindow(const string& winname,int flags=WINDOW_AUTOSIZE)
+第一个参数：//显示的窗口的标识名称
+第二个参数：//窗口设置 WINDOW_AUTOSIZE 自动调整大小（不可改变）
+            //WINDOW_NORMAL （可更改大小）WINDOW_OPENGL 
+   destroyWindow()、destroyAllWindow() 清楚窗口
+
+
+
+4）imwrite()函数  保存图像
+bool imwrite(const string& filename,InputArray img, const vector<int>& params=vector<int>() )
+第一个参数：//保存的文件名  .jpg  .bmp  
+第二个参数：//图像
+第三个参数：//保存设置  编码    jpg:图像质量0～100
+
+
+R1_hrS21XPWTr6XztYREsrQUKvcF8RUI
+4N9Y1R2bt7jhZy4qJwAYydzNbX2oODPr
+
+
+
+
+
+
+7.树梅派与arduino的配合
+  7.1在树莓派上安装arduino  ide
+     sudo apt-get update
+     sudo apt-get install arduino
+  
+  7.2获取操作串口设备的权限
+     sudo usermod -a -G tty EwenWan  
+     sudo usermod -a -G dialout EwenWan  
+     //将用户EwenWan 添加到用组tty和dialout
+     Arduino IDE选择串口  通常为/dev/ttyACM0 格式
+  7.3查看、检查串口设备
+     未插上设备前 ls /dev/tty*
+     插上设备后   ls /dev/tty*
+     看看出现了哪个新的设备
+  7.4设置新的字体
+     sudo apt-get install ttf-inconsolata
+     编辑Arduino配置文件
+     nano ~/.aeduino/preferences.txt
+     修改如下两行
+     editor.front=Inconsolata,medium,14
+     editor.antialias=True
+  7.5树莓派与Arduino的串口通讯
+     树莓派安装pySerial库
+     sudo apt-get install python-serial python3-serial
+    
+     Arduino与树莓派通讯程序
+         void setup(){ Serial.begin(9600);}
+         void loop(){ 
+              for (byte n=0; n < 255; n++){  
+                   Serial.write(n);  //发送的是实际的数字，而数字对应的字符串
+                   //Serial.print(n); 
+                   //Serial.println(n); 
+                     delay(50);
+                }
+          }
+
+          或者发送0~1024的数据
+         void loop(){ 
+              for (int n=0;n < 1024; n++){  
+                     Serial.println(n，DEC);      
+        //以十进制方式转化为字符串，以ASCII码方式发生   "254\r\n"   回车 换行
+                     delay(50);
+                }
+          }               
+
+        或者发生传感器的数据
+         void loop(){ 
+                     int n = anglogRead(A0);
+                     Serial.println(n，DEC);      
+        //以十进制方式转化为字符串，以ASCII码方式发生   "254\r\n"   回车 换行
+                     delay(100);
+
+          }
+
+
+     树莓派程序 
+     # 导入串口通讯库
+     import serial  
+     # 设置通讯端口                          
+     port = "/dev/ttyACM0"
+     # 以9600波特率打开相应串口
+     serialFromArduino = serial.Serial(port,9600) 
+     # 清空输入缓冲区
+     serialFromArduino.flushInput()
+     while True:
+         if (serialFromArduino.inWaiting()>0):
+             # 从串口缓冲区读入一个字节数据
+             input = serialFromArduino.read(1)   #input中存放的为ASCII码  1个字节
+             # 用ord()函数把读入的字节数转换为实际的数值（字符串），然后打印到屏幕上
+             print(ord(input))
+     
+    或者对应0~1024
+      # 导入串口通讯库
+     import serial  
+     # 设置通讯端口                          
+     port = "/dev/ttyACM0"
+     # 以9600波特率打开相应串口
+     serialFromArduino = serial.Serial(port,9600) 
+     # 清空输入缓冲区
+     serialFromArduino.flushInput()
+     while True:
+         input = serialFromArduino.readline()   #input中存放的为ASCII码
+         inputAsInteger = int(input)            #转换为整数
+         print(inputAsInteger * 10)             #显示       
+
+
+    7.6 程序输入参数传递
+      import serial, sys
+      if(len(sys.argv) != 2):
+          print('Usage: python ReadSerial.py port')
+          sys.exit()
+      port = sys.argv[1]
+      //运行脚本  python ReadSerial.py /dev/ttyACM0
+
+
+
+8、树莓派GPIO的操作
+   用shell脚本控制GPIO   命令行集合
+   管脚编号为Broadcom芯片的引脚编号
+
+   编写 on.sh脚本
+   
+   #!/bin/bash                       # 所有shell脚本通用开头
+   echo Exporting pin $1.            # $1 指代第一个命令行参数  echo向屏幕输出信息
+   echo $1 > /sys/class/gpio/export  # 开放指定的端口
+   echo Setting direction to out.    
+   echo out > /sys/class/gpio/gpio$1/direction  # 设置方向为输出
+   echo Setting pin high.
+   echo 1 > /sys/class/gpio/gpio$1/value        #设置输出值为high 高电平
+
+   添加执行权限
+   sudo chmod +x  on.sh   #可执行
+   执行
+   sudo ./on.sh 25           #打开指定端口   ./表明正在执行当前目录下的shell脚步
+
+
+   编写 off.sh脚本
+
+   #!/bin/bash
+   echo Setting pin low.
+   echo 0 > /sys/class/gpio/gpio$1/value
+   echo Unexporting pin $1                    # 关闭指定端口
+   echo $1 > /sys/class/gpio/unexport 
+
+   添加执行权限
+   sudo chmod +x  off.sh   #可执行
+   执行
+   sudo ./off.sh 25           #关闭指定端口   
+
+   使用PowerSwitch Tail 电子继电器 可以实现 低压信号控制高压信号
+
+
+   定时执行程序 cron 
+   sudo crontab -e     # 编辑 程序执行列表
+   0 20 * * * /home/pi/on.sh 25    每天8点打开
+   0 2 * * * /home/pi/off.sh 25    每天2点关闭
+   Ctrl + X 退出编辑 保存
+   
+
+   corn 参数解析    
+分钟（*/5   表示每5分钟）   小时  每天（*） 每月（*） 一周中的某些一天（1-5）   要执行的命令
+   
+
+
+  使用python脚本来控制GPIO
+  安装 python GPIO控制包
+  sudo apt-get update
+  sudo apt-get install python-rpi.gpio
+
+  sudo python2.7 # 进入python环境
+   import RPi.GPIO as GPIO
+   # GPIO.setmode(GPIO.BOARD)   #使用主板编号
+   GPIO.setmode(GPIO.BCM)     #使用芯片引脚编号
+   GPIO.setup(25, GPIO.OUT)   #设置25号管脚为输出
+   GPIO.output(25, GPIO.HIGH) #输出高电平 点亮
+   GPIO.output(25, GPIO.LOW)  #输出低电平 熄灭
+
+
+   编写LED灯闪烁python脚本程序 blink.py
+
+   import RPi.GPIO as GPIO       # 导入GPIO库
+   import time                   # 导入sleep函数所需的库
+   GPIO.setmode(GPIO.BCM)        # 使用芯片引脚编号
+   GPIO.setup(25, GPIO.OUT)      # 25号管脚输出模式
+# 25号管脚输入模式    GPIO.setup(channel, GPIO.OUT, initial=GPIO.HIGH)
+   while True:
+       GPIO.output(25, GPIO.HIGH)# 输出高电平
+       time.sleep(1)             # 暂停1s   time.sleep(0.5) 
+       GPIO.output(25, GPIO.LOW) # 输出低电平
+       time.sleep(1) 
+    
+    执行
+    sudo python blink.py
+   
+
+8.2 按键的读入（要接上拉或下拉电阻）
+    
+   import RPi.GPIO as GPIO        # 导入GPIO库
+   import time                    # 导入sleep函数所需的库
+   GPIO.setmode(GPIO.BCM)         # 使用芯片引脚编号
+   GPIO.setup(24, GPIO.IN)        
+   count = 0                      # 记录按下次数
+   while True:                    # 轮询方式检测按键  会占用较大的cpu
+       inputValue = GPIO.input(24)# 读取电平在状态
+       if(inputValue == True):    # 下拉电阻
+           count = count + 1
+           print("Button pressed " + str(count) + " times")
+           time.sleep(.1)         # 滤除机械噪声
+       time.sleep(.05)
+  
+   RPi.GPIO 库的按键中断检测有待查询（硬件中断函数）
+   
+import RPi.GPIO as GPIO
+import time
+GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
+
+GPIO.setup(35, GPIO.IN, GPIO.PUD_DOWN)      # 设置   软件上拉
+# GPIO.setup([35,37], GPIO.IN, GPIO.PUD_UP) # 设置多个引脚  软件下拉
+
+def my_callback(channel):
+    print('--my_callback start--')
+    for i in range(0, 10000000):
+        pass
+    print('--my_callback end--')
+GPIO.add_event_detect(35, GPIO.RISING, my_callback, bouncetime=200)
+      # 添加事件检测函数  上升沿中断     中断处理函数  防抖延时/开关防抖
+
+# GPIO.add_event_detect(37, GPIO.FALLING, my_callback_two, bouncetime=200)
+
+while True:
+    time.sleep(1)
+GPIO.cleanup()
+
+
+
+    
+   socket远程通讯
+
+   编写 remoIO.py
+    
+import socket
+import time
+g_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+def init(ip, port):
+    g_sock.connect((ip, port))
+    time.sleep(2)
+    return
+
+def send(data):
+    g_sock.send(data)
+    return
+
+def read():
+    data = g_sock.recv(1024)
+    return data
+
+def end():
+    g_sock.close()
+    return
+
+def _test(ip, port):
+    sock = init(ip, port)
+    send("I am Raspberry Pi\r\n!");
+    print read(1024);
+    sock.close()
+    return
+
+if __name__=='__main__':
+    #_test('192.168.2.1', 9999)
+    import sys
+    if len(sys.argv) == 3:
+        _test(sys.argv[1], int(sys.argv[2]))
+    else:
+        print 'usage:'+sys.argv[0]+' ip  port\r\n'
+
+
+
+主程序 远程控制灯闪烁
+
+  编写 remoBlink.py
+
+import RPi.GPIO as GPIO
+import time
+import remoIO
+ 
+ 
+ip = '192.168.2.12'
+port = 8888
+def blink(times, delay):
+ 
+    R=11
+    Y=12
+    W=15
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.setup(R, GPIO.OUT)
+    GPIO.setup(Y, GPIO.OUT)
+    GPIO.setup(W, GPIO.OUT)
+ 
+    remoIO.init(ip, port)
+    remoIO.send('Now, you can input 1,2 or 3 to turnon  the right led:')
+    # in order to initial a communication protocol, add code here
+    # ....
+    command = ''
+    while 1:
+        command = remoIO.read()
+        if command=='1\n':
+            GPIO.output(R, GPIO.LOW)
+            time.sleep(2)
+            GPIO.output(R, GPIO.HIGH)
+            remoIO.send('ok for 1\t')
+        elif command=='2\n':
+            GPIO.output(Y, GPIO.LOW)
+            time.sleep(2)
+            GPIO.output(Y, GPIO.HIGH)
+            remoIO.send('ok for 2\t')
+        elif command=='3\n':
+            GPIO.output(W, GPIO.LOW)
+            time.sleep(2)
+            GPIO.output(W, GPIO.HIGH)
+            remoIO.send('ok or 3\t')
+        elif command=='quit\n':
+            remoIO.send('end remote control!\r\n')
+            remoIO.end()
+            break
+        else:
+            remoIO.send('eroor input!\r\n')
+ 
+    while times>0:
+        if 0==times%2:
+            GPIO.output(R, GPIO.HIGH) #or output(R, GPIO.True)
+        else:
+            GPIO.output(R, GPIO.LOW)
+        time.sleep(delay)
+        times-=1
+    return
+ 
+ 
+if __name__ == '__main__':
+    blink(10, 0.5)
+
+
+    PWM功能
+
+   #  LED 每两秒钟闪烁一次的示例：
+   # 编辑 blink2s.py
+
+   import RPi.GPIO as GPIO
+   GPIO.setmode(GPIO.BOARD)
+   GPIO.setup(12, GPIO.OUT)
+  
+   p = GPIO.PWM(12, 0.5)     # GPIO.PWM(channel, frequency)  周期为2=1/0.5
+   p.start(1)  
+      
+   # p.start(dc)   # dc 代表占空比（范围：0.0 <= dc >= 100.0）
+   # 更改频率   p.ChangeFrequency(freq)   # freq 为设置的新频率，单位为 Hz
+   # 更改占空比 p.ChangeDutyCycle(dc)  # 范围：0.0 <= dc >= 100.0
+
+   input('点击回车停止：')   # 在 Python 2 中需要使用 raw_input
+   p.stop()
+   GPIO.cleanup()
+
+
+
+   # 以下为使 LED 在亮/暗之间切换的示例：
+   # 编辑 ledDump.py
+   
+import time
+import RPi.GPIO as GPIO
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(12, GPIO.OUT)
+  
+p = GPIO.PWM(12, 50)  # 通道为 12 频率为 50Hz
+p.start(0)            # 占空比为0
+
+try:
+    while 1:
+        for dc in range(0, 101, 5):   #占空比从0按增量5，  增加到100
+            p.ChangeDutyCycle(dc)
+            time.sleep(0.1)
+        for dc in range(100, -1, -5): #占空比从100按减量5，减少到0
+            p.ChangeDutyCycle(dc)
+            time.sleep(0.1)
+except KeyboardInterrupt:
+    pass
+
+p.stop()
+GPIO.cleanup()
+
+
+8.3 pygame  音频的输出
+    import pygame.mixer          # 导入pygame 的混音器
+    
+    sudo amixer cset numid=3 1   # 模拟音频接口输出
+    sudo amixer cset numid=3 2   # HDMI数字音频输出

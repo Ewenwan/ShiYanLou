@@ -1,0 +1,63 @@
+
+如果把树莓派(raspberry pi)做成一个电器的话，一上电，必须支持几个动作
+1, 自动登录
+2, 自动运行startx启动窗口系统
+3, 窗口系统启动后，自动运行自定义的程序(一般是应用主界面)
+
+
+研究了一下，是这样做的
+
+实现自动登录：修改/etc/inittab文件
+
+
+sudo nano /etc/inittab
+向下滚动，找到行               1:2345:respawn:/sbin/getty 115200 tty1
+注释掉这一行，修改为       #1:2345:respawn:/sbin/getty 115200 tty1
+在该行下增加一行内容       1:2345:respawn:/bin/login -f pi tty1 /dev/tty1 2>&1
+
+按Ctrl+X退出，记得按Y键保存
+原理：linux启动时，会读取inittab文件，执行其中的登录命令，以pi用户名自动登录
+
+实现自动运行startx启动窗口系统： 修改/etc/rc.local文件
+
+sudo nano /etc/rc.local
+在文件尾部(在exit 0前)加上一行 su pi -c startx
+这个命令的意思是，以pi用户的身份，执行startx
+按Ctrl+X退出，记得按Y保存
+
+重新启动即可 
+
+sudo reboot
+
+这一次启动后，将直接以pi用户登入系统，并立即启动 startx
+
+原理：linux启动时，用户登录后，会执行/etc/rc.local脚本文件，一般我们把要自动执行的命令放在该文件中
+
+窗口系统启动后，自动运行自定义的程序的实现方法
+
+进入当前用户HOME目录下的.config目录(这是一个隐藏目录，需用ls -a显示出来)
+
+cd ~/.config 
+当前用户是pi, 其HOME目录是/home/pi, 上述命令相当于 cd /home/pi/.config
+
+建立一个名为autostart的子目录,并进入该目录
+
+mkdir autostart
+
+cd autostart
+
+生成一个*.desktop文件（比如：my.desktop），命令如下:
+sudo nano my.desktop
+
+输入以下文件内容:
+
+[Desktop Entry]
+Type=Application
+Exec=midori
+
+最后一句Exec的值就是要启动的程序名(最好是全路径的可执行文件名)，此处是midori浏览器
+按CTRL+X退出，记得按Y键存盘
+OK了，重新 startx 即可
+原理：startx后，LXDE窗口管理器会找到~/.config/autostart目录下的所有 .desktop文件，一一执行
+
+把上述全部串起来，就是一上电：自动登录－自动启动窗口-自动运行程序

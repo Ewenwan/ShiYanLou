@@ -1,0 +1,274 @@
+1、查看树莓派Linux版本
+
+lsb_release -a  命令查看
+
+uname -a        命令好像查不出来  all所有信
+
+
+2、添加源和秘钥 
+
+Raspbian Wheezy（版本）
+$ sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu wheezy main" > /etc/apt/sources.list.d/ros-latest.list'
+$ wget https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -O - | sudo apt-key add -
+
+
+Raspbian Jessie（版本）
+$ sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu jessie main" > /etc/apt/sources.list.d/ros-latest.list'
+$ wget https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -O - | sudo apt-key add -
+
+
+3、确保系统最新
+$ sudo apt-get update    更新资源列表
+$ sudo apt-get upgrade   更新包
+
+4、安装辅助功能包以系统包
+Raspbian Wheezy（版本）
+$ sudo apt-get install python-pip python-setuptools python-yaml python-argparse python-distribute python-docutils python-dateutil python-six
+$ sudo pip install rosdep rosinstall_generator wstool rosinstall
+
+Raspbian Jessie（版本）
+$ sudo apt-get install python-pip python-setuptools python-yaml python-distribute python-docutils python-dateutil python-six
+$ sudo pip install rosdep rosinstall_generator wstool rosinstall
+
+
+5、初始化rosdep rose系统依赖并更新
+$ sudo rosdep init
+$ rosdep update
+
+
+6、安装系统文件
+
+ 1）创建系统包工作空间
+
+$ mkdir ~/ros_catkin_ws
+$ cd ~/ros_catkin_ws
+
+
+
+  2）使用 wstool工具安装 ros_comm包
+
+$ rosinstall_generator ros_comm --rosdistro indigo --deps --wet-only --exclude roslisp --tar > indigo-ros_comm-wet.rosinstall
+$ wstool init src indigo-ros_comm-wet.rosinstall
+
+如果 wstool init失败或者中断的话，可以使用 
+wstool update -t src 继续安装
+
+
+  完整包（包含图形化显示工具 rqt rviz等需要好的cpu才行）
+$ rosinstall_generator desktop --rosdistro indigo --deps --wet-only --exclude roslisp --tar > indigo-desktop-wet.rosinstall
+$ wstool init src indigo-desktop-wet.rosinstall
+
+
+3）解决系统依赖包
+Ros_Comm: libconsole-bridge-dev, liblz4-dev
+Desktop: libconsole-bridge-dev, liblz4-dev, liburdfdom-headers-dev, liburdfdom-dev, collada-dom-dev
+
+ 创建外部包文件夹
+$ mkdir ~/ros_catkin_ws/external_src
+
+ 安装编译工具
+$ sudo apt-get install checkinstall cmake
+
+ 添加源列表
+ $ sudo sh -c 'echo "deb-src http://mirrordirector.raspbian.org/raspbian/ testing main contrib non-free rpi" >> /etc/apt/sources.list'
+$ sudo apt-get update
+
+安装  libconsole-bridge-dev: 控制台依赖包
+$ cd ~/ros_catkin_ws/external_src
+$ sudo apt-get build-dep console-bridge
+$ apt-get source -b console-bridge        便已生成包
+$ sudo dpkg -i libconsole-bridge0.2*.deb libconsole-bridge-dev_*.deb   安装包
+
+慎重执行！！！！  会出错
+如果出现问题提示 '-std=c++11' 那么请更新 gcc 到 4.7+
+sudo apt-get install g++-4.7
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.6 60 --slave /usr/bin/g++ g++ /usr/bin/g++-4.6
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.7 40 --slave /usr/bin/g++ g++ /usr/bin/g++-4.7
+sudo update-alternatives --config gcc
+出错后 可卸载gcc 在重新安装gcc
+或者 执行  sudo apt-get install build-essential
+
+安装 liblz4-dev: 
+$ cd ~/ros_catkin_ws/external_src
+$ apt-get source -b lz4              编译生成包
+$ sudo dpkg -i liblz4-*.deb          安装包
+
+
+
+下面是destop完整包需要的依赖  一般不用安装
+liburdfdom-headers-dev:
+$ cd ~/ros_catkin_ws/external_src
+$ git clone https://github.com/ros/urdfdom_headers.git
+$ cd urdfdom_headers
+$ git reset --hard 9aed725
+$ cmake .
+$ sudo checkinstall make install
+
+liburdfdom-dev:
+$ cd ~/ros_catkin_ws/external_src
+$ sudo apt-get install libboost-test-dev libtinyxml-dev
+$ git clone https://github.com/ros/urdfdom.git
+$ cd urdfdom
+$ cmake .
+$ sudo checkinstall make install
+
+collada-dom-dev: (Note: You will also need to patch collada_urdf as described here):
+$ cd ~/ros_catkin_ws/external_src
+$ sudo apt-get install libboost-filesystem-dev libxml2-dev
+$ wget http://downloads.sourceforge.net/project/collada-dom/Collada%20DOM/Collada%20DOM%202.4/collada-dom-2.4.0.tgz
+$ tar -xzf collada-dom-2.4.0.tgz
+$ cd collada-dom-2.4.0
+$ cmake .
+$ sudo checkinstall make install
+
+
+4）其他依赖使用rosdep解决
+Raspbian Wheezy（版本）
+$ cd ~/ros_catkin_ws
+$ rosdep install --from-paths src --ignore-src --rosdistro indigo -y -r --os=debian:wheezy
+
+Raspbian Jessie（版本）使用这个
+$ cd ~/ros_catkin_ws
+$ rosdep install --from-paths src --ignore-src --rosdistro indigo -y -r --os=debian:jessie
+
+
+5）编译ros系统
+sudo ./src/catkin/bin/catkin_make_isolated --install -DCMAKE_BUILD_TYPE=Release --install-space /opt/ros/indigo -j2
+
+
+6）添加ros脚本环境
+source /opt/ros/indigo/setup.bash
+echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
+
+
+
+
+
+
+3 安装arduino ide
+
+下载arduino  ide linux arm
+
+安装下载工具
+sudo apt-get install axel
+下载ide   速度较快
+axel -n 20 https://downloads.arduino.cc/arduino-1.8.2-linuxarm.tar.xz
+
+
+进入下载文件路径
+cd /home/pi/Downloads
+
+解压
+xz -d arduino-1.8.2-linuxarm.tar.xz  #解压得到文件：arduino-1.8.2-linuxarm.tar，此命令需要30秒，需稍等一下
+解开文件
+tar -xvf arduino-1.8.2-linuxarm.tar  #解压得到文件夹 arduino－1.8.2,文件较多，需刷屏一分钟<br>
+添加快捷链接
+ln -s /home/pi/Downloads/arduino-1.8.2/arduino /home/pi/Desktop  #添加一个链接到桌面上，方便使用<br>
+cd arduino-1.8.2
+./arduino #运行Arduino IDE，出现熟悉的IDE界面
+
+
+3.使用
+
+1.将Arduino开发板插到Raspberry的任一USB接口
+
+   后续使用建议Arduino板同时使用外部9-12V的电源适配器供电
+
+2.配置通信端口
+
+  主菜单：Tools -> Port:"/dev/ttyxxx"  -> 选择"/dev/ttyACM0(Arduino/Genuino Uno)"
+
+3.验证效果
+
+  3.1 主菜单：File -> Examples -> 01.Basics -> Blink
+
+  3.2 点击工具栏第二个人按钮（Upload）
+
+     自动完成编译后并下载到板子上，看到界面下方出现“Done uploading”即可。 
+
+
+
+四、安装ros和arduino的串口通讯接口(uart串口通信协议，允许arduino作为一个ros的节点来工作，订阅发布消息捕获系统时间等)
+  进入工作目录的src文件夹
+  cd <ws>/src
+  git clone https://github.com/ros-drivers/rosserial.git  下载
+  cd <ws>
+  catkin_make -j2   源码编译
+  
+  编译完成后会在  <ws>/install 目录下会生成ros_lib库（arduino ide支持的库）
+  catkin_make install  将 ros_lib 安装至 arduino ide中（生成支持 ros——arduino 包）
+ 
+  进入 arduino下 安装ros库
+  cd <sketchbook>/libraries
+  rm -rf ros_lib
+  rosrun rosserial_arduino make_libraries.py .   生成 ros_lib
+
+ 打开ide  查看第三方包  可以见到 ros_lib库
+ 示例运行 Hello World 程序 下载到 arduino  版子中
+
+ 树莓派启动 arduino节点
+ roscore
+ 启动串口服务器将 arduino发布的信息 更新至ros话题里   arduino的 端口
+ rosrun rosserial_python serial_node.py /dev/ttyACM0
+
+可能会提示缺少 一种消息类型 
+ 进入 cd ros_catkin_make/src 文件夹
+ git clone https://github.com/ros/common_msgs.git  下载 消息类型包
+
+ 编译
+ cd   ros_catkin_make      
+ catkin_make -j2
+ 安装
+ catkin_make install
+
+ 更新下脚本环境
+ source  devel/setup.bash
+ 在执行
+ roscore
+ rosrun rosserial_python serial_node.py /dev/ttyACM0
+
+查看话题列表
+ rostopic list
+
+rostopic echo /chatter   查看话题消息
+
+
+五、安装 ros_arduino_bridge ros控制arduino驱动轮子
+硬件支持：
+电子驱动板
+编码器计数器
+等
+
+安装 
+  进入工作目录的src文件夹
+  cd <ws>/src
+  git clone https://github.com/hbrobotics/ros_arduino_bridge.git  下载
+  cd <ws>
+  catkin_make -j2   源码编译
+
+安装支持 ros_arduino_bridge 上层 使用 python编写
+需要安装 python-serial 软件包  python 控制串口
+
+sudo apt-get install python-serial
+
+查看 树梅派上 arduino 的挂载点的权限：
+ls -l /dev/ttyAMA0 
+》》》 crw-rw---- 1 root dialout 204, 64 4月  13 11:20 /dev/ttyAMA0
+查看当前用户是否有 读写权限   c 字符文件
+可以看出 root 用户下 dialout 用户组 有次驱动串口的 读写权限
+
+查看当前用户属于哪些组: groups 命令可查看
+
+可添加用户至相应的 用户组 里
+sudo usermod -a -G dialout ewenwan
+
+
+将 ROSArduinoBridge 事例包 放到 arduino ide （安装包下的libraries里）
+
+cd ~/ros_catkin_ws/src/ros_arduino_bridge/ros_arduino_firmware/src/libraries
+sudo cp -rf ROSArduinoBridge/ ~/EwenWan/software/arduino-1.8.2/libraries
+
+
+
+
+                   
