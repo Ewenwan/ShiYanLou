@@ -160,6 +160,183 @@ void serialEvent() {
   }
 }
 ```
+串口命名控制
+```c
+unsigned int SerialComCount[2];//串口接收计数
+bool serial_cmd_flag=false;
+int arg = 0;
+int index = 0;
+// 串口收到的字符
+char chr;
+// 解析上位机得到的指令
+char cmd;
+// 字符后的 三个参数
+char argv1[32];
+char argv2[32];
+char argv3[32];
+// 转换成 整数
+volatile float arg1=0.0;
+volatile float arg2=0.0;
+volatile float arg3=0.0;
+
+volatile float V_L=0.0;//左轮速度 -+ 0~0.6m/s
+volatile float V_R=0.0;//右轮速度 -+ 0~0.6m/s
+#define Velocity 'v' //速度指令
+/* 当前控制命令参数重置为0*/
+void resetCommand() {
+  cmd = NULL;
+  memset(argv1, 0, sizeof(argv1));
+  memset(argv2, 0, sizeof(argv2));
+  memset(argv3, 0, sizeof(argv3));//缓冲区置0
+  arg1 = 0;
+  arg2 = 0;
+  arg3 = 0;
+  arg = 0;
+  index = 0;
+}
+
+/* Run a command.  Commands are defined in commands.h */
+int runCommand() {
+  arg1 = atof(argv1);//字符转化成整数   Vx
+  arg2 = atof(argv2);//                Vy
+  arg3 = atof(argv3);//                W
+  switch(cmd) {
+  case Velocity:  //'v' 波特率
+  V_L=arg1-0.193*arg3;
+  V_R=arg1+0.193*arg3; 
+  // 获取方向
+   // Left_Direction=    arg2 & 0x01;// 左轮方向 
+  //  Right_Direction=   arg2 & 0x02;// 右轮方向
+  // 设置 左轮方向
+    if(V_L<0) digitalWrite(DIR_left, LOW);   // 后退      
+    else      digitalWrite(DIR_left, HIGH);  // 前进 
+  // 设置 右轮 方向
+    if(V_R<0) digitalWrite(DIR_right, LOW);              
+    else      digitalWrite(DIR_right, HIGH); 
+  //car_pid.Left_Speedwant =abs(V_L)/3.14/0.065*941/20;// 50ms内脉冲数 230.52
+  car_pid.Left_Speedwant =abs(V_L)*230.52;
+   car_pid.Right_Speedwant=abs(V_R)*230.52;
+ //Serial.println(V_L, DEC);
+ //Serial.println(V_R, DEC);
+ SerialComCount[0]++;//接收计数
+  break;
+  }
+}
+
+//解析 上位机的 命令
+  while (Serial.available() > 0) {  //串口内有数据
+    // 读取下一个字节
+    chr = Serial.read();
+
+    // 一个命令结束后执行命令
+    if (chr == 13) { // CR键值为 13  回车键 '/r'  十六进制为D
+      if (arg == 1)      argv1[index] = NULL;//第二个参数  清空
+      else if (arg == 2) argv2[index] = NULL;//第三个参数
+      else if (arg == 3) argv3[index] = NULL;//第四个参数
+      runCommand(); //执行命令
+      resetCommand();
+    }
+    
+    //分割命令行参数 命令内以空格 间隔
+    else if (chr == ' ') {     //遇到空格了，是新的控制参数开始了
+      // Step through the arguments
+      if (arg == 0)    arg = 1;//上一个参数结束(控制标识) 第二个参数开始
+      else if (arg == 1)  {
+        argv1[index] = NULL;   //先清空 第二个参数存储区域argv1
+        arg = 2;               //第三个参数开始
+        index = 0;             //参数 下标归零
+      }
+      else if (arg == 2)  {     
+        argv2[index] = NULL;   //先清空第三个参数存储区域
+        arg = 3;               //第四个参数开始
+        index = 0;
+      }
+      continue;
+    }
+    
+    // 得到命令的各个参数
+    else {
+      if (arg == 0) {
+        // 第一个参数是 命令标志字符（一个字节）
+        cmd = chr;
+      }
+      else if (arg == 1) {
+        // 第二个参数
+        argv1[index] = chr;
+        index++;
+      }
+      else if (arg == 2) {//第三个参数
+        argv2[index] = chr;
+        index++;
+      }
+      else if (arg == 3) {
+        argv3[index] = chr;//第四个参数
+        index++;
+      }
+    }
+  }
+
+```
+ros 收发话题格式
+```c
+#include <ros.h> // ros
+#include <std_msgs/UInt32.h> // 话题消息类型
+ros::NodeHandle   nh;        // 创建ROS句柄
+std_msgs::UInt32  ENC_Pluse; // 定义编码器脉冲广播消息格式
+
+ros::Publisher Pluse("Pluse", &ENC_Pluse); // 定义发布话题节点 发送到话题Pluse，消息为ENC_Pluse
+
+// 订阅话题的 回调函数
+void Motor_contrl( const std_msgs::UInt32& cmd_msg)
+{ // 获取方向
+    Left_Direction=cmd_msg.data/10000000;          // 左轮方向 
+    Right_Direction=cmd_msg.data%10000000/1000000; // 右轮方向
+  // 设置 左轮方向
+    if(Left_Direction==1)      digitalWrite(DIR_left, LOW);   // 后退      
+    else if(Left_Direction==0) digitalWrite(DIR_left, HIGH);  // 前进 
+  // 设置 右轮 方向
+    if(Right_Direction==1)     digitalWrite(DIR_right, LOW);              
+    else if(Right_Direction==0)digitalWrite(DIR_right, HIGH); 
+  // 设置左右轮子期望值         
+    car_pid.Left_Speedwant = cmd_msg.data%1000000/1000; // 左轮PWM期望值
+    car_pid.Right_Speedwant = cmd_msg.data%1000;        // 右轮PWM期望值
+}
+// 订阅 命令发布话题 
+ros::Subscriber<std_msgs::UInt32> sub("motor", Motor_contrl);
+
+
+void setup()
+{
+////ROS节点初始化///////////
+// 默认串口通信 波特率为 57600，可能会通信出错，可以降低通信波特率 
+// arduino-1.8.1\libraries\ros_lib\ArduinoHardware.h ---> ArduinoHardware(SERIAL_CLASS* io , long baud= 57600)
+// baud_ = 57600;  修改此处的值即可，例如 9600
+   nh.initNode();      //初始化节点,会影响串口0   2560 serial1  serial2 serial3 可以用
+   nh.subscribe(sub);  //消息 订初 始化 
+   nh.advertise(Pluse);//消息 发 布初始化
+}
+
+//// 主循环 //////
+void loop()
+{
+ nh.spinOnce();// 需要给ros发布的权限
+ // 编码器数据     
+    ENC_Pluse.data=(0x00               & 0xffffffff)<<30
+                   |(Left_Direction    & 0xffffffff)<<25
+                   |(Right_Direction   & 0xffffffff)<<24
+                   |(pub_countL        & 0xffffffff)<<12
+                   |(pub_countR        & 0xffffffff);
+    Pluse.publish(&ENC_Pluse);// 发布消息
+ delay(1000);
+}
+// linux 测试命令/////
+//   rosrun rosserial_python serial_node.py /dev/ttyUSB0 _baud:=57600
+//   rostopic pub motor std_msgs/UInt32  1100100  // 发布话题消息
+//   rostopic echo Pluse                          // 查询话题消息
+
+
+```
+
 
 ## 脉宽
 ```c
