@@ -1,0 +1,198 @@
+
+如何向代码中添加新的参数，对应了MissionPlanner 中的可配置参数，从而实现一些新的功能？
+
+英文参考：http://dev.ardupilot.com/wiki/code-overview-adding-a-new-parameter/
+
+1 在主执行代码中添加参数
+
+        第一步：
+        Step #1：
+        在文件Parameters.h参数类中的枚举变量（enum）的合适位置，像下面代码块最后一行一样添加你自己的新的参数。
+		你需要注意下面这些事情：
+尽量在执行类似功能的参数区域添加新的参数，或者最坏的情形下就是在“Misc（混合）”区域的末尾添加。
+确保你添加的参数区域中还可以有编号添加新的参数。检查是否能继续添加参数的方法是：
+检查参数的计数，确保你所要添加的参数的上一个元素编号要小于你的下一部分代码的编号。
+比如，Misc部分的第一个参数起始于#20,。my_new_parameter是#36。如果下一部分参数开始于#36，那么我们就不能在这里添加这个新参数。
+不要在一个代码块的中间添加新的参数，那样容易造成现存参数对应的信息的改变。
+不要在参数旁边用“弃用（deprecated）”或“移除（remove）”做注解，
+这是因为一些使用者将此注释用作在eeprom上的旧的参数的默认注解，
+如果你添加的新参数也是这样注解，那么就让人就会看起来很奇怪和疑惑。 
+enum {
+        // Misc
+        //
+        k_param_log_bitmask = 20,
+        k_param_log_last_filenumber,            // *** Deprecated - remove
+                                                          // with next eeprom number
+                                                                    // change
+        k_param_toy_yaw_rate,                     // THOR The memory
+                                                                 // location for the
+                                                                  // Yaw Rate 1 = fast,
+                                                                 // 2 = med, 3 = slow
+ 
+        k_param_crosstrack_min_distance,    // deprecated - remove with next eeprom number change
+        k_param_rssi_pin,
+        k_param_throttle_accel_enabled,     // deprecated - remove
+        k_param_wp_yaw_behavior,
+        k_param_acro_trainer,
+        k_param_pilot_velocity_z_max,
+        k_param_circle_rate,
+        k_param_sonar_gain,
+        k_param_ch8_option,
+        k_param_arming_check_enabled,
+        k_param_sprayer,
+        k_param_angle_max,
+        k_param_gps_hdop_good,          // 35
+        k_param_my_new_parameter,       // 36
+		。。。。。
+		}
+		
+    第二步：
+        Step #2：
+        在枚举变量后面的参数类中声明上面枚举变种提到的参数。
+		可使用的类型包括AP_Int8,AP_Int16,AP_Float,AP_Int32,AP_Vector3(目前还不支持unsigned integer无符号整型)。新的枚举变量的名称应该保持一致，只是去掉了前缀k_param_。
+     // 254,255: reserved
+    };
+ 
+    AP_Int16        format_version;
+    AP_Int8         software_type;
+ 
+    // Telemetry control
+    //
+    AP_Int16        sysid_this_mav;
+    AP_Int16        sysid_my_gcs;
+    AP_Int8         serial3_baud;
+    AP_Int8         telem_delay;
+ 
+    AP_Int16        rtl_altitude;
+    AP_Int8         sonar_enabled;
+    AP_Int8         sonar_type;       // 0 = XL, 1 = LV,
+                                      // 2 = XLL (XL with 10m range)
+                                      // 3 = HRLV
+    AP_Float        sonar_gain;
+    AP_Int8         battery_monitoring;         // 0=disabled, 3=voltage only,
+                                                // 4=voltage and current
+    AP_Float        volt_div_ratio;
+    AP_Float        curr_amp_per_volt;
+    AP_Int16        pack_capacity;              // Battery pack capacity less reserve
+    AP_Int8         failsafe_battery_enabled;   // battery failsafe enabled
+    AP_Int8         failsafe_gps_enabled;       // gps failsafe enabled
+    AP_Int8         failsafe_gcs;               // ground station failsafe behavior
+    AP_Int16        gps_hdop_good;              // GPS Hdop value below which represent a good position
+    AP_Int16        my_new_parameter;                  // my new parameter's description goes here
+。。。。。。。。。。。。
+}	
+
+   第三步：
+        Step #3：
+        在Parameters.pde文件中向var_info表中添加变量的声明信息。
+    // @Param: MY_NEW_PARAMETER
+    // @DisplayName: My New Parameter
+    // @Description: A description of my new parameter goes here
+    // @Range: -32768 32767
+    // @User: Advanced
+    GSCALAR(my_new_parameter, "MY_NEW_PARAMETER", MY_NEW_PARAMETER_DEFAULT),
+ 
+        地面站（如Mission Planner）中将使用@Param ~ @User的注释信息向使用者说明用户所设置的变量的范围等。
+		
+    第四步：
+        Step #4:
+        在config.h中添加你的新参数。
+#ifndef MY_NEW_PARAMETER_DEFAULT
+ # define MY_NEW_PARAMETER_DEFAULT      100     // default value for my new parameter
+#endif
+        向主执行代码添加参数的工作就完成了！添加到主代码中(并非库中)的参数就可以通过诸如g.my_new_parameter这样来使用。
+
+
+
+2 向库中添加参数
+        同样可以使用下列步骤向库中添加新的参数。以AP_Compass库为例：
+
+	 第一步：
+        Step #1：
+        首先在库代码的.h头文件添加新的变量(如Compass.h)。可使用的类型包括AP_Int8,AP_Int16,AP_Float,AP_Int32,AP_Vector3f。
+		然后添加你的参数的默认值（我们将在Step #2中使用）。
+		
+#define MY_NEW_PARAM_DEFAULT         100
+ 
+class Compass
+{
+public:
+    int16_t product_id;                         /// product id
+    int16_t mag_x;                      ///< magnetic field strength along the X axis
+    int16_t mag_y;                      ///< magnetic field strength along the Y axis
+    int16_t mag_z;                      ///< magnetic field strength along the Z axis
+    uint32_t last_update;               ///< micros() time of last update
+    bool healthy;                               ///< true if last read OK
+ 
+    /// Constructor
+    ///
+    Compass();
+ 
+protected:
+    AP_Int8 _orientation;
+    AP_Vector3f _offset;
+    AP_Float _declination;
+    AP_Int8 _use_for_yaw;                       ///
+    AP_Int8 _auto_declination;                  ///
+    AP_Int16 _my_new_lib_parameter;              /// description of my new parameter
+};
+
+   第二步：
+        Step #2：
+        然后在.cpp文件（如Compass.cpp）中添加变量包含有@Param ~ @Increment的var_info表信息，以便允许GCS向用户显示来自地面站的关于该参数值的范围设定。当添加新参数时应注意：
+自己添加的代码编号（下面的编号9）一定要比之前变量的大。
+参数的名称（如MY_NEW_P）包括对象自动添加的前缀要少于16个字符。比如罗盘对象的前缀为“COMPASS_”。
+ 
+const AP_Param::GroupInfo Compass::var_info[] PROGMEM = {
+    // index 0 was used for the old orientation matrix
+ 
+    // @Param: OFS_X
+    // @DisplayName: Compass offsets on the X axis
+    // @Description: Offset to be added to the compass x-axis values to compensate for metal in the frame
+    // @Range: -400 400
+    // @Increment: 1
+ 
+ 
+    // @Param: ORIENT
+    // @DisplayName: Compass orientation
+    // @Description: The orientation of the compass relative to the autopilot board.
+    // @Values: 0:None,1:Yaw45,2:Yaw90,3:Yaw135,4:Yaw180,5:Yaw225,6:Yaw270,7:Yaw315,8:Roll180
+    AP_GROUPINFO("ORIENT", 8, Compass, _orientation, ROTATION_NONE),
+ 
+    // @Param: MY_NEW_P
+    // @DisplayName: My New Library Parameter
+    // @Description: The new library parameter description goes here
+    // @Range: -32768 32767
+    // @User: Advanced
+	。。。。
+    AP_GROUPINFO("MY_NEW_P", 9, Compass, _my_new_lib_parameter, MY_NEW_PARAM_DEFAULT),
+ 
+    AP_GROUPEND
+};
+
+这样，新添加的参数将以_my_new_lib_parameter包含在库中。需要指明的是：protected保护类型的参数是不能够在类外被访问的。
+如果我们将其变为public类型，那么我们就可以在主代码中使用compass._my_new_lib_parameter参数了。
+
+
+ 第三步：
+        Step #3: 
+        前面提到的是在已经存在的类（比如AP_Compass）中定义一个新的变量。如果你重新定义了一个新类，在这个新类中添加参数。添加参数的方法如第二步。不过你还有一个工作要做，就是将这个新类，添加到Parameters.cpp文件的var_info 数组列表中去。下面加粗的代码就是一个示例。
+const AP_Param::Info var_info[] PROGMEM = {
+    // @Param: SYSID_SW_MREV
+    // @DisplayName: Eeprom format version number
+    // @Description: This value is incremented when changes are made to the eeprom format
+    // @User: Advanced
+    GSCALAR(format_version, "SYSID_SW_MREV",   0),
+ 
+    // @Group: COMPASS_
+    // @Path: ../libraries/AP_Compass/Compass.cpp
+    GOBJECT(compass,        "COMPASS_", Compass),
+ 
+    // @Group: INS_
+    // @Path: ../libraries/AP_InertialSensor/AP_InertialSensor.cpp
+    GOBJECT(ins,            "INS_", AP_InertialSensor),
+ 
+    AP_VAREND
+};
+
+		

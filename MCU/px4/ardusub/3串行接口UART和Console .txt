@@ -1,0 +1,74 @@
+第四部分 串行接口UART和Console
+        详细参考：http://dev.ardupilot.com/wiki/learning-ardupilot-uarts-and-the-console/
+        UART很重要，用于调试输出，数传、GPS模块等。
+1、5个UART
+        目前共定义了5个UART，他们的用途分别是：
+   uartA – 串行终端，通常是Micro USB接口，运行MAVLink协议。
+   uartB – GPS1模块。
+   uartC – 主数传接口，也就是Pixhawk telem1接口。
+   uartD – 次数传接口，也就是telem2接口。
+   uartE – GPS2模块。
+        有些UART具备双重角色，比如通过修改SERIAL2_PROTOCOL参数，可以将uartD的Mavlink telemetry数传更改为Frsky telemetry数传（中国江苏产数传）。
+        测试 libraries/AP_HAL/examples/UART_test目录下的 example sketch，分别对5个UART都输出hello 消息。使用USB转串口工具，可以测试。
+2、调试终端Debug console
+        作为5个UART的补充，有些平台额外的还有一个debug console调试终端。你可以通过检查HAL_OS_POSIX_IO宏定义来判断，诸如：
+                #if HAL_OS_POSIX_IO
+                     ::printf("hello console\n");
+               #endif
+        如果定义了HAL_OS_POSIX_IO，可以试着查看AP_HAL/AP_HAL_Boards.h代码。
+3、UART函数
+        每个UART都一系列基本操作函数，主要有：
+        1.          printf – formatted print
+        2.          printf_P – formatted print with progmem string (saves memory on AVR boards)
+        3.          println – print and line feed
+        4.          write – write a bunch of bytes
+        5.          read – read some bytes
+        6.          available – check if any bytes are waiting
+        7.          txspace – check how much outgoing buffer space is available
+        8.          get_flow_control – check if the UART has flow control capabilities
+        可以到AP_HAL中查看他们的定义，并使用UART_TEST进行测试。
+		
+4、UART接口说明
+ 代码定义         PCB电路表述     飞控板接口           Serial标号        说明
+ APM代码中的表述    电路板上的表述  Pixhawk外壳上的标识  串口序号
+ uartA                Micro USB         USB                USB          接USB，支持MAVLink协议
+ uartB                UART4             GPS                Serial 3     接GPS模块，另CAN2接口
+ uartC                UART2             Telem1             Serial 1     接第1数传模块
+ uartD                UART3             Telem2             Serial 2     接第2数传模块
+ uartE                UART8             SERIAL4/5          Serial 4     一般接GPS2模块
+  /                   UART7             SERIAL4/5          Serial 5     Debug Console用于程序调试
+等等
+
+经过对UART测试代码： libraries/AP_HAL/examples/UART_test）进行详细测试：
+void loop(void)
+{ 
+    // Micro USB口输出： Hello on UART uartA at 764.461 seconds
+    test_uart(hal.uartA, "uartA");  
+ 
+    // GPS接口输出：Hello on UART uartB at 91.845 seconds
+    test_uart(hal.uartB, "uartB");
+ 
+    // 数传Telem1输出：Hello on UART uartC at 24.693 seconds
+    test_uart(hal.uartC, "uartC");
+ 
+    // 数传Telem2输出：Hello on UART uartD at 805.557 seconds
+    test_uart(hal.uartD, "uartD");
+ 
+    // SEIRAL 4口输出：Hello on UART uartE at 911.812 seconds
+    test_uart(hal.uartE, "uartE");
+    // also do a raw printf() on some platforms, which prints to the
+    // debug console
+#if HAL_OS_POSIX_IO
+     // SEIRAL 5口输出: Hello on debug console at 976.857 seconds
+    ::printf("Hello on debug console at %.3f seconds\n", hal.scheduler->millis()*0.001f);
+#endif
+    hal.scheduler->delay(1000);
+}
+SERIAL 5 作为重要的调试口。Pixhawk启动时会通过该接口输出大量信息，可以用来对启动过程进行监控。
+
+
+
+
+
+
+		

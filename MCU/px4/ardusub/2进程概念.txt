@@ -1,0 +1,143 @@
+
+来源于 arduino的 结构 看似 单线程
+setup()  //启动执行一次
+
+loop()   //循环执行
+
+APM1 and APM2  不支持多线程  可用 定时器 timer 和 回调函数 callback 实现类似的功能
+PX4 and Linux 支持多线程
+
+
+ardupilot 中的多线程概念
+The timer callbacks         定时器的回调函数
+HAL specific threads        硬件抽象定义的 线程
+driver specific threads     驱动器定义的线程
+ardupilot drivers versus platform drivers      APM驱动与板级驱动
+platform specific threads and tasks   平台 线程 和 任务
+the AP_Scheduler system               调度程序系统
+semaphores                            信号量(Semaphores)  进程间通信  信号灯（任务队列互锁用）
+lockless data structures              无锁数据结构
+
+1、The timer callbacks         定时器的回调函数
+	hal.scheduler->register_timer_process(AP_HAL_MEMBERPROC(&AP_Baro_MS5611::_update)); // 1kHz  定时器
+	也可以 利用 hal.scheduler->millis() 毫秒计时   hal.scheduler->micros()  微妙计时 得到 超过 1kHz 的 定时器效果
+	 定时器优先级为181，高于主进程的180
+
+2、HAL specific threads        硬件抽象定义的 线程  Scheduler.cpp 中有描述
+	The UART thread, for reading and writing UARTs (and USB)                       串口读写线程
+	The timer thread, which supports the 1kHz timer functionality described above  定时器线程
+	The IO thread, which supports writing to the microSD card, EEPROM and FRAM     通用IO口线程 读写 tf卡 ROM  RAM
+	
+	hal.scheduler->register_io_process(AP_HAL_MEMBERPROC(&AP_Terrain::io_timer)); //writing to the microSD card
+	
+	ps 命令 可以查看各个进程 详情
+PID Process Identifier 进程的身份标识
+PRI priority           进程优先级
+
+ PID PRI SCHD TYPE    NP      STATE NAME
+ 0   0   FIFO TASK    READY   Idle Task()
+ 1   192 FIFO KTHREAD WAITSIG hpwork()
+ 2   50  FIFO KTHREAD WAITSIG lpwork()
+ 3   100 FIFO TASK    RUNNING init()
+ 37  180 FIFO TASK    WAITSEM AHRS_Test()
+ 38  181 FIFO PTHREAD WAITSEM <pthread>(20005400)       定时器线程
+ 39  60  FIFO PTHREAD READY   <pthread>(20005400)       UART线程
+ 40  59  FIFO PTHREAD WAITSEM <pthread>(20005400)       IO线程
+ 10  240 FIFO TASK    WAITSEM px4io()
+ 13  100 FIFO TASK    WAITSEM fmuservo()
+ 30  240 FIFO TASK    WAITSEM uavcan()
+
+上面的线程为定时器线程（优先级181），UART线程(60)， IO线程(59)，以及其他线程诸如：px4io, fmuservo, uavcan, lpwork, hpwork and idle tasks
+        线程的主要目的是在不干扰主进程的情况下，在后台处理一些低优先级任务。例如 AP_Terrain library，需要向microSD卡写地形文件，它的实现方式如下：
+ 
+        hal.scheduler->register_io_process(AP_HAL_MEMBERPROC(&AP_Terrain::io_timer));
+ 
+        注意：IO线程优先级59，相比定时器181优先级慢了很多。
+		
+		
+ 3、driver specific threads     驱动器定义的线程
+ 
+ register_io_process()    scheduler calls to use the existing  IO threads
+ register_timer_process() scheduler calls to use the existing timer threads
+
+自己添加新的 硬件 HAL interface that provides a generic way to create threads on multiple AP_HAL targets (please contribute patches back)
+An example of a driver specific thread is the ToneAlarm thread in the Linux port. See AP_HAL_Linux/ToneAlarmDriver.cpp
+
+
+4、ardupilot drivers versus platform drivers   APM驱动与板级（原生）驱动
+
+   我们可以看到MPU6000驱动有两个版本：一个是APM版本，
+   在libraries/AP_InertalSensor/AP_InertialSensor_MPU6000.cpp,
+   另一个为原生代码版本，在PX4Firmware/src/drivers/mpu6000。
+    注意，对于Pixhawk，APM代码使用的是Pixhawk原生驱动，因为原生驱动已经做得很好了。
+	libraries/AP_InertialSensor/AP_InertialSensor_PX4.cpp中可以查看详情。
+	
+      在非PX4平台上，我们使用AP_InertialSensor_MPU6000.cpp驱动，
+	  在PX4平台上，我们就用PX4原生驱动AP_InertialSensor_PX4.cpp
+		
+
+5、platform specific threads and tasks   平台 线程 和 任务  板级专属线程、任务
+idle task - called when there is nothing else to run              休眠任务
+init - used to start up the system                                初始化任务
+px4io - handle the communication with the PX4IO co-processor      通信任务
+hpwork - handle thread based PX4 drivers (mainly I2C drivers)     I2C 总线驱动
+lpwork - handle thread based low priority work (eg. IO)           IO口驱动 读写 SD卡  ROM  RAM
+fmuservo - handle talking to the auxillary PWM outputs on the FMU 电机服务器 任务
+uavcan - handle the uavcan CANBUS protocol                        CAN总线
+
+这些任务的启动，由rc.APM脚本文件(ardupilot\mk\PX4\ROMFS\init.d\rc.APM)指定。
+PX4启动时，会读取该文件。rc.APM属于nsh 类型脚本。
+作为练习，你可以修改rc.APM脚本文件，增加一些sleep和echo命令，
+那么当PX4启动时，通过debug console（也就是serial 5）可以显示出来。
+
+原生线程的启动代码如下：
+ 
+    hrt_call_every(&_call, 1000, _call_interval, (hrt_callout)&MPU6000::measure_trampoline, this);
+ 
+     等同于AP_HAL中的hal.scheduler->register_timer_process()。上述代码的意思是，HRT （high resolution timer）高精度定时器，以1000微妙的周期调用MPU6000::measure_trampoline函数。这些操作是禁止中断的，最多占用数十微妙的时间。
+    上面的优先级非常高。下面的方法，是稍低优先级。
+ 
+    work_queue(HPWORK, &_work, (worker_t)&HMC5883::cycle_trampoline, this, 1);
+  用于处理I2C设备。大概花几百微妙的操作时间。是可以被中断的任务。如果是最低优先级，那么参数改为LPWORK，这样的任务一般需要花费更长的时间。
+  
+ 6、AP_Scheduler任务调度系统
+        用于飞行器主线程，提供了简单的机制控制每个操作花费了多少时间。
+		例如：
+		1、等待一个新IMU采样；
+		2、在每一个IMU采样周期之间调用一系列其他任务。
+		
+        每一个飞行器都有一个AP_Scheduler::Task table任务列表，参考代码
+		（ardupilot\libraries\AP_Scheduler\ Scheduler_test.pde ）类似如下：
+		
+                static const AP_Scheduler::Task scheduler_tasks[] PROGMEM = {
+                { ins_update, 1, 1000 },
+                { one_hz_print, 50, 1000 },
+                { five_second_call, 250, 1800 },
+                };
+        结构体第1列，循环调用的任务函数。
+		第2列，调用频率（也叫tick，一个tick，就是一个最小时间单元，pixhawk为2.5ms）。
+		第3列为最大可能占用的操作时间，scheduler.run()会传递当前可用的时间（微秒）,
+		如果时间不够，那么这个任务就pass掉了，不执行。
+        注意，AP_Scheduler::Task table列表必须具备以下条件：
+        1、 他们不能被阻塞。
+        2、 在飞行时，他们不能调用sleep function
+        3、 他们必须有可预估的最坏的运行时间。
+        你可以修改Scheduler_test.pde，加入自己的代码来读取气压计、罗盘、GPS、更新AHRS输出roll/pitch。 
+
+7、信号灯
+        有3种方法可以避免多线程访问冲突：1、信号灯；2、lockless data；3、PX4 ORB。
+        例如：I2C驱动可以通过信号灯，确保同一时间，只有一个I2C设备被使用。可以查看ardupilot\libraries\AP_Compass\AP_Compass_HMC5843.cpp了解：
+        获得信号灯：_i2c_sem->take(1);
+        释放信号灯：_i2c_sem->give();
+		
+8、Lockless Data Structures
+        Lockless Data Structures比信号灯要方便，例子见：
+ the _shared_data structure in libraries/AP_InertialSensor/AP_InertialSensor_MPU9250.cpp
+ the ring buffers used in numerous places. A good example is libraries/DataFlash/DataFlash_File.cpp
+        Go and have a look at these two examples, and prove to yourself that they are safe for concurrent access. For DataFlash_File look at the use of the _writebuf_head and _writebuf_tail variables.
+
+9、PX4 ORB
+        ORB(Object Request Broker)是PX4的互斥机制。
+        另外两种PX4驱动通信机制，列举如下：
+ ioctl calls (see the examples in AP_HAL_PX4/RCOutput.cpp)
+ /dev/xxx read/write calls (see _timer_tick in AP_HAL_PX4/RCOutput.cpp)		

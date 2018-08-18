@@ -1,0 +1,166 @@
+
+如何向APM代码中添加新的飞行模式。通过这里我们可以对飞行模式相关的几个文件有一个非常清晰的认识。
+
+  英文参考：http://dev.ardupilot.com/wiki/apmcopter-adding-a-new-flight-mode/
+  
+   这部分将涵盖一些怎样创建一个新的高级别的飞行模式的基本操作步骤（类似于自稳，悬停等），
+   这些新模式处于“the onion”（洋葱头工程）中的高级别代码控制部分，如之前姿态控制页面描述的一样。
+   不过遗憾的是本页面并没有提供给你关于所创建的理想飞行模式需要的所有信息，但是希望这将是一个好的开始。
+   
+   
+     Step #1：在文件defines.h中用#define定义你自己新的飞行模式, 。
+enum control_mode_t {
+    STABILIZE =     0,  // 自稳 hold level position 保持水平位置姿态 manual airframe angle with manual throttle
+    ACRO =          1,  // 特技 rate control 角速度控制 manual body-frame angular rate with manual throttle
+    ALT_HOLD =      2,  // 高度保持 manual airframe angle with automatic throttle
+    AUTO =          3,  // 自动 fully automatic waypoint control using mission commands
+    GUIDED =        4,  // fully automatic fly to coordinate or fly at velocity/direction using GCS immediate commands
+    LOITER =        5,  // automatic horizontal acceleration with automatic throttle
+    RTL =           6,  // 返航 automatic return to launching point
+    CIRCLE =        7,  // automatic circular flight with automatic throttle
+    LAND =          9,  // 着陆  automatic landing with horizontal position control
+    DRIFT =        11,  // 半自主 semi-automous position, yaw and throttle control
+    SPORT =        13,  // manual earth-frame angular rate control with manual throttle
+    FLIP =         14,  // automatically flip the vehicle on the roll axis
+    AUTOTUNE =     15,  // automatically tune the vehicle's roll and pitch gains
+    POSHOLD =      16,  // automatic position hold with manual override, with automatic throttle
+    BRAKE =        17,  // full-brake using inertial/GPS system, no pilot input
+    THROW =        18,  // throw to launch mode using inertial/GPS system, no pilot input
+    AVOID_ADSB =   19,  // automatic avoidance of obstacles in the macro scale - e.g. full-sized aircraft
+    GUIDED_NOGPS = 20,  // guided mode but only accepts attitude and altitude
+	// NEWFLIGHTMODE = 21  // add a new flight mode
+};
+
+ Step#2：类似于相似的飞行模式的control_stabilize.cpp 或者control_loiter.cpp文件，创建新的飞行模式的newflightmode.cpp控制sketch文件。
+ 该文件中必须包含一个_init()初始化函数和_run()运行函数，
+ 类似于static bool althold_init(bool ignore_checks)
+ 和    static void althold_run()
+/// -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil -*-
+// newflightmode_init - initialise flight mode
+static bool newflightmode_init(bool ignore_checks)
+{
+    // do any required initialisation of the flight mode here
+    // this code will be called whenever the operator switches into this mode
+ 
+    // return true initialisation is successful, false if it fails
+    // if false is returned here the vehicle will remain in the previous flight mode 
+	// 如果返回错误 则停留在上一个模式
+    return true;
+}
+ 
+// newflightmode_run - runs the main controller
+// will be called at 100hz or more
+static void newflightmode_run()
+{
+    // if not armed or throttle at zero, set throttle to zero and exit immediately
+    if(!motors.armed() || g.rc_3.control_in <= 0) {// 未解锁 或者 油门输入为零
+        attitude_control.relax_bf_rate_controller();         // 控制器休息
+        attitude_control.set_yaw_target_to_current_heading();// 当前航向
+        attitude_control.set_throttle_out(0, false);         // 油门输出为零
+        return;
+    }
+ 
+    // convert pilot input into desired vehicle angles or rotation rates
+    //   g.rc_1.control_in : pilots roll input in the range -4500 ~ 4500  远程遥控通道一 控制输入 roll  横滚
+    //   g.rc_2.control_in : pilot pitch input in the range -4500 ~ 4500  远程遥控通道二 控制输入 pitch 俯仰
+    //   g.rc_3.control_in : pilot's throttle input in the range 0 ~ 1000 远程遥控通道三 控制输入 throt 油门
+    //   g.rc_4.control_in : pilot's yaw input in the range -4500 ~ 4500  远程遥控通道四 控制输入 yaw   偏航
+    
+	// convert pilot input to lean angles  横滚 俯仰角度
+    // To-Do: convert get_pilot_desired_lean_angles to return angles as floats
+    // get_pilot_desired_lean_angles(channel_roll->get_control_in(), channel_pitch->get_control_in(), 
+	// target_roll,target_pitch, aparm.angle_max);
+
+ 
+    // call one of attitude controller's attitude control functions like
+    //   attitude_control.angle_ef_roll_pitch_rate_yaw(roll angle, pitch angle, yaw rate);
+    //   attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(wp_nav->get_roll(), wp_nav->get_pitch(), 
+	//      target_yaw_rate, get_smoothing_gain());
+	//   attitude_control->input_euler_angle_roll_pitch_yaw(wp_nav->get_roll(), wp_nav->get_pitch(), get_auto_heading(),true, 
+	//      get_smoothing_gain());
+	
+    // call position controller's z-axis controller or simply pass through throttle
+    //   attitude_control.set_throttle_out(desired throttle, true);
+}
+
+
+  Step#3：在文件flight_mode.cpp文件的set_mode()函数中
+  
+  增加一个新飞行模式的case（C++中switch..case语法）选项，然后调用上面的_init()函数。
+  
+// set_mode - change flight mode and perform any necessary initialisation
+static bool set_mode(uint8_t mode)
+{
+    // boolean to record if flight mode could be set
+    bool success = false;
+    bool ignore_checks = !motors.armed();   // allow switching to any mode if disarmed.  We rely on the arming check to perform
+ 
+    // return immediately if we are already in the desired mode
+    if (mode == control_mode) {
+        return true;
+    }
+ 
+    switch(mode) {
+        case ACRO:
+            #if FRAME_CONFIG == HELI_FRAME
+                success = heli_acro_init(ignore_checks);
+            #else
+                success = acro_init(ignore_checks);
+            #endif
+            break;
+ 
+        case NEWFLIGHTMODE: // 与 defines.h 中定义的 一致
+            success = newflightmode_init(ignore_checks);
+            break;
+		。。。
+    }
+}
+
+
+Step #4:在文件flight_mode.cpp文件的update_flight_mode()函数中增加一个新飞行模式的case选项，然后调用上面的_run()函数。
+// update_flight_mode - calls the appropriate attitude controllers based on flight mode
+// called at 100hz or more
+static void update_flight_mode()
+{
+    switch (control_mode) {
+        case ACRO:
+            #if FRAME_CONFIG == HELI_FRAME
+                heli_acro_run();
+            #else
+                acro_run();
+            #endif
+            break;
+        case NEWFLIGHTMODE:
+            success = newflightmode_run();
+            break;
+		。。。
+    }
+}
+
+ Step #5: 在文件flight_mode.cpp 文件的print_flight_mode()函数中增加可以输出新飞行模式字符串的case选项。
+static void print_flight_mode(AP_HAL::BetterStream *port, uint8_t mode)
+{
+    switch (mode) {
+    case STABILIZE:
+        port->print_P(PSTR("STABILIZE"));
+        break;
+    case NEWFLIGHTMODE:
+        port->print_P(PSTR("NEWFLIGHTMODE"));
+        break;
+	...
+}
+
+Step #6：在文件Parameters.pde中向FLTMODE1 ~ FLTMODE6参数中正确的增加你的新飞行模式到@Values列表中。
+    // @Param: FLTMODE1
+    // @DisplayName: Flight Mode 1
+    // @Description: Flight mode when Channel 5 pwm is 1230, <= 1360
+    // @Values: 0:Stabilize,1:Acro,2:AltHold,3:Auto,4:Guided,5:Loiter,6:RTL,7:Circle,8:Position,9:Land,10:OF_Loiter,11:ToyA,12:ToyM,13:Sport,17:NewFlightMode
+    // @User: Standard
+    GSCALAR
+	
+	
+Step #7：如果你想让你的新飞行模式出现的Mission Planner的平视显示器HUD和飞行模式组件中，
+你需要相应修改Mission Planner代码。关于Mission Planner如何编译的问题，请参考我的另外一篇文章：http://blog.sina.com.cn/s/blog_402c071e0102v4kx.html。有任何问题可以
+
+
+	

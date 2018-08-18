@@ -1,0 +1,54 @@
+第五部分 学习RC Input and Output
+        参考：http://dev.ardupilot.com/wiki/learning-ardupilot-rc-input-output/
+        RC Input，也就是遥控输入，用于控制飞行方向、改变飞行模式、控制摄像头等外围装置。ArduPilot支持集中不同RC input（取决于具体的硬件飞控板）：
+        1. PPMSum – on PX4, Pixhawk, Linux and APM2
+        2. SBUS – on PX4, Pixhawk and Linux
+        3. Spektrum/DSM – on PX4, Pixhawk and Linux
+        4. PWM – on APM1 and APM2
+        5. RC Override (MAVLink) – all boards
+        其中SBUS and Spektrum/DSM是串行协议，SBUS为100kbps反UART协议，Spektrum/DSM为115200bps UART协议。对于PX4，这些协议是通过硬件UARTs实现的，而有些Linux系统是通过软件UARTs实现的。
+		
+ RC Output，是指飞控接受到RCPWM控制信号输入后，再将其经过控制算法后，输出到伺服和电机（电调）上。
+ 
+ RC Output默认50Hz PWM信号。对于ArduCopter多轴飞行器和直升机，输出频率为400Hz。
+ 
+ 
+1、RCInput对象（AP_HAL）
+        RCInput 对象声明：
+        AP_HAL::RCInput* rcin;
+        相关例程： libraries/AP_HAL/examples/RCInput/RCInput.pde ，试着动动遥控器手柄，看看输出是否符合预期。
+		
+2、RCOutput对象（AP_HAL）
+        RCOutput对象声明：
+        AP_HAL::RCOutput* rcout;
+        不同的飞控，代码实现有所不同，可能包含了片上定时器、I2C、经由协处理器(PX4IO)输出等程序。
+        相关例程： libraries/AP_HAL/examples/RCOutput/RCOutput.pde 这段程序从1通道到14通道，控制电机从最小转速到最大转速逐级变化。
+		
+3、RC_Channel对象
+        hal.rcin和hal.rcout对象，为低层次调用。最常用的是使用更高级封装的RC_Channel 对象来实现RC input 和 output。它允许用户对参数进行配置，例如每个通道min/max/trim值，同时支持辅助AUX通道函数，还可对input output进行比例缩放处理等。
+        相关例程： libraries/RC_Channel/examples/RC_Channel/RC_Channel.pde例程教你如何setup、read、copy input to output。
+		
+4、RC_Channel奇怪的input/output 设置
+        看代码时，有些地方程序会让你感到奇怪，有一些是由于程序代码的不完善产生的，有一些则不是。
+        例如，很多变量作用在input和output上：
+                radio_out = (pwm_out * _reverse) + radio_trim;
+        上述代码中的radio_trim，是一个trim叠加，用来修正遥控器的值。
+        又例如，对于固定翼飞行器，roll（横滚）输入，成为了steer（转向 yaw）。对于ArduCopter中的多轴飞行器，在处于Drift模式（漂移模式）时，我们看到，pitch用于前飞，roll用于转向（而不是传统yaw用于转向）。以后，APM团队会将其纠正过来，将这两个概念分开。大家知道这么回事就OK了。
+		
+		
+5、RC_Channel_aux 对象
+        另一个非常重要的类：RC_Channel_aux class，它是RC_Channel的子类。它有很多特点可供用户使用。这个会有一点比较难以理解，举个例子：
+        用户想要使用通道6(Channel 6)对航拍设备的横向稳定进行控制，那么他可以将FUNCTION设置为21，枚举变量类型为” k_rudder”（偏航，偏转，转向的意思）。如下：
+                AP_GROUPINFO("FUNCTION", 1, RC_Channel_aux, function, 21),
+                AP_GROUPEND
+        如果程序中调用此代码，RC_Channel_aux::set_servo_out(RC_Channel_aux::k_rudder, 4500);，那么所有FUNCTION设为21(k_rudder)的通道(channel)都将输出满偏(4500就是满偏最大值)。
+        在相应的update_aux_servo_function()代码中，
+                case RC_Channel_aux::k_rudder:
+                        _aux_channels[i]->set_angle(4500);// 设置最大角度。
+                        break;
+        注意这是一对多的设置。就我的理解，其实也就是我们常说的混控输出。比如在辅助通道6中，我们可以将其他通道设置为使用function = 21。那么其他使用了21的通道，将会被通道6混控。（这个很复杂，我也没太明白，对这个有更好理解的，请一定告诉我，相互学习：30175224@qq.com。当然如果日后我能有更好的理解，我会更新本博客。）
+        下图，RC_Channel共4个通道，RC_Channel_aux共10个通道。
+         第一组：1、2、3、4、5、6、7、8、10、11（共10通道）
+         第二组：9、12
+         第三组：13、14 
+ 

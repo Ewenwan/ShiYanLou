@@ -1,0 +1,73 @@
+
+1、用代码调度器（scheduler）运行你的代码
+        在给定时间间隔内来运行你的代码的最灵活的方式就是使用调度器。
+   这可以通过将你的函数添加到文件ArduCopter.cpp中的scheduler_tasks数组来完成。
+   需要表明的是：实际上该文件中有两个任务列表，上面的任务列表是针对高频CPUs（如Pixhawk），
+   对应的调度频率是400Hz，下面的是针对低频CPUs（如APM2），对应的调度频率是100Hz。
+   
+   添加一个任务是相当的简单，你只要在列表添加新的一行代码就可以了（列表中位置越靠前意味着拥有更高的级别）。
+   任务项中的第一列代表了函数名，第二列是以2.5ms为单位的数字（或者APM2中以10ms为单位）。
+   所以，如果你想要你的函数执行频率为400Hz，那么该列就需要填写为“1”，如果想要50Hz，那么就需要改为“8”。
+   任务项的最后一列代表该函数预计运行花费的微秒（百万分之一秒）时间。
+   这可以帮助调度器来预估在下一个主循环开始之前有否有足够的时间来运行你的函数。
+   
+   static const AP_Scheduler::Task scheduler_tasks[] PROGMEM = {
+    { update_GPS,            2,     900 },
+    { update_nav_mode,       1,     400 },
+    { medium_loop,           2,     700 },
+    { update_altitude,      10,    1000 },
+    { fifty_hz_loop,         2,     950 },
+    { run_nav_updates,      10,     800 },
+    { slow_loop,            10,     500 },
+    { gcs_check_input,              2,     700 },
+    { gcs_send_heartbeat,  100,     700 },
+    { gcs_data_stream_send,  2,    1500 },
+    { gcs_send_deferred,     2,    1200 },
+    { compass_accumulate,    2,     700 },
+    { barometer_accumulate,  2,     900 },
+    { super_slow_loop,     100,    1100 },
+	
+    { my_new_function,      10,     200 },
+	
+    { perf_update,        1000,     500 }
+};
+
+2、作为循环的一部分运行你的代码
+        为了代替在代码调度器中加入一个新的函数入口，你还可以在现有的任何时间循环事件中添加你的函数。
+		除了在fast-loop循环中添加外，这种方法对比起上面的代码调度器方法并没有什么实质性好处。
+		但当你的代码添加到fast-loop循环中时，就意味着它将以最高的优先级别来执行（它几乎能100%达到所确保的400hz运行速度）。
+		
+fast_loop:APM2上运行频率100hz，Pixhawk上400Hz
+fifty_hz_loop:运行频率50hz
+ten_hz_logging_loop:运行频率10hz
+three_hz_loop:运行频率3.3hz
+on_hz_loop:运行频率1hz
+
+fourhundred_hz_logging() // 400Hz 日志记录
+ten_hz_logging_loop()    // 10 Hz  日志记录
+twentyfive_hz_logging()  // 25 Hz  日志记录
+
+ 所以举个例子，如果你想让你的代码运行频率为10hz，那么你就要将它添加到ArduCopter.pde文件的ten_hz_logging_loop()函数声明中。
+// ten_hz_logging_loop
+// should be run at 10hz
+static void ten_hz_logging_loop()
+{
+    if (g.log_bitmask & MASK_LOG_ATTITUDE_MED) {
+        Log_Write_Attitude();
+    }
+    if (g.log_bitmask & MASK_LOG_RCIN) {
+        DataFlash.Log_Write_RCIN();
+    }
+    if (g.log_bitmask & MASK_LOG_RCOUT) {
+        DataFlash.Log_Write_RCOUT();
+    }
+    if ((g.log_bitmask & MASK_LOG_NTUN) && mode_requires_GPS(control_mode)) {
+        Log_Write_Nav_Tuning();
+    }
+ 
+        // your new function call here
+        my_new_function();
+}
+
+
+

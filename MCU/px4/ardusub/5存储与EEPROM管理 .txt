@@ -1,0 +1,163 @@
+第六部分 存储与EEPROM管理
+        详细参考：http://dev.ardupilot.com/wiki/learning-ardupilot-storage-and-eeprom-management/
+        用户参数、航点、集结点、地图数据以及其他有用的信息需要存储。ArduPilot提供4个基本存储接口：
+        1、AP_HAL::Storage对象：hal.storage；
+        2、StorageManager库，是hal.storage更高级别的封装；
+        3、DataFlash用于日志存储；
+        4、Posix IO函数，是传统文件系统读写函数。
+        其他用于永久存储信息的函数库，都是基于以上4种实现。例如：AP_Param library（用于处理用户可配置参数）是建立在StorageManager库之上的，而StorageManager库则是基于AP_HAL::Storage之上。AP_Terrain library（用于处理地形数据）则是建立在Posix IO functions之上，用于操作地形数据库。
+		
+1、AP_HAL::Storage library
+        AP_HAL::Storage对象适用于所有ArduPilot硬件平台。最小支持4096字节空间的存储，一些类似PX4v1的板子有8K EEPROM，Pixhawk有16K FRAM。所有这些都封装在AP_HAL::Storage API中。
+hal.storage API，非常简单，仅3个函数：
+        1、init()，初始化存储系统；
+        2、read_block()，读块数据；
+        3、write_block()，写块数据。
+        之所以这么简单，是因为APM团队鼓励开发者使用StorageManager API，而不是hal.storage。只有在代码移植或调试时，使用hal.storage会比较方便（原文：You should only be delving into hal.storage when doing bringup of a new board, or when debugging.）。
+        存储空间的大小，在AP_HAL/AP_HAL_Boards.h文件中的HAL_STORAGE_SIZE宏中定义，如下：
+        #define CONFIG_HAL_BOARD_SUBTYPE HAL_BOARD_SUBTYPE_PX4_V2
+        #define HAL_STORAGE_SIZE            16384            // 存储空间 16KB
+        #endif
+        也就是说，我们不支持动态存储空间的定义。如果希望使用动态存储空间，可以使用Posix IO。
+		
+2、StorageManager library
+        在将ArduPilot代码移植到一个新的硬件板上时，hal.storage API非常简单，但是在操作存储区时就不那么好使了。我们会采用StorageManager。StorageManager library提供对存储区域“伪连续块”（一般用作不同的功能和目的）的访问。正因此我们将存储区域分配了不同的功能：
+        1、参数区；
+        2、飞行区域限制点数据区；
+        3、航点数据区；
+        4、集结点数据区。
+        参见： libraries/StorageManager/StorageManager.cpp，我们可以看到存储区域的划分：
+const StorageManager::StorageArea StorageManager::layout_copter[STORAGE_NUM_AREAS] PROGMEM = {
+         // ------------------------   0-4096  分配给了 AVR版本的 APM
+    { StorageParam,   0,     1536}, // 0x600 param bytes 
+    { StorageMission, 1536,  2422},
+    { StorageRally,   3958,    90}, // 6 rally points
+    { StorageFence,   4048,    48}, // 6 fence points
+#if STORAGE_NUM_AREAS >= 8
+         // ------------------------   4096-8192  分配给了PX4版本
+    { StorageParam,   4096,  1280},
+    { StorageRally,   5376,   300},
+    { StorageFence,   5676,   256},
+    { StorageMission, 5932,  2132}, // leave 128 byte gap for
+                                    // expansion and PX4 sentinal
+#endif
+#if STORAGE_NUM_AREAS >= 12                                      // Pixhawk
+         // ------------------------   8192-16384  分配给了 Pixhawk版本
+    { StorageParam,    8192,  1280},                  // 类型    偏移量   长度
+    { StorageRally,    9472,   300},
+    { StorageFence,    9772,   256},
+    { StorageMission, 10028,  6228}, // leave 128 byte gap for expansion
+#endif
+};
+        对于上面的存储分布，我们可以观察到AVR版本用到存储地址是0-4095，而PX4用到地址是4096-8191，Pixhawk用到的地址是8192-16383。这样的结构，是为了更好的与之前的版本兼容。这样一来，用户在更新最新的固件时，所有之前配置的参数将不会改变，将继续起作用。
+        StorageManager API也提供对类似整型数的读写访问，AP_Mission中就会利用这个API来存储和恢复航点数据。
+        相关例程（libraries/StorageManager/examples/StorageTest.pde）对StoageManager layer和AP_HAL::Storage object进行了测试。它对随机的偏移量、随机的长度进行了随机的IO操作。这也就意味可能会出现跨边界访问。这个例程非常有用，它用于对StorageManager API进行严苛测试，同样对于移植ArduPilot到新硬件平台也是极为有用的，因为它对EEPROM的访问函数进行了很严格的测试。
+        注意StorageTest是一个毁坏性的测试，它将会删除你之前存储的参数和航点。一定要记得测试之前，备份你的配置。
+        存储对象的声明，一般如下：
+        StorageAccess AP_Param::_storage(StorageManager::StorageParam);
+        又或者
+        StorageAccess AP_Rally::_storage(StorageManager::StorageRally);
+        StorageAccess AP_Mission::_storage(StorageManager::StorageMission);
+        StorageAccess AP_Limit_Geofence::_storage(StorageManager::StorageFence);
+
+
+3、DataFlash library
+        另一类存储，就是飞行日志存储，这个基于DataFlash library。这个库的名字看上去有些怪怪的，实际上这个库最开始是为APM1的DataFlash芯片设计的，它原本是一个硬件驱动库，后来慢慢演变为一个通用日志系统，这个可以在代码中找到蛛丝马迹（这些都是以前的痕迹，不是最好的代码实现方式）。
+        现在DataFlash API主要用于实现日志存储。它允许你自定义日志消息的数据结构。例如GPS消息，用于记录GPS传感器的日志数据。它能够非常有效存储这些数据，它同时也对其他库提供相应的APIs，用来进行日志回传、下载。
+        LOG数据结构是自定义的，其结构可以查看日志文件的FMT消息。FMT消息地应以的其他数据的存储格式。
+        相关例程 libraries/DataFlash/examples/DataFlash_test/DataFlash_test.pde。这里描述了数据的存储结构和数据格式。简单列举如下：
+ 
+第一点，在.log文件中，我们可以看到如下格式的表达：
+        FMT, 128, 89, FMT, BBnNZ, Type,Length,Name,Format,Columns
+        FMT, 129, 23, PARM, Nf, Name,Value
+        FMT, 130, 45, GPS, BIHBcLLeeEefI,Status,TimeMS,Week,NSats,HDop,Lat,Lng,RelAlt,Alt,Spd,GCrs,VZ,T
+        FMT, 131, 31, IMU, Iffffff, TimeMS,GyrX,GyrY,GyrZ,AccX,AccY,AccZ
+        FMT, 132, 67, MSG, Z, Message
+ 
+第二点，上述格式，对应的代码（参见DataFlash.h）：
+        #define LOG_BASE_STRUCTURES \
+           { LOG_FORMAT_MSG, sizeof(log_Format), \
+              "FMT", "BBnNZ",      "Type,Length,Name,Format,Columns" },    \
+           { LOG_PARAMETER_MSG, sizeof(log_Parameter), \
+              "PARM", "Nf",        "Name,Value" },    \
+            { LOG_GPS_MSG, sizeof(log_GPS), \
+              "GPS",  "BIHBcLLeeEefI", "Status,TimeMS,Week,NSats,HDop,Lat,Lng,RelAlt,Alt,Spd,GCrs,VZ,T" }, \
+            { LOG_IMU_MSG, sizeof(log_IMU), \
+              "IMU",  "Iffffff",     "TimeMS,GyrX,GyrY,GyrZ,AccX,AccY,AccZ" }, \
+        上述结构，以 LOG_IMU_MSG为例讲解：
+		
+		
+信息类型ID       数据大小   信息名称   数据类型    数据1     数据2     数据3     数据4       数据5     数据6     数据7
+LOG_IMU_MSG  sizeof(log_IMU) IMU        Iffffff   TimeMS     GyrX      GyrY      GyrZ        AccX      AccY      AccZ
+131             31(字节)     IMU   l:整型; f:浮点 整型46481  0.000703 -0.000190 -0.000359  -0.133995  0.034236  -9.748702
+
+
+第三点，日志文件(.log)的一条数据如下：
+        IMU, 46481, 0.000703, -0.000190, -0.000359, -0.133995, 0.034236, -9.748702
+
+
+第四点，消息类型的定义：
+// message types for common messages
+// 消息类型，，，对应 FMT 中的消息类型，，，见日志文件 .log 文件。
+#define LOG_FORMAT_MSG           128
+#define LOG_PARAMETER_MSG 129
+#define LOG_GPS_MSG                   130
+#define LOG_IMU_MSG                  131
+#define LOG_MESSAGE_MSG         132
+#define LOG_RCIN_MSG      133
+#define LOG_RCOUT_MSG     134
+#define LOG_IMU2_MSG       135
+…
+ 
+第五点, log_IMU的结构，共占用 3 + 4 + 12 + 12 = 31字节。
+struct PACKED log_IMU {
+    LOG_PACKET_HEADER;                    // 3
+    uint32_t timestamp;                        // 4
+    float gyro_x, gyro_y, gyro_z;            // 4*3 = 12
+    float accel_x, accel_y, accel_z;        // 4*3 = 12
+};
+ 
+第六点：如果要增加自定义的数据结构，那么可以像以下代码一样增加。
+#define LOG_TEST_MSG 1
+ 
+struct PACKED log_Test {
+    LOG_PACKET_HEADER;
+    uint16_t v1, v2, v3, v4;
+    int32_t  l1, l2;
+};
+ 
+static const struct LogStructure log_structure[] PROGMEM = {
+    LOG_COMMON_STRUCTURES,
+    { LOG_TEST_MSG, sizeof(log_Test),                             // 增加自定义格式数据
+      "TEST", "HHHHii",        "V1,V2,V3,V4,L1,L2" }          // 增加自定义格式数据
+};
+ 
+第七点：具体的数据结构操作
+        DataFlash.Init(log_structure, sizeof(log_structure)/sizeof(log_structure[0]));
+        log_num = DataFlash.StartNewLog();
+        DataFlash.WriteBlock(&pkt, sizeof(pkt));
+ 
+        DataFlash API隐藏了底层如何存储log文件的细节。另外，对于Pixhawk or Linux这样的支持 Posix IO的系统，日志文件是存储在microSD卡的“LOGS”目录中的。用户可以直接抽出SD卡，直接拷贝到电脑中。
+
+4、Posix IO
+        有些板子是带操作系统的，支持类似Posix API，如Linux和NuttX。AP_Terrain library就是一个典型的例子。地形数据对于EEPROM是非常的大，经常要随机的存储。DataFlash API就不够灵活了，同时又了Posix IO支持，也就没必要再用DataFlash了。
+        查看AP_HAL_Boards.h文件，确认HAL_OS_POSIX_IO宏已定义，如下：
+        #define HAL_OS_POSIX_IO 1                           // 带文件系统，has posix-like filesystem IO
+        下面给出了LOG 和 TERRAIN 文件存放路径：
+        #define HAL_BOARD_LOG_DIRECTORY "/fs/microsd/APM/LOGS"                       // LOG 日志文件地址
+        #define HAL_BOARD_TERRAIN_DIRECTORY "/fs/microsd/APM/TERRAIN" // 地表、地形文件地址
+        有上述信息，就表示支持Posix IO 功能，另外需要说明的是：
+        1、Posix IO函数，智能通过IO timer定时器，或者其他低优先级线程调用。IO线程优先级59。
+        2、不要通过其他API直接调用，哪怕是简单stat()函数，都不可以，除非你长得太帅。
+        3、尽量少存储，存储数据长度小，尽量少用seek（搜寻）功能。
+        很简单，一个原则，不要太耗时，影响飞控代码执行。一个简单的针对SD卡的IO操作有可能花上一秒钟，这段时间足够让你的飞行器翻转，垂直掉落，直接炸鸡了。Pixhawk SD卡读写操作一般几毫秒，偶尔花费的时间会很长。现在在你知道这么做了？
+        相关例程 libraries/AP_Terrain/TerrainIO.cpp，我们会发现处理IO的状态机都是通过AP_Terrain::io_timer调用的。
+		
+		
+		
+		
+		
+		
+		
+		
+		

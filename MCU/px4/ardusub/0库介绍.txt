@@ -1,0 +1,145 @@
+
+1、核心库 Core libraries:
+   AP_AHRS   - 姿态估计 方向余弦矩阵(DCM) 或者 扩展卡尔曼滤波(EKF) attitude estimation using DCM or EKF
+   AP_Common - 所有执行文件（sketch格式，arduino IDE的文件）和其他库都需要的基础核心库 
+				core includes required by all sketches and libraries
+   AP_Math   - 各种数学函数 向量 矩阵 四元素 欧拉角 旋转矩阵 多边形算法 位置距离角度等计算 操作
+               various math functions especially useful for vector manipulation
+   AC_PID    - 比例积分微分控制器库  比例P控制器  比例积分PI控制器  比例积分微分PID控制器 
+               PID(Proportional-Integral-Derivative) controller library
+   AP_InertialNav     - 内部惯性导航库 融合GPS 气压计 以及加速度计数据
+                        inertial navigation library for blending accelerometer inputs with gps and baro data
+   AC_AttitudeControl - 基于PID控制器 的 位置、姿态控制器
+						ArduCopter’s control library includes various functions of attitude, position control based on PID control.
+   AP_WPNav           - 航点相关库 计算位置偏差和油门偏差 送给 位置控制器 waypoint navigation library
+   AP_Motors          - 多旋翼和直升机 电机 混控器 multicopter and traditional helicopter motor mixing
+   RC_Channel         - 
+						APM_RC的PWM输入/输出数据转换到内部通用单位的库，比如角度 输出PWM 给到 电子调速器    	a library to more convert pwm input/output from APM_RC into internal units such as angles
+   AP_HAL, AP_HAL_AVR, AP_HAL_PX4    - 
+                        硬件抽象层  libraries to implement the “Hardware abstraction layer” which presents an identical interface to the high level code so that it can more easily be ported to different boards.
+						提供给其他高级控制代码一致的接口，而不必担心底层不同的硬件。
+						
+2、传感器库 Sensor libraries:
+
+	AP_InertialSensor - 惯性传感器 陀螺仪和加速度传感器 												            并向主程序执行标准程序和提供标准单位数据（deg/s，m/s）。
+						reads gyro and accelerometer data, perform calibration and provides data in standard units (deg/s, m/s) to main code and other libraries
+	AP_RangeFinder    - 范围距离传感器 声呐 红外(infrared ray)距离传感器接口库 sonar and ir distance sensor interfaced library
+	AP_Baro           - barometer interface library  气压计/压力计
+	AP_GPS            - gps interface library        GPS 全球定位
+	AP_Compass        - 3-axis compass interface library 罗盘
+	AP_OpticalFlow    - optical flow sensor interface library   光流传感器
+	AP_ADC              读取模拟量 惯性传感器(陀螺仪和加速度传感器) APM1  
+	AP_ADC_AnalogSource ping 口电压值
+	
+	
+3、其他传感器库 Other libraries:
+
+AP_Mount, AP_Camera, AP_Relay -  相机安装控制库，相机快门控制库
+			    照相机安装卸载控制库  camera mount control library, camera shutter control libraries
+AP_Mission    - 从eeprom（电可擦只读存储器）存储/读取飞行指令相关库 
+			   存储、读取任务命令 从内存  stores/retrieves mission commands from eeprom
+AP_Buffer     - 先入先出缓冲区             a simple FIFO buffer for use with inertial navigation	
+				惯性导航时所用到的一个简单的堆栈（FIFO，先进先出）缓冲区
+
+
+				
+4、运行共享库 示例程序
+libraries/AP_GPS/examples/GPS_AUTO_test           GPS测试
+libraries/AP_InertialSensor/examples/INS_generic  惯性传感器测试
+libraries/AP_Compass/examples/AP_Compass_test     罗盘测试
+libraries/AP_Baro/examples/BARO_generic           气压计测试
+libraries/AP_AHRS/examples/AHRS_Test              姿态估计测试
+libraries/AP_HAL/examples/UART_test目录下的 example sketch，分别对5个UART都输出hello 消息。使用USB转串口工具，可以测试。
+   目前共定义了5个UART，他们的用途分别是：
+   uartA – 串行终端，通常是Micro USB接口，运行MAVLink协议。
+   uartB – GPS1模块。
+   uartC – 主数传接口，也就是Pixhawk telem1接口。
+   uartD – 次数传接口，也就是telem2接口。
+   uartE – GPS2模块。
+   
+   代码定义         PCB电路表述     飞控板接口           Serial标号        说明
+ APM代码中的表述    电路板上的表述  Pixhawk外壳上的标识  串口序号
+ uartA                Micro USB         USB                USB          接USB，支持MAVLink协议
+ uartB                UART4             GPS                Serial 3     接GPS模块，另CAN2接口
+ uartC                UART2             Telem1             Serial 1     接第1数传模块
+ uartD                UART3             Telem2             Serial 2     接第2数传模块
+ uartE                UART8             SERIAL4/5          Serial 4     一般接GPS2模块
+  /                   UART7             SERIAL4/5          Serial 5     Debug Console用于程序调试
+等等
+
+运行测试app指令
+cd $ARDUPILOT_HOME               # the top-level of an AruPilot repository
+./waf configure --board=px4-v2
+./waf build --target examples/INS_generic --upload  #　惯性传感器测试
+
+查看可以运行的示例程序 waf  
+cd $ARDUPILOT_HOME
+./waf list | grep 'examples'
+
+终端查看 示例程序效果
+LINUX 上 连接 Pixhawk USB设备 通讯协议 MAVLink  通过 mavproxy 软件程序
+
+安装  sudo pip install mavproxy
+升级  sudo pip install --upgrade mavproxy
+
+连接 Pixhawk USB设备
+mavproxy.py --setup --master /dev/serial/by-id/usb-3D_Robotics_PX4_FMU_v2.x_0-if00
+
+ GPS_AUTO_test code 程序解读   void setup();    void loop(); 
+     const AP_HAL::HAL& hal = AP_HAL::get_HAL();     //所有硬件接口  console  I2C  SPI buses analogin can_mgr gpio rcin   等
+     hal.console->printf("GPS AUTO library test\n"); // 终端串口打印  调试信息
+	 AP_GPS gps; //GPS设备
+	 AP_SerialManager serial_manager;// UART comunications 串口通讯管理器
+	 serial_manager.init();    //串口管理器初始化
+     gps.init(serial_manager); //GPS设备初始化
+	 gps.update(); // 更新
+     const Location &loc = gps.location();  //得到位置 数据    loc.lat  维度   loc.lng 经度   loc.alt 海拔
+	 gps.last_message_time_ms()  //数据时间戳 用于判断数据是否更新
+	 
+	 
+	 
+	 AP_HAL::millis()(millsecond 毫秒ms ) and AP_HAL::micros()(microsecond 微妙us)  //得到系统启动时间 to get the time since boot
+	 hal.scheduler->delay()( 毫秒ms ) and hal.scheduler->delay_microseconds() //休眠 时间 对应 频率
+	 hal.gpio->pinMode() GPIO管脚模式设置 , hal.gpio->read()  读取  hal.gpio->write() 写
+	 hal.i2c_mgr    // i2c总线操作
+     hal.spi        // spi总线操作
+
+
+// 距离传感器 lardir  串口读取示例
+    uart = serial_manager.find_serial(AP_SerialManager::SerialProtocol_Lidar, 0);            // 找到相应的串口设备
+    if (uart != nullptr) {
+        uart->begin(serial_manager.find_baudrate(AP_SerialManager::SerialProtocol_Lidar, 0));// 打开相应的串口
+    }
+	
+	int16_t nbytes = uart->available();//串口是否可用
+    while (nbytes-- > 0) {
+	char c = uart->read();      //读取数据 
+	linebuf[linebuf_len++] = c; //存入 缓冲区  
+	}
+	uart->write('d');           //串口写数据
+	 
+// I2C 接口示例
+    hal.i2c_mgr->get_device(HAL_RANGEFINDER_LIGHTWARE_I2C_BUS, _address[instance])));// 定义 设备在 I2C总线上 的 地址
+	
+	AP_HAL::OwnPtr<AP_HAL::I2CDevice> dev
+	AP_RangeFinder_LightWareI2C *sensor
+	
+    dev->register_periodic_callback(50000,FUNCTOR_BIND_MEMBER(&AP_RangeFinder_LightWareI2C::timer, void));
+	//更新时间 50000us=50ms = 20Hz	
+	// 读取 高八位 和 低八位数据
+    bool ret = _dev->read((uint8_t *) &val, sizeof(val));
+    if (ret) {
+        reading_cm = be16toh(val); //转化成 cm 
+    }
+
+// SPI接口示例
+	_add_backend(AP_InertialSensor_Invensense::probe(*this, hal.spi->get_device(HAL_INS_MPU9250_NAME)));
+    // 添加SPI总线
+	
+	
+	
+	
+
+
+
+

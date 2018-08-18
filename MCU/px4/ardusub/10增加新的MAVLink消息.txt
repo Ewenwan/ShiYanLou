@@ -1,0 +1,77 @@
+第十二部分 增加新的MAVLink消息
+英文参考：http://dev.ardupilot.com/wiki/code-overview-adding-a-new-mavlink-message/
+本节源自：http://liung.github.io/blog/apm/2014-09-05-APM-增加新的MAVLink通讯协议消息.html
+MavLink协议：https://pixhawk.ethz.ch/mavlink/
+ 
+地面站之间的数据和指令通信都是通过串行接口使用MAVLink协议来传递的。
+本页面将提供关于添加新的MAVLink信息的一些高级建议。
+这些指令仅在Liunx上测试完成（准确的说，是在Windows上运行的Ubuntu虚拟机上测试完成的）。
+关于设置虚拟机的方法在SITL(软件层面仿真)页面有相关介绍。如果你要运行SITL，你最好遵循下面的一些建议。
+
+这些指令不能直接在Windows或者Mac平台上本地运行。
+
+
+Step#1：
+
+确保你已经安装了最新的ardupilot代码，同时也检查一下mavproxy是否是最新版本。mavproxy工具可以通过在终端窗口运行下面命令进行升级。
+sudo pip install mavproxy   /  sudo pip install   --upgrade mavproxy 
+
+
+Step #2：
+
+先确定你所要添加的信息的类型，以及如何和已有的MavLink消息兼容。
+比如：你可能会想要向飞行器发送一个新的导航指令，让它可以在任务中期（自动模式中）
+模仿一个特技动作（比如翻筋斗）。在这个例子中，你需要一个类似于MAV_CMD_NAV_WAYPOINT
+（可以在MAVLink消息页面搜索MAV_CMD_NAV_WAYPOINT）一样的新的导航指令MAV_CMD_NAV_TRICK。
+又或者你想要从飞行器发送一个新的传感器数据类型到地面站,可能类似于SCALED_PRESSURE消息。
+
+
+Step #3：
+
+在common.xml和ardupilotmega.xml文件中添加你的信息的定义声明。
+如果你希望将该指令添加到MAVLink协议中，那么你应该添加该指令到
+../ardupilot/libraries/GCS_MAVLink/message_definitions/common.xml文件中。
+如果你仅仅个人使用或者仅仅和ArduCopter，ArduPlane，ArduRover搭配使用，那么它就应该被添加到ardupimega.xml文件中。
+
+
+Step #4：
+
+重新生成你的所有inlcude文件，确保添加的信息在主代码中可以被识别。
+首先将目录切换到ardupilot文件夹下，然后执行下面命令：
+./libraries/GCS_MAVLink/generate.sh
+
+成功执行后，你应该看到下面这些文件都应经被更新。
+../libraries/GCS_MAVLink/include/mavlink/v1.0/ardupilotmega/ardupilotmega.h
+../libraries/GCS_MAVLink/include/mavlink/v1.0/ardupilotmega/version.h
+../libraries/GCS_MAVLink/include/mavlink/v1.0/common/version.h
+文件version.h仅简单的更新了文件的日期和时间，但是ardupilotmega.h文件已经应该有了你的新消息的定义声明。
+
+
+Step #5：
+
+在飞行器主代码中添加函数方法用来控制向/从地面站发送/接收指令。
+这些顶层代码指令绝大部分包含在飞行器的GCS_MAVLink.cpp文件中
+或在../libraries/GCS_MAVLink/GCS类中。
+
+在我们想要添加一个新的导航指令的例子中（比如执行特技动作），应该需要下面信息：
+扩展AP_Mission库中的mission_cmd_to_mavlink()和mavlink_to_mission_cmd()方法，
+将mavproxy的指定转换到一个AP_Mission::Mission_Command结构体中。
+ 
+    //       将   Mission_Command 对象   转换到   mavlink消息，该消息能够被发送到 GCS 地面站。
+     bool AP_Mission::mission_cmd_to_mavlink(const AP_Mission::Mission_Command& cmd, mavlink_mission_item_t& packet)
+      {… …}
+
+在飞行器的commands_logic.cpp文件中分别添加
+start_command()函数和verify_command()函数的一个case分支，
+用来校验新的消息指令MAV_CMD_NAV_TRICK是否接收到。
+这些需要你调用自己创建的两个新函数do_trick()和verify_trick()（具体参考下面）。
+
+创建两个新函数do_trick()和verify_trick()，
+用来控制飞行器如何执行特技动作（这可能需要调用control_auto.cpp中的另一个函数来设置auto_mode变量，
+然后调用新方法auto_trick_start()）。当指令第一次被唤醒时将使用do_trick()函数。
+verify_trick()函数将会以10hz频率（或者更高）被重复调用直到特技动作完成，
+当特技动作执行完毕之后verify_trick()函数应该返回True。
+
+
+
+
