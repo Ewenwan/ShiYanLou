@@ -5,9 +5,11 @@
     ATimerDefs.h 
     BTimerDefs.cpp 
     BTimerDefs.h
+    PWM_demo.c
 ## 2. PID控制
     PID.h 
-    PWM.h
+    PID.c
+    PID_demo.c
 ## 3. 定时器1
     ThmerOne_demo.c 
     TimerOne.cpp 
