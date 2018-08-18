@@ -2,8 +2,102 @@
 ## 模拟量
 ## 串口
 ## 脉宽
-## i2c
+```c
+#include <TimerOne.h>
+
+
+//const int  trigger_io = LED_BUILTIN;
+const int  trigger_io = 8;  // 触发口
+
+//Most Arduino boards have two external interrupts: numbers 0 (on digital pin 2) and 1 (on digital pin 3).
+//The Arduino Mega has an additional four: numbers 2 (pin 21), 3 (pin 20), 4 (pin 19), and 5 (pin 18).
+const int  pwm_io = 2;
+
+void setup(void)
+{
+  pinMode( trigger_io, OUTPUT);
+
+  // 定时器中断
+  Timer1.initialize(2000);// 2ms中断
+  Timer1.attachInterrupt(sensor_trigger); // blinkLED to run every 0.15 seconds
+  Serial.begin(9600);
+
+  pinMode(pwm_io, INPUT);          // 中断输入口
+  // 电平变化即触发中断
+  attachInterrupt(0, DYP_plus_measure, CHANGE); // 电平改变触发, DYP_plus_measure中断触发函数
+}
+// 形式：uint32 mills()与uint32 micros()
+//
+// 用于得到从程序开始运行以来的时间，mills()函数返回以毫秒 ms 表示的时间，而micros()函数返回以微秒 us 表示的时间。
+// 当计时溢出后会自动从零开始计数，mills()函数会在程序运行约50天后溢出，而micros()会在程序运行约70分钟后溢出。
+
+unsigned long DYP_PulseStartTicks;     
+volatile int DYP_val = 0 ;
+volatile float DYP_distalce = 0.0;
+void DYP_plus_measure(void)
+{
+        if (digitalRead( pwm_io ) == HIGH)// 低电平到高电平的 时间点
+                DYP_PulseStartTicks = micros();    // 微秒 us  
+        else// 高电平变成低电平的 时间点
+                DYP_val = micros() - DYP_PulseStartTicks;
+        DYP_distalce = DYP_val / 58;// 换算得到 距离  这里需要查询手册，一般是 声速*时间/2 =  340*秒时间/2
+}
+
+int count_2ms = 0;
+const int trigger_time_zones = 50;// 50*2ms =100ms 触发周期
+const int trigger_time_duration = 1;// 持续时间
+void  sensor_trigger(void)
+{
+   count_2ms++;
+   if(count_2ms == trigger_time_zones) 
+   {
+     digitalWrite(trigger_io, HIGH);
+     if(DYP_distalce > 0) Serial.println(DYP_distalce);
+    }
+   if(count_2ms >= trigger_time_zones) count_2ms = 0;
+   if(count_2ms == trigger_time_duration) digitalWrite(trigger_io, LOW);
+}
+
+
+// The main program will print the blink count
+// to the Arduino Serial Monitor
+void loop(void)
+{
+}
 ```
+## 脉冲个数
+```c
+////编码器中断引脚初始化/////  
+   pinMode(En_CHL, INPUT);//设置中断脚为输入状态
+   pinMode(En_CHR, INPUT);// 
+   // 上升沿触发 
+   attachInterrupt(0, interruptL, FALLING);  // step0  input on interrupt 1 - pin 2
+   attachInterrupt(1, interruptR, FALLING);  // step1  input on interrupt 1 - pin 3
+  /*
+型号         int.0 int.1 int.2 int.3 int.4 int.5
+UNO\Ethernet  2     3 　 　 　 　
+Mega2560      2     3     21     20    19   18
+Leonardo      3     2     0      1 　 　
+Due           　所有IO口均可
+  */
+int countR=0, countL=0;
+ ///// 右轮 编码器计数////
+void interruptR()                      
+{
+   countR += 1;
+}
+////// 左轮 编码器计数////
+void interruptL()
+{
+   countL += 1;
+}
+ 
+```
+
+
+
+## i2c
+```c
 // 修改i2c 器件地址 
 #include <Wire.h>
 #define KS109ADDR 0x74     //老地址    // 默认地址  0xe8 右移1位 为0x74 最高位为1 表示读数据  则为 0xf4
