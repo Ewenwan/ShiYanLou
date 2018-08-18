@@ -44,22 +44,22 @@
           OC1B-PB2-PWM10口   支持 pwm输出功能	
 
 ### pwm口：
-      timer	bits	channel	Arduino pin 	Mega pin
-      timer0	8	      A	    6	             13
-      timer0	8	      B	    5	             4
-      timer1	16	      A	    9	             11
-      timer1	16            B	    10	             12
-      timer2	8	      A	    11	             10
-      timer2	8	      B	    3	             9
-      timer3	16	      A	    -	             5
-      timer3	16	      B	    -	             2
-      timer3	16	      C	    -	             3
-      timer4	16	      A	    -	             6
-      timer4	16	      B	    -	             7
-      timer4	16	      C	    -	             8
-      timer5	16	      A	    -	             44
-      timer5	16	      B     -	             45
-      timer5	16	      C	    -	             46
+      timer   bits   channel   Arduino pin   Mega2560 pin
+      timer0   8       A          6              13
+      timer0   8       B          5              4
+      timer1   16      A          9              11
+      timer1   16      B          10             12
+      timer2   8       A          11             10
+      timer2   8       B          3              9
+      timer3   16      A          -              5
+      timer3   16      B          -              2
+      timer3   16      C          -              3
+      timer4   16      A          -              6
+      timer4   16      B          -              7
+      timer4   16      C          -              8
+      timer5   16      A          -              44
+      timer5   16      B          -              45
+      timer5   16      C          -              46
 
 
 ## 2. 中断口资源====================================
