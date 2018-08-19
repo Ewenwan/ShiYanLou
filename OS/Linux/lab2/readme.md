@@ -445,7 +445,100 @@ struct pmm_manager {
     
     在ucore中，线性地址的的高10位作为页目录表的索引，之后的10位作为页表的的索引，
     所以页目录表和页表中各有1024个项，每个项占4B，所以页目录表和页表刚好可以用一个物理的页来存放。
-  
+
+# 地址映射 
+在这个实验中，我们在4个不同的阶段使用了四种不同的地址映射， 下面我就分别介绍这4种地址映射。
+## 第一阶段---- 段式映射
+	这一阶段是从bootasm.S的start到entry.S的kern_entry前，这个阶段很简单，
+	和lab1一样(这时的GDT中每个段的起始地址都是0x00000000并且此时kernel还没有载入)。
+
+	   虚拟地址 virt addr = 线性地址 linear addr = 物理地址 phy addr
+## 第二阶段---- 段式映射
+	这个阶段就是从entry.S的kern_entry到pmm.c的enable_paging()。 
+	
+	这个阶段就比较复杂了，我们先来看bootmain.c这个文件：
+	
+	#define ELFHDR ((struct elfhdr *)0x10000) // scratch space
+	bootmain.c中的函数被调用时候还处于第一阶段， 
+	所以从上面这个宏定义我们可以知道kernel是被放在物理地址为0x10000的内存空间。
+	
+	我们再来看看链接文件 tools/kernel.ld 
+	
+	/* Load the kernel at this address: "." means the current address */
+         . = 0xC0100000;
+	 
+	连接文件将kernel(物理地址 0x10000)链接到了0xC0100000(这是Higher Half Kernel， 
+	具体参考 https://wiki.osdev.org/Higher_Half_Kernel )，
+	这个地址是kernel的虚拟地址。 由于此时系统还只是采用 段式映射，如果我们还是使用
+	
+          虚拟地址 virt addr = 线性地址 linear addr = 物理地址 phy addr
+	  
+        的话，我们根本不能访问到正确的内存空间，
+	比如要访问虚拟地址 0xC0100000， 
+	其物理地址应该在 0x00100000，
+	而在这种映射下， 我们却访问了0xC0100000的物理地址。
+	因此， 为了让虚拟地址和物理地址能匹配，我们必须要重新设计GDT。
+	
+	在entry.S中，我们重新设计了GDT
+	可以看到，此时段的起始地址由0变成了-KERNBASE。因此，在这个阶段， 地址映射关系为：
+	
+   	virt addr - 0xC0000000 = linear addr = phy addr
+	0xC0100000 - 0xC0000000 = 0x00100000 
+
+	这里需要注意两个个地方，
+	第一，lgdt载入的是线性地址，
+	所以用.long REALLOC(__gdt)将GDT的虚拟地址转换成了线性地址；
+	第二，因为在载入GDT前，映射关系还是
+
+	    virt addr = linear addr = phy addr
+
+	所以通过REALLOC(__gdtdesc)来将__gdtdesc的虚拟地址转换为物理地址，
+	这样，lgdt才能真正的找到GDT存储的地方。
+## 第三阶段
+	这个阶段是从kmm.c的enable_paging()到kmm.c的gdt_init()。 
+	这个阶段是最复杂的阶段，我们开启了页机制，
+	并且在boot_map_segment()中将线性地址按照如下规则进行映射：
+
+	    linear addr - 0xC0000000 = phy addr
+
+	这就导致此时虚拟地址，线性地址和物理地址之间的关系如下：
+
+	    virt addr = linear addr + 0xC0000000 = phy addr + 2 * 0xC0000000
+	    
+	这肯定是错误的，因为我们根本不能通过虚拟地址获取正确的物理地址， 我们可以继续用之前例子。
+	我们还是要访问虚拟地址0xC0100000， 
+	则其线性地址就是0x00100000，
+	然后通过页映射后的物理地址是0x80100000。 
+	我们本来是要访问0x00100000，却访问了0x80100000， 
+	因此我们需要想办法来解决这个问题，即要让映射还是：
+
+	    virt addr - 0xC0000000 = linear addr = phy addr
+
+	这个和第一阶段到第二阶段的转变类似，都是需要调整映射关系。
+	为了解决这个问题, ucore使用了一个小技巧：
+	在boot_map_segment()中， 
+	线性地址0xC0000000-0xC0400000(4MB)对应的物理地址是0x00000000-0x00400000(4MB)。
+	如果我们还想使用虚拟地址0xC0000000来映射物理地址0x00000000，
+	也就是线性地址0x00000000来映射物理地址0x00000000，
+	
+	因为ucore在当前lab下的大小是小于4MB的，
+	因此这么做之后， 我们依然可以按照阶段二的映射方式运行ucore。
+	如果ucore的大小大于了4MB， 我们只需按同样的方法设置页目录表的第1,2,3...项。
+## 第四阶段
+
+	这一阶段开始于kmm.c的gdt_init()。gdt_init()重新设置GDT,
+	
+	新的GDT又将段的起始地址变为了0. 调整后, 地址的映射关系终于由
+	
+    	virt addr = linear addr + 0xC0000000 = phy addr + 2 * 0xC0000000
+	
+	  变回了
+	  
+        virt addr = linear addr = phy addr + 0xC0000000
+	
+	同时，我们把目录表中的第0项设置为0，这样就把之前的这种映射关系解除了。
+	通过这几个步骤的转换， 我们终于在开启页映射机制后将映射关系设置正确了。
+
 # 实验1
     我们第一个实验需要完成的主要是default_pmm.c中的
     1. default_init()       ， 空闲内存页记录初始化，nr_free=0，总的空闲内存块先初始化为0；
@@ -738,4 +831,93 @@ default_free_pages(struct Page *base, size_t n)
 // 加入到链表之前
     list_add_before(le, &(base->page_link));
 }
+/*
+将根据传入的Page address来释放n page大小的内存空间。
+该函数会判断Page address是否是allocated的，也会判断是否base + n会跨界(由allocated到free的内存空间)。
+如果输入的Page address合法，则会将新的Page插入到free_list中的合适位置(free_list是按照Page地址由低向高排序的)。
+
+有一点需要注意，在本first-fit连续物理内存分配算法中，对于任何allocated后的Page，
+Property flag都为0；任何free的Page，Property flag都为1。
+
+对于allocated后的Pages，第一个Page的property在这里是被清零了的，
+如果ucore要求只能用第一个Page来free Pages，那么allocate时，第一个Page的property就不应该清零。
+我们在free Page时要用property来判断Page是不是第一个Page。
+
+如果ucore规定free需要free掉整个Page块，
+那么我们还需要检测第一个Page的property是否和要free的page数相等。
+上面这几点在Lab2中并不能确定，如果之后Lab有说明，或者出现错误，我们需要重新修改这些地方。
+*/
 ```
+# 实验2
+这个练习是实现寻找虚拟地址对应的页表项。
+```c
+/* pmm.c */
+
+pte_t * get_pte(pde_t *pgdir, uintptr_t la, bool create) 
+{
+    pte_t *pt_addr;
+    struct Page *p;
+    uintptr_t *page_la; 
+    if (pgdir[(PDX(la))] & PTE_P) {
+        pt_addr = (pte_t *)(KADDR(pgdir[(PDX(la))] & 0XFFFFF000)); 
+        return &pt_addr[(PTX(la))]; 
+    }
+    else {
+        if (create) {
+            p = alloc_page();
+            if (p == NULL) {
+                cprintf("boot_alloc_page failed.\n");
+                return NULL;
+            }
+            p->ref = 1;
+            page_la = KADDR(page2pa(p));
+            memset(page_la, 0x0, PGSIZE); 
+            pgdir[(PDX(la))] = ((page2pa(p)) & 0xFFFFF000) | (pgdir[(PDX(la))] & 0x00000FFF); 
+            pgdir[(PDX(la))] = pgdir[(PDX(la))] | PTE_P | PTE_W | PTE_U;
+            return &page_la[PTX(la)]; 
+        }
+        else {
+            return NULL;
+        }
+    }
+}
+```
+	这个代码很简单, 但有几个地方还是需要注意下: 
+		首先，最重要的一点就是要明白页目录和页表中存储的都是物理地址。
+		      所以当我们从页目录中获取页表的物理地址后，我们需要使用KADDR()将其转换成虚拟地址。
+		      之后就可以用这个虚拟地址直接访问对应的页表了。
+
+		第二， *, &, memset() 等操作的都是虚拟地址。
+		      注意不要将物理或者线性地址用于这些操作(假设线性地址和虚拟地址不一样)。
+
+		第三，alloc_page()获取的是物理page对应的Page结构体，而不是我们需要的物理page。
+		     通过一系列变化(page2pa())，我们可以根据获取的Page结构体得到与之对应的物理page的物理地址，
+		     之后我们就能获得它的虚拟地址。
+
+# 实验3
+这个练习是实现释放某虚地址所在的页并取消对应二级页表项的映射。
+```c
+/* pmm.c */
+
+static inline void
+page_remove_pte(pde_t *pgdir, uintptr_t la, pte_t *ptep) {
+    pte_t *pt_addr;
+    struct Page *p;
+    uintptr_t *page_la; 
+    if ((pgdir[(PDX(la))] & PTE_P) && (*ptep & PTE_P)) {
+        p = pte2page(*ptep);   
+        page_ref_dec(p); 
+        if (p->ref == 0) 
+            free_page(p); 
+        *ptep = 0;
+        tlb_invalidate(pgdir, la);
+    }
+    else {
+        cprintf("This pte is empty!\n"); 
+    }
+}
+
+
+```
+
+
