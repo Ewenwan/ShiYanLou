@@ -458,10 +458,14 @@ struct pmm_manager {
 ##  1. default_init() 
     kern/init.c ---> 内核初始化kern_init() ---> pmm_init()( mm/pmm.c);
     
-    pmm_init() ---> 内存页管理器初始化 init_pmm_manager() ----> 内存页初始化page_init()
+    pmm_init() ---> a. 内存页管理器初始化 init_pmm_manager() ----> b. 内存页初始化page_init()
     
-    init_pmm_manager() ----> default_pmm_manager.init();
-内存管理器 结构体
+    
+### a. 内存页管理器初始化 init_pmm_manager()
+init_pmm_manager() ----> default_pmm_manager.init() ----> default_init() ---> list_init();    
+
+#### 内存管理器 结构体
+
 ```c
 // 结构体定义==============
 struct pmm_manager {
@@ -484,7 +488,7 @@ const struct pmm_manager default_pmm_manager = {
     .check = default_check,                // 内存页检查
 };
 ```
-### 管理器初始化函数 default_init()
+#### 管理器初始化函数 default_init()
 ```c
 free_area_t free_area;
 #define free_list (free_area.free_list)   // 双向链表表头 header
@@ -507,7 +511,7 @@ struct list_entry {
 };
 typedef struct list_entry list_entry_t;
 
-// 双向链表节点初始化 
+// 双向链表节点初始化 ============
 static inline void
 list_init(list_entry_t *elm) {
     elm->prev = elm->next = elm;// 前节点指针 和 后节点指针 初始化为指向自己
@@ -516,6 +520,10 @@ list_init(list_entry_t *elm) {
 
 ```
 
-    
-    
+ ###  b. 内存页初始化page_init()
+
+
+
+
+
     
