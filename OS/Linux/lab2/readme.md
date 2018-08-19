@@ -596,7 +596,9 @@ page_init(void) {
                 if (begin < end) 
 		        {
 		  // 初始化改块内存空间的 free页的信息，重置页标志 flag中的 reserved位
-		      // pa2page() 物理内存地址转换成 页id ，pmm.h --> mmu.h   左移12位, 相当于除以 4096(4k), 每个内存页大小4K
+		      // pa2page() 物理内存地址转换成 页id ,在转成 页id指针
+		      //  pmm.h --> mmu.h   左移12位, 相当于除以 4096(4k), 每个内存页大小4K
+		      // return &pages[PPN(pa)]
 		      // 改块内存空间包含的空闲页数量 (end - begin) / PGSIZE
                     init_memmap(pa2page(begin), (end - begin) / PGSIZE);
    // init_memmap() -> pmm_manager->init_memmap() --> default_init_memmap() (kern/mm/default_pmm.c)
@@ -607,7 +609,133 @@ page_init(void) {
 }
 
 ```
-#### 初始化空闲内存页 default_init_memmap() (kern/mm/default_pmm.c)
+## 2. 初始化空闲内存页 default_init_memmap() (kern/mm/default_pmm.c)
+```c
+static void
+default_init_memmap(struct Page *base, size_t n) 
+{
+    assert(n > 0);
+    struct Page *p = base; // 起始页 指针
+    for (; p != base + n; p ++) // 遍历每一个需要初始化的页
+    {
+        assert(PageReserved(p));
+        p->flags = p->property = 0;// 重置 该内存也的 标志为 可用
+        set_page_ref(p, 0);// 并设置该内存页的 引用次数为0 ，还未使用过
+    }
+    base->property = n;// 记录从这里开始的 连续内存页 的数量
+    SetPageProperty(base);
+    nr_free += n;// 总空闲页计数
+    list_add_before(&free_list, &(base->page_link));// 将空闲页 链表加入到 总内存空闲页表 之前
+}
 
-
+```
+##   3. 分配内存页数量为n的内存，default_alloc_pages()  (kern/mm/default_pmm.c)
+	遍历内存空闲页链表，找到第一块内存大小大于n的页，
+        然后分配出来，把它从空闲页链表中除去，
+        然后如果有多余的内存，把分完剩下的部分再次加入会空闲页链表中即可。
+```c
+// 分配内存页数量为n的内存，default_alloc_pages()，
+//	遍历内存空闲页链表， 找到第一块连续内存页数量大小大于n的块，
+//        然后分配出来，把它从空闲页链表中除去，
+//        然后如果有多余的内存，把分完剩下的部分再次加入会空闲页链表中即可。
+static struct Page *
+default_alloc_pages(size_t n) 
+{
+    assert(n > 0);
+    if (n > nr_free) // 超过总的空闲页数量
+    {
+        return NULL;
+    }
+// 遍历内存空闲页链表， 找到第一块连续内存页数量大小大于n的页========
+    struct Page *page = NULL;// 内存页结构体
+    list_entry_t *le = &free_list; // 空闲页 链表表头
+    // TODO: optimize (next-fit)
+    while ((le = list_next(le)) != &free_list) // 遍历 内存空闲页 链表
+    {// 内存页 链表  转内存页
+        struct Page *p = le2page(le, page_link);// kern/mm/memlayout.h ---> libs/defs.h
+        if (p->property  >= n) // 连续内存页 的数量 大于n的
+	{
+            page = p;// 找到第一块连续内存页数量大于n的内存块地址页
+            break;
+        }
+    }
+//  然后把找到的合适的内存页 分配出来，把它从空闲页链表中除去=======
+    if (page != NULL) 
+    {
+    //    list_del(&(page->page_link));
+        if (page->property > n) 
+	{
+            struct Page *p = page + n;// 连续空间 尾部的内存页 地址
+            p->property = page->property - n;// 连续内存页数量 去除被划出去的n个数量
+            SetPageProperty(p);
+            list_add_after(&(page->page_link), &(p->page_link));// 在空闲页链表中去除被划去的部分
+        }
+        list_del(&(page->page_link));
+        nr_free -= n;// 总空闲页数量 -n
+        ClearPageProperty(page);
+    }
     
+    return page;
+}
+
+```
+
+## 4. default_free_pages() ， 释放n个内存页 (kern/mm/default_pmm.c)
+```c
+// 释放n个内存页=======================
+static void
+default_free_pages(struct Page *base, size_t n) 
+{
+    assert(n > 0);
+// 遍历 内存页，清零相关记录============
+    struct Page *p = base;// 需要释放 的 起始内存页 地址
+    for (; p != base + n; p ++) // 遍历每一个需要被 释放 的内存页
+    {
+        assert(!PageReserved(p) && !PageProperty(p));// 非保留，被使用
+        p->flags = 0;// 设置为 可用
+        set_page_ref(p, 0);// 清零 被引用次数
+    }
+    base->property = n;// 设置 起始内存也 之后的 连续内存页数量
+    SetPageProperty(base);// 未被使用
+    
+// 遍历空闲页链表====================  
+    list_entry_t *le = list_next(&free_list);// 空闲页链表 头节点
+    while (le != &free_list) 
+    {
+        p = le2page(le, page_link);// 该节点对应的 内存应
+        le = list_next(le);// 遍历链表，指针迭代
+	
+        // TODO: optimize
+	// 更新起始内存页 的 连续内存页记录==================
+        if (base + base->property == p)// 结束的 内存页 对应的链表节点 
+	{
+            base->property += p->property;// 加上之后的 连续空闲页数量
+            ClearPageProperty(p);    // 设置为未使用标志
+            list_del(&(p->page_link));// 删除该内存页
+        }
+      // 更新 起始内存页之前的内存页 的  连续内存页记录==================
+        else if (p + p->property == base)// 起始内存页  之前的 内存页节点 对应的链表节点 
+	{
+            p->property += base->property;// 更新连续空闲内存也数量
+            ClearPageProperty(base);          // 设置为未使用标志
+            base = p;                                      // 更新起始连续内存页
+            list_del(&(p->page_link));           // 删除该段
+        }
+    }
+    
+    nr_free += n;// 更新空闲页数量
+    le = list_next(&free_list);
+    while (le != &free_list)
+    {
+        p = le2page(le, page_link);
+        if (base + base->property <= p)
+	{
+            assert(base + base->property != p);
+            break;
+        }
+        le = list_next(le);
+    }
+// 加入到链表之前
+    list_add_before(le, &(base->page_link));
+}
+```
