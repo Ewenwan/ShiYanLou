@@ -307,7 +307,7 @@ finish_probe:
     Page的定义在kern/mm/memlayout.h中。以页为单位的物理内存分配管理的实现在kern/default_pmm.[ch].
 ```c
 // 每一个物理页的属性结构===============
-struct Page {
+struct Page { // kern/mm/memlayout.h
     int ref;        // 映射此 物理页的 虚拟页个数，表示该 物理页 被 页表 的引用记数 page frame's reference counter
                     // 一旦某页表中有一个页表项设置了虚拟页到这个Page管理的物理页的映射关系，就会把Page的ref加一。
                     // 反之，若是解除，那就减一。
@@ -328,7 +328,7 @@ struct Page {
 
 // 然后是下面这个结构。
 // 一个双向链表，负责管理所有的 连续内存 空闲块，便于分配和释放==============
-typedef struct {
+typedef struct {// kern/mm/memlayout.h
     list_entry_t free_list;         //  是一个list_entry结构的双向链表指针 the list header
     unsigned int nr_free;           //  记录当前空闲页的个数, of free pages in this free list
 } free_area_t;
@@ -454,6 +454,68 @@ struct pmm_manager {
                                然后分配出来，把它从空闲页链表中除去，
                                然后如果有多余的内存，把分完剩下的部分再次加入会空闲页链表中即可。
     4. default_free_pages() ， 释放大小为n的内存
+    
+##  1. default_init() 
+    kern/init.c ---> 内核初始化kern_init() ---> pmm_init()( mm/pmm.c);
+    
+    pmm_init() ---> 内存页管理器初始化 init_pmm_manager() ----> 内存页初始化page_init()
+    
+    init_pmm_manager() ----> default_pmm_manager.init();
+内存管理器 结构体
+```c
+// 结构体定义==============
+struct pmm_manager {
+            const char *name;                                 // 物理内存页管理器的名字
+            void (*init)(void);                               // 初始化内存管理器
+            void (*init_memmap)(struct Page *base, size_t n); // 初始化管理空闲内存页的数据结构
+            struct Page *(*alloc_pages)(size_t n);            // 分配n个物理内存页
+            void (*free_pages)(struct Page *base, size_t n);  // 释放n个物理内存页
+            size_t (*nr_free_pages)(void);                    // 返回当前剩余的空闲页数
+            void (*check)(void);                              // 用于检测分配/释放实现是否正确的辅助函数
+};
+// 结构体实例==========
+const struct pmm_manager default_pmm_manager = {
+    .name = "default_pmm_manager",       // 名字
+    .init = default_init,                // 管理器初始化函数
+    .init_memmap = default_init_memmap,  // 内存映射初始化
+    .alloc_pages = default_alloc_pages,  // 分配内存页
+    .free_pages = default_free_pages,    // 空闲内存页
+    .nr_free_pages = default_nr_free_pages,// 空闲内存页数量
+    .check = default_check,                // 内存页检查
+};
+```
+### 管理器初始化函数 default_init()
+```c
+free_area_t free_area;
+#define free_list (free_area.free_list)   // 双向链表表头 header
+#define nr_free (free_area.nr_free)       // 该 空闲区域链表 free list 中存储的空闲页的数量
+static void
+default_init(void) {
+    list_init(&free_list); // 双向链表节点初始化 前节点指针 和 后节点指针 初始化为指向自己
+    nr_free = 0;           // 空闲也数量清零 
+} 
+
+// 空闲区域链表 结构体 kern/mm/memlayout.h
+typedef struct {
+    list_entry_t free_list; //  双向链表表头 header  节点
+    unsigned int nr_free;   //  该 空闲区域链表 free list 中存储的空闲页的数量
+} free_area_t;
+
+// 双向链表节点 结构体   libs/list.h
+struct list_entry {
+    struct list_entry *prev, *next;// 指向 前节点 和 后节点 的 节点指针
+};
+typedef struct list_entry list_entry_t;
+
+// 双向链表节点初始化 
+static inline void
+list_init(list_entry_t *elm) {
+    elm->prev = elm->next = elm;// 前节点指针 和 后节点指针 初始化为指向自己
+}
+
+
+```
+
     
     
     
