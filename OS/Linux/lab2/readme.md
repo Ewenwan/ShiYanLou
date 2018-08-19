@@ -490,6 +490,7 @@ const struct pmm_manager default_pmm_manager = {
 ```
 #### 管理器初始化函数 default_init()
 ```c
+// kern/mm/default_pmm.c
 free_area_t free_area;
 #define free_list (free_area.free_list)   // 双向链表表头 header
 #define nr_free (free_area.nr_free)       // 该 空闲区域链表 free list 中存储的空闲页的数量
@@ -520,10 +521,93 @@ list_init(list_entry_t *elm) {
 
 ```
 
- ###  b. 内存页初始化page_init()
+###  b. 内存页初始化page_init() 来自 pmm_init()( mm/pmm.c);
+    page_init() -> 获取最大物理内存地址 maxpa
+                   从Kernel的结束地址(end-->取整pages)开始初始化 内存信息页
+                   从 真正空闲页 freemem 开始 初始化每一个可用的内存页 init_memmap()
+    init_memmap() -> pmm_manager->init_memmap() --> default_init_memmap() (kern/mm/default_pmm.c)
+```c
+// page_init() 
+/* pmm_init - initialize the physical memory management */
+static void
+page_init(void) {
+    struct e820map *memmap = (struct e820map *)(0x8000 + KERNBASE);
+    uint64_t maxpa = 0;
+    
+// 1. 获取物理内存空间的最大地址 maxpa =======================
+    cprintf("e820map:\n");
+    int i;
+    for (i = 0; i < memmap->nr_map; i ++) // 地址范围描述符 数组元素 个数 nr_map
+    {
+      // 这里内存块的信息来源于 bootloder中使用 BIOS INT5h中断探测到的 内存信息
+        uint64_t begin = memmap->map[i].addr,   end = begin + memmap->map[i].size;// 该块内存的地址范围
+        cprintf("  memory: %08llx, [%08llx, %08llx], type = %d.\n",
+                memmap->map[i].size, begin, end - 1, memmap->map[i].type);// 内存块，大小，起始地址，借宿地址，类型(是否可用)
+	       
+        if (memmap->map[i].type == E820_ARM) 
+	{
+            if (maxpa < end && begin < KMEMSIZE) 
+	    {
+                maxpa = end;// 所有内存块中的最大地址， 实际物理内存空间结束地址 4GB  8GB 16GB ...
+            }
+        }
+        
+    }
+    if (maxpa > KMEMSIZE) 
+    {
+        maxpa = KMEMSIZE;
+    }
+    
+// 2. 计算内存信息页的起始页 地址(在系统数据之后，用来记录所有内存页信息的)=====
+    extern char end[];// 全局变量 end， Kernel的结束地址(end)，这个地址是在tools/kernel.ld 中定义的(ucoreBSS段结束处)
+    npage = maxpa / PGSIZE;// 计算总内存空间 按页分组(4K)，需要多少页
+    pages = (struct Page *)ROUNDUP((void *)end, PGSIZE);// 系统结束处  空闲内存空间的起始地址，page是4k的帧数倍
+    // 把end 按页大小为 边界取整 后，作为 管理页级物理内存空间所需的Page结构的内存空间
+    //  除去操作系统后的需要管理的内存的起始页地址
+    
+// 3. 在 内存信息页区域(内存页管理区域)写入内存页信息======
+    for (i = 0; i < npage; i ++) 
+    {// 从pages开始，将所有页的信息的flag 都设置为reserved(不可用)。
+        SetPageReserved(pages + i);// 该内存页 首先设置为 保留，不可用
+    }
+    
+//4.  最终空闲物理空间起始地址 free , free页就是除了kernel 和 页信息外的可用空间
+// 内存管理处的起始地址page + 内存管理所需的内存数量 ，之后为空闲地址。
+    uintptr_t freemem = PADDR((uintptr_t)pages + sizeof(struct Page) * npage);
+    
+// 5. 初始化每一块内存空间中的 空闲内存页==========================
+    for (i = 0; i < memmap->nr_map; i ++)
+    {
+        uint64_t begin = memmap->map[i].addr, end = begin + memmap->map[i].size;// 该块内存的地址范围
+        if (memmap->map[i].type == E820_ARM)
+	   {
+            if (begin < freemem) 
+	        {
+                begin = freemem;// 将起始地址设置为空闲页空间的起始地址 freemem
+            }
+            if (end > KMEMSIZE)
+	        {
+                end = KMEMSIZE;// 最大地址
+            }
+            if (begin < end) 
+	        {
+                begin = ROUNDUP(begin, PGSIZE);// 内存起始地址 按页大小取整，还是地址，只不过地址是 页大小的整数倍
+                end = ROUNDDOWN(end, PGSIZE);// 内存结束地址 按页大小取整
+                if (begin < end) 
+		        {
+		  // 初始化改块内存空间的 free页的信息，重置页标志 flag中的 reserved位
+		      // pa2page() 物理内存地址转换成 页id ，pmm.h --> mmu.h   左移12位, 相当于除以 4096(4k), 每个内存页大小4K
+		      // 改块内存空间包含的空闲页数量 (end - begin) / PGSIZE
+                    init_memmap(pa2page(begin), (end - begin) / PGSIZE);
+   // init_memmap() -> pmm_manager->init_memmap() --> default_init_memmap() (kern/mm/default_pmm.c)
+                }
+            }
+        }
+    }
+}
 
-
-
+```
+#### 初始化空闲内存页 default_init_memmap() (kern/mm/default_pmm.c)
 
 
     
