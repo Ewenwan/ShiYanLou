@@ -208,16 +208,19 @@ analogWrite(); 的变化好像就是是980hz，490hz。你自己多试验一下�
     控制这些timer/counter工作方式的寄存器有TCCRnA、TCCRnB、OCRnA、OCRnB、OCRnC（若定时器有C通道），
     其中n代表timer/counter的名字。TCCRnA及TCCRnB为控制寄存器，他们可以控制的参数有：
     1. 脉冲生成模式控制位（WGM）：用来设置timer/counter的工作模式，
-        2bit位于寄存器TCCRnA，2bit（16位timer/counter）或 1bit（8位timer/counter）位于寄存器TCCRnB；
+        2bit位于寄存器TCCRnA，2bit（16位timer/counter） 2bit（8位timer/counter）位于寄存器TCCRnB；
     2. 时钟选择位（CS）：设置时钟的分频系数（计数器工作的速度），3bit位于寄存器TCCRnB；
     3. 输出模式控制位（COMnA、COMnB及COMnC）：使能/禁用/反相 输出波形，各占2bit，位于寄存器TCCRnA。
     4. 输出比较器（OCRnA、OCRnB及OCRnC）：该值为计数器与之进行比较的值，当计数器等于这三个值时，
         相应通道的输出值根据不同的模式进行变化，这些寄存器跟对应的定时/计数器有相同的位数。
+        
+TCCRnA  决定通道口模式 和 定时器模式(前两位)：
 
-![]()
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/MCU/arduino/menu_pdf/TCCRnA.PNG)
 
+TCCRnB  决定定时器模式(后两位) 和 分频系数时钟选择位（CS）：
 
-![]()
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/MCU/arduino/menu_pdf/TCCRnB.PNG)
 
 ```c
 void setPwmFrequency2560(int pin, int divisor) {
