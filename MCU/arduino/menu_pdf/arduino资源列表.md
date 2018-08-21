@@ -76,4 +76,23 @@
     c. spi
     d. can
 
-## 
+## 4. pwm 冷门知识
+### a. 普通io延时实现
+```c
+int pin = 13;
+void setup() {
+  pinMode(pin, OUTPUT);
+}
+void loop(){
+  digitalWrite(pin, HIGH);
+  delayMicroseconds(100); // Approximately 10% duty cycle @ 1KHz
+  digitalWrite(pin, LOW);
+  delayMicroseconds(1000 - 100);
+}
+這個範例中, 一個循環是 1000 us = 1ms, 所以一秒循環 1000次, 因此 Frequency 是 1 KHz,
+每個循環中, 有電的比率是 100/1000 * 100% = 10%, 所以 duty cycle (佔空比)為 10%;
+這樣就可以模擬出 5Volt x 10% = 0.5 Volt 的電壓!
+```
+
+
+
