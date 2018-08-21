@@ -163,6 +163,40 @@ A: 可以, 偷改 timer 的 Prescaler 就可以達到更改 Frequency 的目的 
 參考:
    http://playground.arduino.cc/Main/TimerPWMCheatsheet
    http://www.atmel.com/Images/doc8161.pdf
+   
+脉冲生成模式控制位（WGM）：用来设置时钟的模式
+时钟选择位（CS）：设置时钟的预定标器
+输出模式控制位（COMnA和COMnB）：使能/禁用/反相 输出A和输出B
+输出比较器（OCRnA和OCRnB）：当计数器等于这两个值时，输出值根据不同的模式进行变化
+
+你改这几个寄存器就好了，我之前用的是arduino nuo 。
+下面这个例子以Timer2为例，把Pin3和Pin11作为快速PWM的两个输出管脚。其中：
+WGM的设置为011，表示选择了快速PWM模式；
+COM2A和COM2B设置为10，表示A和B输出都是非反转的PWM；
+CS的设置为100，表示时钟周期是系统时钟的1/64；
+OCR2A和OCR2B分别是180和50，表示两路输出的占空比；
+
+pinMode(3, OUTPUT);  
+pinMode(11, OUTPUT);  
+TCCR2A = _BV(COM2A1) | _BV(COM2B1) | _BV(WGM21) | _BV(WGM20);  
+TCCR2B = _BV(CS22);  
+OCR2A = 180;  
+OCR2B = 50;  
+这段代码看上去有点晕，其实很简单。_BV(n)的意思就是1< COM2A1，表示COM2A的第1位（靠，其实是第2位，不过程序员们是从0开始数数的）。所以_BV(COM2A1)表示COM2A = 10；
+类似的，_BV(WGM21) | _BV(WGM20) 表示 WGM2 = 011。
+
+在Arduino Duemilanove开发板，上面这几行代码的结果为：
+输出 A 频率: 16 MHz / 64 / 256 = 976.5625Hz
+输出 A 占空比: (180+1) / 256 = 70.7%
+输出 B 频率: 16 MHz / 64 / 256 = 976.5625Hz
+输出 B 占空比: (50+1) / 256 = 19.9%
+
+CS就是改它的分频数的。比如你改成TCCR2B = _BV(CS20)。你用示波器测它的变化貌似会达到44KHZ。
+
+analogWrite(); 的变化好像就是是980hz，490hz。你自己多试验一下。
+你可以参考http://www.diy-robots.com/?p=852
+   
+   
 ```
 
 
