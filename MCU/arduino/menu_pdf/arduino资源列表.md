@@ -120,7 +120,49 @@ void loop(){
 // arduino-1.8.1\hardware\arduino\avr\cores\arduino\wiring_analog.c
 // arduino-1.8.1\hardware\arduino\avr\cores\arduino\wiring.c
 //  analogWrite() 的实现
+那 PWM 的 Frequency 可不可以更改?
+A: 可以, 偷改 timer 的 Prescaler 就可以達到更改 Frequency 的目的 !
+   但是, 千萬不要更改 timer0 的 Prescaler, 否則 millis( ) 和 micros( ) 以及 delay() 都會受到影響 !!!
+   以下是以 timer1 控制的 pin 9, pin 10 為例(注意兩個 pin 的頻率相同!)
+   在你的 setup( ) { 內, 寫如下兩句即可:
+      int fff = 3;  // 可以是 1, 2, 3, 4, 5
+      TCCR1B = TCCR1B & 0xF8 | fff;
+  其中 fff 與對應頻率如下:
+  fff   Prescaler   Frequency
+   1           1        31372.549 Hz
+   2           8          3921.569
+   3         64            490.196   <--DEFAULT
+   4       256           122.549
+   5    1024               30.637 Hz
 
+至於 timer2 控制的 pin 11 和 pin 3,
+則在 setup( ) { 內寫:
+     TCCR2B = TCCR2B & 0xF8 | ?;
+此處的 ? 可以有七種:
+   ?  Prescaler   Frequency
+   1         1       31372.549 Hz
+   2         8         3921.569
+   3            32          980.392
+   4        64         490.196   <--DEFAULT
+   5      128         245.098
+   6      256         122.549
+   7    1024           30.637 Hz
+
+如果你堅持要改 timer0 的 Prescaler, 以更改 pin 5, pin 6 的 PWM 頻率:
+   (注意 millis( ) 和 micros( ) 以及 delay() 都會受到影響 !! )
+則在 setup( ) { 內寫:
+     TCCR0B = TCCR0B & 0xF8 | ?;
+此處的 ? 可以有五種:
+   ?  Prescaler   Frequency
+   1          1       362500 Hz
+   2          8           7812.5
+   3        64             976.5625   <--DEFAULT
+   4      256             244.140625
+   5    1024               61.03515625 Hz
+
+參考:
+   http://playground.arduino.cc/Main/TimerPWMCheatsheet
+   http://www.atmel.com/Images/doc8161.pdf
 ```
 
 
