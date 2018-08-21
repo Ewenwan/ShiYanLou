@@ -245,48 +245,56 @@ TCCRnB  决定定时器模式(后两位) 和 分频系数时钟选择位（CS）
 
 ## 示例程序
 ```c
-void setPwmFrequency2560(int pin, int divisor) {
+void setPwmFrequency2560(int pin, int divisor)// 管脚 分频
+{
   byte mode;
   if((pin >= 2 && pin <= 13) || (pin >= 44 && pin <= 46)) 
   {
-    switch(divisor) {
-      case 1: mode = 0x01; break;
-      case 8: mode = 0x02; break;
-      case 64: mode = 0x03; break;
-      case 256: mode = 0x04; break;
-      case 1024: mode = 0x05; break;
-      default: return;
-    }
+     switch(divisor) 
+     {// 分频
+        case 1: mode = 0x01; break;   // 001b
+        case 8: mode = 0x02; break;   // 010b
+        case 64: mode = 0x03; break;  // 011b
+        case 256: mode = 0x04; break; // 100b
+        case 1024: mode = 0x05; break;// 101b
+        default: return;
+      }
+      
       if(pin == 4 || pin == 13)//Timer0
       {
-        TCCR0B = TCCR0B & 0b11111000 | mode;  
+        TCCR0B = TCCR0B & 0b11111000 | mode;  // 后三位 分频=======
+  // 还可以设置 TCCR0A 确定工作模式
       }
-      else if(pin == 11 || pin == 12 || pin == 13)//Timer1
+      
+      else if(pin == 11 || pin == 12 || pin == 13)// Timer1
       {
-        TCCR1B = TCCR1B & 0b11111000 | mode;  
+        TCCR1B = TCCR1B & 0b11111000 | mode; // 
       }
+      
       else if(pin == 8 || pin == 9)//Timer2
       {
         TCCR2B = TCCR2B & 0b11111000 | mode;  
       }
-      else if(pin == 5 || pin == 2 || pin == 3)//Timer3
+      
+      else if(pin == 5 || pin == 2 || pin == 3)// Timer3
       {
         TCCR3B = TCCR3B & 0b11111000 | mode;  
       }
-      else if(pin == 6 || pin == 7 || pin == 8)//Timer4
+      
+      else if(pin == 6 || pin == 7 || pin == 8)// Timer4
       {
         TCCR4B = TCCR4B & 0b11111000 | mode;    
       }
-      else if(pin == 46 || pin == 45 || pin == 44)//Timer5
+      
+      else if(pin == 46 || pin == 45 || pin == 44)// Timer5
       {
         TCCR5B = TCCR5B & 0b11111000 | mode;    
       }
-    
   } 
-
 }
 
-void setup() {                
+void setup() 
+{                
   
   pinMode(44, OUTPUT);
   setPwmFrequency2560(44,8);
@@ -297,10 +305,10 @@ void setup() {
   pinMode(5, OUTPUT);
   pinMode(2, OUTPUT);
   setPwmFrequency2560(5,1); //pin2,pin5属于同一个计时器，设置一次即可。
-
 }
 
-void loop() {
+void loop() 
+{
    analogWrite(44,128);
    analogWrite(7,128);
    analogWrite(5,128);
