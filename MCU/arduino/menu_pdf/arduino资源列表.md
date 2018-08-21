@@ -204,7 +204,7 @@ analogWrite(); 的变化好像就是是980hz，490hz。你自己多试验一下�
 ```
 ## 定时器控制寄存器详解
 
-    每个timer/counter有计数、快速PWM及相位校准PWM等模式（常用这三个吧），
+    每个timer/counter有 计数、快速PWM 及 相位校准PWM等模式（常用这三个吧），
     控制这些timer/counter工作方式的寄存器有TCCRnA、TCCRnB、OCRnA、OCRnB、OCRnC（若定时器有C通道），
     其中n代表timer/counter的名字。TCCRnA及TCCRnB为控制寄存器，他们可以控制的参数有：
     1. 脉冲生成模式控制位（WGM）：用来设置timer/counter的工作模式，
@@ -222,6 +222,28 @@ TCCRnB  决定定时器模式(后两位) 和 分频系数时钟选择位（CS）
 
 ![](https://github.com/Ewenwan/ShiYanLou/blob/master/MCU/arduino/menu_pdf/TCCRnB.PNG)
 
+
+## 定时器模式 脉冲生成模式 WGMn3 WGMn2 WGMn1 WGM0
+    模式id    WGMn3 WGMn2 WGMn1 WGM0
+    0          0     1      0    0    CTC计数模式
+    1          1     1      0    0    CTC计数模式
+    2          1     1      1    1    快速PWM模式    计数到 OCRnA
+    3          1     1      1    0    快速PWM模式    计数到 ICRn
+    4          0     1      0    1    快速PWM模式    8bits  计数到0x00ff   256
+    5          0     1      1    0    快速PWM模式    9bits  计数到0x01ff   512
+    6          0     1      1    1    快速PWM模式    10bits 计数到0x01ff   1024
+    7          0     0      0    1    相位校准PWM模式8bits   计数到0x00ff   256
+    8          0     0      1    0    相位校准PWM模式9bits   计数到0x01ff   512
+    9          0     0      1    1    相位校准PWM模式10bits  计数到0x01ff   1024
+    10         1     0      1    0    相位校准PWM模式    计数到 ICRn
+    11         1     0      1    1    相位校准PWM模式    计数到 OCRnA
+    12         1     0      0    0    相位校准+频率校准PWM模式 计数到 ICRn
+    13         1     0      0    1    相位校准+频率校准PWM模式 计数到 OCRnA
+    14         0     0      0    0    正常   计数到0xffff  65535
+    15         1     1      0    1    保留
+## 通道口模式 输出模式 （COMnA、COMnB及COMnC）
+
+## 示例程序
 ```c
 void setPwmFrequency2560(int pin, int divisor) {
   byte mode;
