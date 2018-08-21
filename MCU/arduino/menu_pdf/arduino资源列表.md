@@ -2,17 +2,23 @@
 ## 1. PWM口资源=======================
 ### a. ATMEGA 2560   Arduino MEGA 2560  一共 12 个 PWM口=================
 
-    Timer0  8bit  PWM  (13) 和 4  
+    arduino mega2560 开发板。
+    PWM波是通过timer/counter产生的，
+    该单片机有timer0、timer1、timer2、timer3、timer4、timer5共六个定时/计数器，
+    其中timer0、timer2为8位的定时/计数器，每个定时/计数器又有A、B两个通道，
+    而定时/计数器timer1、timer3、timer4、timer5为16位的，每个又有A、B、C三个通道。
+    首先来看一下定时/计数器的各个通道与arduino mega2560 引脚的对应关系：
+    
+    Timer0  8bit  PWM  (13) 和 4 口  
             两个独立比较输出单元  OC0A-PB7  PWM13口  OC0B-PG5-PWM4口  支持 pwm输出功能
 
-    Timer2  8bit PWM 10 和 9
-            两个独立比较输出单元  OC2A-PB4-PWM10口    OC2B-PH6-PWM9口   支持 pwm输出功能
+    Timer2  8bit PWM 10 和  9 口
+            两个独立比较输出单元  OC2A-PB4  PWM10口    OC2B-PH6-PWM9口   支持 pwm输出功能
 
     Timer1  16bit  PWM  11  12 口
             三个独立比较输出单元 OC1A-PB5-PWM11口  OC1B-PB6-PWM12口   ( OC1C-PB7(与OC0A复用)-PWM13口 ) 
-        支持 pwm输出功能
-
-    Timer3  16bit  PWM  2  3  5
+            可以看到timer0的A通道与timer1的C通道共用一个引脚，若这两个通道同时被使能，将会输出两者相与的结果。
+    Timer3  16bit  PWM   5  2  3 
             三个独立比较输出单元  OC3A-PE3-PWM5口  OC3B-PE4-PWM2口   OC3C-PE5-PWM3口 
         支持 pwm输出功能
 
@@ -21,8 +27,8 @@
         支持 pwm输出功能
 
 
-    Timer5  16bit  无PWM   44
-        三个独立比较输出单元  OC5A-PL3  OC5B-PL4   OC5C-PL5  
+    Timer5  16bit  无PWM   44 45 46
+        三个独立比较输出单元  OC5A-PL3-44口  OC5B-PL4-45   OC5C-PL5-46  
         支持 pwm输出功能
 
 
@@ -195,8 +201,88 @@ CS就是改它的分频数的。比如你改成TCCR2B = _BV(CS20)。你用示波
 
 analogWrite(); 的变化好像就是是980hz，490hz。你自己多试验一下。
 你可以参考http://www.diy-robots.com/?p=852
-   
-   
+```
+## 定时器控制寄存器详解
+
+    每个timer/counter有计数、快速PWM及相位校准PWM等模式（常用这三个吧），
+    控制这些timer/counter工作方式的寄存器有TCCRnA、TCCRnB、OCRnA、OCRnB、OCRnC（若定时器有C通道），
+    其中n代表timer/counter的名字。TCCRnA及TCCRnB为控制寄存器，他们可以控制的参数有：
+    1. 脉冲生成模式控制位（WGM）：用来设置timer/counter的工作模式，
+        2bit位于寄存器TCCRnA，2bit（16位timer/counter）或 1bit（8位timer/counter）位于寄存器TCCRnB；
+    2. 时钟选择位（CS）：设置时钟的分频系数（计数器工作的速度），3bit位于寄存器TCCRnB；
+    3. 输出模式控制位（COMnA、COMnB及COMnC）：使能/禁用/反相 输出波形，各占2bit，位于寄存器TCCRnA。
+    4. 输出比较器（OCRnA、OCRnB及OCRnC）：该值为计数器与之进行比较的值，当计数器等于这三个值时，
+        相应通道的输出值根据不同的模式进行变化，这些寄存器跟对应的定时/计数器有相同的位数。
+
+![]()
+
+
+![]()
+
+```c
+void setPwmFrequency2560(int pin, int divisor) {
+  byte mode;
+  if((pin >= 2 && pin <= 13) || (pin >= 44 && pin <= 46)) 
+  {
+    switch(divisor) {
+      case 1: mode = 0x01; break;
+      case 8: mode = 0x02; break;
+      case 64: mode = 0x03; break;
+      case 256: mode = 0x04; break;
+      case 1024: mode = 0x05; break;
+      default: return;
+    }
+      if(pin == 4 || pin == 13)//Timer0
+      {
+        TCCR0B = TCCR0B & 0b11111000 | mode;  
+      }
+      else if(pin == 11 || pin == 12 || pin == 13)//Timer1
+      {
+        TCCR1B = TCCR1B & 0b11111000 | mode;  
+      }
+      else if(pin == 8 || pin == 9)//Timer2
+      {
+        TCCR2B = TCCR2B & 0b11111000 | mode;  
+      }
+      else if(pin == 5 || pin == 2 || pin == 3)//Timer3
+      {
+        TCCR3B = TCCR3B & 0b11111000 | mode;  
+      }
+      else if(pin == 6 || pin == 7 || pin == 8)//Timer4
+      {
+        TCCR4B = TCCR4B & 0b11111000 | mode;    
+      }
+      else if(pin == 46 || pin == 45 || pin == 44)//Timer5
+      {
+        TCCR5B = TCCR5B & 0b11111000 | mode;    
+      }
+    
+  } 
+
+}
+
+void setup() {                
+  
+  pinMode(44, OUTPUT);
+  setPwmFrequency2560(44,8);
+  
+  pinMode(7, OUTPUT);
+  setPwmFrequency2560(6,1);
+  
+  pinMode(5, OUTPUT);
+  pinMode(2, OUTPUT);
+  setPwmFrequency2560(5,1); //pin2,pin5属于同一个计时器，设置一次即可。
+
+}
+
+void loop() {
+   analogWrite(44,128);
+   analogWrite(7,128);
+   analogWrite(5,128);
+   analogWrite(2,128);
+   delay(500); 
+}
+
 ```
 
 
