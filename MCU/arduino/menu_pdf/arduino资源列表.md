@@ -89,10 +89,38 @@ void loop(){
   digitalWrite(pin, LOW);
   delayMicroseconds(1000 - 100);
 }
-這個範例中, 一個循環是 1000 us = 1ms, 所以一秒循環 1000次, 因此 Frequency 是 1 KHz,
-每個循環中, 有電的比率是 100/1000 * 100% = 10%, 所以 duty cycle (佔空比)為 10%;
-這樣就可以模擬出 5Volt x 10% = 0.5 Volt 的電壓!
+// 时间周期是 1000 us = 1ms, 所以一秒循环 1000次, 因此 频率Frequency 是 1 KHz,
+// 每个循环中, 有电(高电平状态)的比率是 100/1000 * 100% = 10%, 所以 duty cycle (占空比)为 10%;
+// 模拟的电压为 5Volt x 10% = 0.5 Volt 的电压!
 ```
+    这种方法的好处是任意一个IO管脚都可以实现，而坏处是 频率和占空比都会受到中断的影响，而变的不准确。
+    在一个是，做了这个，cpu就干不了其他的事情了。
+### b. 通过定时器和比较器来实现
+```c
+// Arduino UNO 的 MCU 有三個 timer,
+// 其中 timer0 控制 pin 5, pin 6; timer1 控制 pin 9, pin 10; timer 2 控制 pin 11, pin 3;
+// 所以, 我们可以对这些 pin 用 analogWrite(pin, val); 输出 0 到 255 的 val 值到 pin ;
+// 如果输出 val 是 0, 它会偷偷直接改用 digitalWrite(pin, 0); 输出低电平,
+// 如果 val 是 255, 也是会偷偷直接改用 digitalWrite(pin, 1); 輸出高电平!
+// 如果 val 是 1 到 254, 会下命令请 pin 脚对应的 timer定时器帮忙!!
 
+// 系统时钟通过分屏器会接到定时器上，每来一个时钟，定时器的计数器 TCNT? 的 计数值counter会加1，
+// 定时器有几种计数模式，一般有 增计数模式、减计数模式、增减计数模式。
+// 每個 定时器timer 的分频 Prescaler 是独立设置的, 通常可以設 1, 2, 4, 8, 64, 256, or 1024 等,
+// 这必须查看 单片机 MCU 的 手册datasheet.
+
+// 要设定 定时器timer 的 计数模式Mode， 可以通过修改 timer 的控制寄存器, TCCR?A, TCCR?B(TCCR1A, TCCR1B,TCCR2A, TCCR2B),
+// 注意以 ATmega328 為例, TCCR?A 和 TCCR?B 要合起來用, 此處的 A, B 和 通道channel A, channel B无关，不是一个事!!
+
+// Arduino 每个 timer 有两个比较器, 分別命名 OCR?A 和 OCR?B ,
+// 其中 ? 是 0, 1, 2 分別对应到 timer0, timer1, 和 timer2 着三个定时器.
+// 每当 定时器的计数器 TCNT? 的值 等于 比较器的值，定时器就有在这个时刻改变 通道的电平，
+// 而当计数器 TCNT? 溢出时， 通道的电平也可能改变。
+
+// arduino-1.8.1\hardware\arduino\avr\cores\arduino\wiring_analog.c
+// arduino-1.8.1\hardware\arduino\avr\cores\arduino\wiring.c
+//  analogWrite() 的实现
+
+```
 
 
