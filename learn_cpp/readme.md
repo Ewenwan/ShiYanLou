@@ -161,9 +161,6 @@ dynamic_cast提供了两种转换方式，
        const char* name() const;
     };
 
-
-
-
 ##############################
 ## 【【B】】模板
 
@@ -339,8 +336,9 @@ C++中的虚函数的作用主要是实现了多态的机制。
 
 我们可以通过Base的实例来得到虚函数表。 下面是实际例程：
  
-           typedef void(*Fun)(void);//函数指针  Fun  void(void) 返回值为void、输入值为void
+            typedef void(*Fun)(void);//函数指针  Fun  void(void) 返回值为void、输入值为void
             Base b;// 定义Base类 的实例b 
+            
             Fun pFun = NULL;// 定义一个函数指针Fun 变量 pFun， 初始化为 NULL
             cout << "虚函数表地址：" << (int*)(&b) << endl;//  &b 取地址 (int*) 强制转换成int类型的指针（表id）
 
@@ -366,7 +364,7 @@ Base::f
 
     对象的内存布局：
     
-[](http://p.blog.csdn.net/images/p_blog_csdn_net/haoel/15190/o_vtable1.jpg)
+![](http://p.blog.csdn.net/images/p_blog_csdn_net/haoel/15190/o_vtable1.jpg)
 
     (&b) 对象的地址
     (int*)(&b) 强行把&b 转成int*，取得 虚函数表 的地址
