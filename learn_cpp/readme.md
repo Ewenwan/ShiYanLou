@@ -363,9 +363,9 @@ Base::f
 
 |Base::f()|Base::g()|Base::h()|.|
 
-    对象的内存布局：
+    对象的内存布局 和 虚函数表 ：
     
-![](http://p.blog.csdn.net/images/p_blog_csdn_net/haoel/15190/o_vtable1.jpg)
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/learn_cpp/img/base_class_virtual_table.PNG)
 
     (&b) 对象的地址
     (int*)(&b) 强行把&b 转成int*，取得 虚函数表 的地址
