@@ -391,13 +391,13 @@ Base::f
 
 Derive 类 继承 父类 Base
 
-![]()
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/learn_cpp/img/inheritance_class.PNG)
 
 在这个继承关系中，子类没有重载任何父类的函数。那么，在派生类的实例中，
 
 对于子类对象的实例：Derive d; 的虚函数表如下：
 
-![]()
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/learn_cpp/img/inheritance_class_virtual_table.PNG)
 
 我们可以看到下面几点：
 
