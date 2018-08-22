@@ -5,6 +5,8 @@
 
 [C++ Primer 5 代码](https://github.com/Ewenwan/Cpp-Primer)
 
+[C++设计成这样的原因 《C++演化和设计》](http://vdisk.weibo.com/s/vfFpMc1XDsGn)
+
 
 #    C++  泛型技术  泛化技术  增加不确定性  通用性  灵活性
 
