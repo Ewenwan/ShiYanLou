@@ -301,6 +301,7 @@ typename可以更加直观的反映出后面的名字是一个类型名。
 
 
 ## 【【C】】虚函数技术
+[参考](https://blog.csdn.net/haoel/article/details/1948051)
 
 C++中的虚函数的作用主要是实现了多态的机制。
 
