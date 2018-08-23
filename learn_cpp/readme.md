@@ -509,19 +509,14 @@ Derive 继承 于 Base1 Base2 Base3
         private:
                 virtual void f() { cout << "Base::f" << endl; } 
     };
-
-
-    class Derive : public Base{//继承 于 Base父类
+    class Derive : public Base{// 子类Derive 继承 于 Base父类
     };
-
-
-    typedef void(*Fun)(void);//函数指针
-
+    typedef void(*Fun)(void);  // 函数指针
 
     void main() {
         Derive d;
-        Fun  pFun = (Fun)*((int*)*(int*)(&d)+0);//调用父类的私有虚函数
-        pFun();
+        Fun  pFun = (Fun)*((int*)*(int*)(&d)+0);//通过虚函数指针 调用父类的 私有虚函数
+        pFun();// 会打印 Base::f
     }
 
 
