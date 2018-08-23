@@ -458,38 +458,44 @@ Derive 继承 于 Base1 Base2 Base3
 
 
 #### 【4】多重继承（有虚函数覆盖）
- Derive 继承 于 Base1 Base2 Base3   且有相同函数 f()
+ Derive 继承 于 Base1 Base2 Base3   且有 同名函数 f()
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/learn_cpp/img/class_derive_more_class_over.PNG)
 
      |Derive::f()|Base1::g()|Base1::h()|Derive::g1()|Derive::h1()|.|
-
      |Derive::f()|Base2::g()|Base2::h()|.|
-
      |Derive::f()|Base3::g()|Base3::h()|.|
- 
+
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/learn_cpp/img/class_derive_more_class_over_virtual_table.PNG)
+
  三个父类虚函数表中的f()的位置被替换成了子类的函数指针。
  
- 这样，我们就可以任一静态类型的父类来指向子类，并调用子类的f()了。
+ 这样，我们就可以 用 任一静态类型的父类来指向 子类，并调用子类的f()了。
  
  如：
 
-            Derive d;
-            Base1 *b1 = &d;
-            Base2 *b2 = &d;
-            Base3 *b3 = &d;
-            b1->f(); //Derive::f()
-            b2->f(); //Derive::f()
-            b3->f(); //Derive::f()
+            Derive d;// 子类
+            Base1 *b1 = &d;// 父类1的指针 b1 指向子类d
+            Base2 *b2 = &d;// 父类2的指针 b2 指向子类d
+            Base3 *b3 = &d;// 父类3的指针 b3 指向子类d
+            b1->f(); // Derive::f()  之类d的内存空间中 三个子类的 虚函数表 的第一个函数都是 Derive::f()
+            b2->f(); // Derive::f()
+            b3->f(); // Derive::f()
  
             b1->g(); //Base1::g()
             b2->g(); //Base2::g()
             b3->g(); //Base3::g()
-
+            
+            b1->g(); //Base1::h()
+            b2->g(); //Base2::h()
+            b3->g(); //Base3::h()
 
 
 #### 【5】安全性
 ##### 一、通过父类型的指针访问子类自己的虚函数  会出错
           Base1 *b1 = new Derive();
-            b1->f1();  //编译出错   f1() 为子类自己的虚函数
+            b1->g1();  //编译出错   g1() 为子类自己的虚函数
+            b1->h1();  //编译出错   h1() 为子类自己的虚函数
+            
 任何妄图使用父类指针想调用子类中的未覆盖父类的成员函数的行为都会被编译器视为非法。
 
 
