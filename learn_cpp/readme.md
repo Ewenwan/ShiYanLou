@@ -434,21 +434,25 @@ Derive 类 继承 父类 Base
 
 
 #### 【3】多重继承（无虚函数覆盖）
- Derive 继承 于 Base1 Base2 Base3
+Derive 继承 于 Base1 Base2 Base3
+
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/learn_cpp/img/class_derive_more_class.PNG)
 
      |Base1::f()|Base1::g()|Base1::h()|Derive::f1()|Derive::g1()|Derive::h1()|.|
      
      |Base2::f()|Base2::g()|Base2::h()|.|
      
      |Base3::f()|Base3::g()|Base3::h()|.|
-     
+
+子类内存空间：
+
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/learn_cpp/img/class_derive_more_class_virtual_table.PNG)
 
 我们可以看到：
 
-1）  每个父类都有自己的虚表。
+1）  在子类内存空间中，存在每个父类的虚表。
 
 2）  子类的成员函数被放到了第一个父类的表中。（所谓的第一个父类是按照声明顺序来判断的）
-
 
 这样做就是为了解决不同的父类类型的指针指向同一个子类实例，而能够调用到实际的函数。
 
