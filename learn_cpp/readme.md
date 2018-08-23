@@ -411,7 +411,9 @@ Derive 类 继承 父类 Base
 #### 【2】一般继承（有虚函数覆盖）
 如果子类中有虚函数重载了父类的虚函数   f()
 
-1）覆盖的f()函数被放到了虚表中原来父类虚函数的位置。
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/learn_cpp/img/class_derive_over.PNG)
+
+1）子类覆盖的f()函数被放到了虚表中原来父类虚函数的位置。
 
 2）没有被覆盖的函数依旧。
 
@@ -419,11 +421,14 @@ Derive 类 继承 父类 Base
 
 这样，我们就可以看到对于下面这样的程序，
  
-            Base *b = new Derive();
- 
-            b->f();
- 
-由b所指的内存中的虚函数表的f()的位置已经被Derive::f()函数地址所取代，
+            Base *b = new Derive();// 父类指针Base* b 指向了子类 Derive()
+            b->f();// 会调用子类中覆盖了父类的同名的函数 Derive::f()
+
+子类 Derive 的虚函数表：
+
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/learn_cpp/img/class_derive_over_virtual_table.PNG)
+
+由b所指的内存中的虚函数表的f()的位置已经被 Derive::f() 函数地址所取代，
 
 于是在实际调用发生时，是Derive::f()被调用了。这就实现了多态。
 
