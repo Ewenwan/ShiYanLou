@@ -1,4 +1,36 @@
 # CMake 学习笔记
+```C
+PROJECT(CppBaseTest) # 项目名称
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0) # cmakelists版本要求
+
+#  SET设置变量 支持C++11    -O2  优化等级
+SET(CMAKE_C_FLAGS "${CMAK_C_FLAGS} -g -Wall -O2 -std=c11")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -g -Wall -O2 -std=c++11")
+# 支持C++14, when gcc version > 5.1, use -std=c++14 instead of c++1y
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -g -Wall -O2 -std=c++1y")
+
+# MESSAGE 编译时打印信息
+MESSAGE(STATUS "project source dir: ${PROJECT_SOURCE_DIR}")
+
+# SET设置变量
+SET(PATH_SRC_FILES ${PROJECT_SOURCE_DIR}/./../../demo/CppBaseTest)
+MESSAGE(STATUS "path src files: ${PATH_SRC_FILES}")
+
+# INCLUDE_DIRECTORIES 指定头文件的搜索路径
+INCLUDE_DIRECTORIES(${PATH_SRC_FILES})
+
+# 递归查询所有匹配的文件:*.cpp
+FILE(GLOB_RECURSE CPP_LIST ${PATH_SRC_FILES}/*.cpp)
+FILE(GLOB_RECURSE C_LIST ${PATH_SRC_FILES}/*.c)
+#MESSAGE(STATUS "cpp list: ${C_LIST}")
+
+# 编译可执行程序
+ADD_EXECUTABLE(CppBaseTest ${CPP_LIST} ${C_LIST})
+# 用来为target添加需要链接的共享库，指定工程所用的依赖库，包括动态库和静态库
+TARGET_LINK_LIBRARIES(CppBaseTest pthread)
+
+```
+
 
 
 # CMake 特点
