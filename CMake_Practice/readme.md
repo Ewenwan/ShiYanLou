@@ -1,4 +1,7 @@
 # CMake 学习笔记
+
+[CMake 示例用法](https://github.com/Ewenwan/Linux_Code_Test/tree/master/Samples_CMake)
+
 ```C
 PROJECT(CppBaseTest) # 项目名称
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0) # cmakelists版本要求
