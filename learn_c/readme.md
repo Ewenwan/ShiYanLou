@@ -8,10 +8,12 @@
 # 关键字
 * 1. auto 自动变量声明
 * 2. int double long char float short signed unsigned 
-* 3. struct结构体 union联合 enum枚举 static静态变量  const只读变量(常量)
+* 3. struct结构体 union联合 enum枚举 static静态变量(内存静态区-唯一性-静态全局-静态局部-静态函数(内部函数))  
+     const只读变量(常量)
 * 4. case break default if else do while for continue
-* 5. register寄存器变量  volatile易失型变量(确保本条指令不会因编译器的优化而省略，且要求每次直接读值)
-* 6. typedef别名 extern声明 
-* 7. void return
-* 8. goto无条件跳转语句
-* 9. sizeof 计算对象所占内存空间大小
+* 5. register寄存器变量-最快-CPU皇帝同志的太监总管-中转站
+* 6. volatile易失型变量(确保本条指令不会因编译器的优化而省略，且要求每次直接读值)
+* 7. typedef别名 extern声明-未分配内存(喝稀粥)， 定义才分配了内存(抱伊人) 
+* 8. void return
+* 9. goto无条件跳转语句
+* 10. sizeof 计算对象所占内存空间大小
