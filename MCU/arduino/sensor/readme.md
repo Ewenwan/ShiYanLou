@@ -727,3 +727,83 @@ void loop() {
   
 }
 ```
+ **定时器控制舵机正反转
+ ```c
+ 
+ ///*
+// 舵机的实现 定时器1
+#include <Servo.h>
+
+#include <FlexiTimer2.h>// 系统任务定时器 make2560可用 
+//#include <MsTimer2.h>  // uno  Timer2  8bit PWM 3 和 11 用不了
+
+Servo myservo;  // 创建 servo 对象来控制一个 servo
+const int pin = 9;//舵机的控制信号引脚   timer1  PWM 9 10口
+const int ang_pin = A0;//将舵机的角度输出信号连接至A0
+
+bool zf_flag = 0;//符号标志选择正反转 0 正 1500 ->1900  1 反
+int r_zl = 2;    //每次增量
+int min_r = 600; //最小位置（500，若设置为1500，水平位置）//600，最小适合值
+int r_current = min_r;//当前位置
+int max_r =2400;  //最大角度位置//2400最大合适值
+float angle;      // 舵机反馈的角度值 对应角度值
+int   angle_int;
+int   angle_int_100ms;//100ms时对应的角度
+
+bool direction_change_flag = 0; // 舵机转向变化flag 向任意一个方向转动到转不动了，就需要改变方向。
+
+// 20ms  舵机控制 任务=========================
+void servo_control(){
+   if(r_current <=  min_r)   zf_flag = 0;//当前位置小于等于最小位置，标志位置0
+  else if(r_current >=  max_r) zf_flag = 1;//当前位置大于等于最大位置，标志位置1
+  if(zf_flag) r_current -=  r_zl;//正转
+  else r_current +=  r_zl;//反转
+  myservo.writeMicroseconds(r_current);//向9脚写入当前状态
+  angle = (analogRead(ang_pin)*(-2.132) + 2592.7)/100*15;
+  angle_int = angle;
+}
+//*/
+int servo_count=0;//子计时器
+int servo_change_dir_dect_time_count=0;
+void task(){
+  servo_count++;
+  if(servo_count >= 10)
+  {
+    servo_control();
+    servo_count = 0;
+  }
+  
+// 舵机调换方向判断=========转不动了改变方向==============
+  servo_change_dir_dect_time_count++;
+  if(servo_change_dir_dect_time_count == 50) angle_int_100ms = angle_int; // 100ms时的角度值
+  if(servo_change_dir_dect_time_count >= 500){
+    int temp = abs(angle_int - angle_int_100ms);// 两次 角度差值绝对值
+    Serial.println(temp);// 打印看看正常情况下 会有多少的 角度差 
+    //  11为阈值， 或者这里 使用 temp的平均值来作为阈值（自适应）
+    if(temp>11);// 可能需要多次都小于一个值才能够判断出 舵机堵转  500ms正常差值 6~7   1s差值 11~20
+    else direction_change_flag =1;// 舵机转不动了， 变换转动方向
+    servo_change_dir_dect_time_count = 0;
+    }
+}
+void setup() {
+   Serial.begin(9600);//串口初始化
+  // put your setup code here, to run once:
+   myservo.attach(pin);
+   FlexiTimer2::set(2,1.0/1000,task );//2ms执行一次定时器中断服务程序 2560
+   FlexiTimer2::start();
+
+ // MsTimer2::set(20, task); // 20ms period
+ // MsTimer2::start();
+
+   
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  
+  // 舵机切换方向============================
+if(direction_change_flag) {zf_flag = !zf_flag; direction_change_flag=0;}
+    
+}
+
+ ```
