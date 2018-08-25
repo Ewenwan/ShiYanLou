@@ -311,6 +311,40 @@ C++中的虚函数的作用主要是实现了多态的机制。
 
 这种技术可以让父类的指针有“多种形态”.
 
+```c
+class A{
+    int a;
+    // a的后面直接是虚函数，内存中存在为虚函数表指针    
+ public:
+    virtual void f();
+    virtual void g(int);
+    virtual void h(double);
+};
+
+class B: public A{
+ public:
+    int b;
+    void g(int);// 会覆盖 A类的 A::g
+    virtual void m(B*);
+};
+
+class C: public B{
+ public:
+    int c;
+    void h(double);// 会覆盖 B的父类A 的 A:h
+    virtual void n(C*);
+}
+
+&C, 类C的实例的内存空间大概如下：
+变量a
+虚函数表指针vptr  ------>  |&A::f|&B::g|&C::h|&B::m||&C::n|.|  按继承的先后顺序存放函数
+变量b
+变量c
+
+```
+
+
+
 
 ### 虚函数表
  
