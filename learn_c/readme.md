@@ -15,14 +15,19 @@
      
      enum 枚举 可以自增1，这样不用每一个值都定义，而 宏 #define 必须每个值都定义。   
      而且枚举是一个集合，代表一类值，像你代码中的颜色归为一类，方便使用，而宏不能形成集合。   
+     #define不只是可以为类型取别名，还可以定义常量、变量、编译开关等.   
      
 * 4. case break default if else do while for continue 
-* 5. register寄存器变量-最快-CPU皇帝同志的太监总管-中转站 
-* 6. volatile易失型变量(确保本条指令不会因编译器的优化而省略，且要求每次直接从内存中读值) 
-* 7. typedef别名 extern声明-未分配内存(喝稀粥)，外来的，非国产的，不是本文件中定义的；  定义才分配了内存(抱伊人)  
-* 8. void色即是空空即是色，世间万物  return返回 
-* 9. goto无条件跳转语句，尽量少用，或不用 
-* 10. sizeof 计算对象所占内存空间大小 
+* 5. register寄存器变量-最快-CPU皇帝同志的太监总管-中转站    
+* 6. volatile易失型变量(确保本条指令不会因编译器的优化而省略，且要求每次直接从内存中读值)      
+* 7. typedef 类型别名, 伟大的缝纫师，擅长做马甲, 面具，化妆师， 整容师， 挂羊头卖狗肉，鬼门关，孟婆汤 ...      
+                      华美绝伦的芍药，就有个别名---“将离”, 表达了那种依依不舍的惜别之情…    
+                      常用来给结构体取别名，方便使用。   
+                      
+* 8. extern声明-未分配内存(喝稀粥)，外来的，非国产的，不是本文件中定义的；  定义才分配了内存(抱伊人)  
+* 9. void色即是空空即是色，世间万物  return返回 
+* 10. goto无条件跳转语句，尽量少用，或不用 
+* 11. sizeof 计算对象所占内存空间大小 
       sizeof 在计算变量所占空间大小时，括号可以省略，而计算类型(模子)大小时不能省略 
       int i; sizeof i; sizeof(i); sizeof(int)都可以； sizeof int;编译出错 
       
@@ -81,7 +86,7 @@ typedef struct st_type
 {
 int i;
 int a[]; // int a[0];
-}type_a;
+}type_a; // type_a 为 typede f定义的 结构体 st_type 的别名，方便使用
 // 定义一个可变长的结构体，用 sizeof(type_a)得到的只有 4，就是 sizeof(i)=sizeof(int)。
 // 给结构体分配内存
 type_a *p = (type_a*)malloc(sizeof(type_a)+100*sizeof(int));
@@ -125,4 +130,31 @@ printf("%x,%x",ptr1[-1],*ptr2);// 5,2
                         // ptr-1=ptr-sizeof(int)，故ptr-1指向&a[4]。因此，*(ptr-1)的值即为a[4]=5。
 
 ```
+>**typedef常见用法**
+```c
+1.常规变量类型定义：typedef unsigned char uchar描述：uchar等价于unsigned char类型定义
+                       uchar c 声明 等于unsigned char c声明
+2.数组类型定义:     typedef int array[2];（注：可理解为typedef int[] array）
+                       array 等价于 int[2]定义;      array a 声明等价于int a[2]声明
+                   typedef int array[M][N]; 描述： array等价于 int[M][N]定义;
+                       array a 声明 等价于int a[M][N]声明
+3.指针类型定义:     typedef  int *pointer;   描述： pointer等价于 int*定义; 
+                       pointer p 声明等价于int* a声明
+                   typedef int *pointer[M]; 描述： pointer等价于 int*[M]定义;
+                       pointer p声明等价于int*a[M]声明明
+4.函数地址说明描述:  int func(void);       
+                    unsigned long funcAddr=(unsigned long)func；
+                    funcAddr 的值是 func 函数的首地址
+5.函数声明例如：     typedef int func(void); 
+                       func 等价于 int(void)类型函数
+6.函数指针例如：     typedef int (*func)(void) 
+                    func等价于int (*)(void)类型  
+                       func pf 等价于 int(*pf)(void)声明，pf是一个函数指针变量
+```
+# 2. 符号
+
+
+
+
+
 
