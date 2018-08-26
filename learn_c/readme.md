@@ -554,11 +554,155 @@ int a [3][2]={ 1, 3, 5};
 ![](https://github.com/Ewenwan/ShiYanLou/blob/master/learn_c/img/pointer_two.PNG)
 
 ## 4.7 数组与指针作为函数参数
+```c
+C 语言中，当一维数组作为函数参数的时候，编译器总是把它解析成一个指向其首元素首地址的指针。    
+无法把指针变量本身传递给一个函数， 但可以改变指针指向的值。    
+可以利用函数返回值，也可以传递二级指针，即 想改变的指针 的 地址。   
 
+当数组超过一维时，将第一维改写为指向数组首元素首地址的指针之后，后面的维再也不可改写。  
+比如： a[3][4][5]作为参数时可以被改写为（*p） [4][5]  
+```
 ## 4.8 函数指针 函数指针数组
+```c
+char * fun3(char * p1,char * p2);    // fun3是函数，返回值为 char*类型    
+char * *fun2(char * p1,char * p2);   // fun2也是函数, 返回值为 char** 类型     
+char * (*fun1)(char * p1,char * p2); // fun1是函数指针，指向一个类型为 char*(char*,char*)的函数    
+```
+函数指针调用示例：
+```c
+#include <stdio.h>
+#include <string.h>
+char * fun(char * p1,char * p2)
+{
+     int i = 0;
+     i = strcmp(p1,p2);
+     if (0 == i)
+     {
+          return p1;
+     }
+     else
+     {
+          return p2;
+     }
+}
+int main()
+{
+     char * (*pf)(char * p1,char * p2);// 定义函数指针
+     pf = &fun;        // 赋值，初始化
+     (*pf) ("aa","bb");// 调用函数指针指向的函数
+     return 0;
+}
+```
+### *(int*)&p 强转 指针地址类型，再解引用
+```c
+void Function()
+{
+printf("Call Function!\n");
+}
+int main()
+{
+     void (*p)(); // void(void)类型函数的指针 p, 
+     // &p 是求指针变量 p 本身的地址，这是一个 32 位的二进制常数（32 位系统）。
+     // (int*)&p 表示将地址强制转换成指向 int 类型数据的指针。
+     // (int)Function 表示将函数的 入口 地址 强制转换成 int 类型 的 数据。
+     *(int*)&p=(int)Function;// 表示将函数的入口地址赋值给指针变量 p。
+     (*p) ();// 表示对函数的调用。
+     return 0;
+}
+```
+### (*(void(*) ())0)()
+```c
+void(*)() , 指向类型为 void(void)的函数的 函数指针
+(void(*) ())0 ，将 0 强制转换为函数指针类型， 0 是一个地址，也就是说一个函数存在首地址为 0 的一段区域内。
+(*(void(*) ())0)，取 0 地址开始的一段内存里面的内容，其内容就是保存在首地址为 0 的一段区域内的函数。
+(*(void(*) ())0)()， 这是函数调用
+同理 ：
+(*(char**(*) (char **,char **))0) ( char **,char **);
+```
+### 函数指针数组 
+```
+char * (*pf)(char * p);   // 定义的是一个函数指针 pf, 指向一个类型为 char*(char*)的函数
+char * (*pf[3])(char * p);// 定义一个函数指针数组, 数组名为 pf，数组内存储了 3 个指向函数的指针。
+```
+示例：
+```c
+#include <stdio.h>
+#include <string.h>
+char * fun1(char * p)
+{
+     printf("%s\n",p);
+     return p;
+}
+char * fun2(char * p)
+{
+     printf("%s\n",p);
+     return p;
+}
+char * fun3(char * p)
+{
+     printf("%s\n",p);
+     return p;
+}
+int main()
+{
+     char * (*pf[3])(char * p);// pf 为 函数指针数组名
+     // 为数组赋值
+     pf[0] = fun1;  // 可以直接用函数名
+     pf[1] = &fun2; // 可以用函数名加上取地址符
+     pf[2] = &fun3;
+     pf[0]("fun1");// 调用函数
+     pf[1]("fun2");
+     pf[2]("fun3");
+     return 0;
+}
+
+```
+### 函数指针数组的指针 
+```c
+char * (*pf)(char * p);   // 定义的是一个函数指针 pf, 指向一个类型为 char*(char*)的函数
+char * (*pf[3])(char * p);// 定义一个 函数指针 数组, 数组名为 pf，数组内存储了 3 个指向函数的指针。
+char * (*(*pf)[3])(char * p);// 定义一个指针，指向一个函数指针数组，该数组内存放3个 指向类型为char*(char*)的函数的函数指针。
+```
+用法：
+```c
+#include <stdio.h>
+#include <string.h>
+char * fun1(char * p)
+{
+     printf("%s\n",p);
+     return p;
+}
+char * fun2(char * p)
+{
+     printf("%s\n",p);
+     return p;
+}
+char * fun3(char * p)
+{
+     printf("%s\n",p);
+     return p;
+}
+int main()
+{
+     char * (*pf[3])(char * p);// pf 为 函数指针 数组名
+     char * (*(*pf)[3])(char * p);// 函数指针数组 的 指针
+     pf = &a;
+     // 为数组赋值
+     a[0] = fun1;
+     a[1] = &fun2;
+     a[2] = &fun3;
+
+     pf[0][0]("fun1");// 调用函数
+     pf[0][1]("fun2");
+     pf[0][2]("fun3");
+     return 0;
+}
+
+```
 
 
-## 4.9
+# 5 内存管理
+## 野指针 猫 
 
 
 
