@@ -800,6 +800,185 @@ for (i=0; i<=10; i++) // for (i=0; i<10; i++)  左闭右开写法=============
 ```
 ### 内存泄漏 由malloc 系列函数或 new 操作符分配的内存。如果用完之后没有及时 free 或 delete，这块内存就无法释放，直到整个程序终止。
 
+### malloc 返回指针 NULL 申请0字节内存
+
+申请 0 字节内存，函数并不返回 NULL，而是返回一个正常的内存地址。  
+但是你却无法使用这块大小为 0 的内存。  
+这好尺子上的某个刻度，刻度本身并没有长度，只有某两个刻度一起才能量出长度。  
+对于这一点一定要小心，因为这时候 if（NULL ！ = p）语句校验将不起作用。  
+
+
+### malloc 与 free 配对使用 一定要一夫一妻制，不然肯定出错。
+```c
+malloc 两次只 free 一次会内存泄漏； malloc 一次 free 两次肯定会出错。
+也就是说，在程序中 malloc 的使用次数一定要和 free 相等，否则必有错误。
+这种错误主要发生在循环使用malloc 函数时，往往把 malloc 和 free 次数弄错了。
+```
+
+### 释放完块内存之后，没有把指针置 NULL，这个指针就成为了“野指针”，也有书叫“悬垂指针”。
+
+这是很危险的，而且也是经常出错的地方。所以一定要记住一条： free 完之后，一定要给指针置 NULL。
+
+# 6. 函数
+## 函数头注释
+```c
+/************************************************************************
+* Function Name : nucFindThread   函数名
+* Create Date : 2000/01/07        创建日期
+* Author/Corporation : your name/your company name   作者
+*
+* Description : Find a proper thread in thread array.  描述
+* If it’s a new then search an empty.
+*
+* Param : ThreadNo： someParam description            参数
+*         ThreadStatus： someParam description
+*
+* Return Code : Return Code description,eg:           返回值
+ERROR_Fail: not find a thread
+ERROR_SUCCEED: found
+*
+* Global Variable : DISP_wuiSegmentAppID
+* File Static Variable : naucThreadNo
+* Function Static Variable : None
+*
+*------------------------------------------------------------------------
+* Revision History   版本信息
+* No. Date Revised by Item Description
+* V0.5 2008/01/07 your name … …
+************************************************************************/
+static unsigned char nucFindThread(unsigned char ThreadNo,unsigned char ThreadStatus)
+{
+…
+}
+
+```
+
+## 复杂的函数中，在分支语句，循环语句结束之后需要适当的注释，方便区分各分支或循环体。
+```c
+while (condition)
+{
+     statement1;
+     if (condition)
+     {
+          for(condition)
+          {
+               Statement2;
+          }//end 'for(condition)'
+     }
+     else
+     {
+          statement3;
+     }//'end if (condition)'
+     statement4
+}//end 'while (condition)'
+
+
+```
+## 修改别人代码的时候不要轻易删除别人的代码，应该用适当的注释方式
+```C
+while (condition)
+{
+     statement1;
+     //////////////////////////////////////
+     //your name , 2008/01/07 delete
+     //if (condition)
+     //{
+     // for(condition)
+     // {
+     // Statement2;
+     // }
+     //}
+     //else
+     //{
+     // statement3;
+     //}
+     ////////////////////////////////////////
+     ///////////////////////////////////////
+     // your name , 2000/01/07 add
+          …
+          new code
+          …
+     ///////////////////////////////////////
+     statement4
+}
+
+```
+### 递归函数的展开
+     平时写代码，不到万不得已，尽量不要用递归。
+     即便是要用递归，也要注意递归的层次不要太深，防止出现栈溢出的错误；
+     同时递归的停止条件一定要正确，否则，递归可能没完没了。
+     
+```c
+void fun(int i)
+{
+     if (i>0)
+     {
+          fun(i/2);
+     }
+     printf("%d\n",i);
+}
+int main()
+{
+     fun(10);
+     return 0;
+}
+// 输出：
+// 0 
+// 1 
+// 2
+// 5
+// 10
+// 递归函数展开 =====================
+void fun(int i)
+{
+     if (i>0)
+     {
+          //fun(i/2);
+          if(i/2>0)
+          {
+               if(i/4>0)
+               {
+                    if(i/8>0)
+                    {
+                         if(i/16>0)
+                         {
+                         ... // 不执行
+                         }
+                         printf("%d\n",i/16);  // 0
+                    }
+                    printf("%d\n",i/8);// 1 
+               }
+               printf("%d\n",i/4); // 2
+          }
+          printf("%d\n",i/2); // 5
+     }
+printf("%d\n",i);// 10
+}
+```
+# 7. 文件结构
+## 文件头 
+```c
+/************************************************************************
+* File Name : FN_FileName.c/ FN_FileName.h                      文件名
+* Copyright : 2003-2008 XXXX Corporation,All Rights Reserved.   版权亦称“著作权”
+* Module Name : Draw Engine/Display                             文件模块功能名称
+*
+* CPU : ARM7
+* RTOS : Tron
+*
+* Create Date : 2008/10/01                                      创建日期
+* Author/Corporation : WhoAmI/your company name                 作者
+*
+* Abstract Description : Place some description here.           文件描述信息
+*
+*-----------------------Revision History----------------------- 版本信息
+* No Version Date Revised By Item Description
+* 1 V0.95 08.05.18 WhoAmI abcdefghijklm WhatUDo
+*
+************************************************************************/
+
+```
+
 
 
 
