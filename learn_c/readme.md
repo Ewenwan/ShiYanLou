@@ -336,9 +336,132 @@ BMC my multi-line comment EMC   // 错误
 
 
 ```
+## 3.3 #pragma编译
+```c
+1. #pragma message("消息文本") 
+     它能够在编译信息输出窗口中输出相应的信息，这对于源代码信息的控制是非常重要的。
+     当编译器遇到这条指令时就在编译输出窗口中将消息文本打印出来。
+
+     假设我们希望判断自己有没有在源代码的什么地方定义了_X86 这个宏可以用下面的方法:
+     #ifdef _X86
+     #Pragma message(“_X86 macro activated!”)
+     #endif
+
+2. #pragma code_seg()
+     另一个使用得比较多的 pragma 参数是 code_seg。
+     格式如：
+
+     #pragma code_seg( ["section-name"[,"section-class"] ] )
+
+     它能够设置程序中函数代码存放的代码段，当我们开发驱动程序的时候就会使用到它。
+
+3. #pragma once 编译一次
+     比较常用只要在头文件的最开始加入这条指令就能够保证头文件被编译一次, 
+     但是考虑到兼容性并没有太多的使用它。
+
+4. #pragma hdrstop
+     #pragma hdrstop 表示预编译头文件到此为止，后面的头文件不进行预编译。 
+     你可以用#pragma startup 指定编译优先级，如果使用了#pragma package(smart_init) ，
+     BCB就会根据优先级的大小先后编译.
+
+5. #pragma resource 载入资源
+     #pragma resource "*.dfm"  表示把*.dfm 文件中的资源加入工程。 
+     *.dfm 中包括窗体外观的定义。
+
+6. #pragma warning 错误信息
+     #pragma warning(disable:4507 34) // 不显示 4507 和 34 号警告信息
+     #pragma warning(once:4385)       // 4385 号警告信息仅报告一次
+     #pragma warning(error:164)       // 把 164 号警告信息作为一个错误。
+
+     #pragma warning( push )保存所有警告信息的现有的警告状态。
+     #pragma warning( push, n)保存所有警告信息的现有的警告状态，并且把全局警告等级设定为 n。
+     #pragma warning( pop )向栈中弹出最后一个警告信息，在入栈和出栈之间所作的一切改动取消。
+
+7. #pragma pack(用于指定内存对齐的方式（按指定的字节数进行对齐）) 和 内存对齐问题(降低访存消耗)
+struct TestStruct1
+{
+     char c1;  // 1字节   数据结构（尤其是栈）应该尽可能地在自然边界上对齐。(大小为4的倍数)
+     short s;  // 2字节
+     char c2;  // 1字节
+     int i;    // 4字节
+}
+
+|c1| - |     s |   编译器在默认情况下按照4字节对齐，即#pragma pack(4)
+|c2| - | - | - |
+| i            |
+3*4 =12 字节
+
+CPU对内存的读取不是连续的，而是分块读取的，块的大小只能是2^i字节数(i=0,1,2,3…)。
+从CPU的读取性能和效率来考虑，若读取的数据未对齐，则需要两次总线周期来访问内存，因而效率会大打折扣。
+某些硬件平台只能从规定的相对地址处读取特定类型的数据，否则产生硬件异常。
+
+struct TestStruct2
+{
+     char c1;  // 1字节   
+     char c2;  // 1字节
+     short s;  // 2字节
+     int i;    // 4字节
+}
+
+|c1|c2|s    |
+|i          |
+2*4 = 8字节内存
 
 
+使用指令#pragma pack (n)，编译器将按照 n 个字节对齐。
+使用指令#pragma pack ()，编译器将取消自定义字节对齐方式。
+在#pragma pack (n)和#pragma pack ()之间的代码按 n 个字节对齐。
 
 
+#pragma pack(8)
+struct TestStruct4
+{
+     char a; // 1字节
+     long b; // 4字节
+};
+struct TestStruct5
+{
+     char c;  // 1字节
+     TestStruct4 d; 
+     long long e;// 8字节
+};
+#pragma pack()
+                         a    b
+TestStruct4 的内存布局： 1***,1111,
+                        c   TestStruct4.a TestStruct4.b   d
+TestStruct5 的内存布局： 1***,   1***,      1111, ****， 11111111
+
+```
+
+## 3.4 #运算符 变量取值  引号内替换变量
+```c
+#define SQR(x) printf("The square of x is %d.\n", ((x)*(x)));
+如果这样使用宏：
+SQR(8);
+则输出为：
+The square of x is 64.
+注意到没有，引号中的字符 x 被当作普通文本来处理，而不是被当作一个可以被替换的语言符号。
+
+#define SQR(x) printf("The square of "#x" is %d.\n", ((x)*(x)));
+再使用：
+SQR(8);
+则输出的是：
+The square of 8 is 64.
+很简单吧？相信你现在已经明白#号的使用方法了。
+
+```
+
+## 3.5 ##运算符 用于宏函数的替换部分 把两个语言符号组合成单个语言符号
+```c
+#define XNAME(n) x ## n
+如果这样使用宏：
+XNAME(8)
+则会被展开成这样：
+x8
+看明白了没？ ##就是个粘合剂，将前后两部分粘合起来。
+
+```
+
+# 4. 指针和数组
 
 
