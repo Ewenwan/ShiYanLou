@@ -15,7 +15,7 @@
 * 4. case break default if else do while for continue 
 * 5. register寄存器变量-最快-CPU皇帝同志的太监总管-中转站 
 * 6. volatile易失型变量(确保本条指令不会因编译器的优化而省略，且要求每次直接从内存中读值) 
-* 7. typedef别名 extern声明-未分配内存(喝稀粥)， 定义才分配了内存(抱伊人)  
+* 7. typedef别名 extern声明-未分配内存(喝稀粥)，外来的，非国产的，不是本文件中定义的；  定义才分配了内存(抱伊人)  
 * 8. void色即是空空即是色，世间万物  return返回 
 * 9. goto无条件跳转语句，尽量少用，或不用 
 * 10. sizeof 计算对象所占内存空间大小 
@@ -23,10 +23,10 @@
       int i; sizeof i; sizeof(i); sizeof(int)都可以； sizeof int;编译出错 
       
 ## 技巧
-**bool 变量与“零值”进行比较**
+>**bool 变量与“零值”进行比较**
 
           if(bTestFlag); if(!bTestFlag);
-**float 变量与“零值”进行比较**
+>**float 变量与“零值”进行比较**
           
           if((fTestVal >= -EPSINON) && (fTestVal <= EPSINON)); //EPSINON 为定义好的精度
  **指针变量与“零值”进行比较**   
@@ -67,8 +67,12 @@ for (col=0; col<5; col++ )// 外层循环 次数少   常采用左闭右开区�
 }
 ```
 
-**struct定义的柔性数组**
+**struct定义的柔性数组 flexible array**
 ```c
+// C99 中，结构中的最后一个元素允许是未知大小的数组，这就叫做柔性数组成员,
+// 但结构中的柔性数组成员前面必须至少一个其他成员。
+// 柔性数组成员允许结构中包含一个大小可变的数组。
+// sizeof 返回的这种结构大小不包括柔性数组的内存。
 typedef struct st_type
 {
 int i;
@@ -77,13 +81,14 @@ int a[]; // int a[0];
 // 定义一个可变长的结构体，用 sizeof(type_a)得到的只有 4，就是 sizeof(i)=sizeof(int)。
 // 给结构体分配内存
 type_a *p = (type_a*)malloc(sizeof(type_a)+100*sizeof(int));
-// 为结构体指针 p 分配了一块内存。用 p->item[n]就能简单地访问可变长元素。
+// 为结构体指针 p 分配了一块内存。用 p->a[n]就能简单地访问可变长元素。
 // 我们再用 sizeof（*p）测试结构体的大小，发现仍然为 4。
 // 在定义这个结构体的时候，模子的大小就已经确定不包含柔性数组的内存大小。
 // 柔性数组只是编外人员，不占结构体的编制。
-
+// 用 free 函数来释放内存：
+// free(p);
 
 ```
-          
+ **struct 的成员默认情况下属性是 public 的，而 class 成员却是 private 的**         
           
           
