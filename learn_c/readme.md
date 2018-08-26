@@ -233,7 +233,8 @@ n 字符串";
 ```c
 预处理名称    意 义  
 
-#define      宏定义 ,  是个演技非常高超的替身演员, 经常耍大牌, 从本行宏定义开始，以后的代码就就都认识这个宏了.
+#define      宏定义 ,  是个演技非常高超的替身演员, 经常耍大牌, 要搞定它其实很简单，别吝啬括号就行了.
+             从本行宏定义开始，以后的代码就就都认识这个宏了.
              编译器会在预编译的时候用真身替换替身.
              
 #undef       撤销已定义过的宏名  
@@ -274,6 +275,34 @@ n 字符串";
 ```c
 #define PI 3.141592654   // 数值宏常量,  通常大写
 #define ERROR_POWEROFF -1 // 这个-1，我们一般称为“魔鬼数”, 鬼知道-1 表示的是什么意思
+// 字符串宏常量
+#define ENG_PATH_1 E:\English\listen_to_this\listen_to_this_3
+#define ENG_PATH_2 “E:\English\listen_to_this\listen_to_this_3”
+// 请注意：有的系统里规定路径的要用双反斜杠“\\” ,比如：
+#define ENG_PATH_4 E:\\English\\listen_to_this\\listen_to_this_3
 
+// 如果路径太长,用反斜杠 接续符 啊：（最后一个 \ 为接续符）
+#define ENG_PATH_3 E:\English\listen_to_this\listen\
+_to_this_3
+
+// 不能用define 宏定义注释符号，因为 注释 先于 预处理指令 被处理
+#define BSC //
+#define BMC /*
+#define EMC */
+BSC my single-line comment      // 错误, 预处理阶段不认识注释符
+BMC my multi-line comment EMC   // 错误
+
+// 定义表达式---注意多使用括号
+#define SEC_A_YEAR (60*60*24*365) UL   // 定义一年有多少秒
+#define SQR (x) ( (x) * (x) )          // 定义一个宏函数，求 x 的平方
+                                       // 宏函数被调用时是以实参代换形参。而不是“值传送”。
+
+// 撤销宏定义==========
+#define PI 3.141592654
+… // 可以使用 PI
+// code                                       
+#undef PI
+// 下面的代码就不能用 PI 了，它已经被撤销了宏定义。
+// 也就是说宏的生命周期从#define 开始到#undef 结束。
 
 ```
