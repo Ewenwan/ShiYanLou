@@ -21,6 +21,16 @@
     如果大家有余力，尝试完成扩展练习。
 ![](https://img-blog.csdn.net/20170903193711721?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZm91eV95dW4=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center)
 
+![https://img-blog.csdn.net/20161227152013168?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvZGFyazU2Njk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast]
+
+	缓存对程序员是不可见的，当CPU发出访存请求的时候，在主存控制器中产生请求队列；
+	然后主存控制器中调度器对请求进行调度；
+	根据请求的内容不同可以分为命令，地址，和数据等。
+	根据物理地址找到对应的bank，然后取出对应的某一行ROW，到Row Buffer 中，
+	然后取出对应的某一列column，（到缓存中）然后CPU再访问。
+	
+
+
 # 程序执行顺序
     1. boot/bootasm.S  | bootasm.asm（修改了名字，以便于彩色显示）
      a. 开启A20   16位地址线 实现 20位地址访问  芯片版本兼容
