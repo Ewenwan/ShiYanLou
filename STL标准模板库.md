@@ -195,6 +195,56 @@ cout << *iter ; // 0
 
 
 ```
+### c.双向链表list 
+	 双向链表，包含前后指针，和数据域，数据不连续，浪费访存，多包含两个指针变量，浪费内存
+```c
+/*
+1. 在链表中任意位置插入/删除 元素 特别快 O(1)
+2. 在链表中查找元素 特别慢， O(n)， 实际上因为内存不连续，浪费访存case，比vector慢了很多
+3. 无随机访问 [] 以及 .at()
+4. splice() 实现list拼接的功能。将源list的内容部分或全部元素删除，拼插入到目的list。 O(1)
+*/
+#include<list>
+#include<algorithm> // std::find
+#include<iostream>
+using namespace std;
+int main(){
+
+list<int> mylist = {5, 2, 0};
+mylist.push_back(1);
+mylist.push_back(3);
+mylist.push_back(1);
+mylist.push_back(4);// {5, 2, 0, 1, 3, 1, 4};
+
+mylist.push_front(5);// {5, 5, 2, 0, 1, 3, 1, 4};
+
+// 查找元素2
+list<int>::iterator itr = find(mylist.begin(), mylist.end(), 2);// itr --->2
+
+cout << *itr << endl;
+// 插入元素6   链表插入速度特别快
+mylist.insert(itr,6);// {5, 5, 6, 2, 0, 1, 3, 1, 4};// 在2的前面一个位置插入6
+cout << *itr << endl;
+
+itr++; // 指向 0
+cout << *itr << endl;
+
+// 删除 itr指向的元素   速度特别快 O(1)
+mylist.erase(itr);// {5, 5, 6, 2, 1, 3, 1, 4};
+cout << *itr << endl; // 但是内存还存在 0元素
+
+for(list<int>::iterator itr1 = mylist.begin(); itr1 != mylist.end();++itr1){
+	cout << *itr1 << endl;
+}
+
+	return 0;
+}
+```
+### d. 单向链表forward_list 
+
+
+### e. array数组
+
 
 ## 1.2 有序关联容器（红黑二叉树） 
 	set, multiset 单值树集合  multi 关键字可以重复出现
