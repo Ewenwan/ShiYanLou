@@ -1,9 +1,10 @@
-# Standard Template Libraries
-# 1. 容器
-# 2. 迭代器
-# 3. 算法
+# Standard  Library 标准库
+# Standard Template Library 标准模板库
+## 1. 容器   Containers
+## 2. 迭代器 Iterators
+## 3. 算法   Algorithms
 
-# 1. 函数模板、类模板 与 * 运算符 重载
+# 1. 函数模板、类模板 与 * 乘法运算符 重载
 ```c
 #include<iostream>
 // 函数模板
@@ -52,3 +53,40 @@ int main(){
 }
 
 ```
+
+# 容器 迭代器 算法 示例
+```c
+#include<iostream>// std::cout & std::endl 
+#include<vector>  // std::vector
+#include<algorithm>// std::sort
+using namespace std;
+
+int main(){
+// 容器========
+	vector<int> vec_i;
+	vec_i.push_back(5);
+	vec_i.push_back(2);
+	vec_i.push_back(0); // vec_i = (5, 2, 0);
+// 迭代器======
+	vector<int>::iterator iter_beg = vec_i.begin(); // [begin, end) 左闭右开区间
+	vector<int>::iterator iter_end = vec_i.end();
+
+    for(vector<int>::iterator it = iter_beg; it!=iter_end; ++it){
+		cout << *it << endl;// vec_i = (5, 2, 0);
+	}
+// 算法========
+	sort(iter_beg+1, iter_end);//vec_i = (5, 0, 2);
+	
+    for(vector<int>::iterator it = iter_beg; it!=iter_end; ++it){
+		cout << *it << endl;
+	}
+	
+	sort(iter_beg, iter_end);//vec_i = (0, 2, 5);
+	for(vector<int>::iterator it = iter_beg; it!=iter_end; ++it){
+		cout << *it << endl;
+	}
+	
+	return 0;
+}
+```
+
