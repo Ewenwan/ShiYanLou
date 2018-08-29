@@ -2,7 +2,7 @@
 # Standard Template Library 标准模板库
 ## 1. 容器   Containers
 ## 2. 迭代器 Iterators
-## 3. 算法   Algorithms
+## 3. 算法   Algorithms  
 
 # 1. 函数模板、类模板 与 * 乘法运算符 重载
 ```c
@@ -75,6 +75,7 @@ int main(){
 		cout << *it << endl;// vec_i = (5, 2, 0);
 	}
 // 算法========
+        // 算法 通过 迭代器 对 容器元素 进行操作 !!!!!!!!!!!!!!!
 	sort(iter_beg+1, iter_end);//vec_i = (5, 0, 2);
 	
     for(vector<int>::iterator it = iter_beg; it!=iter_end; ++it){
