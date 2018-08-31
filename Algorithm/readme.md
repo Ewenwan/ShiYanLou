@@ -19,6 +19,8 @@
 
 [各种排序算法动画演示及对比](https://www.toptal.com/developers/sorting-algorithms)
 
+[博客c++ 技术](https://blog.csdn.net/gavin0123/article/list/3?t=1)
+
 # 数值计算
 ```c
 // 求一个数的立方根
