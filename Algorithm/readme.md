@@ -6,6 +6,8 @@
 
 [离散数学 树 图 mook](https://www.icourse163.org/course/UESTC-1002268006)
 
+[数学分析 数值算法 编程Numerical Recipes ](http://ishare.iask.sina.com.cn/f/36998796.html)
+
 [leetcode 博客题解](https://blog.csdn.net/liuxiao214/article/details/76032392)
 
 [编程之法：面试和算法心得](https://github.com/julycoding/The-Art-Of-Programming-By-July)
