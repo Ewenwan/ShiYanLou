@@ -2,6 +2,10 @@
 
 [《算法导论》第三版 C++泛型实现 ](https://github.com/Ewenwan/CLRS-1)
 
+[算法导论网易公开课](http://open.163.com/movie/2010/12/G/F/M6UTT5U0I_M6V2T1JGF.html)
+
+[离散数学 树 图 mook](https://www.icourse163.org/course/UESTC-1002268006)
+
 [leetcode 博客题解](https://blog.csdn.net/liuxiao214/article/details/76032392)
 
 [编程之法：面试和算法心得](https://github.com/julycoding/The-Art-Of-Programming-By-July)
