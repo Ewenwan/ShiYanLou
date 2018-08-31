@@ -19,6 +19,31 @@
 
 [各种排序算法动画演示及对比](https://www.toptal.com/developers/sorting-algorithms)
 
+# 数值计算
+```c
+// 求一个数的立方根
+#define E 0.0001 //精度设置
+using namespace std;
+double getCubeRoot(double num)
+{
+	double x0=num;// 初始解
+	double result;// 最终结果
+	while (1)
+	{
+		result = x0-(x0*x0*x0-num)/(3*x0*x0); 
+		// 给定num，需要计算一个x，使得 f(x) = x^3-num 最小化
+		// 对函数求导 f'(x)=3*x^2 ，进行更新迭代 x=x-f(x)/f'(x)
+		// 牛顿迭代 f(x) = x^3-num, f'(x)=3*x^2; x=x-f(x)/f'(x);
+		if ((result*result*result-num) < E && (result*result*result-num) > -E )
+			return result;
+		else
+			x0=result;
+	}
+}
+
+```
+
+
 # 数组系列
 # 例如：求给定序列中 最大子序列的和
 
