@@ -69,7 +69,11 @@ scan_ssid=1
       要手动开启的话，和 WiFi 配置相似，同样在 boot 分区新建一个文件，空白的即可，文件命名为 ssh。
       注意要小写且不要有任何扩展名。
       树莓派在启动之后会在检测到这个文件之后自动启用 ssh 服务。
-      随后即可通过登录路由器找到树莓派的 IP 地址，通过 ssh (只有命令行界面)连接到树莓派了。
+      
+      随后即可通过登录路由器找到树莓派的 IP 地址，(也可使用网段扫描法找树莓派IP )
+       ipscan22.exe  https://pan.baidu.com/share/link?shareid=3434443053&uk=605377859&errno=0&errmsg=Auth%20Login%20Sucess&&bduss=&ssnerror=0&traceid=
+      
+      通过 ssh (只有命令行界面)连接到树莓派了。
 
       手动启用 SSH 服务，命令如下：
       service sshd restart
