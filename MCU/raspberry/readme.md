@@ -12,6 +12,10 @@
         在 boot 分区，也就是树莓派的 /boot 目录下新建 wpa_supplicant.conf 文件，
         按照下面的参考格式填入内容并保存 wpa_supplicant.conf 文件。
         
+        在TF卡的boot分区，创建wpa_supplicant.conf文件，加入如下内容：     
+        
+        在树莓派通电后会自动添加到/etc/wpa_supplicant/wpa_supplicant.conf文件里面，进行自动连接。
+        
 > 文件内容： 
 ```
 country=CN
