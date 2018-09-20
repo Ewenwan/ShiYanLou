@@ -115,8 +115,76 @@ scan_ssid=1
     
     
     
-    
-    
-    
+# 2. 树莓派上的软件安装和卸载命令汇总
+
+## a. 基础命令
+        安装软件 apt-get install softname1 softname2 softname3……
+        卸载软件 apt-get remove softname1 softname2 softname3……
+        卸载并清除配置 apt-get remove –purge softname1
+        更新软件信息数据库 apt-get update
+        进行系统升级 apt-get upgrade
+        搜索软件包 apt-cache search softname1 softname2 softname3……
+
+        如果使用 apt-get 遇到速度慢或者源不存在等错误，可能需要更换源，请参考此处。
+        http://shumeipai.nxez.com/2013/08/31/raspbian-chinese-software-source.html
+
+        安装deb软件包  dpkg -i xxx.deb     install
+        删除软件包     dpkg -r xxx.deb     remove
+        连同配置文件一起删除 dpkg -r –purge xxx.deb
+        查看软件包信息 dpkg -info xxx.deb
+        查看文件拷贝详情 dpkg -L xxx.deb    
+        查看系统中已安装软件包信息 dpkg -l   list
+        重新配置软件包 dpkg-reconfigure xxx
+
+        清除所有已删除包的残馀配置文件
+
+        dpkg -l |grep ^rc|awk '{print $2}' |sudo xargs dpkg -P
+        如果报如下错误，证明你的系统中没有残留配置文件了，无须担心。
+        dpkg: –purge needs at least one package name argument
+
+        dpkg安裝的可以用apt卸載，反之亦可。
+        
+> 常用apt命令列表
+```sh
+apt-cache search # ------(package 搜索包)
+apt-cache show #------(package 获取包的相关信息，如说明、大小、版本等)
+sudo apt-get install # ------(package 安装包)
+sudo apt-get install # -----(package - - reinstall 重新安装包)
+sudo apt-get -f install # -----(强制安装?#"-f = --fix-missing"当是修复安装吧...)
+sudo apt-get remove #-----(package 删除包)
+sudo apt-get remove - - purge # ------(package 删除包，包括删除配置文件等)
+sudo apt-get autoremove --purge # ----(package 删除包及其依赖的软件包+配置文件等（只对6.10有效，强烈推荐）)
+sudo apt-get update #------更新源
+sudo apt-get upgrade #------更新已安装的包
+sudo apt-get dist-upgrade # ---------升级系统
+sudo apt-get dselect-upgrade #------使用 dselect 升级
+apt-cache depends #-------(package 了解使用依赖)
+apt-cache rdepends # ------(package 了解某个具体的依赖?#当是查看该包被哪些包依赖吧...)
+sudo apt-get build-dep # ------(package 安装相关的编译环境)
+apt-get source #------(package 下载该包的源代码)
+sudo apt-get clean && sudo apt-get autoclean # --------清理下载文件的存档 && 只清理过时的包
+sudo apt-get check #-------检查是否有损坏的依赖
+```
+## b. aptitude 命令
+        aptitude 与 apt-get 一样，是 Debian 及其衍生系统中功能极其强大的包管理工具。
+        与 apt-get 不同的是，aptitude 在处理依赖问题上更佳一些。
+        举例来说，aptitude 在删除一个包时，会同时删除本身所依赖的包。
+        这样，系统中不会残留无用的包，整个系统更为干净。
+        以下是笔者总结的一些常用 aptitude 命令，仅供参考。
+        
+
+        aptitude update 更新可用的包列表
+        aptitude upgrade 升级可用的包
+        aptitude dist-upgrade 将系统升级到新的发行版
+        aptitude install pkgname 安装包
+        aptitude remove pkgname 删除包
+        aptitude purge pkgname 删除包及其配置文件
+        aptitude search string 搜索包
+        aptitude show pkgname 显示包的详细信息
+        aptitude clean 删除下载的包文件
+        aptitude autoclean 仅删除过期的包文件
+
+当然，你也可以在文本界面模式中使用 aptitude。
+
 
 
