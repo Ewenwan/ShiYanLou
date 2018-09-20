@@ -1,5 +1,8 @@
 # 树莓派应用
 # 1. 无屏幕和键盘配置树莓派WiFi和SSH，连接wifi后，支持远程登录
+
+
+
 ## a. WiFi 网络配置
     用户可以在未启动树莓派的状态下单独修改 /boot/wpa_supplicant.conf 文件配置 WiFi 的 SSID 和密码，
     这样树莓派启动后会自行读取 wpa_supplicant.conf 配置文件连接 WiFi 设备。
@@ -64,7 +67,9 @@ scan_ssid=1
 > 4. WiFi 的加密模式, 由路由器设置wifi时决定
 
 ## b. 开启 SSH 服务, 进行远程登录
-
+      开启SSH远程：（自2016年9月开始，raspberry默认关闭ssh连接）
+      在TF卡分区里面创建一个名为 “ssh” 空文件即可（不要有txt后缀！）
+      
       如果通过 ssh 连接树莓派出现 Access denied 这个提示则说明 ssh 服务没有开启。
       要手动开启的话，和 WiFi 配置相似，同样在 boot 分区新建一个文件，空白的即可，文件命名为 ssh。
       注意要小写且不要有任何扩展名。
@@ -112,8 +117,32 @@ scan_ssid=1
      4. 卸载
         sudo apt-get remove tightvncserver
 [参考](https://github.com/Ewenwan/ShiYanLou/blob/master/MCU/raspberry/%E6%A0%91%E8%8E%93%E6%B4%BE%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8.txt)
+
+## c. HDMI输出
+    开启强制HDMI输出：（很多现在的显示器在树莓派上并不能识别）
+    在TF卡分区，打开config.txt文件(开机后位置： /boot/config.txt)，修改如下：
+
+    hdmi_safe=1
+    config_hdmi_boost=4
+    hdmi_ignore_edid=0xa5000080
+    hdmi_group=2
+    hdmi_mode=82   
     
-    
+     一些参数介绍：
+
+        项	含义
+        hdmi_safe=1	安全启动HDMI
+        config_hdmi_boost=4	开启热插拔
+        hdmi_group=1	CEA电视显示器
+        hdmi_group=2	DMT电脑显示器
+        hdmi_ignore_edid=0xa5000080	忽略自动探测的分辨率
+        输出分辨率：	
+        hdmi_mode=4	640x480 60Hz
+        hdmi_mode=9	800x600 60Hz
+        hdmi_mode=16	1024x768 60Hz
+        hdmi_mode=82	1080p 60Hz
+
+
     
 # 2. 树莓派上的软件安装和卸载命令汇总
 
