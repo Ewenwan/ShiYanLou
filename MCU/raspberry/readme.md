@@ -95,11 +95,6 @@ scan_ssid=1
       点击进行连接即可连接到树莓派。
       
       
-
----------------------
-
-本文来自 Lyh-Memory 的CSDN 博客 ，全文地址请点击：https://blog.csdn.net/u012313335/article/details/73920256?utm_source=copy 
-
       window下客户端推荐使用putty.exe这个小巧的ssh客户端软件，进行远程ssh登录。
       linus下：
         下可直接使用 终端 ssh登陆
@@ -134,6 +129,11 @@ scan_ssid=1
      4. 卸载
         sudo apt-get remove tightvncserver
 [参考](https://github.com/Ewenwan/ShiYanLou/blob/master/MCU/raspberry/%E6%A0%91%E8%8E%93%E6%B4%BE%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8.txt)
+
+
+      串口登录
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/MCU/raspberry/raspberry_io.PNG)
+      
 
 ## c. HDMI输出
     开启强制HDMI输出：（很多现在的显示器在树莓派上并不能识别）
