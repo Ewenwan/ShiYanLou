@@ -86,6 +86,19 @@ scan_ssid=1
 
       手动启用 SSH 服务，命令如下：
       service sshd restart
+      
+      https://blog.csdn.net/u012313335/article/details/73920256
+      
+      如需在手机或者平板上进行连接，需要在应用商店下载安装Serverauditor，完成安装后打开软件。
+      点击右上角的“+”号添加设备，在连接界面中，填写主机IP、用户名以及密码（其他可不填写），
+      填写完成后点击右上角的保存图标。完成之后即会在服务器界面出现树莓派IP的选项，
+      点击进行连接即可连接到树莓派。
+      
+      
+
+---------------------
+
+本文来自 Lyh-Memory 的CSDN 博客 ，全文地址请点击：https://blog.csdn.net/u012313335/article/details/73920256?utm_source=copy 
 
       window下客户端推荐使用putty.exe这个小巧的ssh客户端软件，进行远程ssh登录。
       linus下：
