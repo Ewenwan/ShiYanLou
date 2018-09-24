@@ -7,6 +7,7 @@
 
 [Python抓取股票信息](http://jinjaysnow.github.io/blog/2014-10/Python%E6%8A%93%E5%8F%96%E8%82%A1%E7%A5%A8%E4%BF%A1%E6%81%AF.html)
 
+[关于Python的面试题  Python语言特性 操作系统 数据库 网络 编程题 红黑树](https://github.com/Ewenwan/interview_python)
 
 # window python 开发环境
 ## 1. anaconda
