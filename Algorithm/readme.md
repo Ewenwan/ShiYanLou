@@ -1,5 +1,16 @@
 # 各种 算法 数学建模算法 群体智能算法  数据结构：数组 字符串 链表 树 图 桶 森林 
 
+[算法/深度学习/NLP面试笔记 
+    soccer 机器学习
+    basketball 深度学习
+    hamburger 自然语言处理
+    fries 计算机视觉
+    apple 算法
+    cherries 数学
+    strawberry 编程语言
+    cookie 笔试面经
+](https://github.com/imhuay/Algorithm_Interview_Notes-Chinese)
+
 [《算法导论》第三版 C++泛型实现 ](https://github.com/Ewenwan/CLRS-1)
 
 [算法导论网易公开课](http://open.163.com/movie/2010/12/G/F/M6UTT5U0I_M6V2T1JGF.html)
