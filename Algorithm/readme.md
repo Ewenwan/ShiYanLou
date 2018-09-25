@@ -1,4 +1,6 @@
 # 各种 算法 数学建模算法 群体智能算法  数据结构：数组 字符串 链表 树 图 桶 森林 
+[Uri Zwick's home page 算法大师](http://www.cs.tau.ac.il/~zwick/)
+
 
 [算法/深度学习/NLP面试笔记 
     soccer 机器学习
@@ -28,6 +30,18 @@
 [CLRS算法](https://github.com/Ewenwan/CLRS)
 
 [群体智能/集群智能](http://jinjaysnow.github.io/blog/2016-01/%E9%9B%86%E7%BE%A4%E6%99%BA%E8%83%BD.html)
+
+
+[数据结构 哈希表算法](http://www.cs.tau.ac.il/~zwick/Adv-Alg-2015/Hash_Tables_Basics.pdf) 
+
+[整数排序](http://www.cs.tau.ac.il/~zwick/Adv-Alg-2015/Integer-Sorting.pdf) 
+
+[哈希表线性问题](http://www.cs.tau.ac.il/~zwick/Adv-Alg-2015/Linear-Probing.pdf) 
+
+[sorting network 排序网络](http://www.cs.tau.ac.il/~zwick/Adv-Alg-2015/Sorting-Networks.pdf) 
+
+[范埃德博阿斯树 ](http://www.cs.tau.ac.il/~zwick/Adv-Alg-2015/van-Emde-Boas.pdf) 
+
 
 
 > 小詹学Python 微信公众号等
