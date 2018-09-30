@@ -94,6 +94,29 @@
 # 三、 linux配置
 [ubuntu大法-快速翻墙装驱动配置开发环境](https://github.com/DragonFive/myblog/blob/master/source/_posts/nvidiaDriverInstall.md)
 
+
+Ubuntu14.04升级CMake：
+
+    Ubuntu14.04 默认CMake版本是2.8.X 当我们需要更高级版本的时候就需要升级CMake。具体步骤如下： 
+        通过PPA安装：
+
+    sudo add-apt-repository ppa:george-edison55/cmake-3.x
+    sudo apt-get update
+    sudo apt-get upgrade 
+    cmake --version1234
+
+    编译安装步骤如下：
+
+
+
+    sudo apt-get install build-essential //如果系统已安装build-essential则不需要执行此步骤
+    wget http://www.cmake.org/files/v3.2/cmake-3.2.2.tar.gz
+    tar xf cmake-3.2.2.tar.gz
+    cd cmake-3.2.2
+    ./configure
+    make
+
+
 # 四、Linux环境编程
 [博客专栏](https://blog.csdn.net/column/details/tennysonsky-linux.html)
 ## ubuntu下添加新用户、解决远程登录问题
