@@ -261,6 +261,7 @@
 # apt-get无法安装 
     解决方法：强制解锁
     sudo rm /var/cache/apt/archives/lock3
+    sudo rm /var/cache/apt/archives/lock 
     sudo rm /var/lib/dpkg/lock
     
     
