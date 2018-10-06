@@ -162,3 +162,7 @@ Ubuntu14.04升级CMake：
     安装 sudo pip install dict-cli
     使用 dict test 
 
+# linux下 插件按caj
+    
+    安装 火狐扩展插件 Greasemonkey https://addons.mozilla.org/zh-CN/firefox/addon/greasemonkey/
+     Greasemonkey 安装脚本 cnki-pdf-special.user.js
