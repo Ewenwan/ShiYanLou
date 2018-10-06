@@ -166,3 +166,5 @@ Ubuntu14.04升级CMake：
     
     安装 火狐扩展插件 Greasemonkey https://addons.mozilla.org/zh-CN/firefox/addon/greasemonkey/
      Greasemonkey 安装脚本 cnki-pdf-special.user.js
+    
+    http://kns.cnki.net/KCMS/****  >>>  http://www.cnki.net/KCMS/****  就会出现pdf版本
