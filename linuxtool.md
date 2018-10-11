@@ -20,7 +20,20 @@
     然后新建一个C项目
 ## 6、激活码激活
     获取  激活码  http://idea.lanyus.com/
-    
+
+## Kdevelop 安装
+在终端输入下面指令安装Kdevelop(要连接网络)
+
+先安装cmake
+
+    sudo apt-get install cmake
+
+安装kdevelop
+    
+    sudo apt-get install kdevelop
+
+
+
 # 二、nfs服务器搭建
     多台电脑之间创建共享文件夹
 ## nfs服务器端配置
