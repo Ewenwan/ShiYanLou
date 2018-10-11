@@ -1,4 +1,6 @@
 # 参考资料
+[c++ 多线程 并发 指南 实战](https://github.com/Ewenwan/Cplusplus-Concurrency-In-Practice)
+
 [c/c++教程](https://www.cprogramming.com/)
 
 [学习C++，应该循序渐进的看哪些书？](https://www.zhihu.com/question/20410487)
