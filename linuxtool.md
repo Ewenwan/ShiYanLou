@@ -181,3 +181,70 @@ Ubuntu14.04升级CMake：
      Greasemonkey 安装脚本 cnki-pdf-special.user.js
     
     http://kns.cnki.net/KCMS/****  >>>  http://www.cnki.net/KCMS/****  就会出现pdf版本
+
+
+# linux下图像工具
+    1. 截图工具 gnome-screenshot  
+       PrintScreen键：整个界面  
+       Alt+PrintScreen键:当前窗口 
+       Shift+PrintScreen键：区域截图
+       打开软件：下拉菜单截图，延时截图
+       
+    2. Linux系统下的Photoshop 位图处理软件GIMP
+       sudo add-apt-repository ppa:otto-kesselgulasch/gimp
+       sudo apt-get update
+       sudo apt-get install gimp
+       
+       卸载： 
+       sudoapt-get install ppa-purge
+       sudo ppa-purge ppa:otto-kesselgulasch/gimp
+     
+     3. 矢量图绘制软件Inkscape  与Illustrator、Freehand、CorelDraw、Xara X 等其他软件相似
+       在矢量图绘制软件中，画框就是画框，画完框后可以改变这个框的边线颜色及样式，
+       可以改变它的填充颜色及样式，可以拖动它的位置，可以改变它的大小，但是在位图处理软件中，
+       就得换一种思考模式，在位图处理软件中，要画框只能先建立一个矩形的选区，然后对这个选区进行描边和填充，
+       还可以对选取进行羽化，这样可以得到一个模模糊糊的框框，一旦描边和填充结束，则这个框框就再不能更改。
+       所以Inkscape适合做添加框框、文字这样的工作，
+       而GIMP适合做对选区羽化、非规则区域切图、添加阴影和发光这样的工作。
+       
+       sudo add-apt-repository ppa:inkscape.dev/stable
+       sudo apt update
+       sudo apt-get install inkscape
+     
+     4. 示意图绘制软件Dia
+        wget wget http://sourceforge.net/projects/dia-installer/files/dia/0.97.2/dia-0.97.2.tar.xz/download
+
+        tar xvf dia-0.97.2.tar.xz
+        cd dia-0.97.2
+        ./configure --enable-gnome
+
+        Configuration:
+            Source code location:    .
+            Compiler:        gcc
+            Gnome support:                yes
+            Python support:                no
+            Libart support (PNG export):        yes
+            Cairo support (PNG, PDF, print):    yes
+            Dia Python bindings with SWIG        no
+            WMF plug-in with libEMF:                no
+            html doc:                               no
+            pdf and ps doc:                         no
+
+        Now type make to build dia...
+        # make && make install
+        直接在命令行输入
+        #dia
+        打开画图软件dia
+        
+      5. 建模工具Umbrello
+        mkdir -p $HOME/src
+        cd $HOME/src
+        git clone git://anongit.kde.org/umbrello  
+        cd umbrello
+        mkdir build
+        cd build
+
+
+
+
+
