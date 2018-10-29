@@ -127,5 +127,60 @@ func main() {
     fmt.Println(runtime.Version())
 }
 ```
+# 数据类型
+    在Go语言中，数据类型用于声明函数和变量。
 
+    数据类型的出现是为了把数据分成所需内存大小不同的数据，编程的时候需要用大数据的时候才需要申请大内存，就可以充分利用内存。
 
+    数据类型
+    Go语言按类别有以下几种数据类型：
+
+    1.bool，一个字节，值是true或者false，不可以用0或者1表示（java中boolean占用4个字节，
+                   而boolean作为数组出现时，每个boolean占用1个字节）
+
+    2.int/uint(带符号为与不带符号位的int类型)：根据平台不同是32位或者64位
+
+    3.intx/uintx:x代表任意位数，例如：int3，代表占3bit的int类型
+
+    4.byte占用8位，一个字节，相当于uint8，不带符号位
+
+    5.floatx:由于没有double类型，所以float64就是double。float32小数精确到7位，float64小数精确到15位。
+
+    6.complex64/complex128:复数类型
+
+    7.uintptr:保存指针用的类型，也是随着平台改变而改变，因为指针的长度就是随平台而变。
+
+    8.其他类型值：array，struct，string
+
+    9.引用类型：slice，map，channel
+
+    10.接口类型：interface
+
+    11.函数类型：func
+
+    注意：Golang中还有个rune类型，它等价于int32类型。
+
+## 类型转换
+    Golang是静态类型的编程语言，所有数据的类型在编译期确定了。
+    #而且 Golang中即使是底层存的是一个类型，声明的类型不一样，也要强制转换才能互用。
+
+    在Go 语言里面没有隐式转换，遇到不同类型想互用，只能进行强制类型转换。
+
+    Go语言类型转换基本格式如下：
+
+        type_name(expression)
+
+    其中type_name是数据类型，expression是原始数据或表达式。
+
+以下实例中将整型转化为浮点型，并计算结果，将结果赋值给浮点型变量：
+```go
+package main
+import "fmt"
+func main() {
+   var sum int = 17      
+   var count int = 5     
+   var mean float32        
+   mean = float32(sum)/float32(count)  //强制转换
+   fmt.Printf("mean 的值为: %f\n",mean)
+}
+```
