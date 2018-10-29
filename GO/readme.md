@@ -46,3 +46,86 @@ func main(){
 
 还有值得注意的一点是：Golang官方的约定是每行程序结束后不需要撰写分号;，但是如果你不小心加了，编译器也不会报错
 
+
+# 跨平台特性
+Go语言和Java，Python一样，也是支持跨平台的。另外，Go语言还有黑科技：支持跨平台编译。比如你手头只有Mac系统，而你的用户有Linux和Windows的，他们也想使用你的Go语言程序，你可以通过交叉编译出Linux和Windows上的可执行文件给他们。另外，你甚至可以在32位平台的机器上以编译生成64位平台上的可执行程序。
+
+## Windows下安装
+    go语言官方下载地址：https://golang.org/dl。 
+    然后在这里找到对应的windows安装包，
+    一路Next安装即可。
+    安装完毕后重启电脑，在cmd控制台下输入：
+
+    go version
+    如果打印出：
+
+    go version go1.9.2 windows/amd64
+    则证明安装成功！
+
+## Linux下安装
+    go语言官方下载地址：https://golang.org/dl。 
+    然后在这里找到对应的Linux安装包，
+    然后执行以下命令解压：
+
+        mkdir /home/go
+        mkdir /home/gopath
+        tar -C /home -xzvf go1.9.2.linux-amd64.tar.gz
+
+    接下来修改系统配置文件（环境变量），执行命令：
+        vi ~/.bashrc
+    加入以下内容：
+
+        export GOROOT=/home/go
+        export PATH=$PATH:$GOROOT/bin
+        export GOPATH=/home/gopath
+
+    然后执行：
+        source ~/.bashrc
+
+    让配置文件生效。
+
+    然后打开Terminal，输入：
+        go version
+
+    如果打印出：
+        go version go1.9.2 linux/amd64
+    则证明安装成功！
+
+
+## GOROOT和GOPATH区别
+    GOROOT是Go语言的安装目录，类似于JAVA中的JAVA_HOME。
+
+    GOPATH是你代码中的引用的包所在的位置，可以看成是工程目录，可以设置多个。
+
+## IDE推荐
+    主流的文本编辑器，例如sublime，vscode，atom，vim和emacs等，都有Go语言插件，读者可以自行配置下。
+
+    这里推荐两款IDE，第一款是开源免费的liteide，
+    地址：https://www.golangtc.com/download/liteide。 
+    这是一个国人开发的 Google Go 语言的一个开发工具，支持单步调试，而且跨平台。
+
+    第二个是Jetbrain在2017年11月发布的Go语言IDE——GoLand，功能方面不弱，但貌似是收费的。
+
+## Golang中国社区
+    因为某些原因，Go语言官网在国内是没法直接访问的，用户无法从Go语言官网下载安装文件。
+    如果还需要下载一些第三方的依赖包，速度更是慢的不行。
+    Golang中国社区的出现就解决了这个问题：
+    不仅提供最新版的Go语言安装包和第三方包的下载，还提供liteide的下载！
+
+    地址：https://www.golangtc.com
+
+    这是一个高质量的语言社区，上面有丰富的教程和学习资料，还有各种Go语言问题的讨论。
+## 代码示例
+接下来我们看一个简单的程序，可以打印出当前运行环境中的Go语言版本号。
+```go
+package main
+import (
+    "fmt"
+    "runtime"
+)
+func main() {
+    fmt.Println(runtime.Version())
+}
+```
+
+
