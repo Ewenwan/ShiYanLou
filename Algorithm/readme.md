@@ -31,7 +31,6 @@
 
 [群体智能/集群智能](http://jinjaysnow.github.io/blog/2016-01/%E9%9B%86%E7%BE%A4%E6%99%BA%E8%83%BD.html)
 
-
 [数据结构 哈希表算法](http://www.cs.tau.ac.il/~zwick/Adv-Alg-2015/Hash_Tables_Basics.pdf) 
 
 [整数排序](http://www.cs.tau.ac.il/~zwick/Adv-Alg-2015/Integer-Sorting.pdf) 
@@ -53,6 +52,40 @@
 [各种排序算法动画演示及对比](https://www.toptal.com/developers/sorting-algorithms)
 
 [博客c++ 技术](https://blog.csdn.net/gavin0123/article/list/3?t=1)
+
+
+
+[常用算法的 C++ 实现](https://github.com/Ewenwan/Algorithms)
+
+	常用算法
+	 二叉树和前中后序遍历
+	 线索二叉树
+	 哈夫曼树与哈夫曼编码
+	 图的深度优先遍历(DFS)和广度优先遍历(BFS)
+	 最小生成树(MST)：Prim算法
+	 最小生成树(MST)：Kruskal算法
+	 最短路径：Dijkstra算法
+	 最短路径：Floyd算法
+	 二叉排序树/平衡二叉树(AVL)
+	 动态规划(DP) - 01背包问题
+	 贪心算法 - 钱币找零问题
+	 冒泡排序
+	 简单选择排序
+	 直接插入排序
+	 希尔排序
+	 堆排序
+	 归并排序
+	 快速排序
+	 A*寻路算法
+	其他算法
+	 静态链表
+	 十字链表
+	 四则运算表达式求值(逆波兰后缀表示法)
+	 KMP匹配算法
+	 AOV网拓扑排序
+	 AOE网关键路径
+	 多路查找树(B树)
+	 散列表查找(哈希表)
 
 # 数值计算
 ```c
