@@ -3,7 +3,7 @@
 // 参考 https://blog.csdn.net/qq_35644234/article/details/59106779
 
 /*
-算法思路： 
+算法思路：
 首先就是从图中的一个起点a开始，把a加入U集合，然后，寻找从与a有关联的边中，
 权重最小的那条边并且该边的终点b在顶点集合：（V-U）中，我们也把b加入到集合U中，
 并且输出边（a，b）的信息，这样我们的集合U就有：{a,b}，
@@ -11,15 +11,43 @@
 （V-U）中，我们把c加入到集合U中，并且输出对应的那条边的信息，
 这样我们的集合U就有：{a,b,c}这三个元素了，一次类推，直到所有顶点都加入到了集合U。
 
-时间复杂度的分析： 
+时间复杂度的分析：
 其中我们建立邻接矩阵需要的时间复杂度为：O(n*n),然后，
 我们Prim函数中生成最小生成树的时间复杂度为：O(n*n).
 
+输入：
+
+6 10
+1 2 6
+1 3 1
+1 4 5
+2 3 5
+2 5 3
+3 5 6
+3 6 4
+4 3 5
+4 6 2
+5 6 6
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+输出：
+
+
 */
 
-#include<iostream>
-#include<string>
-#include<vector>
+#include <iostream>
+#include <string>
+#include <vector>
 using  namespace std;
 
 //首先是使用邻接矩阵完成Prim算法
@@ -29,6 +57,12 @@ struct Graph {
     int ** arc; //邻接矩阵
     string *information; //记录每个顶点名称
 };
+
+// dev 不认识 to_string()
+// https://blog.csdn.net/xiao_song_shu/article/details/76933854
+
+// dev c++ 不认识的话
+// #define INT_MAX 10000
 
 //创建图
 void createGraph(Graph & g) {
@@ -109,7 +143,7 @@ void Prim(Graph g,int begin) {
         int index;
         //寻找数组close_edge中权重最小的那个边
         for (k = 0; k < g.vexnum; k++) {
-            if (close_edge[k].weight != -1) {  
+            if (close_edge[k].weight != -1) {
                 if (close_edge[k].weight < min) {
                     min = close_edge[k].weight;
                     index = k;
@@ -119,8 +153,8 @@ void Prim(Graph g,int begin) {
         //将权重最小的那条边的终点也加入到集合U
         close_edge[index].weight = -1;
         //输出对应的边的信息
-        cout << g.information[close_edge[index].start] 
-            << "-----" 
+        cout << g.information[close_edge[index].start]
+            << "-----"
             << g.information[close_edge[index].end]
             << "="
             <<g.arc[close_edge[index].start][close_edge[index].end]
