@@ -1,6 +1,17 @@
 // 采用的是邻接表的方式存储图，代码如下
 // https://blog.csdn.net/qq_35644234/article/details/59106779
+/*
+时间复杂分析： 
+在建立图的时候的时间复杂为：O(n+e),在执行Prim算法的时间复杂还是：O(n*n)，
+总体来说还是邻接表的效率会比较高，因为虽然Prim算法的时间复杂度相同，
+但是邻接矩阵的那个常系数是比邻接表大的。
 
+另外，Prim算法的时间复杂度都是和边无关的，都是O(n*n)，
+所以它适合用于边稠密的网建立最小生成树。
+
+但是克鲁斯卡算法恰恰相反，它的时间复杂度为：O(eloge)，其中e为边的条数，
+因此它相对Prim算法而言，更适用于边稀疏的网。
+*/
 #include<iostream>
 #include<string>
 using  namespace std;
@@ -78,12 +89,7 @@ void createGraph(Graph_List &g) {
                 temp = temp->next;
             }
             temp->next = next_2;  //在该链表的尾部插入一个结点
-
-
         }
-
-
-
     }
 }
 
