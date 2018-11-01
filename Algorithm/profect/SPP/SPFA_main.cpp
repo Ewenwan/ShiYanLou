@@ -1,3 +1,26 @@
+/*
+// 地图：
+https://img-blog.csdn.net/20170312100750154?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzU2NDQyMzQ=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast
+输入：
+
+2
+7 12
+1 2 12
+1 6 16
+1 7 14
+2 3 10
+2 6 7
+3 4 3
+3 5 5
+3 6 6
+4 5 4
+5 6 2
+5 7 8
+6 7 9 
+
+*/
+
+
 #include"SFPA.h"
 
 //检验输入边数和顶点数的值是否有效，可以自己推算为啥：
