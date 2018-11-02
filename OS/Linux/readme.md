@@ -1,6 +1,8 @@
 # linux 系统
 [linux下编程代码实验 CMake/Make/Shell/Multi-thread/socket/stl/awk](https://github.com/Ewenwan/Linux_Code_Test)
 
+[linux 软硬件驱动 ](https://github.com/Ewenwan/linux-study)
+
 # 操作系统启动过程
 	1. bootloader bootasm.S 使能A20 加载全局描述符表GDT 使能并进入保护模式　调用bootmain
 	2. bootmain.c 从硬盘读取ELF格式的os，以程序块格式存入内存,跳转到 操作系统入口函数处, kern/init.c中的kern_init函数
