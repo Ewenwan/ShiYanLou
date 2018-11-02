@@ -1,6 +1,12 @@
 # 编译器 编译原理
 
-[]()
+[甲骨文公司编辑器Oracle Solaris Studio 12.4 Information Library (简体中文) c/cpp用户指南 数值计算指南 代码分析器 性能分析器 线程分析器](https://docs.oracle.com/cd/E57201_01/)
+
+[哈工大 编译原理 ](http://www.icourse163.org/course/HIT-1002123007)
+
+[编译原理——词法分析器实现](https://www.cnblogs.com/zyrblog/p/6885922.html)
+
+[编译技术 西电](http://www.xuetangx.com/courses/course-v1:XIYOU+20180208+sp/about)
 
 [LLVM](https://github.com/Ewenwan/llvm-release/blob/master/README.md)
 
