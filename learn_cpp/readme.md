@@ -7,6 +7,9 @@
 
 [C++设计成这样的原因 《C++演化和设计》](http://vdisk.weibo.com/s/vfFpMc1XDsGn)
 
+[boost库学习](https://www.cnblogs.com/lvdongjie/category/579434.html)
+
+
 # C++类成员和数据成员初始化总结
     C++为类中提供类成员的初始化列表
     类对象的构造顺序是这样的：
