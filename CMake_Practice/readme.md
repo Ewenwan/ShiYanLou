@@ -354,7 +354,7 @@ ENDIF()
 
 
 # *.cpp *.cu *.hpp 混合编程 编译
-```CMakeLists
+```C
 # CMakeLists.txt for test -x cu option project　by guan shiyuan
 project(test_cuda_project)
 # required cmake version
