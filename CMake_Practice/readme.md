@@ -353,4 +353,27 @@ ENDIF()
       设置 C++编译选项,也可以通过指令 ADD_DEFINITIONS()添加。
 
 
+# *.cpp *.cu *.hpp 混合编程 编译
+```CMakeLists
+# CMakeLists.txt for test -x cu option project　by guan shiyuan
+project(test_cuda_project)
+# required cmake version
+cmake_minimum_required(VERSION 2.8)
+# packages
+find_package(CUDA)
+set(CUDA_SOURCE_PROPERTY_FORMAT OBJ)
 
+set(CUDA_SEPARABLE_COMPILATION ON)
+include_directories(${CUDA_INCLUDE_DIRS})
+set(CUDA_PROPAGATE_HOST_FLAGS OFF)
+set(CUDA_NVCC_FLAGS -arch=sm_61;-O3;-G;-g;-std=c++11)
+
+file(GLOB_RECURSE CURRENT_HEADERS  *.h *.hpp *.cuh)
+file(GLOB CURRENT_SOURCES  *.cpp *.cu)
+set_source_files_properties(main.cpp PROPERTIES CUDA_SOURCE_PROPERTY_FORMAT OBJ)
+source_group("Include" FILES ${CURRENT_HEADERS})
+source_group("Source" FILES ${CURRENT_SOURCES})
+
+cuda_add_executable(test_cuda_project ${CURRENT_HEADERS} ${CURRENT_SOURCES} )
+
+```
