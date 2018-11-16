@@ -165,4 +165,69 @@ D.get('f', -1 ) >>> -1  返回默认值
 
 
 
+# 7. 可变 参数函数
+```python
+# *参数，相当于传入一个 list  *用来拆包的
+def calc_sum(*numers):
+    sum = 0
+    for num in numers:
+        sum += num
+    return sum
+
+if __name__ == '__main__':
+    # 需要测试的函数 赋值给 一个名字
+    test_func = calc_sum
+    # assert 测试
+    assert test_func() == 0
+    assert test_func(3) == 3
+    assert test_func(1,3,5) == 9
+    assert test_func(-1,1) == 0
+    print('OK')
+```
+
+# 8. 面向对象 类 
+```python
+class Student(object):
+    # 类构造函数 __init__   self 类名
+    def __init__(self, name, score=-1):
+        # __开头的参数为 私有参数
+        self.__name = name
+        self.__score = score
+        self.say_hi()
+    
+    def name(self):
+        # 通过函数获取私有变量
+        return self.__name
+    
+    def say_hi(self):
+        if self.__score < 0:
+            print("{}: Hi, my name is {}. I'm a new student.".format(self.__name, self.__name))
+        else:
+            print("{}: Hi, my name is {}. My score is {}.".format(self.__name, self.__name, self.__score))
+            
+    def get_score(self, teacher, score):
+        self.score = score
+        print("{}: teacher {}. just gave me a {}.".format(self.__name, teacher, score))
+        
+        
+class Teacher(object):
+    def __init__(self, name):
+        # __开头的参数为 私有参数
+        self.__name = name
+        self.say_hi()
+        
+    def say_hi(self):
+        print("{}: Hi, my name is {}. I'm a teacher.".format(self.__name, self.__name)
+        
+    def score(self, student, score):
+        student.get_score(self.__name, score)
+        print("{}: I just gave {} a {}.".format(self.__name, student.name , score))
+    
+if __name__ == '__main__':
+    studentA = Student('A')
+    TeacherB = Teacher（'B'）
+    # 老师给学生打分 80
+    TeacherB.score(studentA, 80)
+    
+```
 
