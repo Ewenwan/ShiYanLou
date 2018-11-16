@@ -32,5 +32,13 @@
     字符串 string   "" 或 ''  '''  '''
     布尔值 bool     True False   可进行 and or not
     空值 None 不同与 0
-    
      
+> 基本运算  python3
+    
+     加 + 
+     减 - 
+     乘 *
+     浮点除 /
+     整数除 //  得到商
+     取余   %
+     乘方 **
