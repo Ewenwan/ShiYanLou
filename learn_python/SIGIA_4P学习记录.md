@@ -96,9 +96,26 @@ T[3].append(4)
   
 ```
 
-# Dict 字典   key:value  查找速度快
+# Dict 字典   key:value  查找速度快  哈系函数实现 内存换时间  无序  key必须不可变
 ```python
+D = {'a': 1, 'b': 2, 'c': 3} # 前面的key 决定 value存在哪里
+print(D['a'])  >>> 1
 
+D['d']) = 4  # 添加
+
+D['d']) = 7  # 修改
+
+'b' in D >>> 返回 True
+'f' in D >>> 返回 False
+
+D.key()  >>> 
+         dict_keys(['a','b','c','d'])
+# get 获取元素==============
+D.get('b') >>> 2
+
+D.get('f') >>> None 无值
+
+D.get('f', -1 ) >>> -1  返回默认值
 
 
 ```
