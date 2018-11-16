@@ -51,7 +51,10 @@ type(s_b.decode(ascii))  >>> str  # 解码
 
 type(s_u.encode(ascii))  >>> bytes  # 编码
 
-
+s_u = 'sig中文'
+type(s_u.encode(utf-8))  >>> 
+b'sig\xxxxxxx'
+# decode 回 'sig中文'
 
 
 ```
