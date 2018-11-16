@@ -231,3 +231,41 @@ if __name__ == '__main__':
     
 ```
 
+# 9. Python 代码的组织-模块
+> * 包-> 模块 -> 类 或功能函数
+
+> * 每个包里都有一个 __init__.py 文件，用以区分是普通目录函数包
+
+> * 自建包名 不可与其他包重名 不然就覆盖了
+
+
+```python
+# 模块功能
+'first module'
+
+# 模块作者
+__author__ = 'ewenwan'
+
+# 内容开始
+
+# 命令行参数  args 
+import sys 
+
+def say_hi():
+    if len(args)==1:
+        print('one augment')
+    elif len(args)==2:
+        print('two augment')
+    else:
+        print('more then two augment')
+        
+# 执行函数        
+if __name__ == '__main__':
+    say_hi()
+
+```
+
+
+
+
+
