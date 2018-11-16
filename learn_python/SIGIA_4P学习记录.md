@@ -39,7 +39,23 @@
     大小写敏感
     4空格缩进 vs {}
     统一 tab 和 4空格，tab 不同系统代表的空格数量不同
+    字符编码：
+        纯英文，可用ASCII将str 编码为 bytes
+        含有中文。可用utf-8将str 编码为 bytes
+        从网络或磁盘上读取的字节流为 bytes
+```python
+s_u = 'sig'
+s_b = b'sig'
+type(s_b)  >>> bytes
+type(s_b.decode(ascii))  >>> str  # 解码
 
+type(s_u.encode(ascii))  >>> bytes  # 编码
+
+
+
+
+```
+        
 > 数据类型
     
     整数 int
