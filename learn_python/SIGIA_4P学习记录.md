@@ -10,6 +10,21 @@
 ```python
   # 输出
   print("XXXXX")
+  print('"asc"') >>> "asc"
+  print("'asc'") >>> 'asc'
+  print(''' 'tpr' and "asc" ''') >>> 'tpr' and "asc"
+  print('\"asc\"') >>> "asc"
+  print('\"asc\\ \"') >>> "asc\ "
+  
+  
+  print(r'\"asc\\ \"') >>> \"asc\\ \"  # raw string 正则表达式
+  
+  ''' 'd'
+      'd'
+      'r'
+  '''   多行输出
+  
+  
   print(300)
   print(100+300)
   print('100 + 300 =', 100+300) >>> 100 + 300 = 400   # 注意,打印了空格
@@ -29,7 +44,7 @@
     
     整数 int
     浮点数 float
-    字符串 string   "" 或 ''  '''  '''
+    字符串 string   "abc" 或 'dgv'  '''cdsfr'''  内容一致，id就一致
     布尔值 bool     True False   可进行 and or not
     空值 None 不同与 0
      
@@ -50,7 +65,7 @@ a = 6   # a 新指向了6
         # 而b还指向4
 ```
  
-# 列表 List  可变有序集合   []
+# 3. 列表 List  可变有序集合   []
 ```python
 L = ['ls1','ls2','ls3']
 print L
@@ -75,7 +90,7 @@ L =[]  # 清空
 ```
 
 
-# Tuple  '不可变' List  ()
+# 4. Tuple  '不可变' List  ()
 ```python
 T = ('ls1','ls2','ls3')
 T[0]  # 访问
@@ -96,7 +111,7 @@ T[3].append(4)
   
 ```
 
-# Dict 字典   key:value  查找速度快  哈系函数实现 内存换时间  无序  key必须不可变
+# 5. Dict 字典   key:value  查找速度快  哈系函数实现 内存换时间  无序  key必须不可变
 ```python
 D = {'a': 1, 'b': 2, 'c': 3} # 前面的key 决定 value存在哪里
 print(D['a'])  >>> 1
@@ -119,7 +134,7 @@ D.get('f', -1 ) >>> -1  返回默认值
 
 
 ```
-
+# 6. Set 集合  Dict 中 Key的集合，key是唯一的，不可重复，去重复的好方法
 
 
 
