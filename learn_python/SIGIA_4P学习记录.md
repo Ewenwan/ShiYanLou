@@ -1,10 +1,10 @@
-# 1.简介
+# 简介
 
     a. 课程OKR  Objectives and Key Results 即目标与关键成果法
        目标，Objectives ： 掌握AI领域的Python开发
        成果1 KR1
        
-# 2. python
+## 2. python
 
 > 输入输出
 ```python
@@ -92,7 +92,7 @@ a = 6   # a 新指向了6
         # 而b还指向4
 ```
  
-# 3. 列表 List  可变有序集合   []
+## 3. 列表 List  可变有序集合   []
 ```python
 L = ['ls1','ls2','ls3']
 print L
@@ -117,7 +117,7 @@ L =[]  # 清空
 ```
 
 
-# 4. Tuple  '不可变' List  ()
+## 4. Tuple  '不可变' List  ()
 ```python
 T = ('ls1','ls2','ls3')
 T[0]  # 访问
@@ -138,7 +138,7 @@ T[3].append(4)
   
 ```
 
-# 5. Dict 字典   key:value  查找速度快  哈系函数实现 内存换时间  无序  key必须不可变
+## 5. Dict 字典   key:value  查找速度快  哈系函数实现 内存换时间  无序  key必须不可变
 ```python
 D = {'a': 1, 'b': 2, 'c': 3} # 前面的key 决定 value存在哪里
 print(D['a'])  >>> 1
@@ -161,11 +161,11 @@ D.get('f', -1 ) >>> -1  返回默认值
 
 
 ```
-# 6. Set 集合  Dict 中 Key的集合，key是唯一的，不可重复，去重复的好方法
+## 6. Set 集合  Dict 中 Key的集合，key是唯一的，不可重复，去重复的好方法
 
 
 
-# 7. 可变 参数函数
+## 7. 可变 参数函数
 ```python
 # *参数，相当于传入一个 list  *用来拆包的
 def calc_sum(*numers):
@@ -185,7 +185,7 @@ if __name__ == '__main__':
     print('OK')
 ```
 
-# 8. 面向对象 类 
+## 8. 面向对象 类 
 ```python
 class Student(object):
     # 类构造函数 __init__   self 类名
@@ -231,7 +231,7 @@ if __name__ == '__main__':
     
 ```
 
-# 9. Python 代码的组织-模块
+## 9. Python 代码的组织-模块
 > * 包-> 模块 -> 类 或功能函数
 
 > * 每个包里都有一个 __init__.py 文件，用以区分是普通目录函数包
@@ -266,6 +266,34 @@ if __name__ == '__main__':
 ```
 
 
+## 10. 包管理工具 pip pip3 查找 安装 删除
+```sh
+# pip版本信息
+pip -V
+# 位置
+which pip
+# 查看已安装的包
+pip list
+
+# 升级 pip
+pip install --upgrade pip --user
+sudo pip install --upgrade pip
+
+
+# python 路径  查找 添加
+>>> python
+>>> import sys
+>>> print('\n'.join(sys.path)) # 使用 '\n' 添到 path中 回车换行打印
+....
+>>> pwd
+>>> sys.path.append('/home/ewenwan/...')
+>>> print('\n'.join(sys.path))
+
+```
+
+
+
+# List 可变列表
 
 
 
