@@ -87,6 +87,23 @@ T.append('ls4')   # 报错
 T.pop()           # 报错
 T[0] = 'TR2'      # 报错
 
+# 但是 Tuple内的 List 可变
+T = ('ls1','ls2','ls3',[1,2,3])
+T[3].append(4)
+ >>> 
+  ('ls1','ls2','ls3',[1,2,3,4])
+  
+  
 ```
+
+# Dict 字典   key:value  查找速度快
+```python
+
+
+
+```
+
+
+
 
 
