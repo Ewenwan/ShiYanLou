@@ -3,7 +3,20 @@
     a. 课程OKR  Objectives and Key Results 即目标与关键成果法
        目标，Objectives ： 掌握AI领域的Python开发
        成果1 KR1
-       
+  
+> linux 目录结构
+
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/learn_python/img/linux_file_sys.png)
+  
+> 为什么学习python
+
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/learn_python/img/python.png)
+
+> python 逻辑判断
+
+![](https://github.com/Ewenwan/ShiYanLou/blob/master/learn_python/img/python_logical.png)
+  
+  
 ## 2. python
 
 > 输入输出
