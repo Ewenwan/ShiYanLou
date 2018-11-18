@@ -25,4 +25,15 @@
 
       然后，输入doxywizard调出gui面板。
        doxywizard
-
+      
+      step1： 填写文档生成的地址
+      step2：主要的是源代码目录 source code directory 
+             请把它设到lsd_slam_core/src下，并钩上Scan recursively，表明我们要扫描子文件夹。
+      然后， destination directory 输出文件夹设成当前目录./即可，本来我们就在当前目录嘛。
+      
+      这步做好了，点左边的“Mode”，进入下一个版块。下个版块里会让你选语言，既然咱们用c++，保持默认的就可以了。
+　　    Output和Diagrams也没什么好动的。
+      
+      现在准备工作完成啦！切到Run，点“Run doxygen"，哗啦哗啦，等文档生成完。
+      然后点“show html output"，就可以在浏览器里看到文档啦。
+      如果你下一次想直接看，直接打开doc/html/index.html就可以了！
