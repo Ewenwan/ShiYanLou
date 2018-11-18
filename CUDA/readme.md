@@ -5,6 +5,8 @@
 
 [参考3](https://bbs.csdn.net/topics/390798229)
 
+[The CMake version of cuda_by_example ](https://github.com/Ewenwan/cuda_by_example)
+
 # 1、hello wold
 ```c
 // 输出hello world
