@@ -15,6 +15,10 @@
     链接：https://pan.baidu.com/s/1ckivxnwoxFkxSLHQ2a9PWA 
     提取码：syau 
 
+    st-link-v2
+    链接：https://pan.baidu.com/s/1pIQac49ocU-sSooLSljz4Q 
+    提取码：l534 
+ 
 串口：pl2303 / ch340
 
     链接：https://pan.baidu.com/s/12MpnvmZaNtu7ETTt7sDu0g 
