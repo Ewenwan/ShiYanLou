@@ -629,5 +629,285 @@ Iteration[2] O(n)       O(n)
 
 
 
+# 认识函数
+	代码块
+		代码块是一一组语句句,类似于其他语言言中的大大括号
+		Python中的代码块靠缩进建立立,最好是4个空格,而而非非制表符
+		Python中的代码块由 : 来引导,有缩进的提示终止止
+		代码块里里里可以放条件语句句,循环语句句,函数定义,类定义,上下文文管理理器器等
+	函数定义
+		函数是一一个代码块
+		用用 def 定义
+		返回一一个值(任何情况下都是)
+		Python中的调用用符号: ()
+		Python中可调用用判断函数: callable
+		函数中的 return 语句句:可省略略; 可单独出现; 可返回多个变量量(终止止与返回值)
+		放在函数定义开头的字符串串称为docstring,作为函数的一一部分( __doc__ )
+		交互式解释器器中的 help 函数
+
+```python
+>>> def print_sigai():
+...
+print("sigai")
+...
+>>> print_sigai()
+	sigai
+>>> help(print_sigai)    # 交互式解释器器中的 help 函数
+	Help on function print_sigai in module __main__:
+	print_sigai()
+	(END)
+>>> def print_sigai():
+... '''JUST A FUNCTION''' # 放在函数定义开头的字符串串称为docstring, 作为函数的一一部分( __doc__ )
+... print("sigai")
+...
+>>> print_sigai()
+	sigai
+>>> help(print_sigai)
+	Help on function print_sigai in module __main__:
+	print_sigai()
+		JUST A FUNCTION
+	(END)
+
+>>> print_sigai.__doc__   # 放在函数定义开头的字符串串称为 docstring , 作为函数的一一部分( __doc__ )
+'JUST A FUNCTION'
+>>> print_sigai.__doc__ = 'just a function'  # docstring 可以修改
+>>> print_sigai.__doc__
+'just a function'
+>>> help(print_sigai)
+	Help on function print_sigai in module __main__:
+	print_sigai() 
+		just a function    # 已经被修改了====================
+	(END)
+	
+	
+#   eval(str) 把 str 当作命令来执行================
+>>> def sigai_1():
+... pass
+...
+>>> def sigai_2():
+... return
+...
+>>> def sigai_3():
+... return None
+...
+>>> def sigai_4():
+... return 4
+...
+>>> def sigai_5():
+... return 1,2,3,4,"5"  # 当作 一个 tuple 返回
+...
+>>> [eval('sigai_' + str(x) + '()') for x in range(1,6)]
+[None, None, None, 4, (1, 2, 3, 4, '5')]
+
+
+```
+
+# 函数参数
+## 形参与实参
+	定义函数的时候是形参,使用用函数的时候传递的是实参
+	内部修改实参,不不影响外部同名变量
+```python
+>>> def sigai(a,b):   # 传值进入，这里 分 可变对象和不可变对象，不可变 数，字符串，tuple不可变==============
+... a += 1
+... b += 1
+... print(a,b)    
+... return a + b
+...
+>>> a,b = 1,1
+>>> sigai(a,b)
+2 2
+4
+>>> print(a,b)  # 外部 a,b 不变
+1 1
+```
+
+## 参数的传递
+```c
+>>> def sigai(a,b): # 可变对象 赋值传递时 传递的是引用，传递的是地址，内部修改，会影响外部
+... a.append(1)
+... b.append(1)
+... print(a,b)
+... return a + b
+...
+>>> a,b = [1],[1]  # 出入的是列表
+>>> sigai(a,b)
+[1, 1] [1, 1]  # a 和 b
+[1, 1, 1, 1]   # a+b
+
+>>> print(a,b) # a, b 已经变了
+[1, 1] [1, 1]
+
+
+#  传递深拷贝 的 副本=====就不会修改原对象了，通过a[:]  嵌套的 List 记得使用用 copy.deepcopy ==================
+>>> a,b = [1],[1]
+>>> sigai(a[:],b[:])
+[1, 1] [1, 1]
+[1, 1, 1, 1]
+>>> print(a,b)
+[1] [1]
+
+
+
+```
+
+## 位置参数与关键字参数
+	参数位置解耦
+	默认参数设置
+```c
+# 位置参数======
+>>> def say_hi(say, name):
+...print(say + ' ' + name + '!') # 第一个参数 第二个参数 
+...
+>>> def say_hi_2(name, say):
+...print(name + ' ' + say + '!')
+...
+>>> say_hi('hello','sigai')
+hello sigai!
+>>> say_hi_2('hello','sigai')
+hello sigai!
+
+# 关键子参数==================
+```python
+参数名字和位置一一起记,实在记不不住呀,关键字参数了了解一一下
+>>> say_hi(name='sigai',say='hello')
+hello sigai!
+
+# 关键字参数更更重要的用用途是设置默认值(大大型程序尤其重要)
+>>> def say_hi(name, say='hello'):
+... print(say + ' ' + name + '!')
+...
+>>> say_hi('sigai')
+    hello sigai!
+
+
+# 还可以再进一一步,所有参数都设置默认值
+>>> def say_hi(name='sigai', say='hello'):
+...print(say + ' ' + name + '!')
+...
+>>> say_hi()
+hello sigai!
+
+# 功能完整的函数:主逻辑用用位置参数,配置选项用用关键字参数
+# Keras 的预处理理库 image 函数=======
+# https://github.com/keras-team/keras-preprocessing/blob/master/keras_preprocessing/image.py
+
+def __init__(self,
+	featurewise_center=False,
+	samplewise_center=False,
+	featurewise_std_normalization=False,
+	samplewise_std_normalization=False,
+	zca_whitening=False,
+	zca_epsilon=1e-6,
+	rotation_range=0,
+	width_shift_range=0.,height_shift_range=0.,
+	brightness_range=None,
+	shear_range=0.,
+	zoom_range=0.,
+	channel_shift_range=0.,
+	fill_mode='nearest',
+	cval=0.,
+	horizontal_flip=False,
+	vertical_flip=False,
+	rescale=None,
+	preprocessing_function=None,
+	data_format='channels_last',
+	validation_split=0.0,
+	dtype='float32'):
+
+# 两个建议:
+#	最好不不同时使用用多个位置参数与多个关键字参数
+#	如果使用用了了关键字参数,位置参数越少越好,并且集中放在最前面面
+
+```
+
+
+
+## 任意数量量的参数与Python中的星号
+```python
+>>> sum(1,2)
+3
+>>> sum(1,2,3)
+6
+>>> sum(1,2,3,4)
+10
+>>> sum(1,2,3,4,5,6,7)
+28
+
+# * 表示按 tuple解析======
+>>> def sum(*l):
+... result = 0
+... for x in l: result += x
+... return result
+...
+
+# 与赋值不不同,函数的参数用用星号拆包或缝合时,得到的是元组========================
+
+>>> list(range(7))
+[0, 1, 2, 3, 4, 5, 6]
+>>> a,*b,c = list(range(7))  # 外部 *表示使用list 收集变量
+>>> type(b)
+<class 'list'>
+>>> def sum(*l):
+... print(type(l))
+...
+>>> sum(1,2)
+<class 'tuple'>   # 函数中的* 表示使用 tuole 收集变量
+
+
+# 还可以接受 任意 个 关键字参数,两个星号了了解一一下 ==============================
+
+>>> def register(**kw):
+... print("kw's type is",type(kw))
+... print("kw is",kw)
+...
+>>> register(name='sigai',pi=3.1415926) # 传递字典形式，key变成字符串
+kw's type is <class 'dict'>
+kw is {'name': 'sigai', 'pi': 3.1415926}
+
+# 可以一一起收集位置参数与关键字参数============
+>>> def register(*list,**dict):
+... print(list)
+... print(dict)
+...
+>>> register(1,2,3,name='sigai',pi=3.14) # 传递 列表形式 和 关键字形式
+(1, 2, 3)
+{'name': 'sigai', 'pi': 3.14}
+
+
+# 刚才的星号是用用作封包的,其实也可以用用来拆包===============
+>>> def sum(a,b,c):
+...
+return a + b + c
+...
+>>> x = (1,2,3)
+>>> sum(*x) # 这里的* 号 用来拆包，将x拆成了3个参数
+6
+>>> sum(x)
+Traceback (most recent call last):
+File "<stdin>", line 1, in <module>
+TypeError: sum() missing 2 required positional arguments: 'b' and 'c'
+
+# 对于函数参数中的星号拆包和封包,用用一一个即可,用用两个其实等于没用用
+>>> def sum_1(*l):              # 这里是将 多个参数 包成一个参数 tuple类型
+... result = 0
+... for x in l: result += x
+... return result
+...
+>>> def sum_2(l):    # 这里只能传递一个参数，但是这个参数 可以是list
+... result = 0
+... for x in l: result += x
+... return result
+...
+>>> sum_1(*range(5))  # 这里的 * 的作用是拆包，传给函数的是 5个参数
+10
+>>> sum_2(range(5))   # 这里的 输入参数是 一个list
+10
+
+
+```
+
+
+# 名称空间与作用用域解析(Namespace and Scope Resolution)
+
 
 
