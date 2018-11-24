@@ -921,4 +921,86 @@ void loop() {
 }
  
  ```
- 
+
+# 舵机内部控制程序
+```c
+    /* by Payne.Pan 2017.2 */
+    /* only for study      */
+    #define A   5
+    #define B   6
+    #define Delta 5 // 脉冲信号响应 灵敏度====
+
+    long prev_time=0;
+    long pwm=0;
+
+
+    void rising() // 2号口  pwm信号 脉冲上升沿
+    {
+      prev_time = micros();// 上升沿时刻的时间
+      attachInterrupt(0, falling, FALLING);// 切换为下降沿，检测脉冲信号的 下降沿
+    }
+
+
+    void falling() { // 检测脉冲信号的 下降沿
+      pwm = micros()-prev_time; // 下降沿时间 - 上升沿时间 ====> 脉冲信号 持续时间
+      attachInterrupt(0,rising, RISING);// 再次切换为 上降沿中断， 检测下一个脉冲信号的  上升沿
+    }
+
+// 控制电机 正转 反转 停止=====
+    void runMotor(int dir) 
+    {
+      if (dir == 0) // 点击停止
+      {
+        digitalWrite(A,LOW);
+        digitalWrite(B,LOW);
+      }
+      else if (dir > 0) // 电机正转
+      {
+        digitalWrite(A,HIGH);
+        digitalWrite(B,LOW);
+      } 
+      else  // 电机反转
+      {
+        digitalWrite(A,LOW);
+        digitalWrite(B,HIGH);
+      }
+    }
+
+// 初始化 
+    void setup() {
+      pinMode(2,INPUT);   // 外接 pwm 输入信号，用来接收 转动的角度值====500～2500模式===== 
+      
+      pinMode(A,OUTPUT);  // 电机控制板 正反转
+      pinMode(B,OUTPUT);
+      
+      pinMode(A0,INPUT); # 舵机 电位器反馈 模拟量测量接口
+      
+      attachInterrupt(0,rising, RISING); // 2号管脚对应 0号 可以检测硬件中断的端口，上升边中断 外接 PWM信号
+    }
+
+    void loop() {
+      int a = analogRead(A0);     // 读取 舵机主轴连接的电位器 反馈值
+      a = map(a,0,1023,500,2500); // 将0～1023的 模拟量值 映射到 500～2500范围，对应 pwm控制信号的 脉冲宽度范围
+      if(pwm)>2500 pwm =2500;
+      else if(pwm<500) pwm =500; // 确保 pwm 范围，保护====
+      if (pwm-a > Delta)
+      {
+        runMotor(1);// 正转
+      } 
+      else if (pwm-a < -Delta)
+      {
+        runMotor(-1);// 反转
+      } 
+      else 
+      {
+        runMotor(0);// 停止
+      }
+    }
+
+
+```
+
+
+
+
+
