@@ -1117,4 +1117,163 @@ sigai_1
 	built-in: 解释器器在则在,  解释器器亡则亡
 	global:   导入入模块时创建,直到解释器器退出
 	local:    函数调用用时才创建
- 
+
+
+# 函数式编程概述  线程 多线程 优化
+     何为No Side Effect? 
+	函数的所有功能就仅仅是返回一个新的值而而已,没有其他行为,尤其是
+	不得修改外部变量 因而,各个独立的部分的执行顺序可以随意打乱,带
+	来执行顺序上的自由 
+	执行顺序的自由使得一系列列新的特性得以实现:
+		无无锁的并发;
+		惰性求值;
+		编译器器级别的性能优化等.
+		
+     程序的状态与 命令式编程 多米诺骨牌
+	程序的状态首首先包含了当前定义的全部变量
+	有了程序的状态,我们的程序才能不断往前推进
+	命令式编程,就是通过不断修改变量的值,来保存当前运行行的状态,来步步推进
+	
+     函数式编程
+	通过函数来保存程序的状态(通过函数创建新的参数和返回值来保存状态)
+	函数一层的叠加起来,每个函数的参数或返回值代表了一个中间状态
+	
+	命令式编程里  一次变量 值 的修改,
+	在函数式编程里 变成了 一个函数的转换
+	最自自然的方方式:递归
+
+
+## 一等函数
+     一等对象
+     定义:
+	在运行时创建
+	能赋值给变量或数据结构中的元素
+	能作为参数传给函数
+	能作为函数的返回结果
+	Python中,所有函数的都是一等对象,简称为一等函数
+     
+     python 中的函数 功能
+     1. 在运行行行时创建
+     2. 能赋值给变量量或数据结构中的元素
+     3. 能作为参数传递给函数
+     4. 能作为函数的返回结果
+
+     
+     
+```python   
+>>> def say_hi(): 
+...   print("Hello SigAI")
+
+>>> say_hi() # 1. 在运行行行时创建
+Hello SigAI
+
+>>> test = say_hi  #  2. 能赋值给变量量或数据结构中的元素
+>>> test()
+Hello SigAI
+
+
+# 3. 能作为参数传递给函数
+>>> def repeat(f,num):
+... [f() for i in range(num)] # 调用函数 num次
+...
+>>> repeat(say_hi,3)
+Hello SigAI
+Hello SigAI
+Hello SigAI
+
+#  4. 能作为函数的返回结果
+>>> def repeat_func(f,num):
+...     def new_func():
+...         [f() for i in range(num)]
+        return new_func
+...
+>>> repeated_func = repeat_func(say_hi,3)
+>>> repeated_func()
+Hello SigAI
+Hello SigAI
+Hello SigAI
+
+
+```
+
+## 高高阶函数
+定义:接受函数为参数,或把函数作为返回结果的函数
+
+### map高高阶函数
+```c
+>>> def square(x): return x * x   # 行为
+...
+>>> xx = map(square, range(10))   # 将 行为 映射到 可迭代对象上的没一个元素   工业化生产
+>>> xx
+<map object at 0x7f993713bef0>
+>>> xx = list(xx)
+>>> xx
+[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+# 可用用 [x * x for x in range(10)] 替代==========================
+
+
+```
+	
+### filter高高阶函数  过滤函数
+```python
+>>> x = [(), [], {}, None, '', False, 0, True, 1, 2, -3]
+>>> x_result = filter(bool, x)  # 将 bool 行为 映射到 列表x 中的没一个元素
+>>> x_result
+<filter object at 0x7f993713beb8>
+>>> x_result = list(x_result)
+>>> x_result
+[True, 1, 2, -3]
+# 可用用 [i for i in x if bool(i)] 替代 加入了 条件判断 实现了类似 filter的功能
+
+```
+
+### reduce高高阶函数
+```python
+>>> def multiply(a,b): return a * b
+...
+>>> from functools import reduce
+>>> reduce(multiply, range(1,5))  # 前面的变量是一个行为 1×2--->2
+                                  # 2×3---->6
+				  # 6×4---->24
+24
+
+```
+
+### sorted高高阶函数
+```python
+>>> sorted([x * (-1) ** x for x in range(10)]) # x * (-1)^x  奇数保持不变，偶数变负数
+[-9, -7, -5, -3, -1, 0, 2, 4, 6, 8] # 默认 升序排序
+
+>>> sorted([x * (-1) ** x for x in range(10)], reverse=True)
+[8, 6, 4, 2, 0, -1, -3, -5, -7, -9] # reverse=True 降序排序
+
+>>> sorted([x * (-1) ** x for x in range(10)], key=abs) # 升序排序前，按 key行为处理一下，再排序，还按key之前的数
+[0, -1, 2, -3, 4, -5, 6, -7, 8, -9]
+
+>>> sorted([x * (-1) ** x for x in range(10)], reverse=True, key=abs)
+[-9, 8, -7, 6, -5, 4, -3, 2, -1, 0] # 降序排序前，按 key行为处理一下，再排序，还按key之前的数
+# max min同理理
+```
+
+
+
+### partial高高阶函数   指定函数行为 成 新的函数
+```python
+>>> from functools import partial
+
+>>> abs_sorted = partial(sorted, key=abs) # 指定行为 合成函数=========
+
+>>> abs_sorted([x * (-1) ** x for x in range(10)])
+[0, -1, 2, -3, 4, -5, 6, -7, 8, -9]
+>>> abs_reverse_sorted = partial(sorted, key=abs, reverse=True)
+>>> abs_reverse_sorted([x * (-1) ** x for x in range(10)])
+[-9, 8, -7, 6, -5, 4, -3, 2, -1, 0]
+
+```
+
+## 匿匿名函数
+
+
+
+
+
