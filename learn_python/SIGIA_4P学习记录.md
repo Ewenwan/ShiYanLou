@@ -907,7 +907,214 @@ TypeError: sum() missing 2 required positional arguments: 'b' and 'c'
 ```
 
 
-# 名称空间与作用用域解析(Namespace and Scope Resolution)
+# 名称空间与作用用域解析(Namespace and Scope Resolution) LEGB解析规则
+## 作用用域的产生生
+	局部 Local:function and class method
+	嵌套 Enclosed:its enclosing function, if a function is wrapped inside another function  
+	全局 Global:the uppermost level of executing script itself    导入包开始
+	内置 Built-in:special names that Python reserves for itself   解析器开始
+##  globals() =================
+```python
+# globals() 字典 .key() 拿出关键字 成 list ''.join() 链接成字符串， 中间使用 '\n' 换行符链接
+>>> print('\n'.join(globals().keys()))
+__name__
+__doc__
+__package__
+__loader__
+__spec__
+__annotations__
+__builtins__
+  
+>>> sigai_1 = 1  # 自建了一个变量
+>>> print('\n'.join(globals().keys()))
+__name__
+__doc__
+__package__
+__loader__
+__spec__
+__annotations__
+
+__builtins__    # 上面是 __builtins__  内的
+sigai_1         # 模块级别 自建了一个变量 也存在于 globals() 中
 
 
 
+>>> sigai_2 = 2 
+>>> import math         # 导入模块
+>>> def say_hi(): pass  # 定义函数
+...
+>>> class Human: pass   # 定义类
+...
+>>> print('\n'.join(globals().keys()))
+__name__
+__doc__
+__package__
+__loader__
+__spec__
+__annotations__
+__builtins__
+sigai_1
+sigai_2
+math
+say_hiHuman
+
+```
+## local() ========================================
+```python
+from copy import copy # 浅拷贝
+globals_init = copy(list(globals().keys()))      # 初始全局作用域 变量  list类型
+
+print("globals_init: ", *globals_init, sep='\n') # 中间 * 号 拆包，将list拆开，中间按 sep='\n' 填充 就是家换行 和'\n'.join() 类似
+
+print() # 打印 一个空行
+
+a, b = 1, 2 # 多个变量一起赋值
+
+# 定义一个函数
+def f1(c=3):
+    # 
+    d = 4
+    # 查看 定义f1函数  使得 globals 全局 内多出来的 变量     *号拆包=====
+    print("globals in f1:", *(globals().keys() - globals_init))
+    
+    print("locals in f1:", *(locals().keys()))  # 局部内多出来的
+    # f1 内部 定义 f2函数
+    def f2(e=5):
+        f = None
+	# 查看 定义f1 和 f2 函数  使得 globals 全局 内多出来的 变量
+        print("globals in f2:", *(globals().keys() - globals_init))
+	## 局部内多出来的
+        print("locals in f2:", *(locals().keys()))
+	
+    f2() # 调用 f2
+    
+if __name__ == '__main__':
+f1()
+
+
+>>> 
+	Globals_init:
+	__name__
+	__doc__
+	__package__
+	__loader__
+	__spec__
+	__annotations__
+	__builtins__
+	__file__
+	__cached__
+	copy             # 导入的包
+	
+	globals in f1: globals_init f1 a b
+	locals in f1: d c
+	globals in f2: globals_init f1 a b
+	locals in f2: f e
+
+
+
+```
+
+## 作用用域间变量量的遮盖
+```python
+name = 'sigai_1'
+print(name)
+def f1():
+    name = 'sigai_2'
+    print(name)
+    def f2():
+        name = 'sigai_3'
+        print(name)
+    f2()
+if __name__ == '__main__':
+f1()
+
+>>>   从最近的作用 域 向上 进行查找
+	sigai_1
+	sigai_2
+	sigai_3
+
+```
+
+## 修改不不同作用用域里里里的变量量
+```python
+def f1(name):
+    name = 'sigai_2'
+    print(name)
+if __name__ == '__main__':
+    name = 'sigai_1'
+    print(name)
+    f1(name)
+    print(name)  # 回到外面 还是 使用 外面的
+>>> 
+	sigai_1
+	sigai_2
+	sigai_1
+	
+# 函数内声明全局变量
+def f1():
+    global name      # 函数内声明全局变量 修改会 关联到 外面
+    name = 'sigai_2'
+    print(name)
+if __name__ == '__main__':
+    name = 'sigai_1'
+    print(name)
+    f1()
+    print(name)
+>>> 
+	sigai_1
+	sigai_2
+	sigai_2
+
+
+# 嵌套
+
+def f1():
+    name = 'sigai_2'
+    print(name)
+    def f2():
+        name = 'sigai_3'
+        print(name)
+    f2()
+    print(name)
+if __name__ == '__main__':
+    name = 'sigai_1'
+    print(name)
+    f1()
+    print(name)
+>>> 
+	sigai_1
+	sigai_2
+	sigai_3
+	sigai_2
+	sigai_1
+
+# nonlocal 非局部，也不是全局，嵌套函数内部变量
+def f1():
+    name = 'sigai_2'
+    print(name)
+    def f2():
+        nonlocal name     # 这个变量 关联到 f1 内的 name
+        name = 'sigai_3'
+        print(name)
+    f2()
+    print(name)
+if __name__ == '__main__':
+    name = 'sigai_1'
+    print(name)
+    f1()
+    print(name)
+>>> 
+sigai_1
+sigai_2
+sigai_3
+sigai_3
+sigai_1
+
+
+	
+```
+## 作用用域的生生命周期
+	built-in: 解释器器在则在,  解释器器亡则亡
+	global:   导入入模块时创建,直到解释器器退出
+	local:    函数调用用时才创建
+ 
