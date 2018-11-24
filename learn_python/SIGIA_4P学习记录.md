@@ -1273,7 +1273,97 @@ Hello SigAI
 
 ## 匿匿名函数
 
+	定义:
+	     使用lambda表达式创建的函数,函数本身没有名字
+	特点:
+	     只能使用纯表达式,不能赋值,不能使用while和try等块语句句
+	语法: 
+	     lambda [arg1 [,arg2 [,arg3......]]]: expression
+	什么是表达式? 
+	     Expressions get a value; Statements do something
+	用 lambda 与用 def 的区别在哪
+	写法上:
+	   1. def可以用代码块,一个代码块包含多个语句句
+	   2. lambda只能用单行表达式,而表达式仅仅是单个语句中的一一种
+	结果上:
+	   1. def语句一一定会增加一一个函数名称
+	   2. lambda不会,这就降低了变量名污染的风险
+	Compound Statements > Simple Statements > Expressions
+	 代码块    --->             单行语句    --->     表达式
+	能用一一个表达式直接放到 return 里返回的函数都可以用 lambda 速写
 
 
+> 能用用一一个表达式直接放到 return 里里里返回的函数都可以用用 lambda 速写
+
+```python
+>>> def multiply(a,b): return a * b
+...
+>>> multiply(3,4)
+12
+>>> multiply_by_lambda = lambda x,y: x * y
+>>> multiply_by_lambda(3,4)
+12
+```
+
+> List + lambda 可以得到行为列列表
+
+```python
+>>> f_list = [lambda x: x + 1, lambda x: x ** 2, lambda x: x ** 3]
+#           行为      x+1              x^2               x^3
+# 函数式集合 
+
+>>> [f_list[j](10) for j in range(3)]
+[11, 100, 1000]
+```
+
+> 问题=========
+```python
+fun = [lambda x: x*i for i in range(4)]  # ： 冒号前面为 lambda 函数的参数
+for item in fun:
+    print(item(1))
+    
+上述式子的输出结果：
+预计结果为：0, 1, 2, 3
+实际输出为：3, 3, 3, 3
+
+分析: lambda x: x*i 为内层（嵌）函数，他的命名空间中只有 {'x': 1} 没有 i ，
+     所以运行时会向外层函数（这儿是列表解析式函数 [ ]）的命名空间中请求 i 
+     而当列表解析式运行时，列表解析式命名空间中的 i 经过循环依次变化为 0->1->2->3 最后固定为 3 ，
+     所以当 lambda x: x*i 内层函数运行时，去外层函数取 i 每次都只能取到 3
+     
+解决： 给内层函数 lambda x: x*i 增加参数
+给内层函数 lambda x: x*i 增加参数，命名空间中有了用来存储每次的 i ,
+即改成 
+[lambda x, i=i: x*i for i in range(4)] 
+这样每一次，内部循环生成一个lambda 函数时，
+都会把 --i--作为默认参数传入lambda的命名空间
+循环4次实际lambda表达式为：
+第一次：lambda x, i=0 第二次：lambda x, i=1 第三次：lambda x, i=2 第四次：lambda x, i=3
+
+fun = [lambda x, i=i: x*i for i in range(4)]
+for item in fun:
+    print(item(1))
+
+#输出结果为：
+0
+1
+2
+3   
+
+
+# lambda 函数 内部没有 i
+>>> f_list = [lambda x: x**i for i in range(5)]  # 最后i 都会变成4 4个函数 x^4
+>>> [f_list[j](10) for j in range(5)] 
+[10000, 10000, 10000, 10000, 10000]
+
+
+# lambda 函数 内部 添加 i 参数
+>>> f_list = [lambda x,i=i: x**i for i in range(5)] # 每次的 i 都会从  range(5) 中对应的位置取出来
+                                                    # x^0 x^1 x^2 x^3 x^4
+>>> [f_list[j](10) for j in range(5)]
+[1, 10, 100, 1000, 10000]
+
+
+```
 
 
