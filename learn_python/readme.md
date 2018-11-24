@@ -9,6 +9,9 @@
 
 [关于Python的面试题  Python语言特性 操作系统 数据库 网络 编程题 红黑树](https://github.com/Ewenwan/interview_python)
 
+
+[HackerRank刷题之路---Python](http://www.cnblogs.com/dn-harris/p/6048255.html?utm_source=itdadao&utm_medium=referral)
+
 # window python 开发环境
 ## 1. anaconda
 [下载](https://www.anaconda.com/download/)
