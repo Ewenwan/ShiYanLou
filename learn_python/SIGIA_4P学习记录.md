@@ -1575,4 +1575,104 @@ print(a)
 	nonlocal 的出现其实是一种权衡利弊的结果：私有之安全封装，全局之灵活共享
 	而这也是闭包之所以出现的原因之一
 	
-# 闭包
+# 闭包 简化的 面向对象编程================
+	什么是闭包？
+	定义：延伸了作用域的函数（能访问定义体之外定义的非全局变量）
+	闭包是一种函数，它会保留定义函数时存在的外层非全局变量的绑定
+	
+## 求历史值的平均值的函数
+```python
+>>> avg(10)
+10.0
+>>> avg(11)  
+10.5        # (10+11)/2
+>>> avg(12)
+11.0        # (10+11+12)/3 =11
+
+```
+## 第一个版本：用类实现
+```python
+class Averager():
+    # 类构造函数
+    def __init__(self):
+        self.series = []
+    # 调用执行函数
+    def __call__(self, new_value):
+        self.series.append(new_value) # 用列表记录历史输入值
+        total = sum(self.series)      # 总和
+        return total/len(self.series) # 和/数量
+
+>>> avg = Averager()
+>>> avg(10)
+10.0
+>>> avg(11)
+10.5
+>>> avg(12)
+11.0
+```
+
+
+## 第二个版本：用闭包实现
+```python
+def make_averager():
+    series = [] # 非局部
+    
+    def averager(new_value):
+        series.append(new_value) # 访问上一级非局部的变量 (不用声明nonlocal即可访问可变对象)
+        total = sum(series) # 总和
+        return total/len(series) # 总和/数量
+	
+    return averager
+    
+>>> avg = make_averager()
+>>> avg(10)
+10.0
+>>> avg(11)
+10.5
+>>> avg(12)
+11.0
+```
+
+## 第三个版本：优化过的闭包 不用记录历史值
+```python
+def make_averager():
+    count = 0 # 传入的数 的数量
+    total = 0 # 当前总和
+    
+    def averager(new_value):
+        # 上一级 非局部变量为 不可变对象 局部中不可直接访问，需要声明为 nonlocal对象
+	# nonlocal count, total  # 注释掉 会报错
+        count += 1 # 数量+1
+        total += new_value # 总和
+        return total / count # 总和/总数
+	
+    return averager
+    
+>>> from test import make_averager
+>>> avg = make_averager()
+>>> avg(10)
+Traceback (most recent call last):
+报错????
+UnboundLocalError: local variable 'count' referenced before assignment
+
+'''
+思考：为什么刚才就可以修改？现在就不可以了呢？
+还记得可变对象与不可变对象的区别吗？
+Python 2中没有 nonlocal 关键字，只能用可变对象来临时性的解决中间层变量修改的问题
+而 nonlocal 是Python 3中引入的一个官方的解决方案，以弥补内层函数无法修改中间层不可
+变对象。
+'''
+
+```
+## 闭包有什么用呢？
+	1. 共享变量的时候避免使用了不安全的全局变量
+	2. 允许将函数与某些数据关联起来，类似于简化版面向对象编程
+	3. 相同代码每次生成的闭包，其延伸的作用域都彼此独立（计数器，注册表）
+	4. 函数的一部分行为在编写时无法预知，需要动态实现，同时又想保持接口一致性
+	5. 较低的内存开销：类的生命周期远大于闭包
+	6. 实现装饰器
+
+
+
+# Python中的 重头戏- 装饰器
+	
