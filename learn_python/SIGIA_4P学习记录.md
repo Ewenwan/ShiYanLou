@@ -1368,4 +1368,211 @@ for item in fun:
 
 ```
 
+# 变量作用域 声明 赋值 调用 global公有 nonlocal非公非私 local私有
 
+> 3种作用域；5次调用；3次赋值；0次声明
+```python
+
+a = 1
+print(a) # 全局 global
+
+def func_enclosed():
+    a = 2
+    print(a) # nonlocal 非局部
+    def func_local():
+        a = 3
+        print(a) # local 局部
+    func_local()
+    print(a) # nonlocal 非局部
+    
+func_enclosed()
+print(a) # 全局 global
+
+>>>
+1
+2
+3
+2
+1
+# 总结：无声明的情况下，赋值即私有，若外部有相同变量名则将其遮挡
+```
+
+> 3种作用域；5次调用；1次赋值；0次声明
+
+```python
+a = 1
+print(a)
+def func_enclosed():
+    #a = 2
+    print(a)
+    def func_local():
+        #a = 3
+        print(a)
+    func_local()
+    print(a)
+func_enclosed()
+print(a)
+
+>>>
+1
+1
+1
+1
+1
+# 总结：无赋值情况下，变量访问依据LEGB法则
+```
+
+> 3种作用域；5次调用；3次赋值；1次 global 声明(非局部nonlocal 中修改)
+
+```python
+a = 1
+print(a) # 全局 global
+def func_enclosed():
+    global a # global声明
+    a = 2
+    print(a) # nonlocal 转换成 global
+    def func_local():
+        a = 3
+        print(a) # local 局部
+    func_local()
+    print(a) # nonlocal 转换成 global
+func_enclosed()
+print(a)     #  global 已被 nonlocal  修改
+
+>>>
+1
+2
+3
+2
+2
+# 总结：内层函数可以通过声明的方式直接修改外部变量
+```
+
+
+
+> 3种作用域；5次调用；3次赋值；1次 global 声明(局部local 中修改)
+
+```python
+a = 1
+print(a)# 全局 global
+
+def func_enclosed():
+    a = 2
+    print(a) # 非局部 nonlocal
+    def func_local():
+        global a # 全局声明
+        a = 3
+        print(a) # 局部local 转变成 全局
+    func_local()
+    print(a)
+    
+func_enclosed()
+print(a)  # 全局 已被 局部local 中修改
+
+>>> 
+1
+2
+3
+2
+3
+# 总结：位于最内层的函数，通过 global 声明，会越过中间层，直接修改全局变量
+```
+
+> 3种作用域；5次调用；3次赋值；2次 global 声明
+
+```python
+a = 1
+print(a)# 全局 global
+
+def func_enclosed():
+    global a
+    a = 2
+    print(a) # nonlocal 转换成 global
+    
+    def func_local():
+        global a
+        a = 3
+        print(a) # 局部local 转变成 全局
+    func_local()
+    print(a)
+    
+func_enclosed()
+print(a) # 全局 已被修改 值为最近一次修改时的值
+>>> 
+1
+2
+3
+3
+3
+# 总结： global 声明其实是一种绑定关系，意思是告诉解释器，
+# 不用新创建变量了，我用的是外面那
+个
+```
+
+> 3种作用域；5次调用；3次赋值；1次 nonlocal 声明
+
+```python
+a = 1
+print(a) # 全局
+
+def func_enclosed():
+    a = 2
+    print(a)# 非局部
+    
+    def func_local():
+        nonlocal a # 非局部声明
+        a = 3
+        print(a)   # 局部转变成 非局部
+    func_local()
+    print(a)  # 非局部，已被 局部中修改
+    
+func_enclosed()
+print(a) #全局
+
+>>>
+1
+2
+3
+3
+1
+# 总结：位于最内层的函数，如果仅想修改中间层变量，而不是全局变量，可使用 nonlocal 关键字
+
+```
+
+> 3种作用域；5次调用；3次赋值；1次 nonlocal 声明；1次 global 声明
+
+```python
+a = 1
+print(a)
+def func_enclosed():
+    global a
+    a = 2
+    print(a)  # nonlocal 已经转变成 global
+    
+    def func_local():
+        nonlocal a #已经没有非局部变量a了，会报错=========!=!
+        a = 3
+        print(a)
+	
+    func_local()
+    print(a)
+func_enclosed()
+print(a)
+# 总结： nonlocal 只能绑定在中间层定义的变量，如果中间层变量被声明外全局变量，则会报错
+```
+
+## 金句：
+	无声明的情况下，赋值即私有，若外部有相同变量名则将其遮挡
+	想修改外部相同变量名，需要将外部变量声明
+	根据外部变量的作用域级别不同，使用 global或者nonlocal
+	
+## Python解释器如何识别变量的作用域？
+	先看出现了几层作用域
+	再看变量出现的位置
+	如果有对变量进行赋值操作，则再看是否声明为外部变量
+	为什么会有 nonlocal 关键字？
+	nonlocal 填补了 global与local 之间的空白
+	nonlocal 的出现其实是一种权衡利弊的结果：私有之安全封装，全局之灵活共享
+	而这也是闭包之所以出现的原因之一
+	
+# 闭包
