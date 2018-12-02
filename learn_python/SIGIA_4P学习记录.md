@@ -2124,7 +2124,487 @@ if __name__ == '__main__':
 		1. 高内聚，低耦合
 		2. 抽象不变的接口，封装变化的细节
 		
-# OOP in Python
+# OOP in Python 面向对象的Python实现
+> 类的创建
+
+```python
+# 类实现 类名 一般大写
+class Model:
+    pass
+    
+def main():
+    # 类实例化出来的 对象名字一般小写 model
+    model = Model() # 调用 类 后面 加()
+    print(model)
+
+# 主函数
+if __name__ == '__main__':
+    main()
+>>> 
+    <__main__.Model object at 0x108fa05f8>
+    
+'''
+要点：
+1. 类名一般大写，实例化出来的对象，名称一般小写
+2. 类在被定义时，也创建了一个局部作用域
+3. 类名加上 () 生成对象，说明类被定义后便可以调用
+4. 本质上讲，类本身就是一个对象
+'''
+```
+
+> 类的数据绑定
+
+```python
+class Model:
+    name = "CNN"
+    
+def main():
+    print(Model.name)
+    model = Model()
+    print(model.name)
+    model.name = "RNN"
+    print(Model.name)
+    print(model.name) # model 对象中 name 已经改变
+    
+if __name__ == '__main__':
+    main()
+    
+# 输出：
+CNN
+CNN
+CNN
+RNN
+    
+'''
+要点：
+1. 类定义体中，可以定义自己的 属性(内定义的变量)，并通过 . 来引用
+2. 类实例化出 对象 以后，创建了 新的局部作用域，也就是 对象自己的作用域
+3. 对实例化出来的 对象引用属性时，先从自己的作用域找，未找到 则向上找，这里找到了类作用域
+4. 实例化出来的对象是可以在 运行时绑定数据的.
+'''
+       
+```
+
+
+> 类的自定义实例化： __init__()  类构造函数
+
+```python
+class Model:
+    name = "DNN"
+    
+    # 类构造函数，self 为类指针 c++ this
+    def __init__(self, name):
+        self.name = name
+	
+def main():
+    cnnmodel = Model("CNN") # name = "CNN"
+    rnnmodel = Model("RNN") # name = "RNN"
+    # "DNN" "CNN" "RNN"
+    print(Model.name, cnnmodel.name, rnnmodel.name)
+    # 整体赋值
+    cnnmodel.name, rnnmodel.name = "RNN", "CNN"
+    # "DNN" "RNN" "CNN"
+    print(Model.name, cnnmodel.name, rnnmodel.name)
+    
+if __name__ == '__main__':
+    main()
+
+'''
+要点：
+1. 类定义体中， self 指代实例化出来的对象
+2. 没有跟在 self 后面的属性属于类属性
+3. 可以使用 __init__() 函数自定义初始化方式
+4. 隶属于类的方法是共享的，隶属于对象的方式是每个对象私有的
+'''
+```
+
+
+> 对象方法, 类中定义函数, 类实例化后绑定到 对象上!!!!!
+
+```python
+class Model:
+    name = "DNN"
+    
+    #类初始化函数 构造函数
+    def __init__(self, name):
+        self.name = name
+	
+    # 打印类内 name参数的一个函数
+    def print_name(self):
+        print(self.name)
+	
+def main():
+    cnnmodel = Model("CNN")
+    cnnmodel.print_name() # "CNN"
+    cnnmodel.name = "RNN"
+    cnnmodel.print_name() # "RNN"
+    
+if __name__ == '__main__':
+    main()
+
+'''
+要点：
+1. 类定义体中的方法默认情况下隶属于对象，而非类本身
+2. 直接在类上调用方法时会报错
+cnnmodel.print_name() 等价于 Model.print_name(cnnmodel)
+那有没有隶属于类自己的方法呢？
+'''
+
+```
+
+> 类方法 @classmethod 内置装饰器 语法糖
+
+```python
+class Model:
+    # 类属性
+    name = "DNN"
+    
+    # 类构造函数
+    def __init__(self, name):
+        self.name = name
+	
+    # 类实例化后才有的 方法 
+    def print_name(self):
+        print(self.name)
+    
+    # 不用实例化，类本身就有的 方法
+    @classmethod # 装饰器
+    def print_cls_name(cls): # 传入的为 cls 不是self
+        print(cls.name)
+	
+def main():
+    Model.print_cls_name() # 类本身的方法 "DNN"
+    cnnmodel = Model("CNN")# 实例化一个对象
+    cnnmodel.print_name()  # "CNN"
+    cnnmodel.name = "RNN"  
+    cnnmodel.print_name()  # "RNN" 
+    Model.print_cls_name() # "DNN"
+    
+if __name__ == '__main__':
+    main()
+'''
+要点：
+1. 使用 @classmethod 与 cls 可以将方法绑定到类本身上
+'''
+```
+
+
+> 属性封装
+
+```python
+class Model:
+    # 双下划线开头，可以将数据 属性私有化，对于方法一样适用
+    # 私有 属性 / 变量,需要通过公开的函数访问
+    __name = "DNN"
+    
+    # 类构造函数
+    def __init__(self, name):
+        self.__name = name
+	
+    # 对象 方法 打印 私有属性/变量
+    def print_name(self): # 传入self
+        print(self.__name)
+    
+    # 类方法 打印 私有属性/变量
+    @classmethod
+    def print_cls_name(cls): # 输入cls
+        print(cls.__name)
+	
+def main():
+    Model.print_cls_name()  # "DNN"
+    cnnmodel = Model("CNN") 
+    cnnmodel.print_name()   # "CNN"
+    # print(Model.__name)   # 报错 ，外部 不能直接访问 类内 私有变量
+    # print(cnnmodel.__name)# 报错 
+    
+if __name__ == '__main__':
+    main()
+    
+'''
+要点：
+1. 通过双下划线开头，可以将数据属性私有化，对于方法一样适用
+2. 从报错信息也能看出， Model 是一个 type object ， cnnmodel 是一个 Model object
+Python中的私有化是假的，本质上是做了一次名称替换，因此实际中也有为了方便调试而适
+用单下划线的情况，而私有化也就全凭自觉了
+'''
+
+```
+
+
+> 继承（隐式实例化）
+```python
+class Model:
+    # 私有 属性 / 变量,需要通过公开的函数访问
+    __name = "DNN"
+    
+    # 类构造函数，实例化
+    def __init__(self, name):
+        self.__name = name
+	
+    # 对象 方法 打印名字
+    def print_name(self):
+        print(self.__name)
+    
+    # 类 方法 打印名字
+    @classmethod
+    def print_cls_name(cls): # cls 属于 Model
+        print(cls.__name)
+
+# 类的继承，Model类为父类，CNNModel为子类
+class CNNModel(Model):
+    __name = "CNN"
+    # 无 __init__(self,name):  隐式调用父类的
+    
+def main():
+    cnnmodel = CNNModel("Lenet")# 实例化 "Lenet"
+    cnnmodel.print_name()       # 
+    CNNModel.print_cls_name()   # 打印 Model中的 name "DNN"
+    
+if __name__ == '__main__':
+    main()
+    
+'''
+要点：
+1. 如果子类没有定义自己的 __init__() 函数，则隐式调用父类的
+2. 子类可以使用父类中定义的所有属性和方法，但类方法的行为需要注意
+使用了 @classmethod 后的方法虽然可以继承，但是方法里面的 cls 参数绑定了父类，
+即使在子类中调用了类方法，但通过 cls 引用的属性依旧是父类的类属性
+'''
+    
+```
+
+> 继承（显示实例化）
+```python
+class Model:
+    __name = "DNN"
+    
+    def __init__(self, name):
+        self.__name = name
+	
+    def print_name(self):
+        print(self.__name)
+	
+    @classmethod
+    def print_cls_name(cls):
+        print(cls.__name)
+	
+class CNNModel(Model):
+    __name = "CNN"
+    
+    # 子类的 __inin__() 实例化函数，名字+层数
+    def __init__(self, name, layer_num):
+        # 必须显示调用 父类的 实例化函数
+        Model.__init__(self, name)
+	# 多传入的参数，需要执行赋值步骤
+        self.__layer_num = layer_num
+	
+    # 子类 多出来的方法	
+    def print_layer_num(self):
+        print(self.__layer_num)
+	
+def main():
+    cnnmodel = CNNModel("Lenet", 5)
+    cnnmodel.print_name()      # "Lenet"
+    cnnmodel.print_layer_num() # 5
+    
+if __name__ == '__main__':
+    main()
+'''
+要点：
+1. 如果子类中定义了 __init__() 函数，必须显示执行父类的初始化
+'''
+```
+
+
+> 多态
+```python
+# 父类
+class Model:
+
+    __name = "DNN"
+    
+    def __init__(self, name):
+        self.__name = name
+	
+    def print_name(self):
+        print(self.__name)
+	
+    @classmethod
+    def print_cls_name(cls):
+        print(cls.__name)
+#子类1	
+class CNNModel(Model):
+
+    __name = "CNN"
+    
+    def __init__(self, name, layer_num):
+        # 子类初始化函数  需要显示调用父类的 初始化函数
+        Model.__init__(self, name)
+        self.__layer_num = layer_num # 层数
+	
+    def print_name(self):
+        print(self.__name)
+        self.print_layer_num() # 调用打印层数 方法
+	
+    def print_layer_num(self):
+        print("Layer Num: ", self.__layer_num)
+	
+#子类2 
+class RNNModel(Model):
+
+    __name = "RNN"
+    
+    # 层名字 和 类型
+    def __init__(self, name, nn_type):
+        # 子类初始化函数 必须显示调用 父类的 实例化函数
+        Model.__init__(self, name)
+        self.__nn_type = nn_type # 层类型
+	
+    def print_name(self):
+        print(self.__name)   # 名字
+        self.print_nn_type() # 类型
+	
+    # 层类型
+    def print_nn_type(self):
+        print("NN Type: ", self.__nn_type)
+
+# 传入类
+def print_model(model):
+    # 打印类的 print_name()方法
+    model.print_name()
+	
+def main():
+    model = Model("DNN") # 父类 实例化对象 DNN
+    cnnmodel = CNNModel("CNN", 5)      # 子类 CNN 5层
+    rnnmodel = RNNModel("RNN", "LSTM") # 子类 RNN LSTM类型
+    
+    # 打印三个 对象的 打印模型 介绍函数
+    [print_model(m) for m in [model, cnnmodel, rnnmodel]]
+    
+    
+if __name__ == '__main__':
+    main()
+>  输出：
+DNN  # 名字
+CNN  # 名字 
+Layer Num: 5  # 层数
+RNN  # 名字
+NN Type: LSTM # 类型
+
+'''
+要点：
+1. 多态的设计就是要完成对于不同类型对象使用相同的方法调用能得到各自期望的输出
+2. 在数据封装，继承和多态中，多态是Python设计的核心，也叫鸭子类型
+'''
+```
+
+
+### 面向对象的重要特性总结
+	封装：只需知道我能做什么，不需要知道我怎么做的, 隐藏
+	继承：纵向复用，比如：每个技能树上的节点，都有类似的特征
+	多态：横向复用，比如：不同技能树上的节点，都有物理攻击和魔法伤害
+	
+	
+	Python的设计初衷是强调多态，也就是所谓的鸭子类型，明白了Python的设计初衷后，
+	我们编写的Python代码要在一定程度上避免以下三种情况（虽然写成这样也是可以的）：
+		1. C语言般的过程式编程；
+		2. C++或Java般的传统面向对象编程；
+		3. Lisp般的函数式编程；
+
+
+## Pythonic OOP
+> 
+```python
+
+
+```
+
+> 
+```python
+
+
+```
+
+
+> 
+```python
+
+
+```
+
+
+
+
+> 
+```python
+
+```
+
+
+
+
+
+> 
+```python
+
+```
+
+
+
+
+
+> 
+```python
+
+```
+
+
+
+
+
+
+```python
+
+```
+
+
+
+
+
+
+```python
+
+```
+
+
+
+
+
+
+
+```python
+
+```
+
+
+
+
+
+
+```python
+
+```
+
+
+
+
+
+
+```python
+
+```
+
+
 
 
 
