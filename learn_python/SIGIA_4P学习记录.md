@@ -2964,45 +2964,276 @@ class Z(Y, A):
 	赋能                 进化
 
 
+# 迭代器 Iterator
+	迭代器是一个对象
+	迭代器可以被 next() 函数调用，并返回一个值
+	迭代器可以被 iter() 函数调用，并返回迭代器⾃⼰
+	连续被 next() 调⽤时依次返回一系列的值
+	如果到了迭代的末尾，则抛出 StopIteration 异常
+	迭代器也可以没有末尾，只要被 next() 调用，就一定会返回一个值
+	Python中， next() 内置函数调用的是对象的 __next__() 方法
+	Python中， iter() 内置函数调用的是对象的 __iter__() 方法
+	一个实现了迭代器协议的的对象可以被 for 语句循环迭代直到终止
 
-> 
+> dorner next方法
 ```python
+class XIterator:
+    # dorner next方法===
+    def __next__(self):
+        return "Hello World"
+	
+def main():
+    x_it = XIterator()
+    #next() 会调用  dorner next方法
+    [print(next(x_it)) for i in range(3)]
+    
+if __name__ == "__main__":
+    main()
+    
+>>> 
+Hello World
+Hello World
+Hello World
 
+# 只要一个对象实现了 __next__() 方法，就可以被 next() 函数调用
 ```
 
 
 
 
 
-> 
+> dorner next方法
 ```python
+class XIterator:
+    # 类初始化
+    def __init__(self):
+        self.elements = list(range(5)) # 列表 0,1,2,3,4
+	
+    # dorner next方法
+    def __next__(self):
+        if self.elements:
+            return self.elements.pop() # 弹出元素
+	    
+def main():
+    x_it = XIterator()
+    [print(next(x_it)) for i in range(10)]
+    
+if __name__ == "__main__":
+    main()
+>>> 
+4 
+3 
+2 
+1 
+0
+None
+None
+None
+None
+None 
+# 此时由于没有实现 __iter__() ，若用 for 语句迭代，会报错
+```
+
+> dorner iter方法
+```python
+class XIterator:
+    def __init__(self):
+        self.elements = list(range(5))
+	
+    # 迭代方法
+    def __next__(self):
+        if self.elements:
+            return self.elements.pop()
+	    
+    # 返回 自己    
+    def __iter__(self):
+        return self
+	
+def main():
+    x_it = XIterator()
+    for x in x_it:
+        print(x) # 4 3 2 1 0 None ...
+	
+if __name__ == "__main__":
+    main()
+'''
+说明：
+实现了 __iter__() 和 __next__() 后便可以被 for 语句迭代了
+但此时程序⼀旦开始执⾏便不再停止， Why？
+'''
 
 ```
 
-> 
+
+> for 语句的内部实现
 ```python
 
+for element in iterable:
+    # do something with element
+    
+# create an iterator object from that iterable
+iter_obj = iter(iterable)
+
+# infinite loop
+while True:
+    try:
+        # get the next item
+        element = next(iter_obj)
+        # do something with element
+	
+    except StopIteration: # 直到 StopIteration才会结束!!!!!!
+        # if StopIteration is raised, break from loop
+        break
+'''
+说明：
+for 语句里用的是 iterable ，而不是 iterator
+for 语句执执行的第一个操作是从一个 iterable 生成一个 iterator
+for 语句的循环体其实是靠检测 StopIteration 异常来中断的
+要想被 for 语句迭代需要三个条件：
+       __iter__() 
+       __next__()
+       StopIteration   终止条件  主动抛出=====
+       
+如果我们可以从一个对象⾥获得一个迭代器（Iterator），那么这个对象就是可迭代对象
+（Iterable） 迭代器都是可迭代对象（因为实现了 __iter__() ），
+但可迭代对象不一定是迭代器.
+
+'''
 ```
 
 
-> 
-```python
 
+> __next__ 主动  抛出 raise  StopIteration 异常
+```python
+class XIterator:
+    def __init__(self):
+        self.elements = list(range(5)) # 列表元素
+	
+    # 迭代方法
+    def __next__(self):
+        if self.elements:
+            return self.elements.pop()
+	else:
+	    raise StopIteration # 主动 抛出 StopIteration 异常
+	    
+    # 返回 自己    
+    def __iter__(self):
+        return self
+	
+def main():
+    x_it = XIterator()
+    for x in x_it:
+        print(x) # 4 3 2 1 0
+	
+if __name__ == "__main__":
+    main()
 ```
 
 
+# 生成器 Generator
+迭代器协议很有用，但实现起来有些繁琐，没关系，生成器来帮你
+生成器在保持代码简洁优雅的同时，自动实现了迭代器协议
 
-> 
+> 实现生成器的方式1： yeild 表达式
 ```python
+
+# yield实现的 生成器函数 
+def f():
+    yield 1
+    yield 2
+    yield 3
+    # 相比 return 是退出， yeild 更像是暂停
+    # 暂停 继续 暂停 继续 ...
+    # 使用 yeild 语句可以自动实现迭代器协议
+    # 自动抛出 StopIteration 异常
+    
+def main1():
+    f_gen = f()
+    [print(next(f_gen)) for i in range(5)]
+
+def main2():
+    f_gen = f()
+    for x in f_gen:
+        print(x)
+	
+if __name__ == "__main__":
+    main1()
+    main2()
+```
+
+> 实现生成器的方式2： Generator 表达式 生成器表达式
+```python
+>>> [print(x) for x in (x ** 2 for x in range(5))]
+0
+1
+4
+9
+16
+[None, None, None, None, None]  # ???
+
+sum([x ** 2 for x in range(10000000)]) # 对一个list(很大) 求和, 会爆内存
+sum(x ** 2 for x in range(10000000))   # 生成器 传给了 sum，一个值一个值加和
+```
+
+## 为什么需要生成器  类似 动态规划 只保存 当前 的对象??
+	1. 相比迭代器协议，实现生成器的代码量小， 可读性更高
+	2. 相比在 List 中操作元素，直接使用生成器能节省大量内存
+	3. 有时候我们会需要写出一个方法在内存中存放的无限数据流
+	4. 你可以建立生成器管道（多个生成器链式调用）
+	
+> 生成成器表示全部的斐波那契数列
+```python
+def fibonacci():
+    temp = [1, 1]# 最开始的两个数
+    while True:
+        temp.append(sum(temp))# 加入前面的和
+        yield temp.pop(0)# 弹出第一个数，保证只保留最近的两个数
+```
+
+> 通过生成器管道模块化处理数据
+```python
+# 生成器1
+def fibonacci():
+    temp = [1, 1]# 最开始的两个数
+    while True:
+        temp.append(sum(temp))# 加入前面的和
+        yield temp.pop(0)# 弹出第一个数，保证只保留最近的两个数
+	
+# 数据流 
+# 生成器2
+def dataflow():
+    for x in fibonacci():
+        yield x ** 2 # 对斐波那契数列的数 求平方
+	
+	
+if __name__ == "__main__":
+    for x in dataflow(): # 生成了 两个生成器，单个数单个数进行处理====
+        print(x)
+        if x > 100000:   # 超过一定值后退出 
+            break
+
 
 ```
 
+## 总结：关于Python中的迭代思维
+	Python中有两类运算：
+		1. 可以并行的 矢量化的运算：      Numpy
+		2. 必须一个个的操作的迭代式运算： Generator 生成器
+
+	Python中有两类数据：
+		1. 内存中放得下的：数据量较⼩的数据
+		2. 内存中放不下的：数据量较⼤或者⽆穷⼤的数据
+
+	Python中有两种思维：
+		1. Eager：着急派，需要的话，必须 全都准备好.
+		2. Lazy： 懒惰派， “哎，干嘛那么着急，需要的时候再说呗”.
+
+	Python中 处处是 迭代器，缺的是发现迭代器的眼睛.
 
 
-> 
-```python
 
 ```
+
 
 
 
