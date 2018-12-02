@@ -2513,15 +2513,160 @@ NN Type: LSTM # 类型
 
 
 ## Pythonic OOP
-> 
-```python
+### 关于双下划线
+	怎么读
+	_name ：     single underscore name
+	__name ：    double underscore name
+	__name__ ：  dunder name     (double  ender ---> dunder)
+	__init__() : dunder init method（function）
+### 双下划线开头和结尾的变量或方法叫什么
+	类别： special； magic； dunder
+	实体： attribute(属性/变量)； method(方法/函数)
+	
+### 如何认识Python的special method（官档）
 
+	special method： method with special name（dunder）
+	Why use it?： A class can implement certain operations
+	              that are invoked by special syntax
+	original intention of design： operator overloading
+	
+	Allowing classes to define their own behavior with 
+	     respect to language operators.
+
+ 尽可能的保证Python行为的一致性（Special Method 更像是一种协议）
+ 
+	一切都是对象
+		Python中的数据模型是 Objects
+		Python程序中所有数据都是用 objects 或者 objects 之间的关系表示的
+		甚至 Python代码都是 objects
+
+	Objects 的组成:
+	  1. identity （标识，身份证号码） 
+	     当 objects 创建后，identity再也不会改变直到被销毁。
+	     
+	     a = 1.0
+	     print(id(a))
+	     b = 1.0
+	     print(id(b))  # 和上面一致
+	     
+	     要点：
+	       1. 变量存的是创建的 object 的identity
+	       2. 创建出来的不同的 object 有不同的identity
+	       3. 变量的id变了不是因为 object 的identity变了，⽽是对应的 object 变了
+	       4. 对于immutable object，计算结果如果已经存在可直接返回相同的identity
+                      immutable object，不可变对象
+		      
+	  2. type  (类型)
+	  
+	     a = 1.0
+	     print(type(a))
+		
+	     当 objects 创建后，其type也是不会改变的
+	     type() 函数返回一个 Object 的type
+	     type决定了一个 object 支持哪些运算，可能的值在什么范围内
+
+          3. value (值)
+	     有些 Objects 的value是可以改变的： 可变对象 mutable object.
+	     有些 Objects 的value是不能改变的： 不可变对象 immutable object.
+	     需要注意当一个 Object 是个 container 的情况.
+	     一个 Object 的type决定了它是否mutable.
+	     
+	     当我们聚焦于Container的values时，我们关注的是value.
+	     当我们聚焦于Container的mutability时，关注的是identity.
+
+
+> Special Method and Attribute __ 双下划綫 的函数和变量
+
+	每一个class在定义的时候如果没有继承，都会隐式继承 object 这个superclass(超类)
+	每一个⾃定义的class在Python中都是⼀个type object
+
+```python
+# 父类
+class X:
+    pass
+    
+# 子类    
+class Y(X):
+    pass
+    
+def main():
+    x = X() # 实例化一个X 对象
+    y = Y() # 实例化一个Y 对象
+    print(x.__class__.__name__) # 打印 实例化该 对象 的 类的名字  X
+    print(y.__class__.__name__) # Y
+    
+    print(X.__class__.__name__) # 实例化 类 X 的 类名字为 type
+    print(Y.__class__.__name__) # type
+    print(x.__class__.__base__.__name__) # 对象x 的类X 的基类的名字 object
+    print(y.__class__.__base__.__name__) # 对象y 的类Y 的基类的名字 X
+    print(X.__class__.__base__.__name__) # 类X 的 类type 的继承来源  object
+    print(Y.__class__.__base__.__name__) #  object
+    
+if __name__ == "__main__":
+    main()
+
+'''
+要点：
+1. object.__class__  # 该对象的原型 类
+2. class.__name__    # 类 的 名字
+3. class.__base__    # 类 的 父亲类，继承来源 
+4. 注意：链式执行
+'''
 
 ```
 
-> 
+> __ 方法
 ```python
 
+class X:
+    pass
+    
+class Y:
+    # 类帮助文档  __doc__
+    """Class Y"""
+    
+    # 类似 运算符、函数运算 重载================
+    
+    # print(类) 打印的函数=== 
+    def __str__(self):
+        return "{} object".format(self.__class__.__name__)
+	
+    # len(类) 执行的函数
+    def __len__(self):
+        return 10
+    
+    # 逻辑操作，执行函数  donder bool
+    def __bool__(self):
+        return False
+	
+def check_bool(x):
+    if x:
+        print("I'm {}. My bool value is True.".format(str(x)))
+    else:
+        print("I'm {}. My bool value is False.".format(str(x)))
+	
+def main():
+    x = X() # 实例  () 需要 和c++不同
+    y = Y()
+    print(x)
+    print(y)
+    # print(len(x))
+    print(len(y))
+    check_bool(x) # 类实例化对象 默认为 true
+    check_bool(y)
+    print(X.__doc__) # 无 帮助文档 None
+    print(Y.__doc__) # 有帮助文档
+    
+if __name__ == "__main__":
+    main()
+
+'''
+要点：
+1. 之所以要实现special method，是为了让⾃定义的class与Python的内置函数⽆缝衔接
+2. Python有⼤量的内置函数，⽽这些函数⼤部分都是调⽤的对象⾥的special method
+3. 想查看Python中到底有多少 special method：
+
+'''
 
 ```
 
