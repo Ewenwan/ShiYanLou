@@ -1749,7 +1749,7 @@ class DecorateToolBox:
 
     # 类默认的装饰器，可以避免类的实例化，也就是不需要 类的构造函数 __init__
     # 就可以直接调用 类的 一个方法
-    @classmethod
+    @classmethod # 内置装饰器
     def decorate(self, func):
         func.__doc__ += '\nDecorated by decorate.'
         return func
@@ -1973,27 +1973,30 @@ running f3.
 	我们可以强行对输入参数进行特殊限制：
 
 ```python
+# 装饰器，检测函数输入参数，必须全部为整数
 def require_ints(func):
     def temp_func(*args):
         if not all([isinstance(arg, int) for arg in args]):
-            raise TypeError("{} only accepts integers as argument
-s.".format(func.__name__))
+            raise TypeError("{} only accepts integers as arguments.".format(func.__name__))
         return func(*args)
     return temp_func
     
+# 普通+    
 def add(x,y):
     return x + y
-    
+
+# 使用装饰器
 @require_ints
 def require_ints_add(x,y):
     return x + y
     
 if __name__ == '__main__':
-    print(add(1.0, 2.0))
+    print(add(1.0, 2.0))# 正常
     print(require_ints_add(1.0, 2.0))
 
 # 运行结果如下：
 报错
+3.0
 TypeError: require_ints_add only accepts integers as arguments.
 
 
@@ -2004,15 +2007,21 @@ TypeError: require_ints_add only accepts integers as arguments.
 	
 ```python
 import json
+
+# 装饰器
 def json_output(func):
     def temp_func(*args, **kw):
         result = func(*args, **kw)
+	# 使用 json dump解析后返回 json字符串
         return json.dumps(result)
+    # 返回一个新的函数
     return temp_func
-    
+
+# 返回字典的一个函数
 def generate_a_dict(x):
     return {str(i): i**2 for i in range(x)}
-    
+
+# 使用装饰器，返回变成json结构
 @json_output
 def generate_a_dict_json_output(x):
     return {str(i): i**2 for i in range(x)}
@@ -2023,8 +2032,8 @@ if __name__ == '__main__':
     print(b, type(b))
     
 # 运行结果如下：
-{'0': 0, '1': 1, '2': 4, '3': 9, '4': 16} <class 'dict'>
-{"0": 0, "1": 1, "2": 4, "3": 9, "4": 16} <class 'str'>
+{'0': 0, '1': 1, '2': 4, '3': 9, '4': 16} <class 'dict'> # dict key是 '' 单引号
+{"0": 0, "1": 1, "2": 4, "3": 9, "4": 16} <class 'str'>  # json 字符串是 ""
 
 ```
 
