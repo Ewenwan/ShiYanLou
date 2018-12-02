@@ -2671,12 +2671,297 @@ if __name__ == "__main__":
 ```
 
 
+> 类 属性  Attribute
+```python
+class X:
+    pass
+    
+if __name__ == "__main__":
+    # print(X.a)
+    X.a = "a" # 不用实例化，就可使随便绑定 变量
+    print(X.a)  # a
+    X.a = "aa"
+    print(X.a)  # aa
+    del X.a
+    # print(X.a)# 出错
+'''
+说明：
+1. 默认情况下， CRUD都⽀持，⽽且是在public情况下都⽀持（除了双下划线开头的）
+2. 如果对象中没有这个Attribute，访问时会报错
+'''
+
+```
+
+
+> Property（长得像 Attribute 的Method）（推荐使用）
+
+	Property的设计初衷：
+	代码复用
+	延迟计算
+	更加规范的对象属性访问管理
+	场景：我要减肥，需要监控BMI指标，但是只能测量体重，每天更新体重，隔几天看一次BMI指数
+
+```python
+class X:
+    def __init__(self, w, h):
+        self.w = w
+        self.h = h
+        self.BMI = w / h ** 2 # 体重/身高的平方
+	
+def main():
+    x = X(75, 1.83)
+    print(x.BMI) # 22.395413419331717
+    x.w = 74
+    x.w = 73
+    x.w = 72 # 体重慢慢降低===
+             # 
+    print(x.BMI) # 22.395413419331717  BMI只在初始化 __inin__ 时计算一次
+    
+if __name__ == "__main__":
+    main()
+
+```
+
+
+
 > 
 ```python
 
+class X:
+    def __init__(self, w, h):
+        self.__w = w
+        self.__h = h
+        self.BMI = w / h ** 2
+	
+    # 更新体重w时，需要更新 BMI指数
+    def update_w(self, w):
+        self.__w = w       # 更新体重w
+        self._update_bmi() # 更新 BMI指数
+	
+    def _update_bmi(self):
+        self.BMI = self.__w / self.__h ** 2
+	
+def main():
+    x = X(75, 1.83)
+    print(x.BMI)
+    x.update_w(74)# 更新体重w时，也更新 BMI指数
+    x.update_w(73)
+    x.update_w(72)
+    print(x.BMI)
+    
+if __name__ == "__main__":
+    main()
+'''
+分析：
+1. w变为私有，更新需要通过对象方法类执行，并将BMI的更新放于其中，实现功能逻辑
+2. BMI属性依旧可以被外部访问和修改
+3. 与w相关的代码全部被更改
+4. 无论BMI属性是否被访问，每次w更新均会更新BMI，造成一定的计算资源浪费
+'''
+```
+
+
+> 改进二 
+```python
+class X:
+
+    def __init__(self, w, h):
+        self.w = w
+        self.h = h
+	
+    # 需要获取  bmi是 才更新BMI
+    def get_bmi(self):
+        return self.w / self.h ** 2
+	
+def main():
+    x = X(75, 1.83)
+    print(x.get_bmi())
+    x.w = 74
+    x.w = 73
+    x.w = 72
+    print(x.get_bmi()) # 需要获取  bmi是 才更新BMI
+    
+if __name__ == "__main__":
+    main()
+    
+'''
+分析：
+1. 保持w和h属性可以随意更改， bmi指数仅在被访问时实时计算出结果.
+2. 访问BMI的方式由 属性 改为方法，造成一定程度上的代码修改.
+3. 在w更新频率高于BMI访问频率时，节省了计算资源.
+4. 当w未更新，却多次调⽤BMI指数时，造成了重复计算.
+'''
+    
+```
+
+
+> 改进三：
+```python
+
+class X:
+
+    def __init__(self, w, h):
+        self._w = w
+        self._h = h
+        self._bmi = w / h ** 2
+	
+    def get_w(self):
+        return self._w
+    
+    # 设置类内参数
+    def set_w(self, value):
+        if value <= 0:
+            raise ValueError("Weight below 0 is not possible.")
+        self._w = value
+        self._bmi = self._w / self._h ** 2
+    
+    def get_bmi(self):
+        return self._bmi
+    
+    # 重点============ property======需要放在后面=====
+    # 通过 接口函数 修改 类内参数
+    # 实例化 一个 property对象，有两个方法
+    w = property(get_w, set_w)
+    # 实例化 一个 property对象， 有一个获取方法
+    BMI = property(get_bmi)
+    
+'''
+说明：
+1. 从改进三中我们发现，传给Property对象的其实是函数名，那么最优雅的⽅式当属Decorator(装饰器)了
+property(fget=None, fset=None, fdel=None, doc=None)
+'''
+
+def main():
+    x = X(75, 1.83)
+    print(x.BMI) # 这里的BMI 是 一个 property对象，只有 获取 权限
+    x.w = 74     # 这里的w是 property对象，调用的是 set_w()方法，会更新BMI
+    x.w = 73 
+    x.w = 72
+    print(x.BMI) # 获取 BMI 的值
+    
+if __name__ == "__main__":
+    main()
+
+'''
+分析:
+1. Property对象显式的控制属性的访问.
+2. w被更改的时候更新BMI，充分避免了重复计算.
+3. 很容易的增加了异常处理，对更新属性进行预检验.
+4. 完美复用原始调用代码，在调用方不知情的情况完成功能添加.
+'''
 
 ```
 
+
+> 改进四： 使用 @property 进行装饰
+```python
+
+class X:
+
+    def __init__(self, w, h):
+        self._w = w
+        self._h = h
+        self._bmi = w / h ** 2
+	
+    # 使用 property 进行装饰======
+    # 这里 扩展访问 方法
+    @property
+    def w(self):
+        return self._w
+	
+    # 使用 w.setter 对w的设置进行封装,对w的 赋值函数=====
+    @w.setter
+    def w(self, value):
+        if value <= 0:
+            raise ValueError("Weight below 0 is not possible.")
+        self._w = value
+	
+        self._bmi = self._w / self._h ** 2
+    
+    # 获取BMI 的装饰器=====
+    @property
+    def BMI(self):
+        return self._bmi
+	
+def main():
+    x = X(75, 1.83)
+    print(x.BMI) # 获取BMI的值
+    x.w = 74     # 对w进行设置，赋值
+    x.w = 73
+    x.w = 72
+    print(x.BMI)
+    
+if __name__ == "__main__":
+    main()
+    
+
+'''
+说明：
+1. 从改进三中我们发现，传给Property对象的其实是函数名，那么最优雅的方式当属Decorator(装饰器)了
+property(fget=None, fset=None, fdel=None, doc=None)
+使用 @Property 默认实现了 可读
+被   @Property 装饰过的 method 可以通过 @method.setter 继续装饰单输入参数方法实现可写
+'''
+```
+
+
+## Cross-Cutting and Duck Typing 交叉 鸭子类型
+### 单继承 vs 多态
+	单继承 保证了 纵向的   复用 和 一致性
+	多态   保证了 跨类型的 复用 和 一致性
+	
+### 传统OOP vs 鸭子类型
+	传统OOP基于类别进行设计，从 类别 出发 逐步扩展
+	鸭子类型仅 考虑功能，从需要满足的功能 出发 进行设计
+	
+### 传统OOP的多态 vs 鸭值类型的多态
+	传统OOP中的多态大多基于共同的基类进行设计
+	Python中的 鸭子类型 无需考虑继承关系，
+	实现了某个通用的接口就可以完成 多态设计（Special Method）
+
+
+> 
+```python
+
+class X:
+    def f1():
+        pass
+	
+class Y(X):
+    # 有f1() 和 f2()两个方法
+    def f2():
+        pass
+	
+class A:
+    def f3():
+        pass
+	
+def do_f1(x):
+    x.f1()
+def do_f2(x):
+    x.f2()
+    
+def do_f3(x):
+    x.f3()
+
+# 多重继承  MixIn  赋能 进化 转基因 基因编程
+class Z(Y, A):
+    # 有f1() 、 f2()、f3() 三个方法
+    pass
+    
+```
+## 总结
+	1. 通过给一个类实现一个个的Special Method，
+	   你就让这个类越来越像Python的Built-in Class
+	2. 实现Special Method是从语⾔衔接层面为你的Class赋能   __method__
+	3. 实现Decorator是从通⽤的函数功能层面为你的Class赋能  @装饰器
+	4. 通过Multi-Inheritance，利用MixIn的理念，
+	   你可以为你的Class批量化的赋能  多重继承
+
+## Python语⾔设计的三个关键词（其实是一件事的三个不同视角）
+	Duck Typing  鸭子类型 功能 --> 类
+	Consistency          一致性
+	赋能                 进化
 
 
 
@@ -2694,7 +2979,16 @@ if __name__ == "__main__":
 
 ```
 
+> 
+```python
 
+```
+
+
+> 
+```python
+
+```
 
 
 
@@ -2705,51 +2999,10 @@ if __name__ == "__main__":
 
 
 
-
-
-
+> 
 ```python
 
 ```
-
-
-
-
-
-
-```python
-
-```
-
-
-
-
-
-
-
-```python
-
-```
-
-
-
-
-
-
-```python
-
-```
-
-
-
-
-
-
-```python
-
-```
-
-
 
 
 
