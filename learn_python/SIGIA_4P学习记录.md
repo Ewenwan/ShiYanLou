@@ -3232,8 +3232,450 @@ if __name__ == "__main__":
 
 
 
+ 
+
+
+
+# 异常处理
+
+
+	什么是异常？
+	   错误：比如代码语法有问题，程序无法启动；比如试图在除法中除以0
+	   小概率事件：比如图像识别API遇到了图像尺寸为2x2的图像
+	   
+	为什么程序会出现异常？
+	    程序的某一部分不由程序编写者控制（使用别人的数据；数据等待外部输入；
+	                                  程序运行环境一致性问题）
+	    程序编写者难以考虑到全部情况并预先提供处理方式
+	    
+	通常如何处理？
+	    条件语句： if/else
+	    异常处理： try/except/else/finally
+	    
+	Python中的异常及相关语法
+	    Exception ： Python内置的 异常类
+	    raise ：     抛出异常
+	    try ：       尝试运行以下语句
+	    except ：    在 try 语句之后，捕获某个异常，
+	                  为空则捕获全部异常（很危险，难以debug）
+	    else ：在 try 语句之后，如果没有捕获到异常，则执行
+	    finally ：在 try 语句之后，无论是否捕获到异常，均执行
+	    
+	    
+
+> 案例：主动抛出异常
+```python
+>>> raise Exception
+>>> raise Exception("Hello, I'm Exception.")
 ```
 
+> 案例：被动遇到异常
+>>> 1 / 0
+ZeroDivisionError: division by zero
+
+> 案例：异常处理语句 - 未遇到异常
+
+```python
+try:
+    print("Enter try.")  # 尝试运行
+except:
+    print("Enter except.") # 如果出错，则运行
+else:
+    print("Enter else.")   # 正常执行，则运行
+finally:
+    print("Enter finally.")# 都执行
+    
+>>>
+Enter try.
+Enter else.
+Enter finally.
+
+```
+
+
+> 案例：异常处理语句 - 捕获全部异常
+```python
+try:
+    print("Enter try.")
+    1 / 0 # 除0异常
+except: # 直接接:  捕获全部异常
+    print("Enter except.") # 执行异常错误后的 分支
+else:
+    print("Enter else.")   # 不执行
+finally:
+    print("Enter finally.")# 都执行
+```
+
+> 案例：异常处理语句 - 捕获指定异常
+```python
+try:
+    print("Enter try.")
+    1 / 0
+except ZeroDivisionError:# 除0异常
+    print("Enter except ZeroDivisionError.") # 执行
+except ArithmeticError:  #  算术误差 异常
+    print("Enter except ArithmeticError.")
+except: # 其他异常
+    print("Enter except.")
+else:
+    print("Enter else.")
+finally:
+    print("Enter finally.")
+
+
+```
+
+> 案例：异常处理语句 - 捕获异常后仍抛出
+```python
+MODE = "DEBUG" # 调试模式
+try:
+    print("Enter try.")
+    1 / 0
+except:
+    print("Enter except.") # 除0异常
+    if MODE == "DEBUG":
+        raise # 发现异常，抛出异常，终止程序
+    else:
+        print("Enter else.")
+finally:
+    print("Enter finally.")
+
+
+```
+
+
+> 案例：异常处理语句 - 捕获异常后显示异常信息但不抛出异常
+```python
+MODE = "WARN"
+try:
+    print("Enter try.")
+    1 / 0
+except Exception as e:
+    print("Enter except.")# 打印
+    if MODE == "DEBUG":
+        raise
+    elif MODE == "WARN":# 进入这个分支
+        print(e)# 打印异常信息，不抛出信息，程序不会结束
+else:
+    print("Enter else.")
+finally:
+    print("Enter finally.")
+
+
+```
+
+
+> 案例：异常语句与循环的连⽤
+```python
+
+MODE = "WARN"
+
+def main():
+    while True:
+        try:
+            print("Please input your Python 3 Expression.")
+            exp = input() # 输入 python3 表达式
+            print("The result of your expression is", eval(exp))
+	    # eval 执行表达式
+        except Exception as e:
+            if MODE == "DEBUG":
+                raise # 直接抛出异常，结束程序
+            elif MODE == "WARN":
+                print(e) # 打印错误信息，程序不结束
+            elif MODE == "STABLE":
+	        # 给用户看到，重新输入信息
+                print("Something wrong, please input again.")
+        else:
+	    # 输入正确，直接结束 while 循环
+            break
+if __name__ == "__main__":
+    main()
+
+```
+
+
+
+> 异常的传播
+```python
+
+def f1():
+    try:
+        return 1 / 0 # 除0异常
+    except Exception as e:
+        print("This is f1.") # 报错===
+        print(e)             # 打印异常
+	
+def f2():
+    try:
+        f1()
+    except Exception as e:
+        print("This is f2.")
+        print(e)
+	
+def f3():
+    try:
+        f2()
+    except Exception as e:
+        print("This is f3.")
+        print(e)
+	
+def main():
+    try:
+        f3()
+    except Exception as e:
+        print("This is main.")
+        print(e)
+	
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        print("This is __main__.")
+        print(e)
+	
+>>> 输出
+This is f1.
+division by zero
+	
+```
+
+
+
+> raise 抛出异常 异常传播
+```python
+def f1():
+    try:
+        return 1 / 0 # 除0异常
+    except Exception as e:
+        print("This is f1.") # 报错===
+        print(e)             # 打印异常
+	raise                # 抛出异常，会被下一级 捕获
+	
+def f2():
+    try:
+        f1()
+    except Exception as e:
+        print("This is f2.")
+        print(e)
+	
+def f3():
+    try:
+        f2()
+    except Exception as e:
+        print("This is f3.")
+        print(e)
+	
+def main():
+    try:
+        f3()
+    except Exception as e:
+        print("This is main.")
+        print(e)
+	
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        print("This is __main__.")
+        print(e)
+	
+>>> 
+This is f1.
+division by zero
+This is f2.
+division by zero
+
+```
+
+
+
+> 
+```python
+def f1():
+    try:
+        return 1 / 0 # 除0异常
+    except Exception as e:
+        print("This is f1.") # 报错===
+        print(e)             # 打印异常
+	raise                # 抛出异常，会被下一级 捕获
+	
+def f2():
+    try:
+        f1()
+    except Exception as e:
+        print("This is f2.")
+        print(e)
+	raise                # 抛出异常，会被下一级 捕获
+	
+def f3():
+    try:
+        f2()
+    except Exception as e:
+        print("This is f3.")
+        print(e)
+	raise                # 抛出异常，会被下一级 捕获
+	
+def main():
+    try:
+        f3()
+    except Exception as e:
+        print("This is main.")
+        print(e)
+	raise                # 抛出异常，会被下一级 捕获
+	
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        print("This is __main__.")
+        print(e)
+>>> 
+This is f1.
+division by zero
+This is f2.
+division by zero
+This is f3.
+division by zero
+This is main.
+division by zero
+This is __main__.
+division by zero
+	
+```
+
+
+
+> 程序崩溃===未拦截到
+```python
+def f1():
+    try:
+        return 1 / 0 # 除0异常
+    except Exception as e:
+        print("This is f1.") # 报错===
+        print(e)             # 打印异常
+	raise                # 抛出异常，会被下一级 捕获
+	
+def f2():
+    try:
+        f1()
+    except Exception as e:
+        print("This is f2.")
+        print(e)
+	raise                # 抛出异常，会被下一级 捕获
+	
+def f3():
+    try:
+        f2()
+    except Exception as e:
+        print("This is f3.")
+        print(e)
+	raise                # 抛出异常，会被下一级 捕获
+	
+def main():
+    try:
+        f3()
+    except Exception as e:
+        print("This is main.")
+        print(e)
+	raise                # 抛出异常，会被下一级 捕获
+	
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        print("This is __main__.")
+        print(e)
+	raise                # 抛出异常，会被下一级 捕获，释放小偷
+
+>>>
+This is f1.
+division by zero
+This is f2.
+division by zero
+This is f3.
+division by zero
+This is main.
+division by zero
+This is __main__.
+division by zero
+Traceback (most recent call last):
+File "Exception-2.py", line 35, in <module>  # 模块级别
+main()
+File "Exception-2.py", line 27, in main
+f3()
+File "Exception-2.py", line 19, in f3
+f2()
+File "Exception-2.py", line 11, in f2
+f1()
+File "Exception-2.py", line 3, in f1
+return 1 / 0
+ZeroDivisionError: division by zero  # 除0错误
+```
+
+
+## python 内置异常
+	异常名称               描述
+	BaseException     所有异常的基类
+	SystemExit	  解释器请求退出
+	KeyboardInterrupt 用户中断执行(通常是输入^C)
+	Exception         常规错误的基类
+	StopIteration     迭代器没有更多的值
+	GeneratorExit     生成器(generator)发生异常来通知退出
+	SystemExit        Python 解释器请求退出
+	StandardError     所有的内建标准异常的基类
+	ArithmeticError   所有数值计算错误的基类
+	FloatingPointError浮点计算错误
+	OverflowError     数值运算超出最大限制
+	ZeroDivisionError 除(或取模)零 (所有数据类型)
+	AssertionError    断言语句失败
+	AttributeError    对象没有这个属性
+	EOFError          没有内建输入,到达EOF 标记
+	EnvironmentError  操作系统错误的基类
+	IOError           输入/输出操作失败
+	OSError           操作系统错误
+	WindowsError      系统调用失败
+	ImportError       导入模块/对象失败
+	KeyboardInterrupt 用户中断执行(通常是输入^C)
+	LookupError       无效数据查询的基类
+	IndexError        序列中没有没有此索引(index)
+	KeyError          映射中没有这个键
+	MemoryError       内存溢出错误(对于Python 解释器不是致命的)
+	NameError         未声明/初始化对象 (没有属性)
+	UnboundLocalError 访问未初始化的本地变量
+	ReferenceError    弱引用(Weak reference)试图访问已经垃圾回收了的对象
+	RuntimeError      一般的运行时错误
+	NotImplementedError 尚未实现的方法
+	SyntaxError       Python 语法错误
+	IndentationError  缩进错误
+	TabError          Tab 和空格混用
+	SystemError       一般的解释器系统错误
+	TypeError         对类型无效的操作
+	ValueError        传入无效的参数
+	UnicodeError      Unicode 相关的错误
+	UnicodeDecodeError Unicode 解码时的错误
+	UnicodeEncodeError Unicode 编码时错误
+	UnicodeTranslateError Unicode 转换时错误
+	Warning            警告的基类
+	DeprecationWarning 关于被弃用的特征的警告
+	FutureWarning      关于构造将来语义会有改变的警告
+	OverflowWarning    旧的关于自动提升为长整型(long)的警告
+	PendingDeprecationWarning 关于特性将会被废弃的警告
+	RuntimeWarning            可疑的运行时行为(runtime behavior)的警告
+	SyntaxWarning             可疑的语法的警告
+	UserWarning               用户代码生成的警告
+
+
+# 上下文管理器
+> 
+```python
+
+```
+
+
+> 
+```python
+
+```
 
 
 
