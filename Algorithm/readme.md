@@ -53,7 +53,7 @@
 
 [博客c++ 技术](https://blog.csdn.net/gavin0123/article/list/3?t=1)
 
-
+[蓝桥杯竞赛练习题的题解](https://github.com/Ewenwan/Lanqiao)
 
 [常用算法的 C++ 实现](https://github.com/Ewenwan/Algorithms)
 
