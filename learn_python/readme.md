@@ -12,6 +12,9 @@
 
 [HackerRank刷题之路---Python](http://www.cnblogs.com/dn-harris/p/6048255.html?utm_source=itdadao&utm_medium=referral)
 
+
+[python 学习线性代数](https://github.com/Ewenwan/Play-with-Linear-Algebra)
+
 # window python 开发环境
 ## 1. anaconda
 [下载](https://www.anaconda.com/download/)
