@@ -13,6 +13,9 @@
     cookie 笔试面经
 ](https://github.com/imhuay/Algorithm_Interview_Notes-Chinese)
 
+
+[动画的形式呈现解LeetCode解题思路](https://github.com/Ewenwan/LeetCodeAnimation)
+
 [《算法导论》第三版 C++泛型实现 ](https://github.com/Ewenwan/CLRS-1)
 
 [算法导论网易公开课](http://open.163.com/movie/2010/12/G/F/M6UTT5U0I_M6V2T1JGF.html)
