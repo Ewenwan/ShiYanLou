@@ -1,4 +1,7 @@
-# 各种 算法 数学建模算法 群体智能算法  数据结构：数组 字符串 链表 树 图 桶 森林 
+# 各种 算法 数学建模算法 群体智能算法 数组 字符串 链表 树 图 桶 森林 
+
+[算法与数据结构 - 课程官方代码仓 !!!!!!! 推荐](https://github.com/Ewenwan/Play-with-Algorithms)
+
 [Uri Zwick's home page 算法大师](http://www.cs.tau.ac.il/~zwick/)
 
 
@@ -12,6 +15,9 @@
     strawberry 编程语言
     cookie 笔试面经
 ](https://github.com/imhuay/Algorithm_Interview_Notes-Chinese)
+
+
+[python 学习线性代数](https://github.com/Ewenwan/Play-with-Linear-Algebra)
 
 
 [动画的形式呈现解LeetCode解题思路](https://github.com/Ewenwan/LeetCodeAnimation)
