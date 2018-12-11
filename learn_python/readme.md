@@ -17,6 +17,8 @@
 
 [SWIG实现python对c++封装](http://www.cppblog.com/wanghaiguang/archive/2016/08/18/214201.html)
 
+[TensorFlow技术内幕（四）：TF中的混合编程](https://blog.csdn.net/gaofeipaopaotang/article/details/80540721)
+
 # window python 开发环境
 ## 1. anaconda
 [下载](https://www.anaconda.com/download/)
