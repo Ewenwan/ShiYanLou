@@ -15,6 +15,8 @@
 
 [python 学习线性代数](https://github.com/Ewenwan/Play-with-Linear-Algebra)
 
+[SWIG实现python对c++封装](http://www.cppblog.com/wanghaiguang/archive/2016/08/18/214201.html)
+
 # window python 开发环境
 ## 1. anaconda
 [下载](https://www.anaconda.com/download/)
