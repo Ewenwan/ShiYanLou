@@ -1,7 +1,9 @@
 # 树莓派应用
+
+[C/C++ Library for Raspberry Pi. ](https://github.com/Ewenwan/raspberryX)
+
+
 # 1. 无屏幕和键盘配置树莓派WiFi和SSH，连接wifi后，支持远程登录
-
-
 
 ## a. WiFi 网络配置
     用户可以在未启动树莓派的状态下单独修改 /boot/wpa_supplicant.conf 文件配置 WiFi 的 SSID 和密码，
