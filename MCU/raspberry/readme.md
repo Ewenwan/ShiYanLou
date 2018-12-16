@@ -2,6 +2,7 @@
 
 [C/C++ Library for Raspberry Pi. ](https://github.com/Ewenwan/raspberryX)
 
+[树莓派(Raspberry Pi )资源大全中文版 , 包括工具、项目、镜像、资源等](https://github.com/Ewenwan/awesome-raspberry-pi-zh)
 
 # 1. 无屏幕和键盘配置树莓派WiFi和SSH，连接wifi后，支持远程登录
 
