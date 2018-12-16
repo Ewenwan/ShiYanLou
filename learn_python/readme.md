@@ -12,12 +12,13 @@
 
 [HackerRank刷题之路---Python](http://www.cnblogs.com/dn-harris/p/6048255.html?utm_source=itdadao&utm_medium=referral)
 
-
 [python 学习线性代数](https://github.com/Ewenwan/Play-with-Linear-Algebra)
 
 [SWIG实现python对c++封装](http://www.cppblog.com/wanghaiguang/archive/2016/08/18/214201.html)
 
 [TensorFlow技术内幕（四）：TF中的混合编程](https://blog.csdn.net/gaofeipaopaotang/article/details/80540721)
+
+[Python在教育方面的资源列表](https://github.com/Ewenwan/awesome-python-in-education-zh)
 
 # window python 开发环境
 ## 1. anaconda
