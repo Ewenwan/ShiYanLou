@@ -1,3 +1,16 @@
+# 摘要
+    树莓派(Raspberry Pi)是一种小型的单片机计算机；
+    它可以通过其引脚和接口与外部硬件通信。
+    Pi(树莓派的简称)展示了我们可以如何分解大型的Realbox机器，
+    使Dynamicland成为许多计算机、传感器和执行器的生态系统，而不是服务器上的软件。
+    “......Pi之于Dynamicland正如USB接口之于笔记本电脑：这就是我将东西插入Dynamicland的方式。”
+    使用Realtalk来打开/关闭Pi上LED的最小示例。
+    解释Realtalk的“反应数据库”(reactive database)编程模型; 
+    它如何使动感桌(dynamic table)中的Pi编程变得异常简单。
+    Pi的编程与Dynamicland中的任何其他编程没什么区别。
+    通过向Pi发送完整程序来进行远程控制，而不是用一些动力不足的控制语言与之通信。
+    关于Pi如何在未来发挥作用的猜想。
+
 # 树莓派应用
 
 [C/C++ Library for Raspberry Pi. ](https://github.com/Ewenwan/raspberryX)
