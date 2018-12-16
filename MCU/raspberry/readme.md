@@ -17,6 +17,8 @@
 
 [树莓派(Raspberry Pi )资源大全中文版 , 包括工具、项目、镜像、资源等](https://github.com/Ewenwan/awesome-raspberry-pi-zh)
 
+[基于树莓派的 免费数字标牌软件 Screenly OSE](https://github.com/Ewenwan/screenly-ose)
+
 # 1. 无屏幕和键盘配置树莓派WiFi和SSH，连接wifi后，支持远程登录
 
 ## a. WiFi 网络配置
