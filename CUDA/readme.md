@@ -7,6 +7,8 @@
 
 [The CMake version of cuda_by_example ](https://github.com/Ewenwan/cuda_by_example)
 
+[CUDA Program：CUDA image rgb to gray；CUDA KLT](https://github.com/canteen-man/CUDA-Program)
+
 # 1、hello wold
 ```c
 // 输出hello world
