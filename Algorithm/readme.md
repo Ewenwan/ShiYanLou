@@ -4,6 +4,7 @@
 
 [Uri Zwick's home page 算法大师](http://www.cs.tau.ac.il/~zwick/)
 
+[常用算法 排序 哈希 树 队列... 类封装](https://github.com/Ewenwan/Algorithms-1)
 
 [算法/深度学习/NLP面试笔记 
     soccer 机器学习
