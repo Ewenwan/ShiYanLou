@@ -73,6 +73,8 @@
 
 [编译技术 西电](http://www.xuetangx.com/courses/course-v1:XIYOU+20180208+sp/about)
 
+[在线书籍编写模板 gitbook](https://github.com/Ewenwan/gitbook)
+
 # 包含内容：
 		1. c
 
