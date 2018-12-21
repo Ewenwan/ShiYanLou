@@ -4,6 +4,9 @@
 
 [uCore OS实验指导书和源码网址 (2017)](https://chyyuu.gitbooks.io/ucore_os_docs/content/)
 
+[How-to-Make-a-Computer-Operating-System 各章节代码](https://github.com/Ewenwan/How-to-Make-a-Computer-Operating-System)
+
+
 # ucore实验中的常用工具
 
 在ucore实验中，一些基本的常用工具如下：
