@@ -55,6 +55,8 @@
 
 [CPP11新特新 代码实战](https://github.com/Ewenwan/cpp11)
 
+[新特征 C++11/14/17  concepts and code snippets](https://github.com/Ewenwan/modern-cpp-concepts)
+
 [A Detailed Cplusplus Concurrency Tutorial 《C++ 并发编程指南》](https://github.com/Ewenwan/Cplusplus-Concurrency-In-Practice)
 
 [基于C++11新标准的并发和多线程编程深度指南 C++ Concurrency In Action](https://github.com/xiaoweiChen/Cpp_Concurrency_In_Action)
