@@ -1,6 +1,8 @@
 # 学习 GO语言
 [参考](https://blog.csdn.net/column/details/18320.html?&page=2)
 
+[GO语言学习代码](https://github.com/Ewenwan/go_journey)
+
 # 介绍
     Go语言是Google开发的一种静态强类型、编译型、并发型，并具有垃圾回收功能的编程语言。为了方便搜索和识别，有时会将其称为Golang。
 
