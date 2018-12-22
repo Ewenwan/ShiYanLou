@@ -90,7 +90,7 @@
 
 		6. 操作系统os
 
-		7. 单片机stm32 arduino Ti-msp430 树莓派 phax
+		7. 单片机stm32 arduino Ti-msp430 树莓派 px4 arm
 
 		8. 数据挖掘
 
