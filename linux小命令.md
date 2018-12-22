@@ -288,3 +288,36 @@
 
     还可以在连接时使用选项：
     $ ssh -o ServerAliveInterval=30 user@remote-ssh-server-ip
+
+
+# thefuck: 自动纠正前一个命令的拼写错误
+
+    https://github.com/nvbn/thefuck
+    
+    thefuck是一个使用Python编写的开源小工具，它可以自动纠正前一个命令的拼写错误。
+    这个工具非常酷，尤其对于常常使用命令行的童鞋。
+    
+    安装
+        $ sudo apt install python3-dev python3-pip
+        $ sudo -H pip3 install thefuck
+
+    创建一个别名alias，首先编辑bashrc配置文件：
+    $ vim ~/.bashrc
+    
+    在文件尾加入一行：
+    eval "$(thefuck --alias fuck)"
+    
+    使生效：
+    $ source ~/.bashrc
+    
+    sdo vim /etc/passwd
+    >>> sdo comand not found
+    >>> fuck
+    sudo vim /etc/passwd[enter or ctrl c]
+    直接回车执行纠正过的命令。
+    
+https://github.com/nvbn/thefuck/blob/master/README.md
+
+
+
+
