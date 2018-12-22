@@ -21,6 +21,11 @@
 
 [OpenCV检测场景内是否有移动物体 并播放音乐](http://blog.topspeedsnail.com/archives/10797)
 
+[有人已经把TensorFlow移植到了树莓派](https://github.com/samjabrahams/tensorflow-on-raspberry-pi)
+
+
+[人脸检测](http://blog.topspeedsnail.com/archives/10931)
+
 # 1. 无屏幕和键盘配置树莓派WiFi和SSH，连接wifi后，支持远程登录
 
 ## a. WiFi 网络配置
