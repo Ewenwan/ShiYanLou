@@ -5,6 +5,8 @@
 
 [GO开发的 高度可定制的全文搜索引擎 微博搜索网站 学习资源](https://github.com/Ewenwan/wukong)
 
+[Go中文分词 分词器算法为基于词频的最短路径加动态规划](https://github.com/Ewenwan/sego)
+
 # 介绍
     Go语言是Google开发的一种静态强类型、编译型、并发型，并具有垃圾回收功能的编程语言。为了方便搜索和识别，有时会将其称为Golang。
 
