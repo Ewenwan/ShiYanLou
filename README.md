@@ -75,6 +75,8 @@
 
 [在线书籍编写模板 gitbook](https://github.com/Ewenwan/gitbook)
 
+[循序渐进学习书目](https://github.com/codefollower/My-Blog/blob/master/md-files/issues-001.md)
+
 # 包含内容：
 		1. c
 
@@ -88,7 +90,7 @@
 
 		6. 操作系统os
 
-		7. 单片机stm32 arduino Ti-msp430
+		7. 单片机stm32 arduino Ti-msp430 树莓派 phax
 
 		8. 数据挖掘
 
