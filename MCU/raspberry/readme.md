@@ -19,6 +19,8 @@
 
 [基于树莓派的 免费数字标牌软件 Screenly OSE](https://github.com/Ewenwan/screenly-ose)
 
+[OpenCV检测场景内是否有移动物体 并播放音乐](http://blog.topspeedsnail.com/archives/10797)
+
 # 1. 无屏幕和键盘配置树莓派WiFi和SSH，连接wifi后，支持远程登录
 
 ## a. WiFi 网络配置
