@@ -265,3 +265,26 @@
     sudo rm /var/lib/dpkg/lock
     
     
+# 怎么防止远程Linux自动断开SSH连接
+    下面的操作是在本地ssh客户端上，不是远程主机。
+
+    编辑SSH配置文件：
+    $ vim ~/.ssh/config    # 当前登陆用户生效
+
+    添加：
+    Host *
+     ServerAliveInterval 30
+
+    *号代表所有主机，你可以指定某个主机，如：
+    Host server1
+     ServerAliveInterval 30
+
+    ServerAliveInterval 30
+    表示ssh客户端每隔30秒给远程主机发送一个no-op包，
+    no-op是无任何操作的意思，这样远程主机就不会关闭这个SSH会话。
+
+    为了使所有用户生效，你可以在/etc/ssh/ssh_config全局配置文件添加如下一行：
+    ServerAliveInterval 30
+
+    还可以在连接时使用选项：
+    $ ssh -o ServerAliveInterval=30 user@remote-ssh-server-ip
