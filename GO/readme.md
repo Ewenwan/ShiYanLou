@@ -7,6 +7,8 @@
 
 [Go中文分词 分词器算法为基于词频的最短路径加动态规划](https://github.com/Ewenwan/sego)
 
+[Go语言汉字转拼音工具](https://github.com/huichen/pinyin)
+
 # 介绍
     Go语言是Google开发的一种静态强类型、编译型、并发型，并具有垃圾回收功能的编程语言。为了方便搜索和识别，有时会将其称为Golang。
 
