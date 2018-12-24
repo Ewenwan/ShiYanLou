@@ -11,6 +11,7 @@
 
 [C++17 High Performance](https://github.com/PacktPublishing/Cpp-High-Performance)
 
+[C++17 STL Cookbook 代码](https://github.com/PacktPublishing/Cpp17-STL-Cookbook)
 
 [C++  响应式编程（Reactive Programming）](https://github.com/Ewenwan/CPP-Reactive-Programming)
 
