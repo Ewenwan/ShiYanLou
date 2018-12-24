@@ -23,8 +23,9 @@
 
 [有人已经把TensorFlow移植到了树莓派](https://github.com/samjabrahams/tensorflow-on-raspberry-pi)
 
-
 [人脸检测](http://blog.topspeedsnail.com/archives/10931)
+
+[树莓派 python 机器人编程](https://github.com/PacktPublishing/Learn-Robotics-Programming)
 
 # 1. 无屏幕和键盘配置树莓派WiFi和SSH，连接wifi后，支持远程登录
 
