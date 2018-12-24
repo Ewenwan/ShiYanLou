@@ -28,7 +28,7 @@ int main() {
 // 函数的定义带有了__global__这个标签，表示这个函数是在GPU上运行
 // 函数的调用除了常规的参数之外，还增加了<<<>>>修饰。
 // 调用通过<<<参数1,参数2>>>，用于说明内核函数中的线程数量，以及线程是如何组织的。
-// 以线程格（Grid）的形式组织，每个线程格由若干个线程块（block）组成，
+// 以线程格（Grid）的形式组织，每个 线程格 由若干个 线程块（block）组成，
 // 而每个线程块又由若干个线程（thread）组成。
 // 是以block为单位执行的。
 
@@ -443,3 +443,89 @@ int main(void) {
 
 ```
 
+### 5） 大数据量 多数据块，多线程并发执行
+```c
+#include "stdio.h"
+#include<iostream>
+#include <cuda.h>
+#include <cuda_runtime.h>
+
+// 大数据量，大数组
+#define N 50000
+
+//Defining Kernel function for vector addition
+__global__ void gpuAdd(int *d_a, int *d_b, int *d_c)
+{
+
+	// 当前核的id 当前线程块线程id + 块id * 每块线程数
+	int tid = threadIdx.x + blockIdx.x * blockDim.x;	
+	while (tid < N)
+	{
+		d_c[tid] = d_a[tid] + d_b[tid];
+		// 更新 tid 
+		// 线程格维度 gridDim.x ====== 线程块数量
+	        // 每个线程块 维度blockDim.x 为单块线程数数量
+		// 一次执行 一个格子 512线程块 * 512线程数量
+		tid += blockDim.x * gridDim.x;
+	}
+		
+}
+
+int main(void) 
+{
+	// cpu数组
+	int h_a[N], h_b[N], h_c[N];
+	
+	// 执行GPU内存数据
+	int *d_a, *d_b, *d_c;
+	
+	// 分配GPU内存数据
+	cudaMalloc((void**)&d_a, N * sizeof(int));
+	cudaMalloc((void**)&d_b, N * sizeof(int));
+	cudaMalloc((void**)&d_c, N * sizeof(int));
+	
+	// 初始化CPU数据
+	for (int i = 0; i < N; i++) {
+		h_a[i] = 2 * i*i;
+		h_b[i] = i;
+	}
+	// cpu数据 到 GPU
+	cudaMemcpy(d_a, h_a, N * sizeof(int), cudaMemcpyHostToDevice);
+	cudaMemcpy(d_b, h_b, N * sizeof(int), cudaMemcpyHostToDevice);
+	// 512个线性块，每个线程块512个线程
+	gpuAdd << <512, 512 >> >(d_a, d_b, d_c);
+	
+	// 拷贝GPU结果 到 cpu
+	cudaMemcpy(h_c, d_c, N * sizeof(int), cudaMemcpyDeviceToHost);
+	cudaDeviceSynchronize();// 等待 所有线程结束====
+	
+	int Correct = 1;
+	printf("Vector addition on GPU \n");
+	
+	//Printing result on console
+	for (int i = 0; i < N; i++)
+	{
+		if ((h_a[i] + h_b[i] != h_c[i]))// 计算出错
+		{
+			Correct = 0;// 发生错误
+		}
+		
+	}
+	if (Correct == 1)
+	{
+		printf("GPU has computed Sum Correctly\n");
+	}
+	else
+	{
+		printf("There is an Error in GPU Computation\n");// 发生错误
+	}
+	
+	// 清空GPU内存=====
+	cudaFree(d_a);
+	cudaFree(d_b);
+	cudaFree(d_c);
+	return 0;
+}
+
+
+```
