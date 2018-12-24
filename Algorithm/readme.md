@@ -71,6 +71,9 @@
 
 [数据结构和算法 180+ Algorithm & Data Structure Problems using C++](https://github.com/Ewenwan/algorithms_and_data_structures)
 
+
+[CPP-Data-Structures-and-Algorithms](https://github.com/PacktPublishing/CPP-Data-Structures-and-Algorithms)
+
 	常用算法
 	 二叉树和前中后序遍历
 	 线索二叉树
