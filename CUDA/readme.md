@@ -112,7 +112,7 @@ cudaFree()
 
 
 
-# CUDA 设备 
+# 3、CUDA 设备 
 ```c
 #include <stdio.h>
 #include "cuda_runtime.h"
@@ -146,5 +146,300 @@ int main(void)
 
 
 // 结构体 cudaDeviceProp 定义于 driver_types.h 中，包含以下66个参数
+```
+
+# 4、 教程
+
+## a 基本
+### 1）单个数 加法
+```c
+#include <iostream>
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include <stdio.h>
+
+// kernel function 对两个变量进行相加  传递变量=====================
+__global__ void gpuAdd(int d_a, int d_b, int *d_c) 
+{
+	*d_c = d_a + d_b;
+}
+
+//main function
+int main(void) 
+{
+	//Defining host variable to store answer
+	int h_c; // CPU 变量
+  
+	//Defining device pointer
+	int *d_c;// 指针指向 GPU内存地址
+  
+	// 分配gpu 内存存储一个 int
+	cudaMalloc((void**)&d_c, sizeof(int));
+	// 输入 1 and 4 使用gpu内存变量 存储结果 d_c
+	//<< <1,1> >> means 1 block is executed with 1 thread per block
+  // 1线程块，1个线程
+	gpuAdd << <1, 1 >> > (1, 4, d_c);
+  
+	// 内存数据移动  GPU数据d_c 到CPU数据h_c
+	cudaMemcpy(&h_c, d_c, sizeof(int), cudaMemcpyDeviceToHost);
+	printf("1 + 4 = %d\n", h_c);
+  
+	// 清理GPU内存
+	cudaFree(d_c); 
+	return 0;
+}
+
+
+// 输入变量 以指针方式传递===================================
+#include <iostream>
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include <stdio.h>
+
+// 输入变量 全部为指针  类似数据的引用
+__global__ void gpuAdd(int *d_a, int *d_b, int *d_c) 
+{
+	*d_c = *d_a + *d_b;
+}
+
+int main(void) 
+{
+	// CPU变量
+	int h_a,h_b, h_c;
+	// CPU  指针 变量 指向 GPU数据地址
+	int *d_a,*d_b,*d_c;
+	// 初始化CPU变量
+	h_a = 1;
+	h_b = 4;
+  
+	// 分配GPU 变量内存
+	cudaMalloc((void**)&d_a, sizeof(int));
+	cudaMalloc((void**)&d_b, sizeof(int));
+	cudaMalloc((void**)&d_c, sizeof(int));
+  
+	// 输入变量 CPU 拷贝到 GPU   右 到 左
+	cudaMemcpy(d_a, &h_a, sizeof(int), cudaMemcpyHostToDevice);
+	cudaMemcpy(d_b, &h_b, sizeof(int), cudaMemcpyHostToDevice);
+  
+	// 调用核函数
+	gpuAdd << <1, 1 >> > (d_a, d_b, d_c);
+  
+	// 拷贝GPU数据结果 d_c 到 CPU变量
+	cudaMemcpy(&h_c, d_c, sizeof(int), cudaMemcpyDeviceToHost);
+	printf("Passing Parameter by Reference Output: %d + %d = %d\n", h_a, h_b, h_c);
+  
+	// 清理GPU内存 Free up memory 
+	cudaFree(d_a);
+	cudaFree(d_b);
+	cudaFree(d_c);
+	return 0;
+}
+
+```
+
+### 2）多线程 块 id  GPU设备
+```c
+// 多线程块，线程块id==============
+#include <iostream>
+
+#include <stdio.h>
+__global__ void myfirstkernel(void) 
+{
+	//blockIdx.x gives the block number of current kernel
+  // 打印当前所属 线程块id
+	printf("Hello!!!I'm thread in block: %d\n", blockIdx.x);
+}
+
+int main(void) {
+	// 16个线程块，每个线程块1个线程
+	myfirstkernel << <16,1>> >();
+	// 等待所有线程完成工作
+	cudaDeviceSynchronize();
+	printf("All threads are finished!\n");
+	return 0;
+}
+
+// 多GPU设备===============================
+#include <memory>
+#include <iostream>
+#include <cuda_runtime.h>
+#include <stdio.h>
+
+// Main Program 
+
+int main(void)
+{
+	int device_Count = 0;
+	cudaGetDeviceCount(&device_Count);// 获取CUDA设备数量====
+	// This function returns count of number of CUDA enable devices and 0 if there are no CUDA capable devices.
+	if (device_Count == 0)
+	{
+		printf("There are no available device(s) that support CUDA\n");
+	}
+	else
+	{
+		printf("Detected %d CUDA Capable device(s)\n", device_Count);
+	}
+
+	
+}
+
+```
+### 3） CPU数组数据 加法
+```c
+#include "stdio.h"
+#include<iostream>
+// 数组元素数量
+#define N	5
+// 向量加法 CPU
+void cpuAdd(int *h_a, int *h_b, int *h_c) 
+{
+	int tid = 0;	
+	while (tid < N)
+	{
+		h_c[tid] = h_a[tid] + h_b[tid];
+		tid += 1;// 数组元素index
+	}
+}
+
+int main(void) 
+{
+	int h_a[N], h_b[N], h_c[N];
+		//Initializing two arrays for addition
+  // 两个加数================
+	for (int i = 0; i < N; i++) 
+  {
+		h_a[i] = 2 * i*i;
+		h_b[i] = i;
+	}
+	// 使用cpu函数进行相加
+	cpuAdd (h_a, h_b, h_c);
+	// 打印结果
+	printf("Vector addition on CPU\n");
+	for (int i = 0; i < N; i++) {
+		printf("The sum of %d element is %d + %d = %d\n", i, h_a[i], h_b[i], h_c[i]);
+	}
+	return 0;
+}
+
+```
+
+### 3） GPU 数组 数据 加法   多线程块，单线程===================
+
+```c
+#include "stdio.h"
+#include<iostream>
+#include <cuda.h>
+#include <cuda_runtime.h>
+// 数组元素数量
+#define N	5
+//Defining Kernel function for vector addition
+__global__ void gpuAdd(int *d_a, int *d_b, int *d_c) {
+	// Getting block index of current kernel
+	int tid = blockIdx.x;	// 本线程块的id 
+  // 不需要循环体 核函数本身就是被多个线程块共同执行=======
+	if (tid < N)
+		d_c[tid] = d_a[tid] + d_b[tid];
+    
+  //  使用N个线程块，每个线程块执行一个加法==============
+  // 多线程块，单线程
+}
+
+int main(void)
+{
+	// cpu数组
+	int h_a[N], h_b[N], h_c[N];
+	// CPU指针数据 指向 gpu内存数据
+	int *d_a, *d_b, *d_c;
+  
+	// 分配GPU数据
+	cudaMalloc((void**)&d_a, N * sizeof(int));
+	cudaMalloc((void**)&d_b, N * sizeof(int));
+	cudaMalloc((void**)&d_c, N * sizeof(int));
+  
+	//初始化 cpu数组数据
+	for (int i = 0; i < N; i++) 
+  {
+		h_a[i] = 2*i*i;
+		h_b[i] = i ;
+	}
+	// CPU数据拷贝到 GPU内存
+	cudaMemcpy(d_a, h_a, N * sizeof(int), cudaMemcpyHostToDevice);
+	cudaMemcpy(d_b, h_b, N * sizeof(int), cudaMemcpyHostToDevice);
+  
+	// 在GPU中执行加法 使用N个线程块，每个线程块执行一个加法
+	gpuAdd << <N, 1 >> >(d_a, d_b, d_c);
+  
+	// 从GPU中拷贝结果 到 cpu
+	cudaMemcpy(h_c, d_c, N * sizeof(int), cudaMemcpyDeviceToHost);
+
+	printf("Vector addition on GPU \n");
+	// 打印结果信息
+	for (int i = 0; i < N; i++) 
+  {
+		printf("The sum of %d element is %d + %d = %d\n", i, h_a[i], h_b[i], h_c[i]);
+	}
+	// 清空GPU内存
+	cudaFree(d_a);
+	cudaFree(d_b);
+	cudaFree(d_c);
+	return 0;
+}
+
+```
+
+### 4）数组数据 平方 GPU     多线程 ，单线程块===============
+
+```C
+#include "stdio.h"
+#include<iostream>
+#include <cuda.h>
+#include <cuda_runtime.h>
+// 数组元素数量
+#define N	5
+// 执行平方
+__global__ void gpuSquare(float *d_in, float *d_out) {
+	//Getting thread index for current kernel
+	int tid = threadIdx.x;	// 当前 线程id
+	float temp = d_in[tid]; // 每个线程分配的 数组 id
+	d_out[tid] = temp*temp;
+  // 多线程 ，单线程块
+}
+
+int main(void) {
+	// cpu数组数据
+	float h_in[N], h_out[N];
+	// 执行GPU内存数据
+	float *d_in, *d_out;
+
+	// 分配gpu数据
+	cudaMalloc((void**)&d_in, N * sizeof(float));
+	cudaMalloc((void**)&d_out, N * sizeof(float));
+  
+	// 初始化CPU数据
+	for (int i = 0; i < N; i++) {
+		h_in[i] = i;
+	}
+	// 拷贝CPU数据到 GPU
+	cudaMemcpy(d_in, h_in, N * sizeof(float), cudaMemcpyHostToDevice);
+  
+	// 1个线程块，中N个线程，执行函数
+	gpuSquare << <1, N >> >(d_in, d_out);
+  
+	// 拷贝gpu 结果 到cpu
+	cudaMemcpy(h_out, d_out, N * sizeof(float), cudaMemcpyDeviceToHost);
+  
+	// 打印结果信息
+	printf("Square of Number on GPU \n");
+	for (int i = 0; i < N; i++) {
+		printf("The square of %f is %f\n", h_in[i], h_out[i]);
+	}
+	// 情况Gpu内存===
+	cudaFree(d_in);
+	cudaFree(d_out);
+	return 0;
+}
+
+
 ```
 
