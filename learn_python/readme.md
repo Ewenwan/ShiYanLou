@@ -20,6 +20,8 @@
 
 [Python在教育方面的资源列表](https://github.com/Ewenwan/awesome-python-in-education-zh)
 
+[python 面向对象编程](https://github.com/PacktPublishing/Python-Object-Oriented-Programming-Cookbook)
+
 # window python 开发环境
 ## 1. anaconda
 [下载](https://www.anaconda.com/download/)
