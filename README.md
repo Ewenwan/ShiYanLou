@@ -1,4 +1,6 @@
 # 参考资料
+[可视化代码过程](http://pythontutor.com/)
+
 [各种工程实践代码参考 ](https://github.com/Ewenwan/practice)
 
 [c++ 多线程 并发 指南 实战](https://github.com/Ewenwan/Cplusplus-Concurrency-In-Practice)
