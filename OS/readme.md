@@ -6,6 +6,7 @@
 
 [How-to-Make-a-Computer-Operating-System 各章节代码](https://github.com/Ewenwan/How-to-Make-a-Computer-Operating-System)
 
+[linux 系统编程](https://github.com/PacktPublishing/Hands-on-System-Programming-with-Linux)
 
 # ucore实验中的常用工具
 
