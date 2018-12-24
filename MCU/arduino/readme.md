@@ -178,5 +178,103 @@ void loop() {
 
 }
 
+// 开关量检测 ===================================
+#define MOTION_SENSOR 3 // 开关量输入===
+#define LED 5           // 开关量输出===
+
+void setup() {
+  pinMode(MOTION_SENSOR, INPUT);
+  pinMode(LED, OUTPUT);
+
+  digitalWrite(LED, LOW);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int sensorValue = digitalRead(MOTION_SENSOR);// 开关量输入测量
+  if (sensorValue == HIGH) {
+    Serial.println("Motion Detected");
+  }
+
+  digitalWrite(LED, sensorValue);// 开关来输出
+  delay(500);
+}
+
 
 ```
+
+# 通信
+
+```c
+//  单总线协议 DHT 温湿度传感器=======================================
+// https://github.com/PacktPublishing/Mastering-Arduino/tree/master/Chapter%209/Code
+#include "DHT.h"
+
+#define DHT_PIN 3
+#define RAIN_PIN A2
+#define DHT_TYPE DHT11
+#define RAIN_SENSOR_MAX 1024
+#define RAIN_SENSOR_MIN 0
+#define RAIN_OUT_MAX 20
+#define RAIN_OUT_MIN 0
+
+DHT dht(DHT_PIN, DHT_TYPE);
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+}
+
+void loop() {
+  float humidity = dht.readHumidity();
+  float celsius = dht.readTemperature();
+  float fahreheit = dht.readTemperature(true);
+
+  if (isnan(humidity) || isnan(celsius) || isnan(fahreheit)) {
+    Serial.println("Read Failed");
+    return;
+  }
+
+ // float hif = dht.computeHeatIndex(fahreheit, humidity);
+ // float hic = dht.computeHeatIndex(celsius, humidity, false);
+
+  Serial.print("Humidity: ");
+  Serial.println(humidity);
+  Serial.print("Temperature: ");
+  Serial.print(celsius);
+  Serial.println(" *C ");
+  Serial.print(fahreheit);
+  Serial.println(" *F");
+
+  int rain = analogRead(RAIN_PIN);
+  if (isnan(rain)) {
+    Serial.println("Read Failed");
+    return;
+  }
+  int range = map(rain, RAIN_SENSOR_MIN, RAIN_SENSOR_MAX, RAIN_OUT_MAX, RAIN_OUT_MIN);
+  Serial.print("Rain: ");
+  Serial.println(range);
+
+  Serial.println("-------------------------");
+  delay(3000);
+  /*
+  Serial.print("Heat index: ");
+  Serial.print(hic);
+  Serial.println(" *C ");
+  Serial.print(hif);
+  Serial.printlnln(" *F");
+  */
+
+}
+
+
+// ==============SPI显示屏====================================
+// https://github.com/PacktPublishing/Mastering-Arduino/blob/master/Chapter%2013/Sketch/Nokia5110/Nokia5110.ino
+// Nokia5110 <Adafruit_PCD8544.h>
+
+
+// 软件串口--蓝牙通信
+//  https://github.com/PacktPublishing/Mastering-Arduino/blob/master/Chapter%2020/BluetoothLELed/BluetoothLELed.ino
+
+```
+
