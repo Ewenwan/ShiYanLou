@@ -13,6 +13,8 @@
 
 [GO 图像交互界面GUI 开发 ](https://github.com/PacktPublishing/Hands-On-GUI-Application-Development-in-Go)
 
+[GO 机器学习](https://github.com/PacktPublishing/Go-Machine-Learning-Projects)
+
 # 介绍
     Go语言是Google开发的一种静态强类型、编译型、并发型，并具有垃圾回收功能的编程语言。为了方便搜索和识别，有时会将其称为Golang。
 
