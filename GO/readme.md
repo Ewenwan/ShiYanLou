@@ -1,6 +1,9 @@
 # 学习 GO语言
 [参考](https://blog.csdn.net/column/details/18320.html?&page=2)
 
+
+[Go数据结构和算法](https://github.com/PacktPublishing/Hands-On-Data-Structures-and-Algorithms-with-Go)
+
 [GO语言学习代码](https://github.com/Ewenwan/go_journey)
 
 [GO开发的 高度可定制的全文搜索引擎 微博搜索网站 学习资源](https://github.com/Ewenwan/wukong)
