@@ -22,6 +22,8 @@
 
 [python 面向对象编程](https://github.com/PacktPublishing/Python-Object-Oriented-Programming-Cookbook)
 
+[python cuda gpu编程](https://github.com/PacktPublishing/Hands-On-GPU-Programming-with-Python-and-CUDA)
+
 # window python 开发环境
 ## 1. anaconda
 [下载](https://www.anaconda.com/download/)
