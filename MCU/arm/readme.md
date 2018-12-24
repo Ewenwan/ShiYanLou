@@ -5,7 +5,7 @@
 
 [ARMv8 内存管理架构.学习笔记](https://www.cnblogs.com/lvdongjie/p/6644848.html)
 
-
+[嵌入式 arm linux c编程](https://github.com/PacktPublishing/Mastering-Embedded-Linux-Programming-Second-Edition)
 
 # ARM与单片机到底有啥区别
 
