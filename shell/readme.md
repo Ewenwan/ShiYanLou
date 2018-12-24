@@ -1,7 +1,12 @@
 # shell 编程
-[参考代码](https://github.com/Ewenwan/Linux_Code_Test/tree/master/Samples_Shell)
+[参考代码1](https://github.com/Ewenwan/Linux_Code_Test/tree/master/Samples_Shell)
 
-[cankao](https://github.com/keyboard-man/c_cpp/tree/master/boost)
+[参考代码2](https://github.com/keyboard-man/c_cpp/tree/master/boost)
+
+
+[Linux-Shell脚本编程书籍代码](https://github.com/PacktPublishing/Linux-Shell-Scripting-Cookbook-Third-Edition)
+
+
 # 文本分析
 ```sh
 cat demo.log | awk '
@@ -39,12 +44,6 @@ else
 #输出小于或者等于10的提示信息 
 	echo "The number is equal to or less than 10." 
 fi
---------------------- 
-作者：puQuTogether 
-来源：CSDN 
-原文：https://blog.csdn.net/puqutogether/article/details/45815003 
-版权声明：本文为博主原创文章，转载请附上博文链接！
-
 
 ```
 
