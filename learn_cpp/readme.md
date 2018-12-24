@@ -9,6 +9,7 @@
 
 [boost库学习](https://www.cnblogs.com/lvdongjie/category/579434.html)
 
+[C++17 High Performance](https://github.com/PacktPublishing/Cpp-High-Performance)
 
 # C++类成员和数据成员初始化总结
     C++为类中提供类成员的初始化列表
