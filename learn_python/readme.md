@@ -24,6 +24,8 @@
 
 [python cuda gpu编程](https://github.com/PacktPublishing/Hands-On-GPU-Programming-with-Python-and-CUDA)
 
+[python 马尔科夫模型](https://github.com/PacktPublishing/Hands-On-Markov-Models-with-Python)
+
 # window python 开发环境
 ## 1. anaconda
 [下载](https://www.anaconda.com/download/)
