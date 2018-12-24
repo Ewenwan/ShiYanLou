@@ -7,6 +7,8 @@
 
 [嵌入式 arm linux c编程](https://github.com/PacktPublishing/Mastering-Embedded-Linux-Programming-Second-Edition)
 
+[linux 设备驱动开发](https://github.com/PacktPublishing/Linux-Device-Drivers-Development)
+
 # ARM与单片机到底有啥区别
 
 ## 1、软件方面
