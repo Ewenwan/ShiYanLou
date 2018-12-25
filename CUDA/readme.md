@@ -12,6 +12,49 @@
 
 [CUDA 编程 加速 计算机视觉 ！！！推荐](https://github.com/PacktPublishing/Hands-On-GPU-Accelerated-Computer-Vision-with-OpenCV-and-CUDA)
 
+# CUDA存储器类型：
+
+	每个线程拥有自己的 register寄存器 and loacal memory 局部内存
+	每个线程块拥有一块 shared memory 共享内存
+	所有线程都可以访问 global memory 全局内存
+	
+	还有，可以被所有线程访问的
+	     只读存储器：
+	     constant memory (常量内容) and texture memory
+        
+	a. 寄存器Register
+	   寄存器是GPU上的高速缓存器，其基本单元是寄存器文件，每个寄存器文件大小为32bit.
+	   Kernel中的局部(简单类型)变量第一选择是被分配到Register中。
+           特点：每个线程私有，速度快。
+	
+	b. 局部存储器 local memory
+	
+	   当register耗尽时，数据将被存储到local memory。
+	   如果每个线程中使用了过多的寄存器，或声明了大型结构体或数组，
+	   或编译器无法确定数组大小，线程的私有数据就会被分配到local memory中。
+	   
+           特点：每个线程私有；没有缓存，慢。
+           注：在声明局部变量时，尽量使变量可以分配到register。如：
+           unsigned int mt[3];
+           改为：　unsigned int mt0, mt1, mt2;
+	
+	c. 共享存储器 shared memory
+           可以被同一block中的所有线程读写
+           特点：block中的线程共有；访问共享存储器几乎与register一样快.
+	
+	d. 全局存储器 global memory
+　         特点：所有线程都可以访问；没有缓存
+	
+	e. 常数存储器constant memory
+	   用于存储访问频繁的只读参数
+	   特点：只读；有缓存；空间小(64KB)
+	   注：定义常数存储器时，需要将其定义在所有函数之外，作用于整个文件
+	
+	f. 纹理存储器 texture memory
+           是一种只读存储器，其中的数据以一维、二维或者三维数组的形式存储在显存中。
+	   在通用计算中，其适合实现图像处理和查找，对大量数据的随机访问和非对齐访问也有良好的加速效果。
+           特点：具有纹理缓存，只读。
+
 # 1、hello wold
 ```c
 // 输出hello world
@@ -530,7 +573,7 @@ int main(void)
 
 ```
 
-### 6） 多线程数据共享 核函数内部 共享数据 __shared__
+### 6） 多线程数据共享 核函数内部 共享数据 __shared__  可以被同一block中的所有线程读写
 ```c
 #include <stdio.h>
 
@@ -541,6 +584,7 @@ __global__ void gpu_shared_memory(float *d_a)
 	float average, sum = 0.0f;
 	
 	// 共享数据 ，多线程之间 贡献
+	// 可以被同一block中的所有线程读写
 	__shared__ float sh_arr[10];
 
 	// 共享数据，记录数组数据
@@ -645,7 +689,7 @@ int main(int argc, char **argv)
 ```
 
 
-### 8) 多线程块 多线程计算 使用 原子操作 atomic  加法
+### 8) 多线程块 多线程计算 使用 原子操作 atomic  加法  atomicAdd()
 ```c
 #include <stdio.h>
 
@@ -700,28 +744,162 @@ int main(int argc, char **argv)
 
 ```
 
-### 9)
+### 9) GPU常量只读  __constant__ ，缩放+平移操作 ，单线程块，多线程,
+```c
+#include "stdio.h"
+#include<iostream>
+#include <cuda.h>
+#include <cuda_runtime.h>
+
+// 定义两个 GPU int常量 
+__constant__ int constant_f;
+__constant__ int constant_g;
+
+// 数组大小
+#define N	5
+
+// 使用GPU常量的 缩放+平移操作 核函数
+__global__ void gpu_constant_memory(float *d_in, float *d_out) 
+{
+	// 单线程块，多线程，当前线程id ==== 总线程id
+	int tid = threadIdx.x;	
+	//  使用GPU常量的 缩放+平移操作 核函数
+	d_out[tid] = constant_f*d_in[tid] + constant_g;
+}
+
+int main(void) 
+{
+	// cpu 数组变量
+	float h_in[N], h_out[N];
+	
+	// 准备GPU 数据
+	float *d_in, *d_out; // cpu指针数据，指向GPU数据数据地址
+	int h_f = 2;   // 为GPU 长亮数据准备的 对应的CPU数据
+	int h_g = 20;
+	
+	// 分配GPU 数组数据
+	cudaMalloc((void**)&d_in, N * sizeof(float));
+	cudaMalloc((void**)&d_out, N * sizeof(float));
+	
+	// 初始化CPU数组数据
+	for (int i = 0; i < N; i++) {
+		h_in[i] = i;
+	}
+	// 拷贝cpu数组变量h_in 到 gpu数组数据 d_in
+	cudaMemcpy(d_in, h_in, N * sizeof(float), cudaMemcpyHostToDevice);
+	
+	// 拷贝cpu变量 h_f,  到   GPU常量 constant_f
+	cudaMemcpyToSymbol(constant_f, &h_f, sizeof(int),0,cudaMemcpyHostToDevice);
+	cudaMemcpyToSymbol(constant_g, &h_g, sizeof(int));
+
+	// 调用核函数，使用1个线程块，内部执行N个线程
+	gpu_constant_memory << <1, N >> >(d_in, d_out);
+	
+	// 拷贝GPU中的结果 到 CPU
+	cudaMemcpy(h_out, d_out, N * sizeof(float), cudaMemcpyDeviceToHost);
+	
+	// 打印结果
+	printf("Use of Constant memory on GPU \n");
+	for (int i = 0; i < N; i++) 
+	{
+		printf("The expression for input %f is %f\n", h_in[i], h_out[i]);
+	}
+	
+	// 清空GPU内存 。。。。常量会自动清理???
+	cudaFree(d_in);
+	cudaFree(d_out);
+	return 0;
+}
+
+
+```
+
+### 10) 纹理存储器 texture memory，只读，常数组数据，适合实现图像处理和查找
+```c
+#include "stdio.h"
+#include<iostream>
+#include <cuda.h>
+#include <cuda_runtime.h>
+#define NUM_THREADS 10  // 一个块具有的线程数
+#define N 10            // 数组元素数量，总需要计算的次数
+
+// 纹理内存数据 只读，一维 纹理数据，类似 寄存器功能，加强运算速度
+texture <float, 1, cudaReadModeElementType> textureRef;
+
+__global__ void gpu_texture_memory(int n, float *d_out)
+{
+        // 当前总线程id  = 块id*块维度 + 块线程id
+	int idx = blockIdx.x*blockDim.x + threadIdx.x;
+	
+	if (idx < n) 
+	{
+	// tex1D ,一维 纹理数据
+		float temp = tex1D(textureRef, float(idx));// 取出 纹理数据中的 数据
+		d_out[idx] = temp;
+	}
+}
+
+int main()
+{
+	// 计算需要的线程块 数量
+	int num_blocks = N / NUM_THREADS + ((N % NUM_THREADS) ? 1 : 0);
+	
+	// 准备GPU数据
+	float *d_out; //cpu 指针数据，指向 GPU数据内存
+	// 分配GPU内存 存储输出
+	cudaMalloc((void**)&d_out, sizeof(float) * N);
+	
+	// 分配CPU数据存储 输出
+	float *h_out = (float*)malloc(sizeof(float)*N);
+	
+	// 初始化CPU数据，存储输入数据
+	float h_in[N];
+	for (int i = 0; i < N; i++) {
+		h_in[i] = float(i);
+	}
+	
+	// 定义GPU 数组变量 
+	cudaArray *cu_Array;
+        // GPU分配数组数据
+	cudaMallocArray(&cu_Array, &textureRef.channelDesc, N, 1);
+	
+	// 拷贝CPU数组数据 到 GPU数组类型数据 
+	cudaMemcpyToArray(cu_Array, 0, 0, h_in, sizeof(float)*N, cudaMemcpyHostToDevice);
+	
+	// 将CPU数组数据 绑定到 纹理内存数据类型
+	cudaBindTextureToArray(textureRef, cu_Array);
+	
+	// 调用核函数  线程块，单位线程数
+  	gpu_texture_memory << <num_blocks, NUM_THREADS >> >(N, d_out);
+	
+	// 拷贝GPU结果数据 到 CPU
+	cudaMemcpy(h_out, d_out, sizeof(float)*N, cudaMemcpyDeviceToHost);
+	
+	// 打印
+	printf("Use of Texture memory on GPU: \n");
+	for (int i = 0; i < N; i++) {
+		printf("Texture element at %d is : %f\n",i, h_out[i]);
+	}
+	
+	// 清理内存
+	free(h_out);      // 清理cpu内存
+	cudaFree(d_out);  // 清理Gpu内存，输出
+	cudaFreeArray(cu_Array);// 清理Gpu 数组内存 输入
+	cudaUnbindTexture(textureRef);// 取消 纹理数据内存 绑定
+	
+}
+
+
+```
+
+### 10)
 ```c
 
 
 
 ```
 
-### 9)
-```c
-
-
-
-```
-
-### 9)
-```c
-
-
-
-```
-
-### 9)
+### 11)
 ```c
 
 
