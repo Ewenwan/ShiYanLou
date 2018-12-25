@@ -590,17 +590,112 @@ int main(int argc, char **argv)
 
 ```
 
-### 7) 多线程块 多线程计算 未使用 原子操作 atomic
+### 7) 多线程块 多线程计算 未使用 原子操作 atomic 加法
 ```c
+#include <stdio.h>
 
+
+#define NUM_THREADS 10000 // 总线程数
+#define SIZE  10// 数组大小
+
+#define BLOCK_WIDTH 100   // 每个线程块的线程数
+
+__global__ void gpu_increment_without_atomic(int *d_a)
+{
+	// 计算当前总线程id  当前块id*块维度 + 当前线程id
+	int tid = blockIdx.x * blockDim.x + threadIdx.x;
+
+	// each thread increments elements wrapping at SIZE variable
+	tid = tid % SIZE;// 取余数组大小
+	d_a[tid] += 1;   // 对应index元素自增1，可记录每个对应的线程总共执行了多少次
+}
+
+int main(int argc, char **argv)
+{
+
+	printf("%d total threads in %d blocks writing into %d array elements\n",
+		NUM_THREADS, NUM_THREADS / BLOCK_WIDTH, SIZE);
+
+	// 定义CPU数据
+	int h_a[SIZE]; // 数组
+	const int ARRAY_BYTES = SIZE * sizeof(int);// 总字节数
+
+	// 定义GPU数据，并分配内存，进行初始化
+	int * d_a;//cpu指针 指向GPU数据地址
+	cudaMalloc((void **)&d_a, ARRAY_BYTES);// GPU上分配内存
+	cudaMemset((void *)d_a, 0, ARRAY_BYTES);// 数据初始化为0
+        
+	// 无原子操作 自加法                线程块数量                 每块线程数数量  
+	gpu_increment_without_atomic << <NUM_THREADS / BLOCK_WIDTH, BLOCK_WIDTH >> >(d_a);
+
+	// 拷贝GPU结果到 CPU数据
+	cudaMemcpy(h_a, d_a, ARRAY_BYTES, cudaMemcpyDeviceToHost);
+
+	printf("Number of times a particular Array index has been incremented without atomic add is: \n");
+	for (int i = 0; i < SIZE; i++)
+	{
+		printf("index: %d --> %d times\n ", i, h_a[i]);// 每个数组元素被执行 自增运算次数，无原子操作
+	}
+        // 清空GPU内存
+	cudaFree(d_a);
+	return 0;
+}
 
 
 ```
 
 
-### 8) 多线程块 多线程计算 使用 原子操作 atomic
+### 8) 多线程块 多线程计算 使用 原子操作 atomic  加法
 ```c
+#include <stdio.h>
 
+
+#define NUM_THREADS 10000 // 总线程数
+#define SIZE  10// 数组大小
+
+#define BLOCK_WIDTH 100   // 每个线程块的线程数
+
+__global__ void gpu_increment_without_atomic(int *d_a)
+{
+	// 计算当前总线程id  当前块id*块维度 + 当前线程id
+	int tid = blockIdx.x * blockDim.x + threadIdx.x;
+
+	// each thread increments elements wrapping at SIZE variable
+	tid = tid % SIZE;// 取余数组大小
+	// d_a[tid] += 1;   // 对应index元素自增1，可记录每个对应的线程总共执行了多少次
+	atomicAdd(&d_a[tid], 1); // 原子add操作 每个元素 加上第二个参数 1 ------------------
+}
+
+int main(int argc, char **argv)
+{
+
+	printf("%d total threads in %d blocks writing into %d array elements\n",
+		NUM_THREADS, NUM_THREADS / BLOCK_WIDTH, SIZE);
+
+	// 定义CPU数据
+	int h_a[SIZE]; // 数组
+	const int ARRAY_BYTES = SIZE * sizeof(int);// 总字节数
+
+	// 定义GPU数据，并分配内存，进行初始化
+	int * d_a;//cpu指针 指向GPU数据地址
+	cudaMalloc((void **)&d_a, ARRAY_BYTES);// GPU上分配内存
+	cudaMemset((void *)d_a, 0, ARRAY_BYTES);// 数据初始化为0
+        
+	// 无原子操作 自加法                线程块数量                 每块线程数数量  
+	gpu_increment_without_atomic << <NUM_THREADS / BLOCK_WIDTH, BLOCK_WIDTH >> >(d_a);
+
+	// 拷贝GPU结果到 CPU数据
+	cudaMemcpy(h_a, d_a, ARRAY_BYTES, cudaMemcpyDeviceToHost);
+
+	printf("Number of times a particular Array index has been incremented with atomic add is: \n");
+	for (int i = 0; i < SIZE; i++)
+	{
+		printf("index: %d --> %d times\n ", i, h_a[i]);// 每个数组元素被执行 自增运算次数，无原子操作
+	}
+        // 清空GPU内存
+	cudaFree(d_a);
+	return 0;
+}
 
 
 ```
