@@ -1,6 +1,9 @@
+# SIGIA_4P python学习 列表 字典 集合 面对对象编程 闭包 装饰器 函数式编程 作用域 异常处理
+[本文连接](https://github.com/Ewenwan/ShiYanLou/edit/master/learn_python/SIGIA_4P%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95.md)
+
 # 简介
 
-[网址](https://www.sigai.cn/)
+[SIGIA_4P 网址](https://www.sigai.cn/)
 
     a. 课程OKR  Objectives and Key Results 即目标与关键成果法
        目标，Objectives ： 掌握AI领域的Python开发
