@@ -1,5 +1,5 @@
 # SIGIA_4P python学习 列表 字典 集合 面对对象编程 闭包 装饰器 函数式编程 作用域 异常处理
-[本文连接](https://github.com/Ewenwan/ShiYanLou/edit/master/learn_python/SIGIA_4P%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95.md)
+[本文连接](https://github.com/Ewenwan/ShiYanLou/learn_python/SIGIA_4P学习记录.md)
 
 # 简介
 
