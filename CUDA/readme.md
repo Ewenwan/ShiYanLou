@@ -1107,19 +1107,27 @@ __global__ void gpu_Matrix_Mul_nonshared(float *d_a, float *d_b, float *d_c, con
 __global__ void gpu_Matrix_Mul_shared(float *d_a, float *d_b, float *d_c, const int size)
 {
 	int row, col;
-	//Defining Shared Memory
-	__shared__ float shared_a[TILE_SIZE][TILE_SIZE];
-	__shared__ float shared_b[TILE_SIZE][TILE_SIZE];
+	// 线程块共享内存=====存储矩阵A和矩阵B的数据==
+	__shared__ float shared_a[TILE_SIZE][TILE_SIZE]; // 2*2
+	__shared__ float shared_b[TILE_SIZE][TILE_SIZE]; // 2*2
+	
+	// 目标矩阵位置=========
+	// 块一行线程数 * 块所述列id  + 当前块内 线程 列id
 	col = TILE_SIZE * blockIdx.x + threadIdx.x;
 	row = TILE_SIZE * blockIdx.y + threadIdx.y;
 
-	for (int i = 0; i< size / TILE_SIZE; i++) 
+	for (int i = 0; i< size / TILE_SIZE; i++) // 4/2=2 一个线程块内 2次
 	{
-		shared_a[threadIdx.y][threadIdx.x] = d_a[row* size + (i*TILE_SIZE + threadIdx.x)];
-		shared_b[threadIdx.y][threadIdx.x] = d_b[(i*TILE_SIZE + threadIdx.y) * size + col];
+		shared_a[threadIdx.y][threadIdx.x] = d_a[row* size + (i*TILE_SIZE + threadIdx.x)];   
+		                                                      // 一行元素 k 计算不同了 
+		shared_b[threadIdx.y][threadIdx.x] = d_b[(i*TILE_SIZE + threadIdx.y) * size + col];  
+		                                                  // 一列元素
+		
 		__syncthreads(); 
-		for (int j = 0; j<TILE_SIZE; j++)
+		
+		for (int j = 0; j<TILE_SIZE; j++)// 每个线程求和  2次
 			d_c[row*size + col] += shared_a[threadIdx.x][j] * shared_b[j][threadIdx.y];
+			
 		__syncthreads(); 
 
 	}
