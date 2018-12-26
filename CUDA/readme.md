@@ -62,32 +62,35 @@
         gridDim.x，gridDim.y，gridDim.z相当于这个dim3的x，y，z方向的维度，这里是2*2*1。
 	序号从0到3，且是从上到下的顺序，就是说是下面的情况:
 	 具体到 线程格 中每一个 线程块的 id索引为：
+	 
         grid 中的 blockidx 序号标注情况为：      0     2 
                                                1     3
-     dim3 blocksize(4,4);  // 线程块的形状，4行*4列*1页，一个线程块内部共有 16个线程
+					       
+       dim3 blocksize(4,4);  // 线程块的形状，4行*4列*1页，一个线程块内部共有 16个线程
      
-     blockDim.x，blockDim.y，blockDim.z相当于这个dim3的x，y，z方向的维度，这里是4*4*1.序号是0-15，也是从上到下的标注：
+       blockDim.x，blockDim.y，blockDim.z相当于这个dim3的x，y，z方向的维度，
+       这里是4*4*1.序号是0-15，也是从上到下的标注：
 
-     block中的 threadidx 序号标注情况    0       4       8      12 
-                                        1       5       9      13
-                                        2       6       10     14
-                                        3       7       11     15
-    1.  1维格子，1维线程块，N个线程======
-    
-         实际的线程id tid =  blockidx.x * blockDim.x + threadidx.x
-         块id   0 1 2 3 
+	block中的 threadidx 序号标注情况   0       4       8      12 
+					  1       5       9      13
+					  2       6       10     14
+					  3       7       11     15
+	1.  1维格子，1维线程块，N个线程======
+
+	 实际的线程id tid =  blockidx.x * blockDim.x + threadidx.x
+	 块id   0 1 2 3 
 	 线程id 0 1 2 3 4
-    2. 1维格子，2D维线程块
-         块id   1 2 3 
+	2. 1维格子，2D维线程块
+	 块id   1 2 3 
 	 线程id  0  2
-	         1  3
-		               块id           块线程总数
-         实际的线程id tid =  blockidx.x * blockDim.x * blockDim.y + 
-	                       当前线程行数    每行线程数
-	                    threadidx.y * blockDim.x   + 
+	        1  3
+			       块id           块线程总数
+	 实际的线程id tid =  blockidx.x * blockDim.x * blockDim.y + 
+			       当前线程行数    每行线程数
+			    threadidx.y * blockDim.x   + 
 			       当前线程列数
-	                    threadidx.x
-	 
+			    threadidx.x
+
 
 
 # 1、hello wold
