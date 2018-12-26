@@ -1198,7 +1198,10 @@ int main()
 
 ```
 
-### 12) CUDA使用Event进行程序计时
+
+## b  Event事件记录、错误处理、stream异步、rank_sort排列排序算法、histogram直方图计算
+
+### 1) CUDA使用 Event 进行程序计时
 ```c
 #include "stdio.h"
 #include<iostream>
@@ -1296,43 +1299,143 @@ int main(void)
 
 ```
 
-### 13)
+### 2) 错误处理 error_handling  
+```c
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
+
+#include <stdio.h>
+// 两个数相乘====
+__global__ void gpuAdd(int *d_a, int *d_b, int *d_c)
+{
+	*d_c = *d_a + *d_b;
+}
+
+int main()
+{
+    // 定义CPU变量 host variables
+    int h_a, h_b, h_c;
+    // 定义cpu指针变量 指向 gpu数据地址
+    int *d_a, *d_b, *d_c;
+    // 初始话cpu数据
+    h_a = 1;
+    h_b = 4;
+    
+    // cuda 错误变量
+    cudaError_t cudaStatus;
+	  
+    //分配输出变量 的GPU内存  .
+    cudaStatus = cudaMalloc((void**)&d_c, sizeof(int));
+    if (cudaStatus != cudaSuccess) 
+    {
+        fprintf(stderr, "cudaMalloc failed!");// 内存分配错误
+        goto Error;
+    }
+    // 分配两个输入变量 的GPU内存 
+    cudaStatus = cudaMalloc((void**)&d_a, sizeof(int));
+    if (cudaStatus != cudaSuccess) 
+    {
+        fprintf(stderr, "cudaMalloc failed!");// 内存分配错误
+        goto Error;
+    }
+    cudaStatus = cudaMalloc((void**)&d_b, sizeof(int));
+    if (cudaStatus != cudaSuccess) 
+    {
+        fprintf(stderr, "cudaMalloc failed!");// 内存分配错误
+        goto Error;
+    }
+
+    // 拷贝两个CPU变量 到 GPU
+    cudaStatus = cudaMemcpy(d_a,&h_a, sizeof(int), cudaMemcpyHostToDevice);
+    if (cudaStatus != cudaSuccess) 
+    {
+        fprintf(stderr, "cudaMemcpy failed!");// 内存拷贝错误
+        goto Error;
+    }
+    cudaStatus = cudaMemcpy(d_b, &h_b, sizeof(int), cudaMemcpyHostToDevice);
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaMemcpy failed!");// 内存拷贝错误
+        goto Error;
+    }
+
+    // 调用核函数计算
+    gpuAdd<<<1, 1>>>(d_a, d_b, d_c);
+
+    // 检测核函数执行后的状态
+    cudaStatus = cudaGetLastError();
+    if (cudaStatus != cudaSuccess) 
+    {
+        // 核函数执行 错误======
+        fprintf(stderr, "addKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
+        goto Error;
+    }
+    
+    // 从GPU中 拷贝结果 到CPU中
+    cudaStatus = cudaMemcpy(&h_c, d_c, sizeof(int), cudaMemcpyDeviceToHost);
+    if (cudaStatus != cudaSuccess)
+    {
+        fprintf(stderr, "cudaMemcpy failed!");//  内存拷贝错误
+        goto Error;
+    }
+    
+    printf("Passing Parameter by Reference Output: %d + %d = %d\n", h_a, h_b, h_c);
+    
+// 错误分支
+Error:
+    // 清空GPU内存
+    cudaFree(d_c);
+    cudaFree(d_a);
+    cudaFree(d_b);
+    
+    return 0;
+}
+
+```
+
+### 3) Cuda stream 是指一堆异步的cuda操作
+	Cuda stream是指一堆异步的cuda操作，他们按照host代码调用的顺序执行在device上。
+	Stream维护了这些操作的顺序，并在所有预处理完成后允许这些操作进入工作队列，
+	同时也可以对这些操作进行一些查询操作。这些操作包括host到device的数据传输，
+	launch kernel以及其他的host发起由device执行的动作。这些操作的执行总是异步的，
+	cuda runtime会决定这些操作合适的执行时机。我们则可以使用相应的
+	cuda api来保证所取得结果是在所有操作完成后获得的。
+	同一个stream里的操作有严格的执行顺序，不同的stream则没有此限制。
+
+	由于不同stream的操作是异步执行的，就可以利用相互之间的协调来充分发挥资源的利用率。
+	
+	https://www.cnblogs.com/1024incn/p/5891051.html
+	
+```c
+// https://github.com/PacktPublishing/Hands-On-GPU-Accelerated-Computer-Vision-with-OpenCV-and-CUDA/blob/master/Chapter4/03_cuda_streams.cu
+
+
+```
+
+### 4) rank_sort  排列排序算法
 ```c
 
 
 
 ```
 
-### 14)
+### 5) histogram 直方图计算  有/无 元组操作
 ```c
 
 
 
 ```
 
-### 15)
+### 6) histogram 直方图计算 共享内存
 ```c
-
-
-
-```
-
-### 16)
-```c
-
-
-
-```
-
-### 17)
-```c
-
+https://github.com/PacktPublishing/Hands-On-GPU-Accelerated-Computer-Vision-with-OpenCV-and-CUDA/blob/master/Chapter4/06_histogram_shared_memory.cu
 
 
 ```
 
 
-### 18)
+## c 图像读取、显示形状、播放视频、add、sub、颜色空间转换、阈值操作等
+
+### 1)
 ```c
 
 
@@ -1340,7 +1443,7 @@ int main(void)
 ```
 
 
-### 19)
+### 2)
 ```c
 
 
@@ -1348,7 +1451,7 @@ int main(void)
 ```
 
 
-### 20)
+### 3)
 ```c
 
 
@@ -1356,7 +1459,7 @@ int main(void)
 ```
 
 
-### 9)
+### 4)
 ```c
 
 
@@ -1364,7 +1467,7 @@ int main(void)
 ```
 
 
-### 9)
+### 5)
 ```c
 
 
@@ -1372,7 +1475,7 @@ int main(void)
 ```
 
 
-### 9)
+### 6)
 ```c
 
 
@@ -1380,7 +1483,15 @@ int main(void)
 ```
 
 
-### 9)
+### 7)
+```c
+
+
+
+```
+
+## c 图像读取、显示形状、播放视频、add、sub、颜色空间转换、阈值操作等
+### 1)
 ```c
 
 
@@ -1388,7 +1499,7 @@ int main(void)
 ```
 
 
-### 9)
+### 2)
 ```c
 
 
@@ -1396,7 +1507,7 @@ int main(void)
 ```
 
 
-### 9)
+### 3)
 ```c
 
 
@@ -1404,7 +1515,7 @@ int main(void)
 ```
 
 
-### 9)
+### 4)
 ```c
 
 
@@ -1412,7 +1523,7 @@ int main(void)
 ```
 
 
-### 9)
+### 5)
 ```c
 
 
@@ -1420,7 +1531,7 @@ int main(void)
 ```
 
 
-### 9)
+### 6)
 ```c
 
 
@@ -1428,7 +1539,7 @@ int main(void)
 ```
 
 
-### 9)
+### 7)
 ```c
 
 
@@ -1436,15 +1547,7 @@ int main(void)
 ```
 
 
-### 9)
-```c
-
-
-
-```
-
-
-### 9)
+### 8)
 ```c
 
 
