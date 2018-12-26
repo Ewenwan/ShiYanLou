@@ -1198,42 +1198,133 @@ int main()
 
 ```
 
-### 9)
+### 12) CUDA使用Event进行程序计时
+```c
+#include "stdio.h"
+#include<iostream>
+#include <cuda.h>
+#include <cuda_runtime.h>
+// 向量元素数量
+#define N	50000
+
+// 向量加法
+__global__ void gpuAdd(int *d_a, int *d_b, int *d_c) 
+{
+	// 1D线程格  1D线程块
+	int tid = threadIdx.x + blockIdx.x * blockDim.x;// 总线程id
+	while (tid < N)
+	{
+		d_c[tid] = d_a[tid] + d_b[tid]; // 指向加法
+		tid += blockDim.x * gridDim.x;  // 一次执行一个线程格子??
+	}
+
+}
+
+int main(void)
+{
+	// 定义CPU向量 1维数组
+	int h_a[N], h_b[N], h_c[N];
+	// 定义CPU指针变量 指向GPU数据地址
+	int *d_a, *d_b, *d_c;
+	
+	// cudaEvent 变量，计时====
+	cudaEvent_t e_start, e_stop;
+	cudaEventCreate(&e_start);// 创建变量
+	cudaEventCreate(&e_stop);
+	cudaEventRecord(e_start, 0); // 开始记录
+	
+	// 分配GPU内存
+	cudaMalloc((void**)&d_a, N * sizeof(int));
+	cudaMalloc((void**)&d_b, N * sizeof(int));
+	cudaMalloc((void**)&d_c, N * sizeof(int));
+	
+	// 初始化CPU输入向量
+	for (int i = 0; i < N; i++)
+	{
+		h_a[i] = 2 * i*i;
+		h_b[i] = i;
+	}
+	
+	//  拷贝 CPU输入向量 到GPU
+	cudaMemcpy(d_a, h_a, N * sizeof(int), cudaMemcpyHostToDevice);
+	cudaMemcpy(d_b, h_b, N * sizeof(int), cudaMemcpyHostToDevice);
+	
+	// 512个线程格，每个线程格512个线程，来执行核函数
+	gpuAdd << <512, 512 >> >(d_a, d_b, d_c);
+	
+	// 拷贝GPU结果 到 CPU
+	cudaMemcpy(h_c, d_c, N * sizeof(int), cudaMemcpyDeviceToHost);
+	
+	//  事件记录 
+	cudaDeviceSynchronize();// 线程同步
+	cudaEventRecord(e_stop, 0);// 事件记录
+	cudaEventSynchronize(e_stop);// 事件记录 同步
+	
+	// 计算 时间间隔
+	float elapsedTime;
+	cudaEventElapsedTime(&elapsedTime, e_start, e_stop);// 计算 时间间隔
+	printf("Time to add %d numbers: %3.1f ms\n",N, elapsedTime);// 打印 时间间隔
+
+        // 验证计算是否出错=========================
+	int Correct = 1;
+	printf("Vector addition on GPU \n");
+	for (int i = 0; i < N; i++) 
+	{
+		if ((h_a[i] + h_b[i] != h_c[i]))
+		{
+			Correct = 0;
+		}
+
+	}
+	if (Correct == 1)
+	{
+		printf("GPU has computed Sum Correctly\n");
+	}
+	else
+	{
+		printf("There is an Error in GPU Computation\n");
+	}
+	
+	
+	// 清空GPU内存
+	cudaFree(d_a);
+	cudaFree(d_b);
+	cudaFree(d_c);
+	return 0;
+}
+
+
+```
+
+### 13)
 ```c
 
 
 
 ```
 
-### 9)
+### 14)
 ```c
 
 
 
 ```
 
-### 9)
+### 15)
 ```c
 
 
 
 ```
 
-### 9)
+### 16)
 ```c
 
 
 
 ```
 
-### 9)
-```c
-
-
-
-```
-
-### 9)
+### 17)
 ```c
 
 
@@ -1241,7 +1332,7 @@ int main()
 ```
 
 
-### 9)
+### 18)
 ```c
 
 
@@ -1249,7 +1340,7 @@ int main()
 ```
 
 
-### 9)
+### 19)
 ```c
 
 
@@ -1257,7 +1348,7 @@ int main()
 ```
 
 
-### 9)
+### 20)
 ```c
 
 
