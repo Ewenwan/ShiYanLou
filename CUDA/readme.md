@@ -1066,7 +1066,7 @@ int main(void)
 
 ```
 
-### 11)  Matrix multiplication 矩阵乘法，无共享内存实现
+### 11)  Matrix multiplication 矩阵乘法， 有/无 共享内存 实现
 ```c
 //Matrix multiplication using shared and non shared kernal
 #include "stdio.h"
@@ -1074,23 +1074,36 @@ int main(void)
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <math.h>
-#define TILE_SIZE 2
+#define TILE_SIZE 2 // 线程块维度  2*2
+                    // 矩阵维度 4*4
+		    // 线程格 维度 2*2
 
-
-//Matrix multiplication using non shared kernel
+// 不使用共享内存实现 Matrix multiplication 矩阵乘法====
 __global__ void gpu_Matrix_Mul_nonshared(float *d_a, float *d_b, float *d_c, const int size)
 {
 	int row, col;
-	col = TILE_SIZE * blockIdx.x + threadIdx.x;
-	row = TILE_SIZE * blockIdx.y + threadIdx.y;
+	// 目标矩阵位置=========
+	//  块一行线程数 * 块所述列id  + 当前块内 线程 列id
+	col = TILE_SIZE * blockIdx.x + threadIdx.x; // 线程 列id
+	row = TILE_SIZE * blockIdx.y + threadIdx.y; // 线程 行id
 
-	for (int k = 0; k< size; k++)
+	for (int k = 0; k< size; k++)// 4次 1*4  与 4*1 向量共四次 乘+运算
 	{
+	//  ??????   结果矩阵位置              A                B
 		d_c[row*size + col] += d_a[row * size + k] * d_b[k * size + col];
 	}
+	
+//                      A              *             B                =       C
+//                                                                          col 
+//    [row*size+0 ][.][.][row*size+3]     [0*size+col ][ ][ ][ ]         [row*size+col][ ][ ][ ] 
+//    [ ][ ][ ][ ]                        [1*size+col ][ ][ ][ ]    row  [ ][ ][ ][ ] 
+//    [ ][ ][ ][ ]                        [2*size+col ][ ][ ][ ]         [ ][ ][ ][ ] 
+//    [ ][ ][ ][ ]                        [3*size+col ][ ][ ][ ]         [ ][ ][ ][ ] 
+
+	
 }
 
-// Matrix multiplication using shared kernel
+// 不使用共享内存实现 Matrix multiplication 矩阵乘法=====
 __global__ void gpu_Matrix_Mul_shared(float *d_a, float *d_b, float *d_c, const int size)
 {
 	int row, col;
@@ -1115,12 +1128,15 @@ __global__ void gpu_Matrix_Mul_shared(float *d_a, float *d_b, float *d_c, const 
 // main routine
 int main()
 {
-	const int size = 4;
-	//Define Host Array
+	const int size = 4; //矩阵维度
+	
+	// 定义二维矩阵 cpu==============
 	float h_a[size][size], h_b[size][size],h_result[size][size];
-	//Defining device Array
-	float *d_a, *d_b, *d_result; 
-	//Initialize host Array
+	
+	// 定义GPU 数据 指针=============
+	float *d_a, *d_b, *d_result; // cpu指针变量 指向 GPU数据地址
+	
+	// 初始化 cpu 两个二维数组变量====
 	for (int i = 0; i<size; i++)
 	{
 		for (int j = 0; j<size; j++)
@@ -1129,27 +1145,32 @@ int main()
 			h_b[i][j] = j;
 		}
 	}
+        
+	// 分配GPU变量
+	cudaMalloc((void **)&d_a,      size*size * sizeof(int));
+	cudaMalloc((void **)&d_b,      size*size * sizeof(int));
+	cudaMalloc((void **)&d_result, size*size * sizeof(int));
 
-	cudaMalloc((void **)&d_a, size*size*sizeof(int));
-	cudaMalloc((void **)&d_b, size*size * sizeof(int));
-	cudaMalloc((void **)&d_result, size*size* sizeof(int));
 
-
-	//copy host array to device array
-
+	// 从CPU 拷贝两个输入矩阵到 GPU
 	cudaMemcpy(d_a, h_a, size*size* sizeof(int), cudaMemcpyHostToDevice);
 	cudaMemcpy(d_b, h_b, size*size* sizeof(int), cudaMemcpyHostToDevice);
 	
-	//Define grid and block dimensions
-	dim3 dimGrid(size / TILE_SIZE, size / TILE_SIZE, 1);
-	dim3 dimBlock(TILE_SIZE, TILE_SIZE, 1);
-	//gpu_Matrix_Mul_nonshared << <dimGrid, dimBlock >> > (d_a, d_b, d_result, size);
-
-	gpu_Matrix_Mul_shared << <dimGrid, dimBlock >> > (d_a, d_b, d_result, size);
-
-	cudaMemcpy(h_result, d_result, size*size * sizeof(int),	cudaMemcpyDeviceToHost);
-	printf("The result of Matrix multiplication is: \n");
+	// 定义GPU 使用情况
+	dim3 dimGrid(size / TILE_SIZE, size / TILE_SIZE, 1); // 2D 线程格 每格 有 (size / TILE_SIZE)^2 个线程块
+	dim3 dimBlock(TILE_SIZE, TILE_SIZE, 1);              // 2D 线程块 每块有 TILE_SIZE*TILE_SIZE 个线程 2*2
 	
+	// 不使用共享内存实现
+	//gpu_Matrix_Mul_nonshared << <dimGrid, dimBlock >> > (d_a, d_b, d_result, size);
+	
+        // 使用共享内存实现
+	gpu_Matrix_Mul_shared << <dimGrid, dimBlock >> > (d_a, d_b, d_result, size);
+        
+	// 从 GPU 拷贝 结果数据 到 CPU
+	cudaMemcpy(h_result, d_result, size*size * sizeof(int),	cudaMemcpyDeviceToHost);
+	
+	// 打印结果
+	printf("The result of Matrix multiplication is: \n");
 	for (int i = 0; i< size; i++)
 	{
 		for (int j = 0; j < size; j++)
@@ -1158,6 +1179,8 @@ int main()
 		}
 		printf("\n");
 	}
+	
+	// 清空GPU内存====
 	cudaFree(d_a);
 	cudaFree(d_b);
 	cudaFree(d_result);
