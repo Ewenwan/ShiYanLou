@@ -55,6 +55,41 @@
 	   在通用计算中，其适合实现图像处理和查找，对大量数据的随机访问和非对齐访问也有良好的加速效果。
            特点：具有纹理缓存，只读。
 
+# threadIdx，blockIdx, blockDim, gridDim之间的区别与联系
+
+     在启动kernel的时候，要通过指定gridsize和blocksize才行
+     dim3 gridsize(2,2);   // 2行*2列*1页 形状的线程格，也就是说 4个线程块
+        gridDim.x，gridDim.y，gridDim.z相当于这个dim3的x，y，z方向的维度，这里是2*2*1。
+	序号从0到3，且是从上到下的顺序，就是说是下面的情况:
+	 具体到 线程格 中每一个 线程块的 id索引为：
+        grid 中的 blockidx 序号标注情况为：      0     2 
+                                               1     3
+     dim3 blocksize(4,4);  // 线程块的形状，4行*4列*1页，一个线程块内部共有 16个线程
+     
+     blockDim.x，blockDim.y，blockDim.z相当于这个dim3的x，y，z方向的维度，这里是4*4*1.序号是0-15，也是从上到下的标注：
+
+     block中的 threadidx 序号标注情况    0       4       8      12 
+                                        1       5       9      13
+                                        2       6       10     14
+                                        3       7       11     15
+    1.  1维格子，1维线程块，N个线程======
+    
+         实际的线程id tid =  blockidx.x * blockDim.x + threadidx.x
+         块id   0 1 2 3 
+	 线程id 0 1 2 3 4
+    2. 1维格子，2D维线程块
+         块id   1 2 3 
+	 线程id  0  2
+	         1  3
+		               块id           块线程总数
+         实际的线程id tid =  blockidx.x * blockDim.x * blockDim.y + 
+	                       当前线程行数    每行线程数
+	                    threadidx.y * blockDim.x   + 
+			       当前线程列数
+	                    threadidx.x
+	 
+
+
 # 1、hello wold
 ```c
 // 输出hello world
@@ -892,48 +927,60 @@ int main()
 
 ```
 
-### 10) 向量点乘 
+### 10) 向量点乘 ，使用共享内存实现
 ```c
 #include "stdio.h"
 #include<iostream>
 #include <cuda.h>
 #include <cuda_runtime.h>
-#define N 1024
-#define threadsPerBlock 512
+
+#define N 1024 //  向量/数组 元素数量
+#define threadsPerBlock 512 // 每个线程块，分配的线程数
 
 
 __global__ void gpu_dot(float *d_a, float *d_b, float *d_c) {
-	//Declare shared memory
+
+	// 定义 共享内存变量，每个线程格 共享====================
 	__shared__ float partial_sum[threadsPerBlock];
+	
+	// 当前 总线程id
 	int tid = threadIdx.x + blockIdx.x * blockDim.x;
-	//Calculate index for shared memory 
+	
+	// 当前线程格内 线程id
 	int index = threadIdx.x;
 	//Calculate Partial Sum
 	float sum = 0;
 	while (tid < N) 
 	{
-		sum += d_a[tid] * d_b[tid];
-		tid += blockDim.x * gridDim.x;
+		sum += d_a[tid] * d_b[tid];// 相乘后加和
+		tid += blockDim.x * gridDim.x;//一次执行一个线程格
+		// 所有线程格中 某一个对应位置的线程计算的和
+		// 但是不同线程格，该 共享数据不共享
+		// 所以上面 得到的 也只是 每个线程格内 每个线程 计算得到的结果=====
 	}
 
-	// Store partial sum in shared memory
+	// 每个对应位置的线程，在所有线程格中的计算和
 	partial_sum[index] = sum;
 
-	// synchronize threads 
+	// 等待所有线程计算结束
 	__syncthreads();
 
-	// Calculating partial sum for whole block in reduce operation
-	
-	int i = blockDim.x / 2;
-	while (i != 0) {
+
+	// 计算一个线程块内所有线程的和=================
+	int i = blockDim.x / 2; // 线程块维度/2
+	while (i != 0) 
+	{
+	        // 右半部分 对应位置 叠加到 左半部分
 		if (index < i)
 			partial_sum[index] += partial_sum[index + i];
+			
 		__syncthreads();
-		i /= 2;
+		i /= 2;// 折半
 	}
-	//Store block partial sum in global memory
+	
+	// 在每个线程块一开始时，上述 partial_sum 刚好计算完成，partial_sum[0]保存了一个线程块内所有线程计算的和
 	if (index == 0)
-		d_c[blockIdx.x] = partial_sum[0];
+		d_c[blockIdx.x] = partial_sum[0]; //  每个线性块，计算得到结果
 }
 
 
@@ -945,42 +992,57 @@ int main(void)
 	// 定义GPU变量
 	float *d_a, *d_b, *d_partial_sum;
 	
-	//Calculate total number of blocks per grid
+	// 计算总线程块数量
 	int block_calc = (N + threadsPerBlock - 1) / threadsPerBlock;
+	
+	// 每个线程格具有的线程块数量，线程格数
 	int blocksPerGrid = (32 < block_calc ? 32 : block_calc);
-	// allocate memory on the host side
-	h_a = (float*)malloc(N * sizeof(float));
-	h_b = (float*)malloc(N * sizeof(float));
-	partial_sum = (float*)malloc(blocksPerGrid * sizeof(float));
+	
+	// 在CPU上分配 内存
+	h_a = (float*)malloc(N * sizeof(float)); // 1*N 浮点型数组
+	h_b = (float*)malloc(N * sizeof(float)); // 1*N 浮点型数组
+	
+	// 是以线程块为执行单位的
+	partial_sum = (float*)malloc(blocksPerGrid * sizeof(float));// 每个线程格执行的 结果
 
-	// allocate the memory on the device
-	cudaMalloc((void**)&d_a, N * sizeof(float));
+	// 在GPU上分配内存
+	cudaMalloc((void**)&d_a, N * sizeof(float));// 1*N 浮点型数组
 	cudaMalloc((void**)&d_b, N * sizeof(float));
-	cudaMalloc((void**)&d_partial_sum, blocksPerGrid * sizeof(float));
+	cudaMalloc((void**)&d_partial_sum, blocksPerGrid * sizeof(float));// 每个线程格执行的 结果
 
-	// fill the host array with data
+	// 填充CPU数据，两个向量
 	for (int i = 0; i<N; i++) {
 		h_a[i] = i;
-		h_b[i] = 2;
+		h_b[i] = 2;  // 扩大两倍
 	}
-
+        
+	// cpu输入数组 复制到 GPU数据
 	cudaMemcpy(d_a, h_a, N * sizeof(float), cudaMemcpyHostToDevice);
 	cudaMemcpy(d_b, h_b, N * sizeof(float), cudaMemcpyHostToDevice);
-	//Call kernel 
+	
+	// 线程格，线程数    
 	gpu_dot << <blocksPerGrid, threadsPerBlock >> >(d_a, d_b, d_partial_sum);
 
-	// copy the array back to host memory
+	// 拷贝GPU数据 到 cpu
 	cudaMemcpy(partial_sum, d_partial_sum, blocksPerGrid * sizeof(float), cudaMemcpyDeviceToHost);
 
-	// Calculate final dot product on host
+	// 对每个线程格计算的结果在此求和
 	h_c = 0;
-	for (int i = 0; i<blocksPerGrid; i++) {
-		h_c += partial_sum[i];
+	for (int i = 0; i<blocksPerGrid; i++) 
+	{
+		h_c += partial_sum[i]; // 求和
 	}
+	
+	// 打印最终的结果
 	printf("The computed dot product is: %f\n", h_c);
+	
+// 验证计算结果是否正确 
 #define cpu_sum(x) (x*(x+1))
 	if (h_c == cpu_sum((float)(N - 1)))
 	{
+	// 计算过程为 (0+2+...+ N-1)*2 = (N-1)*N
+	// 可以尝试 1+ 2^2 + 3^2 + ... + N^2 = N(N+1)(2*N+1)/6
+	// 1+ 2^3 + 3^3 + ... + N^3 = (N(N+1)/2)^2
 		printf("The dot product computed by GPU is correct\n");
 	}
 	else
@@ -988,7 +1050,6 @@ int main(void)
 		printf("Error in dot product computation");
 	}
 	
-
 	// 清理gpu内存
 	cudaFree(d_a);
 	cudaFree(d_b);
@@ -1002,9 +1063,103 @@ int main(void)
 
 ```
 
-### 11)
+### 11)  Matrix multiplication 矩阵乘法，无共享内存实现
 ```c
+//Matrix multiplication using shared and non shared kernal
+#include "stdio.h"
+#include<iostream>
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include <math.h>
+#define TILE_SIZE 2
 
+
+//Matrix multiplication using non shared kernel
+__global__ void gpu_Matrix_Mul_nonshared(float *d_a, float *d_b, float *d_c, const int size)
+{
+	int row, col;
+	col = TILE_SIZE * blockIdx.x + threadIdx.x;
+	row = TILE_SIZE * blockIdx.y + threadIdx.y;
+
+	for (int k = 0; k< size; k++)
+	{
+		d_c[row*size + col] += d_a[row * size + k] * d_b[k * size + col];
+	}
+}
+
+// Matrix multiplication using shared kernel
+__global__ void gpu_Matrix_Mul_shared(float *d_a, float *d_b, float *d_c, const int size)
+{
+	int row, col;
+	//Defining Shared Memory
+	__shared__ float shared_a[TILE_SIZE][TILE_SIZE];
+	__shared__ float shared_b[TILE_SIZE][TILE_SIZE];
+	col = TILE_SIZE * blockIdx.x + threadIdx.x;
+	row = TILE_SIZE * blockIdx.y + threadIdx.y;
+
+	for (int i = 0; i< size / TILE_SIZE; i++) 
+	{
+		shared_a[threadIdx.y][threadIdx.x] = d_a[row* size + (i*TILE_SIZE + threadIdx.x)];
+		shared_b[threadIdx.y][threadIdx.x] = d_b[(i*TILE_SIZE + threadIdx.y) * size + col];
+		__syncthreads(); 
+		for (int j = 0; j<TILE_SIZE; j++)
+			d_c[row*size + col] += shared_a[threadIdx.x][j] * shared_b[j][threadIdx.y];
+		__syncthreads(); 
+
+	}
+}
+
+// main routine
+int main()
+{
+	const int size = 4;
+	//Define Host Array
+	float h_a[size][size], h_b[size][size],h_result[size][size];
+	//Defining device Array
+	float *d_a, *d_b, *d_result; 
+	//Initialize host Array
+	for (int i = 0; i<size; i++)
+	{
+		for (int j = 0; j<size; j++)
+		{
+			h_a[i][j] = i;
+			h_b[i][j] = j;
+		}
+	}
+
+	cudaMalloc((void **)&d_a, size*size*sizeof(int));
+	cudaMalloc((void **)&d_b, size*size * sizeof(int));
+	cudaMalloc((void **)&d_result, size*size* sizeof(int));
+
+
+	//copy host array to device array
+
+	cudaMemcpy(d_a, h_a, size*size* sizeof(int), cudaMemcpyHostToDevice);
+	cudaMemcpy(d_b, h_b, size*size* sizeof(int), cudaMemcpyHostToDevice);
+	
+	//Define grid and block dimensions
+	dim3 dimGrid(size / TILE_SIZE, size / TILE_SIZE, 1);
+	dim3 dimBlock(TILE_SIZE, TILE_SIZE, 1);
+	//gpu_Matrix_Mul_nonshared << <dimGrid, dimBlock >> > (d_a, d_b, d_result, size);
+
+	gpu_Matrix_Mul_shared << <dimGrid, dimBlock >> > (d_a, d_b, d_result, size);
+
+	cudaMemcpy(h_result, d_result, size*size * sizeof(int),	cudaMemcpyDeviceToHost);
+	printf("The result of Matrix multiplication is: \n");
+	
+	for (int i = 0; i< size; i++)
+	{
+		for (int j = 0; j < size; j++)
+		{
+			printf("%f   ", h_result[i][j]);
+		}
+		printf("\n");
+	}
+	cudaFree(d_a);
+	cudaFree(d_b);
+	cudaFree(d_result);
+	return 0;
+}
 
 
 ```
