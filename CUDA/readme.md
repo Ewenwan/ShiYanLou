@@ -13,6 +13,8 @@
 
 [并行编程 CUDA openMP 等](http://heather.cs.ucdavis.edu/~matloff/158/PLN/ParProcBook.pdf)
 
+[并行编程 CUDA openMP 等 中文版](https://github.com/thirdwing/ParaBook)
+
 # CUDA存储器类型：
 
 	每个线程拥有自己的 register寄存器 and loacal memory 局部内存
