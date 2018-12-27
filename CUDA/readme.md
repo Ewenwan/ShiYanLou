@@ -1540,24 +1540,240 @@ int main(void)
 
 ### 4) rank_sort  排列排序算法
 ```c
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
+#include <stdio.h>
 
+#define arraySize 5
+#define threadPerBlock 5
 
+// 和函数，对a数组进行排序后 放入b数组
+__global__ void addKernel(int *d_a, int *d_b)
+{
+	int count = 0;
+	int tid = threadIdx.x; // 当前块中线程id
+	int ttid = blockIdx.x * threadPerBlock + tid;// 总线程id
+	
+	int val = d_a[ttid];// 当前 数组元素
+	
+        // 共享内存，一个线程块共享
+	__shared__ int cache[threadPerBlock];
+	
+	for (int i = tid; i < arraySize; i += threadPerBlock) // 多线程块中对应的线程执行的元素
+	{
+		cache[tid] = d_a[i];// 
+		__syncthreads();
+		for (int j = 0; j < threadPerBlock; ++j)
+			if (val > cache[j])
+				count++;// 位置指针
+		__syncthreads();
+	}
+	d_b[count] = val;// 按大小放入对应位置
+}
 
+int main()
+{
+    // cpu数据
+    int h_a[arraySize] = { 5, 9, 3, 4, 8 };
+    int h_b[arraySize];
+    int *d_a, *d_b; // 指针，指向gpu数据地址
+	 
+    // 分配GPU内存
+    cudaMalloc((void**)&d_b, arraySize * sizeof(int));
+    cudaMalloc((void**)&d_a, arraySize * sizeof(int));
+    
+    // 赋值CPU数据 到 GPU
+    cudaMemcpy(d_a, h_a, arraySize * sizeof(int), cudaMemcpyHostToDevice);
+    
+    // 每个线程计算一个元素
+    addKernel<<<arraySize/threadPerBlock, threadPerBlock>>>(d_a, d_b);
+    // 设备同步，等待GPU计算完成
+    cudaDeviceSynchronize();
+    // 赋值GPU结果到 CPU
+    cudaMemcpy(h_b, d_b, arraySize * sizeof(int), cudaMemcpyDeviceToHost);
+    
+    // 打印结果
+    printf("The Enumeration sorted Array is: \n");
+    for (int i = 0; i < arraySize; i++) 
+    {
+	printf("%d\n", h_b[i]);
+    }
+    
+    // 清空GPU内存
+    cudaFree(d_a);
+    cudaFree(d_b);
+    
+    return 0;
+}
+	 
 ```
 
 ### 5) histogram 直方图计算  有/无 元组操作
 ```c
+#include <stdio.h>
+#include <cuda_runtime.h>
+ 
+#define SIZE 1000  // 数组元素数量， 按大小分配到 16个格子的直方图中
+#define NUM_BIN 16 // 直方图 bin数量
 
+// 无 原子操作
+__global__ void histogram_without_atomic(int *d_b, int *d_a)
+{       
+        // 当前总线程id
+	int tid = threadIdx.x + blockDim.x * blockIdx.x;
+	int item = d_a[tid];// 该数组元素
+	if (tid < SIZE)
+	{
+		d_b[item]++;// 数据为整形，直接以数据为直方图索引，对应直方图bin计数++
+	}
+	
+}
+// 原子操作加法
+__global__ void histogram_atomic(int *d_b, int *d_a)
+{
+	int tid = threadIdx.x + blockDim.x * blockIdx.x; // 当前总线程id
+	int item = d_a[tid];// 该数组元素
+	if (tid < SIZE)
+	{
+		atomicAdd(&(d_b[item]), 1);// 原子操作+1
+	}
+}
+
+int main()
+{
+	// 待计算直方图的 一维数组向量
+	int h_a[SIZE];
+	for (int i = 0; i < SIZE; i++)
+	{
+		
+		h_a[i] = i % NUM_BIN;
+	}
+	
+	// 初始化直方图======
+	int h_b[NUM_BIN];
+	for (int i = 0; i < NUM_BIN; i++)
+	{
+		h_b[i] = 0;
+	}
+
+	// 定义GPU数据指针
+	int * d_a;
+	int * d_b;
+
+	// 分配 GPU数据内存
+	cudaMalloc((void **)&d_a, SIZE * sizeof(int));
+	cudaMalloc((void **)&d_b, NUM_BIN * sizeof(int));
+
+	// 拷贝cpu数据 到 gpu中
+	cudaMemcpy(d_a, h_a, SIZE * sizeof(int), cudaMemcpyHostToDevice);
+	cudaMemcpy(d_b, h_b, NUM_BIN * sizeof(int), cudaMemcpyHostToDevice);
+
+	
+	// 启动核函数，多个线程格子，每个线程格子内共bin个线程，每个线程分配一个bin
+	histogram_without_atomic << <((SIZE+NUM_BIN-1) / NUM_BIN), NUM_BIN >> >(d_b, d_a);
+	//histogram_atomic << <((SIZE+NUM_BIN-1) / NUM_BIN), NUM_BIN >> >(d_b, d_a);
+		
+
+	// 从GPU 拷贝结果 到CPU 
+	cudaMemcpy(h_b, d_b, NUM_BIN * sizeof(int), cudaMemcpyDeviceToHost);
+	printf("Histogram using 16 bin without shared Memory is: \n");
+	// 打印结果
+	for (int i = 0; i < NUM_BIN; i++) 
+	{
+		printf("bin %d: count %d\n", i, h_b[i]);
+	}
+
+	// 清空GPU内存
+	cudaFree(d_a);
+	cudaFree(d_b);
+	return 0;
+}
 
 
 ```
 
 ### 6) histogram 直方图计算 共享内存
 ```c
-https://github.com/PacktPublishing/Hands-On-GPU-Accelerated-Computer-Vision-with-OpenCV-and-CUDA/blob/master/Chapter4/06_histogram_shared_memory.cu
+// https://github.com/PacktPublishing/Hands-On-GPU-Accelerated-Computer-Vision-with-OpenCV-and-CUDA/blob/master/Chapter4/06_histogram_shared_memory.cu
+
+#include <stdio.h>
+#include <cuda_runtime.h>
+#define SIZE 1000   // 向量大小
+#define NUM_BIN 256 // 直方图数量
+
+// 使用共享内存 进行直方图计算
+__global__ void histogram_shared_memory(int *d_b, int *d_a)
+{
+	int tid = threadIdx.x + blockDim.x * blockIdx.x;// 当前总线程id
+	int offset = blockDim.x * gridDim.x;// 一个线程格，线程数量，
+	
+	__shared__ int cache[256];// 一个线程块内共享数据
+	cache[threadIdx.x] = 0;   // 一开始初始化为0
+	__syncthreads();
+	
+	while (tid < SIZE)
+	{
+		atomicAdd(&(cache[d_a[tid]]), 1);// 对应元素位置的 直方图bin中计数+1
+		tid += offset; // 跳过 步长
+	}
+	__syncthreads();//线程同步
+	
+	atomicAdd(&(d_b[threadIdx.x]), cache[threadIdx.x]);// 累加到 对应的直方图bin中
+}
+
+int main()
+{
+	// 生成待分配 数组，CPU中
+	int h_a[SIZE];
+	for (int i = 0; i < SIZE; i++) 
+	{
+		//h_a[i] = bit_reverse(i, log2(SIZE));
+		h_a[i] = i % NUM_BIN;
+	}
+	// 初始化直方图数组
+	int h_b[NUM_BIN];
+	for (int i = 0; i < NUM_BIN; i++)
+	{
+		h_b[i] = 0;
+	}
+
+	// 定义 GPU数据指针
+	int * d_a;
+	int * d_b;
+
+	// 分配 GPU 内存
+	cudaMalloc((void **)&d_a, SIZE * sizeof(int)); // 原数组
+	cudaMalloc((void **)&d_b, NUM_BIN * sizeof(int));// 直方图数组
+
+	//拷贝CPU数据到GPU
+	cudaMemcpy(d_a, h_a, SIZE * sizeof(int), cudaMemcpyHostToDevice);
+	cudaMemcpy(d_b, h_b, NUM_BIN * sizeof(int), cudaMemcpyHostToDevice);
+
+
+	// 启动核函数，现场格子内 NUM_BIN个线程
+	histogram_shared_memory << <SIZE / NUM_BIN, NUM_BIN >> >(d_b, d_a);
+
+
+	// 拷贝GPU结果 到CPU
+	cudaMemcpy(h_b, d_b, NUM_BIN * sizeof(int), cudaMemcpyDeviceToHost);
+	// 打印结果
+	printf("Histogram using 16 bin is: ");
+	for (int i = 0; i < NUM_BIN; i++) 
+	{
+		printf("bin %d: count %d\n", i, h_b[i]);
+	}
+
+	// 清空gpu内存
+	cudaFree(d_a);
+	cudaFree(d_b);
+
+	return 0;
+}
 
 
 ```
+
+
 
 
 ## c 图像读取、显示形状、播放视频、add、sub、颜色空间转换、阈值操作等
