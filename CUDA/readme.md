@@ -1408,6 +1408,133 @@ Error:
 ```c
 // https://github.com/PacktPublishing/Hands-On-GPU-Accelerated-Computer-Vision-with-OpenCV-and-CUDA/blob/master/Chapter4/03_cuda_streams.cu
 
+#include "stdio.h"
+#include<iostream>
+#include <cuda.h>
+#include <cuda_runtime.h>
+
+// 向量大小
+#define N    50000
+
+// 向量加法核函数
+__global__ void gpuAdd(int *d_a, int *d_b, int *d_c)
+{
+	//总线程id = 当前块线程id.x + 块id*块维度x
+	int tid = threadIdx.x + blockIdx.x * blockDim.x;
+	while (tid < N)
+	{
+		d_c[tid] = d_a[tid] + d_b[tid];// 加法
+		tid += blockDim.x * gridDim.x; // 一次执行一个格子 块维度x*格子维度x
+	}
+
+}
+
+int main(void) 
+{
+	// 定义CPU数据
+	int *h_a, *h_b, *h_c;
+	
+	// GPU stream 0 变量数据指针
+	int *d_a0, *d_b0, *d_c0;
+	// GPU stream 1 变量数据指针
+	int *d_a1, *d_b1, *d_c1;
+	
+        // cudaStream 变量
+	cudaStream_t stream0, stream1;
+	cudaStreamCreate(&stream0);
+	cudaStreamCreate(&stream1);
+	
+	// cudaEvent 变量 计时
+	cudaEvent_t e_start, e_stop;
+	cudaEventCreate(&e_start);
+	cudaEventCreate(&e_stop);
+	cudaEventRecord(e_start, 0);// 启动计时
+
+        // 分配cpu 内存?? 对应两个 cudaStream   大小为两倍
+	cudaHostAlloc((void**)&h_a, N *2* sizeof(int), cudaHostAllocDefault);
+	cudaHostAlloc((void**)&h_b, N *2* sizeof(int), cudaHostAllocDefault);
+	cudaHostAlloc((void**)&h_c, N *2*sizeof(int),  cudaHostAllocDefault);
+
+
+	// 分配两个 cudaStream  对应的变量的 gpu中的内存
+	cudaMalloc((void**)&d_a0, N * sizeof(int));
+	cudaMalloc((void**)&d_b0, N * sizeof(int));
+	cudaMalloc((void**)&d_c0, N * sizeof(int));
+	cudaMalloc((void**)&d_a1, N * sizeof(int));
+	cudaMalloc((void**)&d_b1, N * sizeof(int));
+	cudaMalloc((void**)&d_c1, N * sizeof(int));
+	
+	// 初始化cpu数据
+	for (int i = 0; i < N*2; i++) 
+	{
+		h_a[i] = 2 * i*i;
+		h_b[i] = i;
+	}
+	
+	// cpu数据 复制到 指定stream的 gpu中，
+	cudaMemcpyAsync(d_a0, h_a , N * sizeof(int), cudaMemcpyHostToDevice, stream0);
+	cudaMemcpyAsync(d_a1, h_a+ N, N * sizeof(int), cudaMemcpyHostToDevice, stream1);
+	cudaMemcpyAsync(d_b0, h_b , N * sizeof(int), cudaMemcpyHostToDevice, stream0);
+	cudaMemcpyAsync(d_b1, h_b + N, N * sizeof(int), cudaMemcpyHostToDevice, stream1);
+	
+	//调用核函数，512块，*512线程，传入 stream 指针
+	gpuAdd << <512, 512, 0, stream0 >> > (d_a0, d_b0, d_c0);
+	gpuAdd << <512, 512, 0, stream1 >> > (d_a1, d_b1, d_c1);
+	
+	// 拷贝GPU结果到 cpu
+	cudaMemcpyAsync(h_c , d_c0, N * sizeof(int), cudaMemcpyDeviceToHost, stream0);
+	cudaMemcpyAsync(h_c + N, d_c1, N * sizeof(int), cudaMemcpyDeviceToHost, stream0);
+	
+	// 设备同步 和 stream 同步，等待执行结束
+	cudaDeviceSynchronize();
+	cudaStreamSynchronize(stream0);
+	cudaStreamSynchronize(stream1);
+	
+	// EventRecord 计时
+	cudaEventRecord(e_stop, 0);
+	// 等待 EventRecord结束
+	cudaEventSynchronize(e_stop);
+	
+	// 计算处理时间
+	float elapsedTime;
+	cudaEventElapsedTime(&elapsedTime, e_start, e_stop);
+	printf("Time to add %d numbers: %3.1f ms\n",2* N, elapsedTime);
+
+        // 验证计算结果
+	int Correct = 1;
+	printf("Vector addition on GPU \n");
+	//Printing result on console
+	for (int i = 0; i < 2*N; i++) 
+	{
+		if ((h_a[i] + h_b[i] != h_c[i]))
+		{
+			Correct = 0;
+		}
+
+	}
+	if (Correct == 1)
+	{
+		printf("GPU has computed Sum Correctly\n");
+	}
+	else
+	{
+		printf("There is an Error in GPU Computation\n");
+	}
+	
+	// 清空GPU内存
+	cudaFree(d_a0);
+	cudaFree(d_b0);
+	cudaFree(d_c0);
+	cudaFree(d_a0);
+	cudaFree(d_b0);
+	cudaFree(d_c0);
+	
+	// 清空cuda分配的cpu内存
+	cudaFreeHost(h_a);
+	cudaFreeHost(h_b);
+	cudaFreeHost(h_c);
+	return 0;
+}
 
 ```
 
