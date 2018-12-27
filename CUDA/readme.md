@@ -9,8 +9,9 @@
 
 [CUDA Program：CUDA image rgb to gray；CUDA KLT](https://github.com/canteen-man/CUDA-Program)
 
-
 [CUDA 编程 加速 计算机视觉 ！！！推荐](https://github.com/PacktPublishing/Hands-On-GPU-Accelerated-Computer-Vision-with-OpenCV-and-CUDA)
+
+[并行编程 CUDA openMP 等](http://heather.cs.ucdavis.edu/~matloff/158/PLN/ParProcBook.pdf)
 
 # CUDA存储器类型：
 
