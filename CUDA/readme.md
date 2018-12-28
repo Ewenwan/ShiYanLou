@@ -2292,7 +2292,7 @@ std::cout <<"FPS: " <<work_fps <<std::endl;
 ```
 
 
-## c opencv GPU接口 直方图均衡化  变形 仿射变换 均值滤波器 高斯核滤波器
+## d opencv GPU接口 直方图均衡化  变形 仿射变换 均值滤波器 高斯核滤波器 索贝尔 拉普拉斯 腐蚀膨胀
 ### 1)opencv GPU接口 直方图均衡化 
 ```c
 #include <iostream>
@@ -2661,7 +2661,305 @@ int main ()
 ```
 
 
-### 9)
+### 9) GPU 腐蚀膨胀操作
+```c
+#include <iostream>
+#include "opencv2/opencv.hpp"
+
+
+int main ()
+{
+	cv::Mat h_img1 = cv::imread("images/blobs.png",0);
+	cv::cuda::GpuMat d_img1,d_resulte,d_resultd,d_resulto, d_resultc;
+	cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT,cv::Size(5,5));// 长方形核	
+	d_img1.upload(h_img1);
+	
+	cv::Ptr<cv::cuda::Filter> filtere,filterd,filtero,filterc;
+	
+	filtere = cv::cuda::createMorphologyFilter(cv::MORPH_ERODE,CV_8UC1,element);// 腐蚀操作
+	filtere->apply(d_img1, d_resulte);
+	filterd = cv::cuda::createMorphologyFilter(cv::MORPH_DILATE,CV_8UC1,element);//膨胀操作
+	filterd->apply(d_img1, d_resultd);
+	filtero = cv::cuda::createMorphologyFilter(cv::MORPH_OPEN,CV_8UC1,element);// 开运算
+	filtero->apply(d_img1, d_resulto);
+	filterc = cv::cuda::createMorphologyFilter(cv::MORPH_CLOSE,CV_8UC1,element);// 闭运算
+	filterc->apply(d_img1, d_resultc);
+
+	cv::Mat h_resulte,h_resultd,h_resulto,h_resultc;
+	d_resulte.download(h_resulte);
+	d_resultd.download(h_resultd);
+	d_resulto.download(h_resulto);
+	d_resultc.download(h_resultc);
+	cv::imshow("Original Image ", h_img1);
+	cv::imshow("Erosion", h_resulte);
+	cv::imshow("Dilation", h_resultd);
+	cv::imshow("Opening", h_resulto);
+	cv::imshow("closing", h_resultc);
+	cv::imwrite("erosion7.png", h_resulte);
+	cv::imwrite("dilation7.png", h_resultd);
+	cv::imwrite("opening7.png", h_resulto);
+	cv::imwrite("closing7.png", h_resultc);
+	cv::waitKey();
+	return 0;
+}
+
+
+```
+
+## e opencv GPU接口 边缘检测 orb sift 特征 candy hough mog 级联回归人脸检测
+### 1) 蓝色通道图像 边缘检测
+```c
+#include <iostream>
+#include "opencv2/opencv.hpp"
+
+using namespace cv;
+using namespace std;
+
+ int main( int argc, char** argv )
+ {
+ // 打开摄像头
+    VideoCapture cap(0); //capture the video from web cam
+    if ( !cap.isOpened() )  
+    {
+         cout << "Cannot open the web cam" << endl;
+         return -1;
+    }
+    while (true)
+    {
+        Mat frame;
+// 读取一帧图像
+        bool flag = cap.read(frame); 
+         if (!flag) 
+        {
+             cout << "Cannot read a frame from webcam" << endl;
+             break;
+        }
+// 定义GPU数据等
+cuda::GpuMat d_frame, d_frame_hsv,d_intermediate,d_result;
+cuda::GpuMat d_frame_shsv[3];
+cuda::GpuMat d_thresc[3];
+Mat h_result;
+d_frame.upload(frame);
+
+// GPU brg 转HSV空间
+cuda::cvtColor(d_frame, d_frame_hsv, COLOR_BGR2HSV);
+
+// HSV空间 通道分割
+cuda::split(d_frame_hsv, d_frame_shsv);
+
+// 阈值，最大值
+// 三通道，阈值二值化，大于阈值为1
+cuda::threshold(d_frame_shsv[0], d_thresc[0], 110, 130, THRESH_BINARY);
+cuda::threshold(d_frame_shsv[1], d_thresc[1], 50, 255, THRESH_BINARY);
+cuda::threshold(d_frame_shsv[2], d_thresc[2], 50, 255, THRESH_BINARY);
+
+// 二值化三通通道与操作
+cv::cuda::bitwise_and(d_thresc[0], d_thresc[1],d_intermediate);
+cv::cuda::bitwise_and(d_intermediate, d_thresc[2], d_result);
+
+d_result.download(h_result);
+imshow("Thresholded Image", h_result); 
+imshow("Original", frame); 
+
+        if (waitKey(1) == 'q') 
+       {
+            break; 
+       }
+    }
+   return 0;
+}
+
+
+```
+
+### 2) GPU canny边缘检测 
+```c
+#include <cmath>
+#include <iostream>
+#include "opencv2/opencv.hpp"
+
+using namespace std;
+using namespace cv;
+using namespace cv::cuda;
+
+
+int main()
+{
+	Mat h_image = imread("images/drawing.JPG",0);
+	if (h_image.empty())
+	{
+	    cout << "can not open image"<< endl;
+	    return -1;
+	}
+	GpuMat d_edge,d_image;
+	Mat h_edge;
+	d_image.upload(h_image);
+	
+	// 边缘检测指针
+	cv::Ptr<cv::cuda::CannyEdgeDetector> canny_edge = cv::cuda::createCannyEdgeDetector(2.0, 100.0, 3, false);
+	// 创建边缘检测器
+	canny_edge->detect(d_image, d_edge);
+	
+	d_edge.download(h_edge);
+	imshow("source", h_image);
+	imshow("detected edges", h_edge);
+	 waitKey(0);
+
+	return 0;
+}
+
+
+```
+
+### 3) 霍夫线变换  cpu  与 gpu 函数 运行时间对比
+```c
+#include <cmath>
+#include <iostream>
+#include "opencv2/opencv.hpp"
+
+using namespace std;
+using namespace cv;
+using namespace cv::cuda;
+
+
+int main()
+{
+    Mat h_image = imread("images/drawing.JPG",0);
+    if (h_image.empty())
+    {
+        cout << "can not open image"<< endl;
+        return -1;
+    }
+
+    Mat h_edge;
+    // 首先需要进行边缘检测
+    cv::Canny(h_image, h_edge, 100, 200, 3);
+
+    Mat h_imagec;
+    cv::cvtColor(h_edge, h_imagec, COLOR_GRAY2BGR);// 变成3通道，可以显示彩色线条
+    
+    Mat h_imageg = h_imagec.clone();
+    vector<Vec4i> h_lines;
+    
+    // CPU 霍夫线变换计时 HoughLinesP()===================================
+    {
+        const int64 start = getTickCount(); // 计时=====
+        HoughLinesP(h_edge, h_lines, 1, CV_PI / 180, 50, 60, 5);
+        const double time_elapsed = (getTickCount() - start) / getTickFrequency();
+        cout << "CPU Time : " << time_elapsed * 1000 << " ms" << endl;
+        cout << "CPU FPS : " << (1/time_elapsed) << endl;
+    }
+    for (size_t i = 0; i < h_lines.size(); ++i)
+    {
+        // 在图像上 画上检测出来的 直线========
+        Vec4i line_point = h_lines[i];
+        line(h_imagec, Point(line_point[0], line_point[1]), Point(line_point[2], line_point[3]), Scalar(0, 0, 255), 2, LINE_AA);
+    }
+
+    GpuMat d_edge, d_lines;// GPU 中 检测结果
+    
+    d_edge.upload(h_edge);// 边缘图像
+    {
+	const int64 start = getTickCount();
+        Ptr<cuda::HoughSegmentDetector> hough = cuda::createHoughSegmentDetector(1.0f, (float) (CV_PI / 180.0f), 50, 5);
+        hough->detect(d_edge, d_lines);
+
+        const double time_elapsed = (getTickCount() - start) / getTickFrequency();
+        cout << "GPU Time : " << time_elapsed * 1000 << " ms" << endl;
+       cout << "GPU FPS : " << (1/time_elapsed) << endl;
+    }
+    vector<Vec4i> lines_g;
+    if (!d_lines.empty())
+    {
+        lines_g.resize(d_lines.cols);
+        Mat h_lines(1, d_lines.cols, CV_32SC4, &lines_g[0]);
+        d_lines.download(h_lines);// 拷贝检测结果==========
+    }
+    for (size_t i = 0; i < lines_g.size(); ++i)
+    {
+        // 在图像上 画上检测出来的 直线========
+        Vec4i line_point = lines_g[i];
+        line(h_imageg, Point(line_point[0], line_point[1]), Point(line_point[2], line_point[3]), Scalar(0, 0, 255), 2, LINE_AA);
+    }
+
+    imshow("source", h_image);
+    imshow("detected lines [CPU]", h_imagec);
+    imshow("detected lines [GPU]", h_imageg);
+    
+    imwrite("hough_source.png", h_image);
+    imwrite("hough_cpu_line.png", h_imagec);
+    imwrite("hough_gpu_line.png", h_imageg);
+    
+    waitKey(0);
+
+    return 0;
+}
+
+
+```
+
+
+### 4) OPENCV GPU faster特征点检测
+```c
+#include <iostream>
+#include "opencv2/opencv.hpp"
+ 
+using namespace cv;
+using namespace std;
+ 
+int main()
+{
+	Mat h_image = imread( "images/drawing.JPG", 0 );
+
+	// 创建OPENCV GPU faster特征点检测器
+	cv::Ptr<cv::cuda::FastFeatureDetector> detector = cv::cuda::FastFeatureDetector::create(100,true,2);
+	
+	std::vector<cv::KeyPoint> keypoints;// 特征点不用拷贝????
+	
+	// 上传图像
+	cv::cuda::GpuMat d_image;
+	d_image.upload(h_image);
+	
+	// 执行检测
+	detector->detect(d_image, keypoints);
+	
+	// 绘制特征点
+	cv::drawKeypoints(h_image,keypoints,h_image);
+	//Show detected keypoints
+	imshow("Final Result", h_image );
+	waitKey(0);
+	return 0;
+}
+
+
+```
+
+
+### 5)
+```c
+
+
+
+```
+
+
+### 6)
+```c
+
+
+
+```
+
+
+### 7)
+```c
+
+
+
+```
+
+
+### 8)
 ```c
 
 
@@ -2676,22 +2974,8 @@ int main ()
 
 ```
 
-### 9)
-```c
 
-
-
-```
-
-### 9)
-```c
-
-
-
-```
-
-
-### 9)
+### 10)
 ```c
 
 
@@ -2699,7 +2983,7 @@ int main ()
 ```
 
 
-### 9)
+### 11)
 ```c
 
 
@@ -2707,55 +2991,7 @@ int main ()
 ```
 
 
-### 9)
-```c
-
-
-
-```
-
-
-### 9)
-```c
-
-
-
-```
-
-
-### 9)
-```c
-
-
-
-```
-
-
-### 9)
-```c
-
-
-
-```
-
-
-### 9)
-```c
-
-
-
-```
-
-
-### 9)
-```c
-
-
-
-```
-
-
-### 9)
+### 12)
 ```c
 
 
