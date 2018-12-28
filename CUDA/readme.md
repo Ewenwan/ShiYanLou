@@ -2292,8 +2292,8 @@ std::cout <<"FPS: " <<work_fps <<std::endl;
 ```
 
 
-## c opencv GPU接口 直方图均衡化 
-### 1)
+## c opencv GPU接口 直方图均衡化  变形 仿射变换 均值滤波器 高斯核滤波器
+### 1)opencv GPU接口 直方图均衡化 
 ```c
 #include <iostream>
 #include "opencv2/opencv.hpp"
@@ -2356,65 +2356,306 @@ int main ()
 ```
 
 
-### 3)
+### 3) opencv GPU接口  图像 变形 
 ```c
+#include <iostream>
+#include "opencv2/opencv.hpp"
+#include <iostream>
+#include "opencv2/opencv.hpp"
+
+int main ()
+{
+    cv::Mat h_img1 = cv::imread("images/cameraman.tif",0);
+    cv::cuda::GpuMat d_img1,d_result1,d_result2;
+    d_img1.upload(h_img1);
+    // 原图像尺寸
+    int width= d_img1.cols;
+    int height = d_img1.size().height;
+    
+    // gpu cuda接口 图像变形 
+    cv::cuda::resize(d_img1,d_result1,cv::Size(200, 200), cv::INTER_CUBIC);// 变形到固定尺寸，
+    cv::cuda::resize(d_img1,d_result2,cv::Size(0.5*width, 0.5*height), cv::INTER_LINEAR);// 缩小一半 
+// CV_INTER_NN - 最近-邻居插补
+// CV_INTER_LINEAR - 双线性插值（默认方法）
+// CV_INTER_AREA - 像素面积相关重采样。当缩小图像时，该方法可以避免波纹的出现。当放大图像时，类似于方法CV_INTER_NN。
+// CV_INTER_CUBIC - 双三次插值。
+
+    cv::Mat h_result1,h_result2;
+    d_result1.download(h_result1);
+    d_result2.download(h_result2);
+    
+    cv::imshow("Original Image ", h_img1);
+    cv::imshow("Resized Image", h_result1);
+    cv::imshow("Resized Image 2", h_result2);
+    cv::imwrite("Resized1.png", h_result1);
+    cv::imwrite("Resized2.png", h_result2);
+    cv::waitKey();
+    return 0;
+}
+
+```
+
+### 4) opencv GPU接口  图像 仿射变换
+```c
+#include <iostream>
+#include "opencv2/opencv.hpp"
+
+int main ()
+{
+	cv::Mat h_img1 = cv::imread("images/cameraman.tif",0);
+	cv::cuda::GpuMat d_img1,d_result1,d_result2;
+	d_img1.upload(h_img1);
+	int cols= d_img1.cols;
+	int rows = d_img1.size().height;
+	
+	// 平移变换，x，水平方向平移70，y垂直方向平移50
+	cv::Mat trans_mat = (cv::Mat_<double>(2,3) << 1, 0, 70, 
+	                                              0, 1, 50);		      
+	cv::cuda::warpAffine(d_img1,d_result1,trans_mat,d_img1.size());
+	
+	// 旋转变换
+	cv::Point2f pt(d_img1.cols/2., d_img1.rows/2.); // 中心点   
+	cv::Mat r = cv::getRotationMatrix2D(pt, 45, 1.0);// 旋转45度
+	cv::cuda::warpAffine(d_img1, d_result2, r, cv::Size(d_img1.cols, d_img1.rows));
+	
+	cv::Mat h_result1,h_result2;
+	d_result1.download(h_result1);
+	d_result2.download(h_result2);
+	cv::imshow("Original Image ", h_img1);
+	cv::imshow("Translated Image", h_result1);
+	cv::imshow("Rotated Image", h_result2);
+	cv::imwrite("Translated.png", h_result1);
+	cv::imwrite("Rotated.png", h_result2);
+	cv::waitKey();
+	return 0;
+}
+```
+
+
+### 5) opencv GPU接口  图像 均值滤波器
+```c
+#include <iostream>
+#include "opencv2/opencv.hpp"
+
+
+int main ()
+{
+	cv::Mat h_img1 = cv::imread("images/cameraman.tif",0);
+	cv::cuda::GpuMat d_img1,d_result3x3,d_result5x5,d_result7x7;
+
+	d_img1.upload(h_img1);
+	// cuda滤波器指针
+	cv::Ptr<cv::cuda::Filter> filter3x3,filter5x5,filter7x7;
+	// 创建cuda滤波器 BoxFilter 
+	filter3x3 = cv::cuda::createBoxFilter(CV_8UC1,CV_8UC1,cv::Size(3,3));
+	// 执行滤波器
+	filter3x3->apply(d_img1, d_result3x3);
+	filter5x5 = cv::cuda::createBoxFilter(CV_8UC1,CV_8UC1,cv::Size(5,5));
+	filter5x5->apply(d_img1, d_result5x5);
+	filter7x7 = cv::cuda::createBoxFilter(CV_8UC1,CV_8UC1,cv::Size(7,7));
+	filter7x7->apply(d_img1, d_result7x7);
+
+	cv::Mat h_result3x3,h_result5x5,h_result7x7;
+	d_result3x3.download(h_result3x3);
+	d_result5x5.download(h_result5x5);
+	d_result7x7.download(h_result7x7);
+
+
+	cv::imshow("Original Image ", h_img1);
+	cv::imshow("Blurred with kernel size 3x3", h_result3x3);
+	cv::imshow("Blurred with kernel size 5x5", h_result5x5);
+	cv::imshow("Blurred with kernel size 7x7", h_result7x7);
+	cv::imwrite("Blurred3x3.png", h_result3x3);
+	cv::imwrite("Blurred5x5.png", h_result5x5);
+	cv::imwrite("Blurred7x7.png", h_result7x7);
+
+	cv::waitKey();
+	return 0;
+	}
+
+
+```
+
+### 6) opencv GPU接口  图像 高斯核 滤波器
+```c
+#include <iostream>
+#include "opencv2/opencv.hpp"
+
+
+int main ()
+{
+	cv::Mat h_img1 = cv::imread("images/cameraman.tif",0);
+	cv::cuda::GpuMat d_img1,d_result3x3,d_result5x5,d_result7x7;
+
+	d_img1.upload(h_img1);
+	// cuda滤波器指针
+	cv::Ptr<cv::cuda::Filter> filter3x3,filter5x5,filter7x7;
+	// 创建cuda滤波器 GaussianFilter 
+	filter3x3 = cv::cuda::createGaussianFilter(CV_8UC1,CV_8UC1,cv::Size(3,3),1);
+	// 执行滤波器
+	filter3x3->apply(d_img1, d_result3x3);
+	filter5x5 = cv::cuda::createGaussianFilter(CV_8UC1,CV_8UC1,cv::Size(5,5),1);
+	filter5x5->apply(d_img1, d_result5x5);
+	filter7x7 = cv::cuda::createGaussianFilter(CV_8UC1,CV_8UC1,cv::Size(7,7),1);
+	filter7x7->apply(d_img1, d_result7x7);
+	
+	cv::Mat h_result3x3,h_result5x5,h_result7x7;
+	d_result3x3.download(h_result3x3);
+	d_result5x5.download(h_result5x5);
+	d_result7x7.download(h_result7x7);
+	cv::imshow("Original Image ", h_img1);
+	cv::imshow("Blurred with kernel size 3x3", h_result3x3);
+	cv::imshow("Blurred with kernel size 5x5", h_result5x5);
+	cv::imshow("Blurred with kernel size 7x7", h_result7x7);
+	cv::imwrite("gBlurred3x3.png", h_result3x3);
+	cv::imwrite("gBlurred5x5.png", h_result5x5);
+	cv::imwrite("gBlurred7x7.png", h_result7x7);
+	cv::waitKey();
+	return 0;
+}
 
 
 
 ```
 
 
-### 4)
+### 7) cpu 均值滤波器
 ```c
+#include <iostream>
+#include "opencv2/opencv.hpp"
+
+int main ()
+{
+    cv::Mat h_img1 = cv::imread("images/saltpepper.png",0);
+	cv::Mat h_result;
+	cv::medianBlur(h_img1,h_result,3);
+    cv::imshow("Original Image ", h_img1);
+	cv::imshow("Median Blur Result", h_result);
+	cv::waitKey();
+    return 0;
+}
+
+
+```
+
+ 
+### 8) GPU 索贝尔滤波器
+```c
+#include <iostream>
+#include "opencv2/opencv.hpp"
+
+
+int main ()
+{
+	cv::Mat h_img1 = cv::imread("images/blobs.png",0);
+	cv::cuda::GpuMat d_img1,d_resultx,d_resulty,d_resultxy;
+	d_img1.upload(h_img1);
+	
+	cv::Ptr<cv::cuda::Filter> filterx,filtery,filterxy;
+	// 索贝尔滤波器
+	filterx = cv::cuda::createSobelFilter(CV_8UC1,CV_8UC1,1,0);// x水平方向
+	filterx->apply(d_img1, d_resultx);
+	
+	filtery = cv::cuda::createSobelFilter(CV_8UC1,CV_8UC1,0,1);// y垂直方向
+	filtery->apply(d_img1, d_resulty);
+	
+	cv::cuda::add(d_resultx,d_resulty,d_resultxy);    // 叠加
+	
+	cv::Mat h_resultx,h_resulty,h_resultxy;
+	d_resultx.download(h_resultx);
+	d_resulty.download(h_resulty);
+	d_resultxy.download(h_resultxy);
+	cv::imshow("Original Image ", h_img1);
+	cv::imshow("Sobel-x derivative", h_resultx);
+	cv::imshow("Sobel-y derivative", h_resulty);
+	cv::imshow("Sobel-xy derivative", h_resultxy);
+	cv::imwrite("sobelx.png", h_resultx);
+	cv::imwrite("sobely.png", h_resulty);
+	cv::imwrite("sobelxy.png", h_resultxy);
+	cv::waitKey();
+	return 0;
+}
+
+
+```
+
+
+### 9) GPU ScharrFilter 滤波器 类似 索贝尔 Sobel
+```c
+#include <iostream>
+#include "opencv2/opencv.hpp"
+
+
+int main ()
+{
+	cv::Mat h_img1 = cv::imread("images/blobs.png",0);
+	cv::cuda::GpuMat d_img1,d_resultx,d_resulty,d_resultxy;
+	d_img1.upload(h_img1);
+
+	cv::Ptr<cv::cuda::Filter> filterx,filtery;
+	// 创建滤波器
+	filterx = cv::cuda::createScharrFilter(CV_8UC1,CV_8UC1,1,0);
+	filterx->apply(d_img1, d_resultx);
+	filtery = cv::cuda::createScharrFilter(CV_8UC1,CV_8UC1,0,1);
+	filtery->apply(d_img1, d_resulty);
+
+	cv::cuda::add(d_resultx,d_resulty,d_resultxy);   
+
+	cv::Mat h_resultx,h_resulty,h_resultxy;
+	d_resultx.download(h_resultx);
+	d_resulty.download(h_resulty);
+	d_resultxy.download(h_resultxy);
+	
+	cv::imshow("Original Image ", h_img1);
+	cv::imshow("Scharr-x derivative", h_resultx);
+	cv::imshow("Scharr-y derivative", h_resulty);
+	cv::imshow("Scharr-xy derivative", h_resultxy);
+	
+	cv::imwrite("scharrx.png", h_resultx);
+	cv::imwrite("scharry.png", h_resulty);
+	cv::imwrite("scharrxy.png", h_resultxy);
+	cv::waitKey();
+	return 0;
+}
+
 
 
 
 ```
 
 
-### 5)
+### 9) GPU 拉普拉斯滤波器
 ```c
+#include <iostream>
+#include "opencv2/opencv.hpp"
 
 
-
-```
-
-
-### 6)
-```c
-
-
-
-```
-
-
-### 7)
-```c
-
-
-
-```
-
-
-### 8)
-```c
-
-
-
-```
-
-
-### 9)
-```c
-
-
-
-```
-
-
-### 9)
-```c
-
+int main ()
+{
+	cv::Mat h_img1 = cv::imread("images/blobs.png",0);
+	cv::cuda::GpuMat d_img1,d_result1,d_result3;
+	d_img1.upload(h_img1);
+	cv::Ptr<cv::cuda::Filter> filter1,filter3;
+	
+	// 创建滤波器
+	filter1 = cv::cuda::createLaplacianFilter(CV_8UC1,CV_8UC1,1);
+	filter1->apply(d_img1, d_result1);
+	filter3 = cv::cuda::createLaplacianFilter(CV_8UC1,CV_8UC1,3);
+	filter3->apply(d_img1, d_result3);
+	
+	cv::Mat h_result1,h_result3;
+	d_result1.download(h_result1);
+	d_result3.download(h_result3);
+	
+	cv::imshow("Original Image ", h_img1);
+	cv::imshow("Laplacian Filter 1", h_result1);
+	cv::imshow("Laplacian Filter 3", h_result3);
+	
+	cv::imwrite("laplacian1.png", h_result1);
+	cv::imwrite("laplacian3.png", h_result3);
+	cv::waitKey();
+	return 0;
+}
 
 
 ```
