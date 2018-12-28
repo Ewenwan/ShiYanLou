@@ -1779,9 +1779,300 @@ int main()
 
 
 
-## c 图像读取、显示形状、播放视频、add、sub、颜色空间转换、阈值操作等
+## c opencv图像读取、显示、视频播放等 opencvGPU接口图像add、sub、颜色空间转换、阈值操作等
 
-### 1)
+### 1) opencv 图像读取
+```c
+#include <opencv2/opencv.hpp>
+#include <iostream>
+
+using namespace cv;
+using namespace std;
+
+int main(int argc, char** argv)
+{
+ // Read the image 
+ Mat img = imread("images/cameraman.tif",0);
+
+ // Check for failure in reading an Image
+ if (img.empty()) 
+ {
+  cout << "Could not open an image" << endl;
+  return -1;
+ }
+// 可视化窗口名
+ String win_name = "My First Opencv Program"; 
+
+ // Create a window
+ namedWindow(win_name); 
+
+ // Show our image inside the created window.
+imshow(win_name, img); 
+
+// Wait for any keystroke in the window 
+waitKey(0); 
+
+//destroy the created window
+ destroyWindow(win_name); 
+
+ return 0;
+}
+```
+
+
+### 2) 创建单通道 256x256 0值 矩阵，黑色图
+```c
+#include <opencv2/opencv.hpp>
+#include <iostream>
+
+using namespace cv;
+using namespace std;
+
+int main(int argc, char** argv)
+{
+ // 创建单通道 256x256 0值 矩阵，黑色图
+ Mat img(256, 256, CV_8UC1, Scalar(0)); 
+ String win_name = "Blank Image"; 
+ namedWindow(win_name); 
+ imshow(win_name, img); 
+ waitKey(0); 
+ destroyWindow(win_name); 
+ return 0;
+}
+
+
+```
+
+
+### 3) 创建三通道 256x256 blue color 图
+```c
+#include <opencv2/opencv.hpp>
+#include <iostream>
+
+using namespace cv;
+using namespace std;
+
+int main(int argc, char** argv)
+{
+ 
+ // 通道顺序 bgr
+ Mat img(256, 256, CV_8UC3, Scalar(255,0,0)); 
+ 
+ String win_name = "Blank Blue Color Image"; 
+ namedWindow(win_name); 
+ imshow(win_name, img); 
+
+ waitKey(0); 
+ destroyWindow(win_name); 
+ return 0;
+}
+
+
+```
+
+
+### 4) opencv显示图形 
+```c
+#include <opencv2/opencv.hpp>
+#include <iostream>
+
+using namespace cv;
+using namespace std;
+
+int main(int argc, char** argv)
+{
+ // 3通道 512*512图像
+ Mat img(512, 512, CV_8UC3, Scalar(0,0,0)); 
+ // 画线条，起点，终点，颜色，粗细
+ line(img,Point(0,0),Point(511,511),Scalar(0,255,0),7);
+ // 画长方形
+ rectangle(img,Point(384,0),Point(510,128),Scalar(255,255,0),5);
+ // 画圆
+ circle(img,Point(447,63), 63, Scalar(0,0,255), -1);
+ // 画椭圆
+ ellipse(img,Point(256,256),Point(100,100),0,0,180,255,-1);
+ 
+ // 显示文字
+ putText( img, "OpenCV!", Point(10,500), FONT_HERSHEY_SIMPLEX, 3,
+           Scalar(255, 255, 255), 5, 8 );
+	   
+ String win_name = "Blank Blue Color Image"; //Name of the window
+ namedWindow(win_name); // Create a window
+ imshow(win_name, img); // Show our image inside the created window.
+
+ waitKey(0); // Wait for any keystroke in the window
+ destroyWindow(win_name); //destroy the created window
+
+ return 0;
+}
+
+
+
+```
+
+
+### 5) 播放视频文件
+```c
+#include <opencv2/opencv.hpp>
+#include <iostream>
+using namespace cv;
+using namespace std;
+int main(int argc, char* argv[])
+{
+ // 打开视频文件
+ VideoCapture cap("images/rhinos.avi"); 
+ // if not success, exit program
+ if (cap.isOpened() == false) 
+ {
+  cout << "Cannot open the video file" << endl;
+  return -1;
+ }
+cout<<"Press Q to Quit" << endl;
+String win_name = "First Video";
+namedWindow(win_name); 
+ while (true)
+ {
+  Mat frame;
+  // read a frame
+  bool flag = cap.read(frame); 
+
+  //Breaking the while loop at the end of the video
+  if (flag == false) 
+  {
+   break;
+  }
+  //display the frame 
+  imshow(win_name, frame);// 显示该帧图像
+  //Wait for 100 ms and key 'q' for exit
+  if (waitKey(100) == 'q')
+  {
+    break;
+  }
+ }
+destroyWindow(win_name);
+return 0;
+}
+
+
+```
+
+
+### 6) 打开摄像头，播放拍摄到的图像
+```c
+#include <opencv2/opencv.hpp>
+#include <iostream>
+
+using namespace cv;
+using namespace std;
+
+int main(int argc, char* argv[])
+{
+ //open the Webcam
+ VideoCapture cap(0); // 打开0号摄像头
+ // if not success, exit program
+ if (cap.isOpened() == false)  
+ {
+  cout << "Cannot open Webcam" << endl;
+  return -1;
+ }
+ //get the frames rate of the video
+ double fps = cap.get(CAP_PROP_FPS); 
+ cout << "Frames per seconds : " << fps << endl;
+cout<<"Press Q to Quit" <<endl;
+ String win_name = "Webcam Video";
+ namedWindow(win_name); //create a window
+ while (true)
+ {
+  Mat frame;
+  bool flag = cap.read(frame); // read a new frame from video 
+  //show the frame in the created window
+  imshow(win_name, frame);
+  if (waitKey(1) == 'q')
+  {
+      break;
+  }
+ }
+return 0;
+}
+
+
+```
+
+
+### 7) opencv GPU 接口 图像相加
+```c
+#include <iostream>
+#include "opencv2/opencv.hpp"
+
+int main (int argc, char* argv[])
+{
+    // 读取图像，存储在cpu上
+    cv::Mat h_img1 = cv::imread("images/cameraman.tif");
+    cv::Mat h_img2 = cv::imread("images/circles.png");
+    cv::Mat h_result1;
+    
+    // 定义GPU mat数据
+    cv::cuda::GpuMat d_result1,d_img1, d_img2;
+    // cpu上的图像 上传到 GPU中   
+    d_img1.upload(h_img1);
+    d_img2.upload(h_img2);
+    
+    // 调用GPU接执行 mat add
+    cv::cuda::add(d_img1,d_img2, d_result1);
+    
+    // 下载结果，GPU结果 到 CPU中
+    d_result1.download(h_result1);
+    
+    //显示结果
+    cv::imshow("Image1 ", h_img1);
+    cv::imshow("Image2 ", h_img2);
+    cv::imshow("Result addition ", h_result1);
+    cv::imwrite("images/result_add.png", h_result1);
+    cv::waitKey();
+    return 0;
+}
+
+
+```
+### 8) opencv GPU 接口 图像相减
+```c
+#include <iostream>
+#include "opencv2/opencv.hpp"
+
+int main (int argc, char* argv[])
+{
+    //Read Two Images 
+    cv::Mat h_img1 = cv::imread("images/cameraman.tif");
+    cv::Mat h_img2 = cv::imread("images/circles.png");
+    cv::Mat h_result1;
+    
+    // 定义GPU数据
+    cv::cuda::GpuMat d_result1,d_img1, d_img2;
+    
+    // CPU 到 GPU   
+    d_img1.upload(h_img1);
+    d_img2.upload(h_img2);
+    
+    // 调用GPU接执行 mat substract
+    cv::cuda::subtract(d_img1, d_img2,d_result1);
+    
+    // gpu 结果 到 cpu
+    d_result1.download(h_result1);
+    
+    // 显示，保存
+    cv::imshow("Image1 ", h_img1);
+    cv::imshow("Image2 ", h_img2);
+    cv::imshow("Result Subtraction ", h_result1);
+    cv::imwrite("images/result_add.png", h_result1);
+    cv::waitKey();
+    return 0;
+}
+
+
+```
+
+
+### 9)
 ```c
 
 
@@ -1789,7 +2080,7 @@ int main()
 ```
 
 
-### 2)
+### 10)
 ```c
 
 
@@ -1797,7 +2088,7 @@ int main()
 ```
 
 
-### 3)
+### 11)
 ```c
 
 
@@ -1805,7 +2096,7 @@ int main()
 ```
 
 
-### 4)
+### 12)
 ```c
 
 
@@ -1813,23 +2104,7 @@ int main()
 ```
 
 
-### 5)
-```c
-
-
-
-```
-
-
-### 6)
-```c
-
-
-
-```
-
-
-### 7)
+### 13)
 ```c
 
 
