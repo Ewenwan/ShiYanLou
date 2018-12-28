@@ -3379,19 +3379,5 @@ int main(
 
 ```
 
-##  f
-
-### 12)
-```c
-
-
-
-```
-
-
-### 9)
-```c
-
-
-
-```
+##  f 
+[pycuda ](https://github.com/PacktPublishing/Hands-On-GPU-Accelerated-Computer-Vision-with-OpenCV-and-CUDA/tree/master/Chapter11)
