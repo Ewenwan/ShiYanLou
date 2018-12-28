@@ -2072,57 +2072,285 @@ int main (int argc, char* argv[])
 ```
 
 
-### 9)
+### 9) opencv GPU 接口 图像 加权叠加
 ```c
+#include <iostream>
+#include "opencv2/opencv.hpp"
 
+int main (int argc, char* argv[])
+{
+    //Read Two Images 
+    cv::Mat h_img1 = cv::imread("images/cameraman.tif");
+    cv::Mat h_img2 = cv::imread("images/circles.png");
+    cv::Mat h_result1;
+    
+    //定义GPU数据
+    cv::cuda::GpuMat d_result1,d_img1, d_img2;
+    
+    // 上传 输入
+    d_img1.upload(h_img1);
+    d_img2.upload(h_img2);
+    
+    // 图像叠加  d_result1 = 0.7*d_img1 + d_img2*0.3 + 0.0
+    cv::cuda::addWeighted(d_img1,0.7,d_img2,0.3,0,d_result1);
+    
+    // 下载结果
+    d_result1.download(h_result1);
+    cv::imshow("Image1 ", h_img1);
+    cv::imshow("Image2 ", h_img2);
+    cv::imshow("Result blending ", h_result1);
+    cv::imwrite("images/result_add.png", h_result1);
+    cv::waitKey();
+    return 0;
+}
 
 
 ```
 
 
-### 10)
+### 10)  opencv GPU 接口 图像 二进制操作 与 或 异或 非
 ```c
+// bitwise_and是对二进制数据进行“与”操作，即对图像（灰度图像或彩色图像均可）每个像素值进行二进制“与”操作，1&1=1，1&0=0，0&1=0，0&0=0
+//bitwise_or是对二进制数据进行“或”操作，即对图像（灰度图像或彩色图像均可）每个像素值进行二进制“或”操作，1|1=1，1|0=0，0|1=0，0|0=0
+//bitwise_xor是对二进制数据进行“异或”操作，即对图像（灰度图像或彩色图像均可）每个像素值进行二进制“异或”操作，1^1=0,1^0=1,0^1=1,0^0=0
+//bitwise_not是对二进制数据进行“非”操作，即对图像（灰度图像或彩色图像均可）每个像素值进行二进制“非”操作，~1=0，~0=1
 
+
+#include <iostream>
+#include "opencv2/opencv.hpp"
+
+int main (int argc, char* argv[])
+{
+    cv::Mat h_img1 = cv::imread("images/circles.png");
+    //Create Device variables
+    cv::cuda::GpuMat d_result1,d_img1;
+    cv::Mat h_result1;     
+    //Upload Image to device
+    d_img1.upload(h_img1);
+
+    cv::cuda::bitwise_not(d_img1,d_result1);// 图像非操作 d_result1 = ~d_img1
+    
+    //Download result back  to host
+    d_result1.download(h_result1);
+    cv::imshow("Result inversion ", h_result1);
+    cv::imwrite("images/result_inversion.png", h_result1);
+    cv::waitKey();
+    return 0;
+}
+
+```
+
+
+### 11) opencv GPU 接口 图像 颜色空间转换
+```c
+#include <iostream>
+#include "opencv2/opencv.hpp"
+
+int main (int argc, char* argv[])
+{
+        cv::Mat h_img1 = cv::imread("images/autumn.tif");
+        //Define device variables
+        cv::cuda::GpuMat d_result1,d_result2,d_result3,d_result4,d_img1;
+        //Upload Image to device
+        d_img1.upload(h_img1);
+
+        //  GPU 接口 图像 颜色空间转换
+        cv::cuda::cvtColor(d_img1, d_result1,cv::COLOR_BGR2GRAY);// 彩色到 灰度
+        cv::cuda::cvtColor(d_img1, d_result2,cv::COLOR_BGR2RGB); // bgr彩色 到 RGB
+        cv::cuda::cvtColor(d_img1, d_result3,cv::COLOR_BGR2HSV); // bgr彩色 到 HSV
+        cv::cuda::cvtColor(d_img1, d_result4,cv::COLOR_BGR2YCrCb);//  bgr彩色 到 YCrCb
+        
+        cv::Mat h_result1,h_result2,h_result3,h_result4;
+        // 下载结果到 cpu
+        d_result1.download(h_result1);
+        d_result2.download(h_result2);
+        d_result3.download(h_result3);
+        d_result4.download(h_result4);
+        
+        // 下载
+        cv::imshow("Result in Gray ", h_result1);
+        cv::imshow("Result in RGB", h_result2);
+        cv::imshow("Result in HSV ", h_result3);
+        cv::imshow("Result in YCrCb ", h_result4);
+        
+        cv::waitKey();
+        return 0;
+}
 
 
 ```
 
 
-### 11)
+### 12) opencv GPU 接口 图像 阈值操作
 ```c
+#include <iostream>
+#include "opencv2/opencv.hpp"
 
+int main (int argc, char* argv[])
+{
+        cv::Mat h_img1 = cv::imread("images/cameraman.tif", 0);
+        //Define device variables
+        cv::cuda::GpuMat d_result1,d_result2,d_result3,d_result4,d_result5, d_img1;
+        //Upload image on device
+        d_img1.upload(h_img1);
+
+        // GPU图像阈值操作，                     阈值， 最大值，
+        cv::cuda::threshold(d_img1, d_result1, 128.0, 255.0, cv::THRESH_BINARY);    // 二值化，大于阈值为1
+        cv::cuda::threshold(d_img1, d_result2, 128.0, 255.0, cv::THRESH_BINARY_INV);// 二值化，大于阈值为0 
+        cv::cuda::threshold(d_img1, d_result3, 128.0, 255.0, cv::THRESH_TRUNC);     // 上截断，大于阈值，截断为阈值
+        cv::cuda::threshold(d_img1, d_result4, 128.0, 255.0, cv::THRESH_TOZERO);    // 下截断到0，小于阈值，截断为0
+        cv::cuda::threshold(d_img1, d_result5, 128.0, 255.0, cv::THRESH_TOZERO_INV);// 上截断到0,大于阈值，截断为0
+
+        cv::Mat h_result1,h_result2,h_result3,h_result4,h_result5;
+        //Copy results back to host
+        d_result1.download(h_result1);
+        d_result2.download(h_result2);
+        d_result3.download(h_result3);
+        d_result4.download(h_result4);
+        d_result5.download(h_result5);
+        cv::imshow("Result Threshhold binary ", h_result1);
+        cv::imshow("Result Threshhold binary inverse ", h_result2);
+        cv::imshow("Result Threshhold truncated ", h_result3);
+        cv::imshow("Result Threshhold truncated to zero ", h_result4);
+        cv::imshow("Result Threshhold truncated to zero inverse ", h_result5);
+        cv::waitKey();
+
+    return 0;
+}
 
 
 ```
 
 
-### 12)
+### 13) opencv cpu 阈值操作性能
 ```c
+#include <iostream>
+#include "opencv2/opencv.hpp"
 
+
+int main (int argc, char* argv[])
+{
+cv::Mat src = cv::imread("images/cameraman.tif", 0);
+cv::Mat result_host1,result_host2,result_host3,result_host4,result_host5;
+//Get initial time in miliseconds
+int64 work_begin = cv::getTickCount(); // 计时
+cv::threshold(src, result_host1, 128.0, 255.0, cv::THRESH_BINARY);
+cv::threshold(src, result_host2, 128.0, 255.0, cv::THRESH_BINARY_INV);
+cv::threshold(src, result_host3, 128.0, 255.0, cv::THRESH_TRUNC);
+cv::threshold(src, result_host4, 128.0, 255.0, cv::THRESH_TOZERO);
+cv::threshold(src, result_host5, 128.0, 255.0, cv::THRESH_TOZERO_INV);
+//Get time after work has finished     
+int64 delta = cv::getTickCount() - work_begin;
+//Frequency of timer
+double freq = cv::getTickFrequency();
+double work_fps = freq / delta;
+std::cout<<"Performance of Thresholding on CPU: " <<std::endl;
+std::cout <<"Time: " << (1/work_fps) <<std::endl;
+std::cout <<"FPS: " <<work_fps <<std::endl;
+return 0;
+}
+
+
+```
+
+### 14) opencv Gpu 阈值操作性能
+```c
+#include <iostream>
+#include "opencv2/opencv.hpp"
+
+int main (int argc, char* argv[])
+{
+ cv::Mat h_img1 = cv::imread("images/cameraman.tif", 0);
+cv::cuda::GpuMat d_result1,d_result2,d_result3,d_result4,d_result5, d_img1;
+//Measure initial time ticks
+int64 work_begin = cv::getTickCount(); // 计时
+d_img1.upload(h_img1);
+cv::cuda::threshold(d_img1, d_result1, 128.0, 255.0, cv::THRESH_BINARY);
+cv::cuda::threshold(d_img1, d_result2, 128.0, 255.0, cv::THRESH_BINARY_INV);
+cv::cuda::threshold(d_img1, d_result3, 128.0, 255.0, cv::THRESH_TRUNC);
+cv::cuda::threshold(d_img1, d_result4, 128.0, 255.0, cv::THRESH_TOZERO);
+cv::cuda::threshold(d_img1, d_result5, 128.0, 255.0, cv::THRESH_TOZERO_INV);
+
+cv::Mat h_result1,h_result2,h_result3,h_result4,h_result5;
+d_result1.download(h_result1);
+d_result2.download(h_result2);
+d_result3.download(h_result3);
+d_result4.download(h_result4);
+d_result5.download(h_result5);
+//Measure difference in time ticks
+int64 delta = cv::getTickCount() - work_begin;
+double freq = cv::getTickFrequency();
+//Measure frames per second
+double work_fps = freq / delta;
+std::cout <<"Performance of Thresholding on GPU: " <<std::endl;
+std::cout <<"Time: " << (1/work_fps) <<std::endl;
+std::cout <<"FPS: " <<work_fps <<std::endl;
+ return 0;
+}
 
 
 ```
 
 
-### 13)
-```c
-
-
-
-```
-
-## c 图像读取、显示形状、播放视频、add、sub、颜色空间转换、阈值操作等
+## c opencv GPU接口 直方图均衡化 
 ### 1)
 ```c
+#include <iostream>
+#include "opencv2/opencv.hpp"
 
+
+int main ()
+{
+    cv::Mat h_img1 = cv::imread("images/cameraman.tif",0);
+    cv::cuda::GpuMat d_img1,d_result1;
+    d_img1.upload(h_img1);
+    
+    //  GPU接口 直方图均衡化 
+    cv::cuda::equalizeHist(d_img1, d_result1);
+    
+    cv::Mat h_result1;
+    d_result1.download(h_result1);
+    cv::imshow("Original Image ", h_img1);
+	cv::imshow("Histogram Equalized Image", h_result1);
+	cv::imwrite("images/result_inversion.png", h_img1);
+	cv::imwrite("images/result_inversion.png", h_result1);
+    cv::waitKey();
+    return 0;
+}
 
 
 ```
 
 
-### 2)
+### 2) opencv 转成HSV空间 单通道 直方图均衡化 再合并
 ```c
+#include <iostream>
+#include "opencv2/opencv.hpp"
 
+
+int main ()
+{
+    cv::Mat h_img1 = cv::imread("images/autumn.tif");
+    cv::Mat h_img2,h_result1;
+    cvtColor(h_img1, h_img2, cv::COLOR_BGR2HSV);// 转成HSV空间 
+    
+    // split分割成 多个 单通道
+    std::vector< cv::Mat > vec_channels;
+    cv::split(h_img2, vec_channels); 
+    
+    // 对单个通道进行直方图均衡化
+    cv::equalizeHist(vec_channels[2], vec_channels[2]);
+    
+    //M那个通道 合并
+    cv::merge(vec_channels, h_img2); 
+      
+    //Convert the histogram equalized image from HSV to BGR color space again
+    cv::cvtColor(h_img2,h_result1, cv::COLOR_HSV2BGR);
+	cv::imshow("Original Image ", h_img1);
+	cv::imshow("Histogram Equalized Image", h_result1);
+    cv::waitKey();
+    return 0;
+}
 
 
 ```
