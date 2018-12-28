@@ -3081,45 +3081,305 @@ int main( int argc, char** argv )
 ```
 
 
-### 7)
+### 7) OPENCV gpu 级联回归 人脸检测
 ```c
+#include "opencv2/objdetect/objdetect.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/cudaobjdetect.hpp" 
+#include <iostream>
+#include <stdio.h>
+ 
+using namespace std;
+using namespace cv;
+ 
+int main( )
+{
+    Mat h_image;
+    h_image = imread("images/lena_color_512.tif", 0);  
+    
+    // OPENCV gpu 级联回归 人脸检测
+    Ptr<cuda::CascadeClassifier> cascade = cuda::CascadeClassifier::create("haarcascade_frontalface_alt2.xml");
+    
+    cuda::GpuMat d_image;
+    cuda::GpuMat d_buf;
+    d_image.upload(h_image);
+    
+    //cascadeGPU->setMinNeighbors(0);
+    //cascadeGPU->setScaleFactor(1.01);
+    cascade->detectMultiScale(d_image, d_buf);// 多尺度检测
+    
+    // 转换检测结果
+    std::vector<Rect> detections;
+    cascade->convert(d_buf, detections);
+    if (detections.empty())
+        std::cout << "No detection." << std::endl;
+    
+    //转换成彩色图
+    cvtColor(h_image,h_image,COLOR_GRAY2BGR);
+    for(int i = 0; i < detections.size(); ++i)
+    {
+      // 画矩形框===== 
+      rectangle(h_image, detections[i], Scalar(0,255,255), 5);
+    }
 
+    imshow("Result image", h_image);
+     
+waitKey(0);   
+return 0;
+}
 
 
 ```
 
 
-### 8)
+### 8) OPENCV gpu 级联回归 人脸检测 处理视频
 ```c
+#include <iostream>
+#include <opencv2/opencv.hpp>
+using namespace cv;
+using namespace std;
 
+int main()
+{
+    VideoCapture cap(0);// 打开摄像头
+    if (!cap.isOpened())
+    {
+        cerr << "Can not open video source";
+        return -1;
+    }
+    
+    std::vector<cv::Rect> h_found;// cpu 目标框
+    // OPENCV gpu 级联回归 人脸检测
+    cv::Ptr<cv::cuda::CascadeClassifier> cascade = 
+                  cv::cuda::CascadeClassifier::create("haarcascade_frontalface_alt2.xml");
+		  
+    cv::cuda::GpuMat d_frame, d_gray, d_found;
+    
+    while(1)
+    {
+        Mat frame;
+        if ( !cap.read(frame) ) 
+	{
+            cerr << "Can not read frame from webcam";
+            return -1;
+        }
+        d_frame.upload(frame);// 上传帧图像到GPU
+	// 转换成灰度图
+        cv::cuda::cvtColor(d_frame, d_gray, cv::COLOR_BGR2GRAY);
+        
+	// 多尺度人脸检测
+        cascade->detectMultiScale(d_gray, d_found);
+	
+	// 转换结果
+        cascade->convert(d_found, h_found);
+        
+	for(int i = 0; i < h_found.size(); ++i)
+	{
+	  // 画矩目标形框===== 
+          rectangle(frame, h_found[i], Scalar(0,255,255), 5);
+	}
+
+        imshow("Result", frame);
+        if (waitKey(1) == 'q') {
+            break;
+        }
+    }
+
+    return 0;
+}
 
 
 ```
 
 
-### 9)
+### 9) OPENCV gpu 级联回归 人眼检测
 ```c
+#include "opencv2/objdetect/objdetect.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/cudaobjdetect.hpp" 
+#include <iostream>
+#include <stdio.h>
+ 
+using namespace std;
+using namespace cv;
+ 
+int main( )
+{
+    Mat h_image;
+    h_image = imread("images/lena_color_512.tif", 0);  // 灰度图格式
+    
+    // OPENCV gpu 级联回归 人脸检测
+    Ptr<cuda::CascadeClassifier> cascade = cuda::CascadeClassifier::create("haarcascade_eye.xml");
+    
+    cuda::GpuMat d_image;
+    cuda::GpuMat d_buf;
+    d_image.upload(h_image);
+    
+    //cascadeGPU->setMinNeighbors(0);
+    //cascadeGPU->setScaleFactor(1.01);
+    cascade->detectMultiScale(d_image, d_buf);
+    
+    std::vector<Rect> detections;
+    cascade->convert(d_buf, detections);// 转换结果
+    
+    if (detections.empty())
+        std::cout << "No detection." << std::endl;
+	
+    // 转换成彩色图格式，方便绘制彩色框
+    cvtColor(h_image,h_image,COLOR_GRAY2BGR);
+    for(int i = 0; i < detections.size(); ++i)
+    {
+      // 画矩目标形框===== 
+      rectangle(h_image, detections[i], Scalar(0,255,255), 5);
+    }
 
+    imshow("Result image", h_image);
+     
+waitKey(0);   
+return 0;
+}
 
 
 ```
 
 
-### 10)
+### 10) gpu 背景减除进行目标检测  背景/前景 检测
 ```c
+#include <iostream>
+#include <string>
+#include "opencv2/opencv.hpp"
 
+using namespace std;
+using namespace cv;
+using namespace cv::cuda;
+int main()
+{
+    VideoCapture cap("abc.avi");
+    if (!cap.isOpened())
+    {
+        cerr << "can not open camera or video file" << endl;
+        return -1;
+    }
+    Mat frame;
+    cap.read(frame);
+    GpuMat d_frame;
+    d_frame.upload(frame);
+	
+    // MOG算法，即高斯混合模型分离算法，全称Gaussian Mixture-based Background/Foreground Segmentation Algorithm
+    Ptr<BackgroundSubtractor> mog = cuda::createBackgroundSubtractorMOG();
+    GpuMat d_fgmask,d_fgimage,d_bgimage;
+    Mat h_fgmask,h_fgimage,h_bgimage;
+    mog->apply(d_frame, d_fgmask, 0.01);
+    while(1)
+    {
+        cap.read(frame);
+        if (frame.empty())
+            break;
+        d_frame.upload(frame);// 上传到GPU
+	
+        int64 start = cv::getTickCount();// 计时
+	
+        mog->apply(d_frame, d_fgmask, 0.01);// 运动检测
+        mog->getBackgroundImage(d_bgimage);// 获取静态背景
+	
+        double fps = cv::getTickFrequency() / (cv::getTickCount() - start);
+        std::cout << "FPS : " << fps << std::endl;
+	
+        d_fgimage.create(d_frame.size(), d_frame.type());
+        d_fgimage.setTo(Scalar::all(0));
+        d_frame.copyTo(d_fgimage, d_fgmask);// 按mask拷贝
+	
+        d_fgmask.download(h_fgmask);
+        d_fgimage.download(h_fgimage);
+        d_bgimage.download(h_bgimage);
+	
+        imshow("image", frame);
+	
+        imshow("foreground mask", h_fgmask);// 前景
+        imshow("foreground image", h_fgimage);
+        imshow("mean background image", h_bgimage);// 背景
+        if (waitKey(1) == 'q')
+            break;
+    }
+
+    return 0;
+}
 
 
 ```
 
 
-### 11)
+### 11) GMG 统计背景图像估计和每像素贝叶斯分割
 ```c
+#include <iostream>
+#include <string>
+#include "opencv2/opencv.hpp"
+#include "opencv2/core.hpp"
+#include "opencv2/core/utility.hpp"
+#include "opencv2/cudabgsegm.hpp"
+#include "opencv2/cudalegacy.hpp"
+#include "opencv2/video.hpp"
+#include "opencv2/highgui.hpp"
 
+using namespace std;
+using namespace cv;
+using namespace cv::cuda;
+
+int main(
+)
+{
+    VideoCapture cap("abc.avi");
+    if (!cap.isOpened())
+    {
+        cerr << "can not open video file" << endl;
+        return -1;
+    }
+    Mat frame;
+    cap.read(frame);
+    GpuMat d_frame;
+    d_frame.upload(frame);
+    
+    // 背景去除
+    Ptr<BackgroundSubtractor> gmg = cuda::createBackgroundSubtractorGMG(40);
+    GpuMat d_fgmask,d_fgimage,d_bgimage;
+    Mat h_fgmask,h_fgimage,h_bgimage;
+    
+    gmg->apply(d_frame, d_fgmask);
+    
+    while(1)
+    {
+        cap.read(frame);
+        if (frame.empty())
+            break;
+        d_frame.upload(frame);
+        int64 start = cv::getTickCount();
+	
+        gmg->apply(d_frame, d_fgmask, 0.01);
+	
+        double fps = cv::getTickFrequency() / (cv::getTickCount() - start);
+        std::cout << "FPS : " << fps << std::endl;
+	
+        d_fgimage.create(d_frame.size(), d_frame.type());
+        d_fgimage.setTo(Scalar::all(0));
+        d_frame.copyTo(d_fgimage, d_fgmask);
+        d_fgmask.download(h_fgmask);
+        d_fgimage.download(h_fgimage);
+	
+        imshow("image", frame);
+        imshow("foreground mask", h_fgmask);
+        imshow("foreground image", h_fgimage);
+        if (waitKey(30) == 'q')
+            break;
+    }
+    return 0;
+}
 
 
 ```
 
+##  f
 
 ### 12)
 ```c
