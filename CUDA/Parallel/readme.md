@@ -175,7 +175,7 @@ void bsort(int *x, int n)
       int SAMPLESIZE;
       // now determine the bucket boundaries; nth - 1 of them, by
       // sampling the array to get an idea of its range
-      #pragma omp single  // only 1 thread does this, implied barrier at end
+      #pragma omp single  // 代码将仅被一个线程执行，具体是哪个线程不确定，
       {
          if (n > 1000) SAMPLESIZE = 1000;
          else SAMPLESIZE = n / 2; // 一半
@@ -360,5 +360,248 @@ int main(int argc,char **argv)
 
 ```
 
+## 4.  omp OpenMP Dijkstra 最短路径图搜索算法
+```c
+// Dijkstra.c
+
+// OpenMP example program:  Dijkstra shortest-path finder in a bidirectional graph;
+// finds the shortest path from vertex 0 to all others
+// 编译 gcc Dijkstra.c -fopenmp -o dijkstra
+// 用法  dijkstra nv print
+
+// where nv 图大小, and print is 1 if graph and min
+// distances are to be printed out, 0 otherwise
+
+#include <omp.h>
+
+// 全局变量，多个线程内部共享，可以放在 "parallel" pragma in dowork() 之前
+
+int nv,       // 图 顶点数量
+    *notdone, // 未检查的节点数量
+    nth,      // 线程数量
+    chunk,    // 每个线程处理的节点数量
+    md,       // 所有线程中，当前最小值
+    mv,       // 最小值对应的 顶点
+    largeint = -1;  // max possible unsigned int
+
+// 距离表=====1对多====多对多
+unsigned *ohd,  // 1-hop distances between vertices; "ohd[i][j]" is
+         // ohd[i*nv+j]
+         *mind;  // min distances found so far
+
+// 初始化
+void init(int ac, char **av)
+{  
+   int i,j,tmp;
+   nv = atoi(av[1]);// 顶点数量
+   ohd = malloc(nv*nv*sizeof(int)); // 距离表
+   mind = malloc(nv*sizeof(int));   // 初始最短距离
+   notdone = malloc(nv*sizeof(int));// 节点 未检查标志
+   
+   // 生成随机的一个图
+   for (i = 0; i < nv; i++)
+      // 生成 距离图
+      for (j = i; j < nv; j++)  
+      {
+         if (j == i) ohd[i*nv+i] = 0; // 顶点到自身距离为0
+         else 
+         {
+            ohd[nv*i+j] = rand() % 20;
+            ohd[nv*j+i] = ohd[nv*i+j];// 对称======
+         }
+      }
+   for (i = 1; i < nv; i++)  
+   {
+      notdone[i] = 1;   // 节点 未检查标志
+      mind[i] = ohd[i]; // 初始值
+   }
+}
+
+// 在 s 到 e之间，找未检查节点 中的 最小值 最小的值d，对应节点v
+void findmymin(int s, int e, unsigned *d, int *v)
+{  int i;
+   *d = largeint;// 初始 较大的值
+   for (i = s; i <= e; i++)
+      if (notdone[i] && mind[i] < *d)  // 未检查节点 中的 最小值 
+      {
+         *d = mind[i];// 较小的值，距离distance
+         *v = i;// 对应节点
+      }
+}
+
+// 更新 s到e之间的最小值
+void updatemind(int s, int e)
+{  int i;
+   for (i = s; i <= e; i++)
+      if (mind[mv] + ohd[mv*nv+i] < mind[i])
+         mind[i] = mind[mv] + ohd[mv*nv+i];// 这个更小====
+}
+
+void dowork()
+{
+   #pragma omp parallel
+   {  int startv,endv,  // 当前线程的 开始和结束节点
+          step,  // 总步骤
+          mymv,  // 当前最小值？？
+          me = omp_get_thread_num();
+          unsigned mymd;  // min value found by this thread
+      #pragma omp single// 代码将仅被一个线程执行，具体是哪个线程不确定=====
+      {  
+         nth = omp_get_num_threads();  // 单个线程内部变量
+         if (nv % nth != 0) 
+         {
+            printf("nv must be divisible by nth\n");
+            exit(1);
+         }
+         chunk = nv/nth;
+         printf("there are %d threads\n",nth);
+      }
+      startv = me * chunk;
+      endv = startv + chunk - 1;
+      for (step = 0; step < nv; step++) 
+      {
+         // find closest vertex to 0 among notdone; each thread finds
+         // closest in its group, then we find overall closest
+         
+         #pragma omp single // 代码将仅被一个线程执行，具体是哪个线程不确定，
+         {  md = largeint; mv = 0;  }
+         findmymin(startv,endv,&mymd,&mymv);
+         // update overall min if mine is smaller
+         
+         #pragma omp critical // 指定一块同一时间只能被一条线程执行的代码区域
+         {  if (mymd < md)
+               {  md = mymd; mv = mymv;  }
+         }
+         #pragma omp barrier //  栅障（Barrier）是OpenMP用于线程同步的一种方法。
+                             // 线程遇到栅障是必须等待，直到并行区中的所有线程都到达同一点。
+         // mark new vertex as done
+         #pragma omp single // 代码将仅被一个线程执行，具体是哪个线程不确定，
+         {  notdone[mv] = 0;  }
+         // now update my section of mind
+         updatemind(startv,endv);
+         #pragma omp barrier
+      }
+   }
+}
+
+int main(int argc, char **argv)
+{  int i,j,print;
+   double startime,endtime;
+   init(argc,argv);
+   startime = omp_get_wtime();
+   // parallel
+   dowork();
+   // back to single thread
+   endtime = omp_get_wtime();
+   printf("elapsed time:  %f\n",endtime-startime);
+   print = atoi(argv[2]);
+   if (print)  {
+      printf("graph weights:\n");
+      for (i = 0; i < nv; i++)  {
+         for (j = 0; j < nv; j++)
+            printf("%u  ",ohd[nv*i+j]);
+         printf("\n");
+      }
+      printf("minimum distances:\n");
+      for (i = 1; i < nv; i++)
+         printf("%u\n",mind[i]);
+   }
+}
+
+
+```
+
+
+## 5. omp 矩阵转置
+```c
+#include <omp.h>
+
+// translate from 2-D to 1-D indices
+int onedim(int n,int i,int j) {  return n * i + j;  }
+
+void transp(int *m, int n)
+{
+   #pragma omp parallel
+   {  int i,j,tmp;
+      // walk through all the above-diagonal elements, swapping them
+      // with their below-diagonal counterparts
+      #pragma omp for
+      for (i = 0; i < n; i++) {
+         for (j = i+1; j < n; j++) {
+            tmp = m[onedim(n,i,j)];
+            m[onedim(n,i,j)] = m[onedim(n,j,i)];
+            m[onedim(n,j,i)] = tmp;
+         }
+      }
+   }
+}
+
+
+```
+
+## 6. omp 快排
+```c
+// OpenMP example program:  quicksort; not necessarily efficient
+
+#include <omp.h>
+
+void swap(int *yi, int *yj)
+{  int tmp = *yi;
+   *yi = *yj;
+   *yj = tmp;
+}
+
+int *separate(int *x, int low, int high)
+{  int i,pivot,last;
+   pivot = x[low];  // would be better to take, e.g., median of 1st 3 elts
+   swap(x+low,x+high);
+   last = low;
+   for (i = low; i < high; i++) {
+      if (x[i] <= pivot) {
+         swap(x+last,x+i);
+         last += 1;
+      }
+   }
+   swap(x+last,x+high);
+   return last;
+}
+
+// quicksort of the array z, elements zstart through zend; set the
+// latter to 0 and m-1 in first call, where m is the length of z;
+// firstcall is 1 or 0, according to whether this is the first of the
+// recursive calls
+void qs(int *z, int zstart, int zend, int firstcall)
+{
+   #pragma omp parallel
+   {  int part;
+      if (firstcall == 1) {
+         #pragma omp single nowait
+         qs(z,0,zend,0);
+      } else {
+         if (zstart < zend) {
+            part = separate(z,zstart,zend);
+            #pragma omp task
+            qs(z,zstart,part-1,0);
+            #pragma omp task
+            qs(z,part+1,zend,0);
+         }
+
+      }
+   }
+}
+
+// test code
+main(int argc, char**argv)
+{  int i,n,*w;
+   n = atoi(argv[1]);
+   w = malloc(n*sizeof(int));
+   for (i = 0; i < n; i++) w[i] = rand();
+   qs(w,0,n-1,1);
+   if (n < 25)
+      for (i = 0; i < n; i++) printf("%d\n",w[i]);
+}
+
+
+```
 
 
