@@ -71,7 +71,7 @@ def anagramSolution2(s1,s2):
     alist1 = list(s1)
     alist2 = list(s2)
     # 对列表字母 进行排序
-    alist1.sort() // 复杂度  O(n*log(n))===
+    alist1.sort() # 复杂度  O(n*log(n))===
     alist2.sort()
 
     pos = 0
@@ -141,7 +141,7 @@ def test2():
         l.append(i) # 插入
 
 def test3():
-    l = [i for i in range(1000)] #列表推导，列表生成器
+    l = [i for i in range(1000)] # 列表推导，列表生成器
 
 def test4():
     l = list(range(1000)) # 调用 列表 构造函数 包装 range 函数
