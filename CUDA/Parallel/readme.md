@@ -133,7 +133,7 @@ int main(int argc, char **argv)
 #include <omp.h>  // required
 #include <stdlib.h>
 
-// needed for call to qsort()
+// 比较两元素大小，快排 qsort()调用
 int cmpints(int *u, int *v)
 {  if (*u < *v) return -1;
    if (*u > *v) return 1;
@@ -143,32 +143,31 @@ int cmpints(int *u, int *v)
 // adds xi to the part array, increments npart, the length of part
 void grab(int xi, int *part, int *npart)
 {
-    part[*npart] = xi;
-    *npart += 1;
+    part[*npart] = xi; # 添加元素
+    *npart += 1;       # 位置+1
 }
 
-// finds the min and max in y, length ny,
-// placing them in miny and maxy
+// 找到 数组y中的最大值和最小值===
 void findminmax(int *y, int ny, int *miny, int *maxy)
 {  int i,yi;
-   *miny = *maxy = y[0];
-   for (i = 1; i < ny; i++) {
-      yi = y[i];
-      if (yi < *miny) *miny = yi;
-      else if (yi > *maxy) *maxy = yi;
+   *miny = *maxy = y[0];// 最大值最小值初始化
+   for (i = 1; i < ny; i++) // 遍历每一个元素
+   {
+      yi = y[i];// 当前元素   
+      if (yi < *miny) *miny = yi; // 最小值
+      else if (yi > *maxy) *maxy = yi;// 最大值
    }
 }
 
-// sort the array x of length n
+// 对数组x进行排序
 void bsort(int *x, int n)
-{  // these are local to this function, but shared among the threads
+{  // 函数内变量，多个线程内共享
    float *bdries; int *counts;
-   #pragma omp parallel
-   // entering this block activates the threads, each executing it
-   {  // variables declared below are local to each thread
-      int me = omp_get_thread_num();
-      // have to do the next call within the block, while the threads
-      // are active
+   
+   #pragma omp parallel  # omp 多线程
+   { 
+      // 每个线程内部局部变量
+      int me = omp_get_thread_num();// 当前线程id
       int nth = omp_get_num_threads();
       int i,xi,minx,maxx,start;
       int *mypart;
@@ -179,8 +178,9 @@ void bsort(int *x, int n)
       #pragma omp single  // only 1 thread does this, implied barrier at end
       {
          if (n > 1000) SAMPLESIZE = 1000;
-         else SAMPLESIZE = n / 2;
-         findminmax(x,SAMPLESIZE,&minx,&maxx);
+         else SAMPLESIZE = n / 2; // 一半
+         findminmax(x,SAMPLESIZE,&minx,&maxx);// 找 最大值和最小值
+         
          bdries = malloc((nth-1)*sizeof(float));
          increm = (maxx - minx) / (float) nth;
          for (i = 0; i < nth-1; i++)
@@ -206,8 +206,10 @@ void bsort(int *x, int n)
       }
       // now record how many this thread got
       counts[me] = nummypart;
+      
       // sort my part
       qsort(mypart,nummypart,sizeof(int),cmpints);
+      
       #pragma omp barrier  // other threads need to know all of counts
       // copy sorted chunk back to the original array; first find start point
       start = 0;
@@ -251,13 +253,14 @@ int main(int argc, char **argv)
 #define PIPE_MSG 0  // type of message containing a number to be checked
 #define END_MSG 1  // type of message indicating no more data will be coming
 
-int NNodes,  // number of nodes in computation
-    N,  // find all primes from 2 to N
-    Me;  // my node number
+int NNodes,  // 节点数量
+    N,       // 寻找范围
+    Me;      //当前节点id
 double T1,T2;  // start and finish times
 
 void Init(int Argc,char **Argv)
-{  int DebugWait;
+{  
+   int DebugWait;
    N = atoi(Argv[1]);
    // start debugging section
    DebugWait = atoi(Argv[2]);
@@ -278,9 +281,12 @@ void Init(int Argc,char **Argv)
 }
 
 void Node0()
-{  int I,ToCheck,Dummy,Error;
-   for (I = 1; I <= N/2; I++)  {
-      ToCheck = 2 * I + 1;  // latest number to check for div3
+{  
+   int I,ToCheck,Dummy,Error;
+   // 变量一半就可以了
+   for (I = 1; I <= N/2; I++)  
+   {
+      ToCheck = 2 * I + 1;  // 只需要 验证奇数是否为素数
       if (ToCheck > N) break;
       if (ToCheck % 3 > 0)  // not divis by 3, so send it down the pipe
          // send the string at ToCheck, consisting of 1 MPI integer, to
@@ -292,6 +298,7 @@ void Node0()
    MPI_Send(&Dummy,1,MPI_INT,1,END_MSG,MPI_COMM_WORLD);
 }
 
+// 中间节点=================
 void NodeBetween()
 {  int ToCheck,Dummy,Divisor;
    MPI_Status Status;
@@ -309,21 +316,25 @@ void NodeBetween()
    MPI_Send(&Dummy,1,MPI_INT,Me+1,END_MSG,MPI_COMM_WORLD);
 }
 
+// 结尾节点======================
 NodeEnd()
 {  int ToCheck,PrimeCount,I,IsComposite,StartDivisor;
    MPI_Status Status;
    MPI_Recv(&StartDivisor,1,MPI_INT,Me-1,MPI_ANY_TAG,MPI_COMM_WORLD,&Status);
    PrimeCount = Me + 2;  /* must account for the previous primes, which
                             won't be detected below */
-   while (1)  {
+   while (1) 
+   {
       MPI_Recv(&ToCheck,1,MPI_INT,Me-1,MPI_ANY_TAG,MPI_COMM_WORLD,&Status);
       if (Status.MPI_TAG == END_MSG) break;
       IsComposite = 0;
       for (I = StartDivisor; I*I <= ToCheck; I += 2)
-         if (ToCheck % I == 0)  {
-            IsComposite = 1;
+         if (ToCheck % I == 0) 
+         {
+            IsComposite = 1;// 非素数=====
             break;
          }
+         
       if (!IsComposite) PrimeCount++;
    }
    /* check the time again, and subtract to find run time */
@@ -337,9 +348,10 @@ int main(int argc,char **argv)
 {  Init(argc,argv);
    // all nodes run this same program, but different nodes take
    // different actions
-   if (Me == 0) Node0();
-   else if (Me == NNodes-1) NodeEnd();
-        else NodeBetween();
+   if (Me == 0) Node0();// 开始节点
+   else if (Me == NNodes-1) NodeEnd();// 结尾节点
+   else NodeBetween();// 中间节点
+   
    // mandatory for all MPI programs
    MPI_Finalize();
 }
