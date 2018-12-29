@@ -35,6 +35,610 @@
 
 ## 3. spider 
 
+
+# python学习线性代数
+## 1. 自定义向量Vector类
+
+Vector.py
+```python
+class Vector:
+    # 双下划线开头结尾的函数，定义为类的内置函数
+    
+    # 类构造函数
+    def __init__(self, lst):
+        self._values = lst
+	
+    # [] 下标方式会调用的函数
+    def __getitem__(self, index):
+        """取向量的第index个元素"""
+        return self._values[index]
+	
+    # len(类对象) 会执行的函数
+    def __len__(self):
+        """返回向量长度（有多少个元素）"""
+        return len(self._values)
+	
+    #
+    def __repr__(self):
+        return "Vector({})".format(self._values)
+	
+    # 展开成字符串
+    def __str__(self):
+        return "({})".format(", ".join(str(e) for e in self._values))
+
+```
+
+main_vector.py
+```python
+import Vector
+
+if __name__ == "__main__":
+
+    vec = Vector([5, 2]) # 构造类对象
+    print(vec)           # 展开成字符串后打印??
+    print("len(vec) = {}".format(len(vec))) # 向量长度
+    print("vec[0] = {}, vec[1] = {}".format(vec[0], vec[1]))#获取每一个对象
+
+```
+
+
+增加向量函数操作，加减乘等运算
+```python
+class Vector:
+    # 构造函数
+    def __init__(self, lst):
+        self._values = list(lst)
+
+    def __add__(self, another):
+        """向量加法，返回结果向量"""
+	
+	# 确保 两向量长度相等
+        assert len(self) == len(another), \
+            "Error in adding. Length of vectors must be same."
+
+        # return Vector([a + b for a, b in zip(self._values, another._values)])
+        return Vector([a + b for a, b in zip(self, another)]) # 注意获取 两个对象内的元素的形式!!!!!!!
+
+    def __sub__(self, another):
+        """向量减法，返回结果向量"""
+        assert len(self) == len(another), \
+            "Error in subtracting. Length of vectors must be same."
+
+        return Vector([a - b for a, b in zip(self, another)])
+
+    def __mul__(self, k):
+        """返回 数量乘法 的结果向量：self * k"""
+        return Vector([k * e for e in self])
+
+    def __rmul__(self, k):
+        """返回 数量乘法 的结果向量：k * self"""
+        return self * k
+
+    def __pos__(self):
+        """返回 向量取正 的结果向量"""
+        return 1 * self
+
+    def __neg__(self):
+        """返回 向量取负 的结果向量"""
+        return -1 * self
+
+    def __iter__(self):
+        """返回向量的 迭代器"""
+        return self._values.__iter__()
+
+    def __getitem__(self, index):
+        """取向量的第index个元素"""
+        return self._values[index]
+
+    def __len__(self):
+        """返回向量长度（有多少个元素）"""
+        return len(self._values)
+
+    def __repr__(self):
+        return "Vector({})".format(self._values)
+
+    def __str__(self):
+        return "({})".format(", ".join(str(e) for e in self._values))
+	
+    # classmethod 装饰器，不需要实例化类对象，即可实现该函数
+    @classmethod
+    def zero(cls, dim):
+        """返回一个dim维的零向量"""
+        return cls([0] * dim)
+
+
+```
+
+向量运算测试
+```python
+from playLA.Vector import Vector
+
+if __name__ == "__main__":
+
+    vec = Vector([5, 2]) # 构造类对象
+    print(vec)
+    print("len(vec) = {}".format(len(vec)))
+    print("vec[0] = {}, vec[1] = {}".format(vec[0], vec[1]))
+
+    vec2 = Vector([3, 1])
+    print("{} + {} = {}".format(vec, vec2, vec + vec2))
+    print("{} - {} = {}".format(vec, vec2, vec - vec2))
+
+    print("{} * {} = {}".format(vec, 3, vec * 3))# 向量数乘
+    print("{} * {} = {}".format(3, vec, 3 * vec))
+
+    print("+{} = {}".format(vec, +vec))# 向量取正
+    print("-{} = {}".format(vec, -vec))# 向量取负
+    
+    # 定义0向量
+    zero2 = Vector.zero(2)
+    print(zero2)
+    print("{} + {} = {}".format(vec, zero2, vec + zero2))
+```
+
+向量归一化
+```python
+class Vector:
+    # ...其他函数省略
+    
+    EPSILON = 1e-8
+    
+    # 默认向量 数量除法
+    def __truediv__(self, k):
+        """返回数量除法的结果向量：self / k"""
+        return (1 / k) * self
+
+    def norm(self):
+        """返回向量的模"""
+	# sqrt(x1^2 + ... + xn^2)
+	# ** 为乘方标号
+        return math.sqrt(sum(e**2 for e in self))
+
+    def normalize(self):
+        """返回向量的单位向量"""
+        if self.norm() < EPSILON:
+            raise ZeroDivisionError("Normalize error! norm is zero.")
+        return Vector(self._values) / self.norm()
+        # return 1 / self.norm() * Vector(self._values)
+        # return Vector([e / self.norm() for e in self])
+# 测试
+vec = Vector([5, 2])
+vec2 = Vector([3, 1]) 
+zero2 = Vector.zero(2)
+print("norm({}) = {}".format(vec, vec.norm()))
+print("norm({}) = {}".format(vec2, vec2.norm()))
+print("norm({}) = {}".format(zero2, zero2.norm()))
+
+print("normalize {} is {}".format(vec, vec.normalize()))
+print(vec.normalize().norm())
+
+print("normalize {} is {}".format(vec2, vec2.normalize()))
+print(vec2.normalize().norm())
+
+# 会发生错误
+try:
+    zero2.normalize()
+except ZeroDivisionError:
+    print("Cannot normalize zero vector {}.".format(zero2))
+```
+
+
+向量点乘
+```python
+class Vector:
+    # ...其他函数省略
+    
+    def dot(self, another):
+        """向量点乘，返回结果标量"""
+        assert len(self) == len(another), \
+            "Error in dot product. Length of vectors must be same."
+        # 对应位置元素相乘后，积相加
+        return sum(a * b for a, b in zip(self, another))
+	
+# 测试
+vec = Vector([5, 2])
+vec2 = Vector([3, 1]) 	
+print(vec.dot(vec2))
+
+
+```
+
+numpy 中的向量
+```python
+import numpy as np
+
+if __name__ == "__main__":
+
+    print(np.__version__)
+
+    # np.array 基础
+    lst = [1, 2, 3]
+    lst[0] = "Linear Algebra"
+    print(lst)
+
+    vec = np.array([1, 2, 3])
+    print(vec)
+    # vec[0] = "Linear Algebra"
+    # vec[0] = 666
+    # print(vec)
+
+    # np.array的创建
+    print(np.zeros(5))
+    print(np.ones(5))
+    print(np.full(5, 666))
+
+    # np.array的基本属性
+    print(vec)
+    print("size =", vec.size)
+    print("size =", len(vec))
+    print(vec[0])
+    print(vec[-1])
+    print(vec[0: 2])
+    print(type(vec[0: 2]))
+
+    # np.array的基本运算
+    vec2 = np.array([4, 5, 6])
+    print("{} + {} = {}".format(vec, vec2, vec + vec2))
+    print("{} - {} = {}".format(vec, vec2, vec - vec2))
+    print("{} * {} = {}".format(2, vec, 2 * vec))
+    print("{} * {} = {}".format(vec, vec2, vec * vec2))
+    print("{}.dot({}) = {}".format(vec, vec2, vec.dot(vec2)))
+
+    print(np.linalg.norm(vec))
+    print(vec / np.linalg.norm(vec))
+    print(np.linalg.norm(vec / np.linalg.norm(vec)))
+
+    # zero3 = np.zeros(3)
+    # print(zero3 / np.linalg.norm(zero3))
+
+
+```
+## 2. 自定义 矩阵 Matrix 类
+```python
+import Vector
+
+class Matrix:
+
+    def __init__(self, list2d):
+        # 每个元素是一个行向量
+        self._values = [row[:] for row in list2d]
+
+    def row_vector(self, index):
+        """返回矩阵的第index个行向量"""
+        return Vector(self._values[index])
+
+    def col_vector(self, index):
+        """返回矩阵的第index个列向量"""
+        return Vector([row[index] for row in self._values])
+
+    def __getitem__(self, pos):
+        """返回矩阵pos位置的元素"""
+        r, c = pos
+        return self._values[r][c]
+
+    def size(self):
+        """返回矩阵的元素个数"""
+        r, c = self.shape()
+        return r * c
+
+    def row_num(self):
+        """返回矩阵的行数"""
+        return self.shape()[0]
+
+    __len__ = row_num
+
+    def col_num(self):
+        """返回矩阵的列数"""
+        return self.shape()[1]
+
+    def shape(self):
+        """返回矩阵的形状: (行数， 列数)"""
+        return len(self._values), len(self._values[0])
+
+    def __repr__(self):
+        return "Matrix({})".format(self._values)
+
+    __str__ = __repr__
+
+# 测试
+matrix = Matrix([[1, 2], [3, 4]])
+print(matrix)
+print("matrix.shape = {}".format(matrix.shape()))
+print("matrix.size = {}".format(matrix.size()))
+print("len(matrix) = {}".format(len(matrix)))
+print("matrix[0][0] = {}".format(matrix[0, 0]))
+
+```
+
+实现矩阵的基本操作
+```python
+import Vector
+
+class Matrix:
+    # 其他函数省略
+
+    @classmethod
+    def zero(cls, r, c):
+        """返回一个r行c列的零矩阵"""
+        return cls([[0] * c for _ in range(r)])
+
+    @classmethod
+    def identity(cls, n):
+        """返回一个n行n列的单位矩阵"""
+	
+	# 其他部分为0
+        m = [[0]*n for _ in range(n)]
+	
+	# 对角线上为1
+        for i in range(n):
+            m[i][i] = 1;
+        return cls(m)
+
+    def __add__(self, another):
+        """返回两个矩阵的加法结果"""
+        assert self.shape() == another.shape(), \
+            "Error in adding. Shape of matrix must be same."
+	# 二维矩阵，对应位置元素相加
+        return Matrix([[a + b for a, b in zip(self.row_vector(i), another.row_vector(i))]
+                       for i in range(self.row_num())])
+
+    def __sub__(self, another):
+        """返回两个矩阵的减法结果"""
+        assert self.shape() == another.shape(), \
+            "Error in subtracting. Shape of matrix must be same."
+	# 二维矩阵，对应位置元素相减
+        return Matrix([[a - b for a, b in zip(self.row_vector(i), another.row_vector(i))]
+                       for i in range(self.row_num())])
+		       
+    # 矩阵数乘
+    def __mul__(self, k):
+        """返回矩阵的数量乘结果: self * k"""
+        return Matrix([[e * k for e in self.row_vector(i)]
+                       for i in range(self.row_num())])
+
+    def __rmul__(self, k):
+        """返回矩阵的数量乘结果: k * self"""
+        return self * k
+
+    def __truediv__(self, k):
+        """返回数量除法的结果矩阵：self / k"""
+        return (1 / k) * self
+
+    def __pos__(self):
+        """返回矩阵取正的结果"""
+        return 1 * self
+
+    def __neg__(self):
+        """返回矩阵取负的结果"""
+        return -1 * self
+
+
+# 测试
+matrix = Matrix([[1, 2], [3, 4]])
+matrix2 = Matrix([[5, 6], [7, 8]])
+print(matrix2)
+print("add: {}".format(matrix + matrix2))
+print("subtract: {}".format(matrix - matrix2))
+print("scalar-mul: {}".format(2 * matrix))
+print("scalar-mul: {}".format(matrix * 2))
+print("zero_2_3: {}".format(Matrix.zero(2, 3)))
+
+# 单位阵
+I = Matrix.identity(2)
+print(I)
+print("A.dot(I) = {}".format(matrix.dot(I)))
+print("I.dot(A) = {}".format(I.dot(matrix)))
+
+```
+
+矩阵和矩阵的乘法 以及 矩阵转置
+```python
+import Vector
+
+class Matrix:
+    # 其他函数省略
+    
+    def dot(self, another):
+        """返回矩阵乘法的结果"""
+        if isinstance(another, Vector):
+            # 矩阵 和 向量 的乘法
+	    # 矩阵 列数量 == 向量长度
+            assert self.col_num() == len(another), \
+                "Error in Matrix-Vector Multiplication."
+	    # 矩阵每一行为向量，变成 向量*向量
+            return Vector([self.row_vector(i).dot(another) for i in range(self.row_num())])
+
+        if isinstance(another, Matrix):
+            # 矩阵1 和 矩阵2 的乘法
+	    # 矩阵1列数 == 矩阵2行数
+            assert self.col_num() == another.row_num(), \
+                "Error in Matrix-Matrix Multiplication."
+	    # 矩阵1 每一行 分别*  矩阵2 每一列
+	    # 矩阵2 每一列 for j in range(another.col_num())
+	    # 矩阵1 每一行 for i in range(self.row_num())
+            return Matrix([[self.row_vector(i).dot(another.col_vector(j)) for j in range(another.col_num())]
+                           for i in range(self.row_num())])
+			   
+    def T(self):
+        """返回矩阵的转置矩阵"""
+        return Matrix([[e for e in self.col_vector(i)]
+                       for i in range(self.col_num())])
+
+# 测试
+T = Matrix([[1.5, 0], [0, 2]])
+p = Vector([5, 3])
+print("T.dot(p) = {}".format(T.dot(p)))
+
+P = Matrix([[0, 4, 5], [0, 0, 3]])
+print("T.dot(P) = {}".format(T.dot(P)))
+
+print("A.dot(B) = {}".format(matrix.dot(matrix2)))
+print("B.dot(A) = {}".format(matrix2.dot(matrix)))
+
+# 转置
+print("P.T = {}".format(P.T()))
+```
+
+numpy矩阵
+```python
+import numpy as np
+
+if __name__ == "__main__":
+
+    # 矩阵的创建
+    A = np.array([[1, 2], [3, 4]])
+    print(A)
+
+    # 矩阵的属性
+    print(A.shape)
+    print(A.T)
+
+    # 获取矩阵的元素
+    print(A[1, 1])
+    print(A[0])
+    print(A[:, 0])
+    print(A[1, :])
+
+    # 矩阵的基本运算
+    B = np.array([[5, 6], [7, 8]])
+    print(A + B)
+    print(A - B)
+    print(10 * A)
+    print(A * 10)
+    print(A * B)
+    print(A.dot(B))
+
+    p = np.array([10, 100])
+    print(A + p)
+    print(A + 1)
+    
+    # 点乘
+    print(A.dot(p))
+    
+    # 单位矩阵
+    I = np.identity(2)
+    print(I)
+    print(A.dot(I))
+    print(I.dot(A))
+
+    # 逆矩阵
+    invA = np.linalg.inv(A)
+    print(invA)
+    print(invA.dot(A))
+    print(A.dot(invA))
+
+    # C = np.array([[1, 2, 3], [4, 5, 6]])
+    # np.linalg.inv(C)
+```
+
+矩阵 平移 和旋转
+```python
+import matplotlib.pyplot as plt
+import Matrix
+import Vector
+import math
+
+
+if __name__ == "__main__":
+
+    points = [[0, 0], [0, 5], [3, 5], [3, 4], [1, 4],
+              [1, 3], [2, 3], [2, 2], [1, 2], [1, 0]]
+    x = [point[0] for point in points]
+    y = [point[1] for point in points]
+
+    plt.figure(figsize=(5, 5))
+    plt.xlim(-10, 10)
+    plt.ylim(-10, 10)
+    plt.plot(x, y)
+    # plt.show()
+
+    P = Matrix(points)
+    
+    # 矩阵表示的是一个 空间变换
+    # https://github.com/Ewenwan/Mathematics#矩阵线性变换-1
+    # T = Matrix([[2, 0], [0, 1.5]])
+    # T = Matrix([[1, 0], [0, -1]])
+    # T = Matrix([[-1, 0], [0, 1]])
+    # T = Matrix([[-1, 0], [0, -1]])
+    # T = Matrix([[1, 0.5], [0, 1]])
+    # T = Matrix([[1, 0], [0.5, 1]])
+    
+    # 纯旋转
+    theta = math.pi / 3
+    T = Matrix([[math.cos(theta), math.sin(theta)], [-math.sin(theta), math.cos(theta)]])
+
+    P2 = T.dot(P.T())
+    plt.plot([P2.col_vector(i)[0] for i in range(P2.col_num())],
+             [P2.col_vector(i)[1] for i in range(P2.col_num())])
+    plt.show()
+
+```
+
+## 3. 线性系统 LinearSystem 
+```python
+import Matrix
+import Vector
+
+# A*x = b
+class LinearSystem:
+
+    def __init__(self, A, b):
+
+        assert A.row_num() == len(b), "row number of A must be equal to the length of b"
+        self._m = A.row_num()
+        self._n = A.col_num()
+        assert self._m == self._n  # TODO: no this restriction
+
+        self.Ab = [Vector(A.row_vector(i).underlying_list() + [b[i]])
+                   for i in range(self._m)]
+
+    def _max_row(self, index, n):
+
+        best, ret = self.Ab[index][index], index
+        for i in range(index + 1, n):
+            if self.Ab[i][index] > best:
+                best, ret = self.Ab[i][index], i
+        return ret
+
+    def _forward(self):
+
+        n = self._m
+        for i in range(n):
+            # Ab[i][i]为主元
+            max_row = self._max_row(i, n)
+            self.Ab[i], self.Ab[max_row] = self.Ab[max_row], self.Ab[i]
+
+            # 将主元归为一
+            self.Ab[i] = self.Ab[i] / self.Ab[i][i]  # TODO: self.Ab[i][i] == 0?
+            for j in range(i + 1, n):
+                self.Ab[j] = self.Ab[j] - self.Ab[j][i] * self.Ab[i]
+
+    def _backward(self):
+
+        n = self._m
+        for i in range(n - 1, -1, -1):
+            # Ab[i][i]为主元
+            for j in range(i - 1, -1, -1):
+                self.Ab[j] = self.Ab[j] - self.Ab[j][i] * self.Ab[i]
+
+    def gauss_jordan_elimination(self):
+
+        self._forward()
+        self._backward()
+
+    def fancy_print(self):
+
+        for i in range(self._m):
+            print(" ".join(str(self.Ab[i][j]) for j in range(self._n)), end=" ")
+            print("|", self.Ab[i][-1])
+
+
+```
+
+
+
+
+
 ## Python 练习册，每天一个小程序 ##
 
 
