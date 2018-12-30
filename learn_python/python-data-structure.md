@@ -983,11 +983,170 @@ print(hotPotato(["Bill","David","Susan","Jane","Kent","Brad"],7))
       
       
       
+###  队列应用2: 模拟： 打印机
+      假设 平均 3分钟(180秒) 会有一个打印任务
+      对于每一秒，我们可以通过生成 1 到 180 之间的随机数来模拟打印任务发生的机会。
+      如果数字是 180，我们说一个任务已经创建。
+      请注意，可能会在一下子创建许多任务，或者需要等待一段时间才有任务。
+      这就是模拟的本质。
+      
+主要模拟步骤
 
+      1. 创建打印任务的队列，每个任务都有个时间戳。队列启动的时候为空。
+      2. 每秒（currentSecond）：
+         2.1 是否创建新的打印任务？
+             如果是，将 currentSecond 作为 时间戳 添加到 队列。
+         2.2 如果 打印机 不忙 并且 有任务在等待（打印队列不空）
+             从 打印机队列 中删除 一个任务 并将其分配给打印机
+             从 currentSecond 中减去 该任务的时间戳，以计算 该任务 的 等待时间。
+             将该任务的 等待时间 附加到列表中稍后处理。
+             根据打印任务的页数，确定需要多少时间（所需处理时间）。
+      3. 该任务的所需的等待时间 减去一秒。
+      4. 如果任务已经完成，换句话说，所需的时间已经达到零，打印机空闲。
+      模拟完成后，从生成的等待时间列表中计算平均等待时间。    
 
+Python 实现
 
+为了设计此模拟，我们将为上述三个真实世界对象创建类：
 
+打印机(Printer), 打印任务(Task), 打印队列(PrintQueue)
 
+```python
+# 打印机(Printer)
+class Printer:
+    def __init__(self, ppm):
+        self.pagerate = ppm     # 打印速度，页/每分钟
+        self.currentTask = None # 当前是否有任务
+        self.timeRemaining = 0  # 任务所需时间
+    
+    # 任务计时
+    def tick(self):
+        if self.currentTask != None:
+            # 任务所需时间，每过一秒，任务时间-1
+            self.timeRemaining = self.timeRemaining - 1
+            if self.timeRemaining <= 0:
+                # 任务已经完成，当前无任务
+                self.currentTask = None
+
+    def busy(self):
+        if self.currentTask != None:
+            return True # 无任务，空闲
+        else:
+            return False # 有任务
+    
+    # 添加一个任务
+    def startNext(self,newtask):
+        self.currentTask = newtask # 新任务
+        # 根据任务的页数计算所需的时间
+        self.timeRemaining = newtask.getPages() * 60/self.pagerate
+
+# 生成打印任务(Task)====
+# 创建任务时，随机数生成器将提供 1 到 20 页的长度
+# 还需要保存一个时间戳用于计算等待时间
+import random
+
+class Task:
+    def __init__(self,time):
+        self.timestamp = time # 任务开始时间
+        self.pages = random.randrange(1,21)# 任务量，打印页数
+
+    def getStamp(self):
+        return self.timestamp
+
+    def getPages(self):
+        return self.pages
+    
+    # 计算任务已经持续的时间
+    def waitTime(self, currenttime):
+        return currenttime - self.timestamp
+        
+
+#  整个仿真
+from pythonds.basic.queue import Queue
+
+import random
+
+# 任务仿真
+def simulation(numSeconds, pagesPerMinute):
+    # 创建打印机 实例
+    labprinter = Printer(pagesPerMinute) # 打印机速度 页/每分钟
+    # 创建打印机队列实例
+    printQueue = Queue()
+    # 等待时间列表
+    waitingtimes = []
+    
+    # 工作时间范围
+    for currentSecond in range(numSeconds):
+        # 该秒是否需要创建任务
+        if newPrintTask():
+            # 创建任务
+            task = Task(currentSecond)
+            # 把打印任务 加入打印机队列
+            printQueue.enqueue(task)
+            
+        # 打印机不忙 并且 有打印任务
+        if (not labprinter.busy()) and (not printQueue.isEmpty()):
+            # 从队列中 取出一个打印任务
+            nexttask = printQueue.dequeue()
+            # 计算该任务 的等待时间
+            waitingtimes.append(nexttask.waitTime(currentSecond))
+            # 打印机开始下一个任务
+            labprinter.startNext(nexttask)
+            
+        # 打印机工作，任务时间逐渐较少
+        labprinter.tick()
+    
+    # 计算平均等待时间
+    averageWait=sum(waitingtimes)/len(waitingtimes)
+    # 大约
+    print("Average Wait %6.2f secs %3d tasks remaining."%(averageWait,printQueue.size()))
+
+# 每秒 根据生产的随机数决定是否需要产生打印任务，模拟打印任务生成
+def newPrintTask():
+    # 平均180秒生成一个任务
+    # 每秒 生成1~180之间一个随机数，为180时，生成任务
+    num = random.randrange(1,181)
+    if num == 180:
+        return True # 生成任务 标志为真
+    else:
+        return False
+
+# 十次模型
+for i in range(10):
+    # 总时间 3600秒， 打印机速度 5页/每分钟 
+    # 模拟 60 分钟（3,600秒）
+    simulation(3600,5)
+    
+>>> 
+Average Wait 165.38 secs 2 tasks remaining.
+Average Wait  95.07 secs 1 tasks remaining.
+Average Wait  65.05 secs 2 tasks remaining.
+Average Wait  99.74 secs 1 tasks remaining.
+Average Wait  17.27 secs 0 tasks remaining.
+Average Wait 239.61 secs 5 tasks remaining.
+Average Wait  75.11 secs 1 tasks remaining.
+Average Wait  48.33 secs 0 tasks remaining.
+Average Wait  39.31 secs 3 tasks remaining.
+Average Wait 376.05 secs 1 tasks remaining.
+我们可以看到，平均等待时间为 122.09 秒。 还可以看到平均等待时间有很大的变化，
+最小值为 17.27 秒，最大值为 376.05 秒。 你也可能注意到，只有两种情况所有任务都完成。
+
+# 打印速度 每分钟 10 页，再次运行 10 次测试，页面速度更快，我们希望在一小时内完成更多的任务。
+>>>for i in range(10):
+      simulation(3600,10)
+
+Average Wait   1.29 secs 0 tasks remaining.
+Average Wait   7.00 secs 0 tasks remaining.
+Average Wait  28.96 secs 1 tasks remaining.
+Average Wait  13.55 secs 0 tasks remaining.
+Average Wait  12.67 secs 0 tasks remaining.
+Average Wait   6.46 secs 0 tasks remaining.
+Average Wait  22.33 secs 0 tasks remaining.
+Average Wait  12.39 secs 0 tasks remaining.
+Average Wait   7.27 secs 0 tasks remaining.
+Average Wait  18.17 secs 0 tasks remaining.
+
+```
 
 ## 3. 双端队列 deques
 
