@@ -1191,16 +1191,328 @@ Average Wait  18.17 secs 0 tasks remaining.
       d.removeFront()      ['dog',4,'cat']        True 尾部删除True
       
 ### python 实现 Deque
-
-
-
+      为抽象数据类型 deque 的实现创建一个新类。
+      同样，Python 列表将提供一组非常好的方法来构建 deque 的细节。
+      我们的实现假定 deque 的尾部在列表中的位置为 0。
       
+```python
+class Deque:
+    # 初始化空列表
+    def __init__(self):
+        self.items = []
+    # 测试为空？
+    def isEmpty(self):
+        return self.items == []
+    # 前端加入 元素，放在右面 O(1)
+    def addFront(self, item):
+        self.items.append(item)
+    # 尾部加入元素， 在开始0位置插入，O(n)
+    def addRear(self, item):
+        self.items.insert(0,item)
+    # 首部删除元素，删除右边的元素 O(n)
+    def removeFront(self):
+        return self.items.pop()
+    # 尾部删除元素，删除位置0上的元素 O(n)
+    def removeRear(self):
+        return self.items.pop(0) # pop(0)方法必须删除列表的第一个元素。
+    # 队列大小
+    def size(self):
+        return len(self.items)
+
+
+```
+
+### 双端队列 deques 应用1： 回文检查
+      2018102
+      回文是一个字符串，读取首尾相同的字符，
+      例如，
+        radar
+        toot
+        madam。 
+      我们想构造一个算法输入一个字符串，并检查它是否是一个回文。
+![](https://facert.gitbooks.io/python-data-structure-cn/3.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.18.%E5%9B%9E%E6%96%87%E6%A3%80%E6%9F%A5/assets/3.18.%E5%9B%9E%E6%96%87%E6%A3%80%E6%9F%A5.figure2.png)
       
+      我们可以直接删除并比较首尾字符，只有当它们匹配时才继续。
+      如果可以持续匹配首尾字符，我们最终要么用完字符，
+      要么留出大小为 1 的deque，取决于原始字符串的长度是偶数还是奇数。
+      在任一情况下，字符串都是回文。
 
+```python
 
+from pythonds.basic.deque import Deque
 
+def palchecker(aString):
+    # 空DQ
+    chardeque = Deque()
+    # 字符串创建 双端队列
+    for ch in aString:
+        chardeque.addRear(ch)
+    # 对等
+    stillEqual = True
 
+    while chardeque.size() > 1 and stillEqual:
+        # 右边元素
+        first = chardeque.removeFront()
+        # 左边元素
+        last = chardeque.removeRear()
+        # 左右两端元素应该匹配
+        if first != last:
+            # 不匹配，不是 回文
+            stillEqual = False
+
+    return stillEqual
+
+print(palchecker("lsdkjfskf"))
+print(palchecker("radar"))
+
+```
+      
 ## 4. 列表 List
+      列表是一个强大但简单的收集机制，为程序员提供了各种各样的操作。
+      然而，不是所有的编程语言都包括列表集合。
+      在这些情况下，列表的概念必须由程序员实现。
+      
+      列表是项的集合，其中每个项保持相对于其他项的相对位置。
+      更具体地，我们将这种类型的列表称为无序列表。
+      我们可以将列表视为具有第一项，第二项，第三项等等。
+      我们还可以引用列表的开头（第一个项）或列表的结尾（最后一个项）。
+      为了简单起见，我们假设列表不能包含重复项。
+      例如，整数 54,26,93,17,77 和 31 的集合可以表示考试分数的简单无序列表。
+      请注意，我们将它们用逗号分隔，这是列表结构的常用方式。
+      当然，Python 会显示这个列表为 [54,26,93,17,77,31]。
+      
+### 无序列表抽象数据类型
+      无序列表的结构是项的集合，其中每个项保持相对于其他项的相对位置。
+      下面给出了一些可能的无序列表操作。
+
+      List()        创建一个新的空列表。它不需要参数，并返回一个空列表。
+      add(item)     向列表中添加一个新项。它需要 item 作为参数，并不返回任何内容。
+                    假定该 item 不在列表中。
+      remove(item)  从列表中删除该项。它需要 item 作为参数并修改列表。假设项存在于列表中。
+      search(item)  搜索列表中的项目。它需要 item 作为参数，并返回一个布尔值。
+      isEmpty()     检查列表是否为空。它不需要参数，并返回布尔值。
+      size()        返回列表中的项数。它不需要参数，并返回一个整数。
+      append(item)  将一个新项添加到列表的末尾，使其成为集合中的最后一项。
+                    它需要 item 作为参数，并不返回任何内容。假定该项不在列表中。
+      index(item)   返回项在列表中的位置。它需要 item 作为参数并返回索引。假定该项在列表中。
+      insert(pos, item) 在位置 pos 处向列表中添加一个新项。
+                    它需要 item 作为参数并不返回任何内容。
+                    假设该项不在列表中，并且有足够的现有项使其有 pos 的位置。
+      pop()         删除并返回列表中的最后一个项。假设该列表至少有一个项。
+      pop(pos)      删除并返回位置 pos 处的项。
+                    它需要 pos 作为参数并返回项。假定该项在列表中。
+      
+### 无序列表实现：链表
+      这些值已被随机放置。如果我们可以在每个项中保持一些明确的信息，
+      即下一个项的位置，则每个项的相对位置可以通过简单地从一个项到下一个项的链接来表示。
+
+![](https://facert.gitbooks.io/python-data-structure-cn/3.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.21.%E5%AE%9E%E7%8E%B0%E6%97%A0%E5%BA%8F%E5%88%97%E8%A1%A8%EF%BC%9A%E9%93%BE%E8%A1%A8/assets/3.21.%E5%AE%9E%E7%8E%B0%E6%97%A0%E5%BA%8F%E5%88%97%E8%A1%A8%EF%BC%9A%E9%93%BE%E8%A1%A8.figure2.png)
+      
+      要注意，必须明确地指定链表的第一项的位置。
+      一旦我们知道第一个项在哪里，第一个项目可以告诉我们第二个是什么，等等。
+      外部引用通常被称为链表的头。
+      类似地，最后一个项需要知道没有下一个项。
+      
+      
+#### Node 节点类(值+指向)
+      链表实现的基本构造块是节点。每个节点对象必须至少保存两个信息。
+      首先，节点必须包含列表项本身。我们将这个称为节点的 数据字段。
+      此外，每个节点必须保存 对 下一个节点的引用。 
+      Node 类还包括访问，修改数据和访问下一个引用的常用方法。
+```python
+class Node:
+    def __init__(self,initdata):
+        # 数据字段
+        self.data = initdata
+        # 对 下一个节点的引用 
+        self.next = None
+        # 引用 None 代表没有下一个节点。
+        # 请注意在构造函数中，最初创建的节点 next 被设置为 None。
+        # 有时这被称为 接地节点，因此我们使用标准接地符号表示对 None 的引用。
+        
+    # 访问数据
+    def getData(self):
+        return self.data
+        
+    # 访问下一个引用
+    def getNext(self):
+        return self.next
+        
+    # 修改数据
+    def setData(self,newdata):
+        self.data = newdata
+        
+    # 修改 下一个引用
+    def setNext(self,newnext):
+        self.next = newnext
+
+# 我们创建一个 Node 对象
+>>> temp = Node(93)
+>>> temp.getData()
+93
+
+
+
+```
+      
+![](https://facert.gitbooks.io/python-data-structure-cn/3.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.21.%E5%AE%9E%E7%8E%B0%E6%97%A0%E5%BA%8F%E5%88%97%E8%A1%A8%EF%BC%9A%E9%93%BE%E8%A1%A8/assets/3.21.%E5%AE%9E%E7%8E%B0%E6%97%A0%E5%BA%8F%E5%88%97%E8%A1%A8%EF%BC%9A%E9%93%BE%E8%A1%A8.figure4.png) 
+      
+      
+      
+#### Unordered List 类
+      无序列表将从一组节点构建，每个节点通过显式引用链接到下一个节点。
+      只要我们知道在哪里找到第一个节点（包含第一个项），
+      之后的每个项可以通过连续跟随下一个链接找到。
+      考虑到这一点，UnorderedList 类必须保持对第一个节点的引用。
+      
+```python
+class UnorderedList:
+
+    def __init__(self):
+        # 记录表头
+        self.head = None
+        # 特殊引用 None 将再次用于表示链表的头部不引用任何内容。
+        
+    # 只是检查链表头是否是 None 的引用 ,判断链表是否为空
+    # 显示了使用引用 None 来表示链接结构的 end 的优点
+    def isEmpty(self):
+        return self.head == None
+    
+    # 添加一个元素
+    def add(self,item):
+        # 新建一个节点
+        temp = Node(item)
+        # 新节点指向 原 链表头的指向 
+        temp.setNext(self.head)
+        # 在更新链表 头
+        self.head = temp
+        
+    # 遍历链表，获取大小
+    def size(self):
+        # 表头后的第一个节点
+        current = self.head
+        count = 0
+        
+        # 非 接地， 未到 链表结尾
+        while current != None:
+            count = count + 1 # 计数+1
+            current = current.getNext() # 迭代，后一个节点
+        return count
+        
+    # 遍历链表，寻找指定元素
+    def search(self,item):
+        # 表头后的第一个节点
+        current = self.head
+        found = False # 未找到
+        
+        # 未到 链表结尾，且未找到
+        while current != None and not found:
+            # 该节点 数据项 是否为 指定元素
+            if current.getData() == item:
+                found = True
+            # 遍历下一个节点
+            else:
+                current = current.getNext()
+        # 返回 找到与否标志
+        return found
+    
+    # 删除指定元素
+    def remove(self,item):
+        # 表头后的第一个节点
+        current = self.head
+        previous = None
+        found = False # 寻找指定元素
+        
+        # 先寻找指定元素
+        while not found:
+            # 查看指定节点数据项 是否为 指定元素
+            if current.getData() == item:
+                # 找到了
+                found = True
+            # 还未找到
+            else:
+                # 记录当前节点的前一个节点
+                previous = current
+                # 更新 下一个节点
+                current = current.getNext()
+                
+        # 一开始就找到了,也就是第一个节点就是要找的元素
+        if previous == None:
+            self.head = current.getNext()
+        # 前一个节点的下一个节点 指向 当前节点的 下一个节点
+        else:
+            previous.setNext(current.getNext())
+    
+    
+# 我们构建一个空的链表。赋值语句
+>>> mylist = UnorderedList()
+
+# 添加元素
+>>> mylist.add(31)
+>>> mylist.add(77)
+>>> mylist.add(17)
+>>> mylist.add(93)
+>>> mylist.add(26)
+>>> mylist.add(54)
+
+# 链表大小
+>>> mylist.size()
+6
+
+# 作为一个例子，试试调用 search 方法来查找 item 17
+>>> mylist.search(17)
+True
+
+```
+
+     链表的头指代列表的第一项的第一节点。反过来，
+     该节点保存对下一个节点（下一个项）的引用，等等。
+     重要的是注意链表类本身不包含任何节点对象。
+     相反，它只包含对链接结构中第一个节点的单个引用。 
+
+![](https://facert.gitbooks.io/python-data-structure-cn/3.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.21.%E5%AE%9E%E7%8E%B0%E6%97%A0%E5%BA%8F%E5%88%97%E8%A1%A8%EF%BC%9A%E9%93%BE%E8%A1%A8/assets/3.21.%E5%AE%9E%E7%8E%B0%E6%97%A0%E5%BA%8F%E5%88%97%E8%A1%A8%EF%BC%9A%E9%93%BE%E8%A1%A8.figure6.png)
+      
+      
+      由于该链表是无序的，所以新项相对于已经在列表中的其他项的特定位置并不重要。 
+      新项可以在任何位置。考虑到这一点，将新项放在最简单的位置是有意义的。
+      
+      链表结构只为我们提供了一个入口点，即链表的头部。
+      所有其他节点只能通过访问第一个节点，然后跟随下一个链接到达。
+      这意味着添加新节点的最简单的地方就在链表的头部。 
+      
+      换句话说，我们将新项作为链表的第一项，现有项将需要链接到这个新项后。
+      
+      更改新节点的下一个引用以引用旧链表的第一个节点。
+      现在，链表的其余部分已经正确地附加到新节点，我们可以修改链表的头以引用新节点。
+      这两个步骤不能反，反了之后就找不到原链表了。
+![](https://facert.gitbooks.io/python-data-structure-cn/3.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.21.%E5%AE%9E%E7%8E%B0%E6%97%A0%E5%BA%8F%E5%88%97%E8%A1%A8%EF%BC%9A%E9%93%BE%E8%A1%A8/assets/3.21.%E5%AE%9E%E7%8E%B0%E6%97%A0%E5%BA%8F%E5%88%97%E8%A1%A8%EF%BC%9A%E9%93%BE%E8%A1%A8.figure7.png)
+      
+      
+      遍历链表，获取大小
+ ![](https://facert.gitbooks.io/python-data-structure-cn/3.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.21.%E5%AE%9E%E7%8E%B0%E6%97%A0%E5%BA%8F%E5%88%97%E8%A1%A8%EF%BC%9A%E9%93%BE%E8%A1%A8/assets/3.21.%E5%AE%9E%E7%8E%B0%E6%97%A0%E5%BA%8F%E5%88%97%E8%A1%A8%EF%BC%9A%E9%93%BE%E8%A1%A8.figure9.png)
+      
+      
+      我们检查存储在当前节点中的项是否是我们希望删除的项。
+      如果是，found 设置为 True 。
+      如果我们没有找到该项，则 previous 和 current 都必须向前移动一个节点。
+      同样，这两个语句的顺序是至关重要的。
+      previous 必须先将一个节点移动到 current 的位置。
+      此时，才可以移动current。
+      这个过程通常被称为“英寸蠕动”，因为 previous 必须赶上 current，然后 current 前进。
+![](https://facert.gitbooks.io/python-data-structure-cn/3.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.21.%E5%AE%9E%E7%8E%B0%E6%97%A0%E5%BA%8F%E5%88%97%E8%A1%A8%EF%BC%9A%E9%93%BE%E8%A1%A8/assets/3.21.%E5%AE%9E%E7%8E%B0%E6%97%A0%E5%BA%8F%E5%88%97%E8%A1%A8%EF%BC%9A%E9%93%BE%E8%A1%A8.figure12.png)
+      
+      一旦 remove 的搜索步骤已经完成，我们需要从链表中删除该节点。 
+![](https://facert.gitbooks.io/python-data-structure-cn/3.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.21.%E5%AE%9E%E7%8E%B0%E6%97%A0%E5%BA%8F%E5%88%97%E8%A1%A8%EF%BC%9A%E9%93%BE%E8%A1%A8/assets/3.21.%E5%AE%9E%E7%8E%B0%E6%97%A0%E5%BA%8F%E5%88%97%E8%A1%A8%EF%BC%9A%E9%93%BE%E8%A1%A8.figure13.png)
+      
+      有一个特殊情况需要解决。 如果要删除的项目恰好是链表中的第一个项，则 current 将引用链接列表中的第一个节点。
+      这也意味着 previous 是 None。 我们先前说过，previous 是一个节点，它的下一个节点需要修改。
+      在这种情况下，不是 previous ，而是链表的 head 需要改变
+![](https://facert.gitbooks.io/python-data-structure-cn/3.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.21.%E5%AE%9E%E7%8E%B0%E6%97%A0%E5%BA%8F%E5%88%97%E8%A1%A8%EF%BC%9A%E9%93%BE%E8%A1%A8/assets/3.21.%E5%AE%9E%E7%8E%B0%E6%97%A0%E5%BA%8F%E5%88%97%E8%A1%A8%EF%BC%9A%E9%93%BE%E8%A1%A8.figure14.png)
+      
+      
+      
+      
+      
 
 
 
