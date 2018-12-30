@@ -834,10 +834,105 @@ print(postfixEval('7 8 + 3 2 + /'))
 ![](https://facert.gitbooks.io/python-data-structure-cn/3.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.9.%E4%B8%AD%E7%BC%80%E5%89%8D%E7%BC%80%E5%92%8C%E5%90%8E%E7%BC%80%E8%A1%A8%E8%BE%BE%E5%BC%8F/assets/3.9.%E4%B8%AD%E7%BC%80%E5%90%8E%E7%BC%80%E5%92%8C%E5%90%8E%E7%BC%80%E8%A1%A8%E8%BE%BE%E5%BC%8F.figure10.png)  
       
       
-https://facert.gitbooks.io/python-data-structure-cn/3.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.9.%E4%B8%AD%E7%BC%80%E5%89%8D%E7%BC%80%E5%92%8C%E5%90%8E%E7%BC%80%E8%A1%A8%E8%BE%BE%E5%BC%8F/
-      
+![](https://facert.gitbooks.io/python-data-structure-cn/3.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.9.%E4%B8%AD%E7%BC%80%E5%89%8D%E7%BC%80%E5%92%8C%E5%90%8E%E7%BC%80%E8%A1%A8%E8%BE%BE%E5%BC%8F/assets/3.9.%E4%B8%AD%E7%BC%80%E5%90%8E%E7%BC%80%E5%92%8C%E5%90%8E%E7%BC%80%E8%A1%A8%E8%BE%BE%E5%BC%8F.figure11.png)
+
+
 
 ## 2. 队列
+      队列是项的有序结合，其中添加新项的一端称为队尾，移除项的一端称为队首。
+      当一个元素从队尾进入队列时，一直向队首移动，直到它成为下一个需要移除的元素为止。
+      最近添加的元素必须在队尾等待。
+      集合中存活时间最长的元素在队首，这种排序成为 FIFO，先进先出，也被成为先到先得。
+      
+      队列的最简单的例子是我们平时不时会参与的列。
+      排队等待电影，在杂货店的收营台等待，在自助餐厅排队等待（这样我们可以弹出托盘栈）。
+      行为良好的线或队列是有限制的，因为它只有一条路，只有一条出路。
+      不能插队，也不能离开。你只有等待了一定的时间才能到前面。
+![](https://facert.gitbooks.io/python-data-structure-cn/3.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.10.%E4%BB%80%E4%B9%88%E6%98%AF%E9%98%9F%E5%88%97/assets/3.10.%E4%BB%80%E4%B9%88%E6%98%AF%E9%98%9F%E5%88%97.figure1.png)
+      
+      12306网上订票排队。。。。
+      除了打印机打印队列，操作系统使用多个不同的队列来控制计算机内的进程。
+      下一步做什么的调度通常基于尽可能快地执行程序和尽可能多的服务用户的排队算法。
+      此外，当我们敲击键盘时，有时屏幕上出现的字符会延迟。
+      这是由于计算机在那一刻做其他工作。
+      按键的内容被放置在类似队列的缓冲器中，使得它们最终可以以正确的顺序显示在屏幕上。
+      
+      
+### 抽象数据类型
+     队列被构造为在队尾添加项的有序集合，并且从队首移除。
+     队列保持 FIFO 排序属性。
+     队列操作如下。
+     
+      Queue()       创建一个空的新队列。 它不需要参数，并返回一个空队列。
+      enqueue(item) 将新项添加到队尾。 它需要 item 作为参数，并不返回任何内容。
+      dequeue()     从队首移除项。它不需要参数并返回 item。 队列被修改。
+      isEmpty()     查看队列是否为空。它不需要参数，并返回布尔值。
+      size()        返回队列中的项数。它不需要参数，并返回一个整数。
+      
+      作为示例，我们假设 q 是已经创建并且当前为空的队列。
+         操作              队列状态             返回数据
+         q.isEmpty()       []                  True        队列是否为空
+         q.enqueue(4)      [4]                             队尾添加元素
+         q.enqueue('dog')  ['dog',4]                       队尾添加元素
+         q.enqueue(True)   [True,'dog',4]                  队尾添加元素
+         q.size()          [True,'dog',4]      3           队列大小
+         q.enqueue(8.4)    [8.4,True,'dog',4]              队尾添加元素
+         q.dequeue()       [8.4,True,'dog']    4           队首删除元素
+         q.dequeue()       [8.4,True]          'dog'       队首删除元素
+         q.size()          [True,'dog']        2           队列大小
+      
+### Python实现队列
+      实现队列抽象数据类型创建一个新类。
+      和前面一样，我们将使用列表集合来作为构建队列的内部表示。
+      我们需要确定列表的哪一端作为队首，哪一端作为队尾。
+      假定队尾在列表中的位置为 0。
+      这允许我们使用列表上的插入函数向队尾添加新元素。
+      弹出操作可用于删除队首的元素（列表的最后一个元素）。
+      回想一下，这也意味着入队为 O(n) ( 数据依次后移 )，出队为 O(1)。
+      
+```python
+
+class Queue:
+    def __init__(self):
+        self.items = []
+
+    def isEmpty(self):
+        return self.items == []
+
+    def enqueue(self, item):
+        self.items.insert(0,item)
+
+    def dequeue(self):
+        return self.items.pop()
+
+    def size(self):
+        return len(self.items)
+
+
+# 测试
+进一步的操作这个队列产生如下结果：
+
+q = Queue()
+q.enqueue(4)
+q.enqueue('dog')
+q.enqueue(True)
+q.size()
+>>> 3
+ q.isEmpty()
+>>>False
+q.enqueue(8.4)
+q.dequeue()
+>>> 4
+q.dequeue()
+>>> 'dog'
+q.size()
+>>> 2
+```
+
+### 队列应用1: 模拟：烫手山芋
+
+
+
 
 
 
