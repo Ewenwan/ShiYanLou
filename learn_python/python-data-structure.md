@@ -766,7 +766,69 @@ print(infixToPostfix("( A + B ) * C - ( D - E ) * ( F + G )"))
 通过弹出栈两次，我们可以得到正确的两个操作数，然后执行乘法（这种情况下结果为 30）。
 我们现在可以通过将其放回栈中来处理此结果，以便它可以表示为表达式后面的运算符的操作数。
 当处理最后一个操作符时，栈上只有一个值，弹出并返回它作为表达式的结果。
+
+7 8 + 3 2 + / 。
+在这个例子中有两点需要注意，
+首先，栈的大小增长收缩，然后再子表达式求值的时候再次增长。
+第二，除法操作需要谨慎处理。回想下，后缀表达式的操作符顺序没变，仅仅改变操作符的位置。
+当用于除法的操作符从栈中弹出时，它们被反转。
+由于除法不是交换运算符，换句话说 15/5和 5/15 不同，
+因此我们必须保证操作数的顺序不会交换。
+
+假设后缀表达式是一个由空格分隔的标记字符串。 
+运算符为*，/，+和 - ，操作数假定为单个整数值。
+输出将是一个整数结果。
+
+      1. 创建一个名为 operandStack 的空栈。
+      2. 拆分字符串转换为标记列表。
+      3. 从左到右扫描标记列表。
+        3.1 如果标记是操作数，将其从字符串转换为整数，并将值压到operandStack。
+        3.2 如果标记是运算符*，/，+或-，它将需要两个操作数。
+            弹出operandStack 两次。 
+            第一个弹出的是第二个操作数，第二个弹出的是第一个操作数。
+            执行算术运算后，将结果压到操作数栈中。
+      4. 当输入的表达式被完全处理后，结果就在栈上，弹出 operandStack 并返回值。
+
 '''
+from pythonds.basic.stack import Stack
+
+# 计算 后缀表达式的值
+def postfixEval(postfixExpr):
+    #  1. 创建一个名为 operandStack 的空栈。
+    operandStack = Stack()
+    # 2. 拆分字符串转换为标记列表。
+    tokenList = postfixExpr.split()
+    # 3. 从左到右扫描标记列表。
+    for token in tokenList:
+        # 3.1 如果标记是操作数
+        if token in "0123456789":
+            # 将其从字符串转换为整数，并将值压到operandStack。
+            operandStack.push(int(token))
+        # 3.2 如果标记是运算符*，/，+或-
+        else:
+            # 第一个弹出的是第二个操作数
+            operand2 = operandStack.pop()
+            # 第二个弹出的是第一个操作数。
+            operand1 = operandStack.pop()
+            # 执行算术运算
+            result = doMath(token,operand1,operand2)
+            # 将结果压到操作数栈中
+            operandStack.push(result)
+    # 4. 当输入的表达式被完全处理后，结果就在栈上，弹出 operandStack 并返回值。
+    return operandStack.pop()
+
+# 它将获取两个操作数和运算符，执行相应的计算
+def doMath(op, op1, op2):
+    if op == "*":
+        return op1 * op2
+    elif op == "/":
+        return op1 / op2
+    elif op == "+":
+        return op1 + op2
+    else:
+        return op1 - op2
+
+print(postfixEval('7 8 + 3 2 + /'))
 
 ```
 ![](https://facert.gitbooks.io/python-data-structure-cn/3.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.9.%E4%B8%AD%E7%BC%80%E5%89%8D%E7%BC%80%E5%92%8C%E5%90%8E%E7%BC%80%E8%A1%A8%E8%BE%BE%E5%BC%8F/assets/3.9.%E4%B8%AD%E7%BC%80%E5%90%8E%E7%BC%80%E5%92%8C%E5%90%8E%E7%BC%80%E8%A1%A8%E8%BE%BE%E5%BC%8F.figure10.png)  
@@ -774,8 +836,7 @@ print(infixToPostfix("( A + B ) * C - ( D - E ) * ( F + G )"))
       
 https://facert.gitbooks.io/python-data-structure-cn/3.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.9.%E4%B8%AD%E7%BC%80%E5%89%8D%E7%BC%80%E5%92%8C%E5%90%8E%E7%BC%80%E8%A1%A8%E8%BE%BE%E5%BC%8F/
       
-      
-      
+
 ## 2. 队列
 
 
