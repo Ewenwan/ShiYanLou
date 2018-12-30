@@ -1359,7 +1359,7 @@ class Node:
       
       
       
-#### Unordered List 类
+#### 无序列表 Unordered List 类
       无序列表将从一组节点构建，每个节点通过显式引用链接到下一个节点。
       只要我们知道在哪里找到第一个节点（包含第一个项），
       之后的每个项可以通过连续跟随下一个链接找到。
@@ -1510,6 +1510,132 @@ True
 ![](https://facert.gitbooks.io/python-data-structure-cn/3.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.21.%E5%AE%9E%E7%8E%B0%E6%97%A0%E5%BA%8F%E5%88%97%E8%A1%A8%EF%BC%9A%E9%93%BE%E8%A1%A8/assets/3.21.%E5%AE%9E%E7%8E%B0%E6%97%A0%E5%BA%8F%E5%88%97%E8%A1%A8%EF%BC%9A%E9%93%BE%E8%A1%A8.figure14.png)
       
       
+#### 有序列表抽象数据结构 Ordered List
+
+      如果上面所示的整数列表是有序列表（升序），则它可以写为 17,26,31,54,77和93。
+      由于 17 是最小项，它占据第一位置。同样，由于 93 是最大的，它占据最后的位置。
+      
+      排序通常是升序或降序，并且我们假设列表项具有已经定义的有意义的比较运算。
+      许多有序列表操作与无序列表的操作相同。
+
+      OrderedList()   创建一个新的空列表。
+                      它不需要参数，并返回一个空列表。
+      add(item)       向列表中添加一个新项。
+                      它需要 item 作为参数，并不返回任何内容。
+                      假定该 item 不在列表中。
+      remove(item)    从列表中删除该项。
+                      它需要 item 作为参数并修改列表。
+                      假设项存在于列表中。
+      search(item)    搜索列表中的项目。
+                      它需要 item 作为参数，并返回一个布尔值。
+      isEmpty()       检查列表是否为空。
+                      它不需要参数，并返回布尔值。
+      size()          返回列表中的项数。
+                      它不需要参数，并返回一个整数。
+      index(item)     返回项在列表中的位置。
+                      它需要 item 作为参数并返回索引。
+                      假定该项在列表中。
+      pop()           删除并返回列表中的最后一个项。
+                      假设该列表至少有一个项。
+      pop(pos)        删除并返回位置 pos 处的项。
+                      它需要 pos 作为参数并返回项。
+                      假定该项在列表中。
+
+
+```python
+class OrderedList:
+    def __init__(self):
+        # head 的引用为 None 表示为空链表
+        self.head = None
+        
+    # isEmpty 和size 方法可以与无序列表一样实现，因为它们只处理链表中的节点数量，而不考虑实际项值。
+        
+    # 只是检查链表头是否是 None 的引用 ,判断链表是否为空
+    # 显示了使用引用 None 来表示链接结构的 end 的优点
+    def isEmpty(self):
+        return self.head == None
+        
+    # 遍历链表，获取大小
+    def size(self):
+        # 表头后的第一个节点
+        current = self.head
+        count = 0
+        
+        # 非 接地， 未到 链表结尾
+        while current != None:
+            count = count + 1 # 计数+1
+            current = current.getNext() # 迭代，后一个节点
+        return count
+        
+    # 同样，remove 方法将正常工作，因为我们仍然需要找到该项，然后删除它。
+    # 删除指定元素
+    def remove(self,item):
+        # 表头后的第一个节点
+        current = self.head
+        previous = None
+        found = False # 寻找指定元素
+        
+        # 先寻找指定元素
+        while not found:
+            # 查看指定节点数据项 是否为 指定元素
+            if current.getData() == item:
+                # 找到了
+                found = True
+            # 还未找到
+            else:
+                # 记录当前节点的前一个节点
+                previous = current
+                # 更新 下一个节点
+                current = current.getNext()
+                
+        # 一开始就找到了,也就是第一个节点就是要找的元素
+        if previous == None:
+            self.head = current.getNext()
+        # 前一个节点的下一个节点 指向 当前节点的 下一个节点
+        else:
+            previous.setNext(current.getNext())
+            
+    # search 和 add，将需要一些修改=====================   
+            
+    # 添加一个元素，需要排序放入合适的位置
+    def add(self,item):
+        # 新建一个节点
+        temp = Node(item)
+        # 新节点指向 原 链表头的指向 
+        temp.setNext(self.head)
+        # 在更新链表 头
+        self.head = temp
+        
+https://facert.gitbooks.io/python-data-structure-cn/3.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.23.%E5%AE%9E%E7%8E%B0%E6%9C%89%E5%BA%8F%E5%88%97%E8%A1%A8/
+        
+        
+        
+    # 遍历链表，寻找指定元素
+    # 在项不在链表中的情况下，我们可以利用 有序结构 来尽快停止搜索。
+    def search(self,item):
+        # 表头后的第一个节点
+        current = self.head
+        found = False # 未找到
+        
+        # 添加另一个布尔变量======用于是否停止寻找==========
+        stop = False
+        
+        # 未到 链表结尾，且未找到,且未停止
+        while current != None and not found and not stop:
+            # 该节点 数据项 是否为 指定元素
+            if current.getData() == item:
+                found = True
+            # 遍历下一个节点
+            else:
+                # 如果发现任何节点包含大于我们正在寻找的项的数据，我们将 stop 设置为 True,不要寻找了
+                if current.getData() > item:
+                    stop = True # 不用找了
+                else:
+                    current = current.getNext()
+        # 返回 找到与否标志
+        return found 
+            
+```
       
       
       
