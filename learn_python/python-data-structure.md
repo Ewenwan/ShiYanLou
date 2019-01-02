@@ -1891,8 +1891,11 @@ myWin.exitonclick()
     
     
 ```python
+import turtle
+
 def tree(branchLen,t):
     if branchLen > 5:
+        # 前进 
         t.forward(branchLen)
         
         # 乌龟向右转 20 度之后立即进行递归调用,这是右树。
@@ -1907,14 +1910,103 @@ def tree(branchLen,t):
         
         # 在右转20度，摆正方向
         t.right(20)
+        
+        # 对应一开始的前进，这里后退
         t.backward(branchLen)
+        
+def main():
+    # 创建一个乌龟
+    t = turtle.Turtle()
+    # 创建一个窗口来绘制
+    myWin = turtle.Screen()
+    t.left(90)
+    t.up()
+    t.backward(100)
+    t.down()
+    t.color("green")
+    tree(75,t)
+    myWin.exitonclick()
+    
+main()
+    
+
+```
+![](https://facert.gitbooks.io/python-data-structure-cn/4.%E9%80%92%E5%BD%92/4.7.%E4%BB%8B%E7%BB%8D%EF%BC%9A%E5%8F%AF%E8%A7%86%E5%8C%96%E9%80%92%E5%BD%92/assets/4.7.%E4%BB%8B%E7%BB%8D%EF%BC%9A%E5%8F%AF%E8%A7%86%E5%8C%96%E9%80%92%E5%BD%92.ac1.png)
+      
+      
+###  谢尔宾斯基三角形
+      
+      谢尔宾斯基三角形阐明了三路递归算法。用手绘制谢尔宾斯基三角形的过程很简单。 
+      从一个大三角形开始。通过连接每一边的中点，将这个大三角形分成四个新的三角形。
+      忽略刚刚创建的中间三角形，对三个小三角形中的每一个应用相同的过程。 
+      每次创建一组新的三角形时，都会将此过程递归应用于三个较小的角三角形。 
+      如果你有足够的铅笔，你可以无限重复这个过程。
+      
+      基本情况被任意设置为我们想要将三角形划分成块的次数。
+      有时我们把这个数字称为分形的“度”。 
+      每次我们进行递归调用时，我们从度中减去 1，直到 0。
+      当我们达到 0 度时，我们停止递归。
+      
+```python
+import turtle
+
+# 绘制三角形
+def drawTriangle(points,color,myTurtle):
+    # 填充颜色
+    myTurtle.fillcolor(color)
+    myTurtle.up()
+    myTurtle.goto(points[0][0],points[0][1])
+    myTurtle.down()
+    # 使用 begin_fill 和 end_fill 方法绘制填充一个三角形
+    myTurtle.begin_fill()
+    myTurtle.goto(points[1][0],points[1][1])
+    myTurtle.goto(points[2][0],points[2][1])
+    myTurtle.goto(points[0][0],points[0][1])
+    myTurtle.end_fill()
+
+# 获取指定两点连线的 中点坐标
+def getMid(p1,p2):
+    return ( (p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2)
+    
+# 绘制谢尔宾斯基三角形
+def sierpinski(points,degree,myTurtle):
+    colormap = ['blue','red','green','white','yellow',
+                'violet','orange']
+    # 绘制最大的带颜色的中间的三角形
+    drawTriangle(points,colormap[degree],myTurtle)
+    # 分割次数
+    if degree > 0:
+        # 绘制上三角形
+        sierpinski([points[0],
+                        getMid(points[0], points[1]),
+                        getMid(points[0], points[2])],
+                   degree-1, myTurtle)
+        # 绘制左三角形
+        sierpinski([points[1],
+                        getMid(points[0], points[1]),
+                        getMid(points[1], points[2])],
+                   degree-1, myTurtle)
+       # 绘制右三角形
+        sierpinski([points[2],
+                        getMid(points[2], points[1]),
+                        getMid(points[0], points[2])],
+                   degree-1, myTurtle)
+
+def main():
+    # 创建一个乌龟
+    myTurtle = turtle.Turtle()
+    # 创建一个窗口来绘制
+    myWin = turtle.Screen()
+    # 大三角形三个顶点坐标
+    myPoints = [[-100,-50],[0,100],[100,-50]]
+    # 绘制谢尔宾斯基三角形，中间为分割次数
+    sierpinski(myPoints,3,myTurtle)
+    myWin.exitonclick()
+
+main()
 
 
 ```
-      
-      
-      
-      
       
       
         
