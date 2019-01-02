@@ -1597,17 +1597,52 @@ class OrderedList:
             
     # search 和 add，将需要一些修改=====================   
             
+    '''
+    最重要的需要修改的方法是 add。 
+    回想一下，对于无序列表，add 方法可以简单地将新节点放置在链表的头部。
+    这是最简单的访问点。 不幸的是，这将不再适用于有序列表。
+    需要在现有的有序列表中查找新项所属的特定位置。
+    假设我们有由 17,26,54,77 和 93 组成的有序列表，并且我们要添加值31 。
+    add 方法必须确定新项属于 26 到 54 之间。
+    我们知道，当我们迭代完节点（ current 变为 None）
+    或 current 节点的值变得大于我们希望添加的项时，我们就找到了该位置。
+    在我们的例子中，看到值 54 我们停止迭代。
+   
+    '''
+            
     # 添加一个元素，需要排序放入合适的位置
     def add(self,item):
+        # 两个哥俩，一前一后双指针
+        current = self.head # 
+        previous = None
+        # 提前结束标志
+        stop = False
+        
+        # 遍历找到有序链表中的合适位置
+        while current != None and not stop:
+            if current.getEats() > item:
+                # 找到合适位置了
+                # current 节点的值变得大于我们希望添加的项时，我们就找到了该位置。
+                # 应当停下来
+                stop = True
+            else:
+                # 还未找到，更新两个 哥俩
+                previous = current
+                current  = current.getNext()
+                
         # 新建一个节点
         temp = Node(item)
-        # 新节点指向 原 链表头的指向 
-        temp.setNext(self.head)
-        # 在更新链表 头
-        self.head = temp
-        
-https://facert.gitbooks.io/python-data-structure-cn/3.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.23.%E5%AE%9E%E7%8E%B0%E6%9C%89%E5%BA%8F%E5%88%97%E8%A1%A8/
-        
+        if previous == None:
+            # 添加的元素最小，需要放在表头
+            # 新节点指向 原 链表头的指向 
+            temp.setNext(self.head)
+            # 更新链表 头
+            self.head = temp
+        else:
+            # 正常的放在 current 之前，previous 节点之后 
+            temp.setNext(current)  # current 之前
+            previous.setNext(temp) # previous 节点之后
+            
         
         
     # 遍历链表，寻找指定元素
@@ -1634,17 +1669,80 @@ https://facert.gitbooks.io/python-data-structure-cn/3.%E5%9F%BA%E6%9C%AC%E6%95%B
                     current = current.getNext()
         # 返回 找到与否标志
         return found 
-            
+'''
+你可能还注意到此实现的性能与早前针对 Python 列表给出的实际性能不同。
+这表明链表不是 Python 列表的实现方式。
+Python 列表的实际实现基于数组的概念。
+'''
 ```
       
       
+有序表中添加新项:
+
+![](https://facert.gitbooks.io/python-data-structure-cn/3.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/3.23.%E5%AE%9E%E7%8E%B0%E6%9C%89%E5%BA%8F%E5%88%97%E8%A1%A8/assets/3.23.%E5%AE%9E%E7%8E%B0%E6%9C%89%E5%BA%8F%E5%88%97%E8%A1%A8.figure17.png)
       
+#### 总结
+      线性 数据结构 以 有序的方式保存它们的数据。
+      栈是维持 LIFO，后进先出，排序的简单数据结构。
+      栈的基本操作是 push，pop和 isEmpty。
+      队列是维护 FIFO（先进先出）排序的简单数据结构。
+      队列的基本操作是 enqueue，dequeue 和 isEmpty。
+      前缀，中缀 和 后缀 都是写表达式的方法。
+      栈 对于设计计算解析表达式算法非常有用。
+      栈可以提供 反转特性。
+      队列可以帮助 构建定时仿真。
+      模拟使用 随机数生成器 来创建真实情况，并帮助我们回答“假设”类型的问题。
+      Deques 是允许类似 栈 和 队列 的混合行为的 数据结构。
+      Deque  的基本操作是 addFront，addRear，removeFront，removeRear 和 isEmpty。
+      列表是 项 的集合，其中每个项目保存相对位置。
+      链表 实现 保持逻辑顺序，而不需要物理存储要求。
+      修改 链表头 是一种特殊情况。
+
+      
+# 二、递归算法思想---分而治之----减而治之
+      要理解可能难以解决的复杂问题有一个简单的递归解决方案。
+      学习如何递归地写出程序。
+      理解和应用递归的三个定律。
+      将递归理解为一种迭代形式。
+      实现问题的递归公式化。
+      了解计算机系统如何实现递归。     
+      
+      递归是一种解决问题的方法，
+      将问题分解为更小的子问题，
+      直到得到一个足够小的问题可以被很简单的解决。
+      通常递归涉及函数调用自身。
+      递归允许我们编写优雅的解决方案，解决可能很难编程的问题。
+
+## 计算整数列表和
+循环计算
+```python
+def listsum(numList):
+    theSum = 0
+    # for循环变量 列表中的每个元素
+    for i in numList:
+        theSum = theSum + i
+    return theSum
+
+print(listsum([1,3,5,7,9]))
 
 
+```
 
 
+递归实现
+```python
+def listsum(numList):
+   # 问题规模最小时的情况
+   if len(numList) == 1:
+        return numList[0]
+   # 大问题分解成多个小问题
+   else:
+        # 函数调用自己，递归调用
+        return numList[0] + listsum(numList[1:])
 
-
-
-
-
+print(listsum([1,3,5,7,9]))
+```
+![](https://facert.gitbooks.io/python-data-structure-cn/4.%E9%80%92%E5%BD%92/4.3.%E8%AE%A1%E7%AE%97%E6%95%B4%E6%95%B0%E5%88%97%E8%A1%A8%E5%92%8C/assets/4.3.%E8%AE%A1%E7%AE%97%E6%95%B4%E6%95%B0%E5%88%97%E8%A1%A8%E5%92%8C.figure2.png)
+      
+      
+      
