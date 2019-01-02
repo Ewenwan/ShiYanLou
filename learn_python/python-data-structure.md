@@ -2117,23 +2117,168 @@ def searchFrom(maze, startRow, startColumn):
             searchFrom(maze, startRow+1, startColumn) or \
             searchFrom(maze, startRow, startColumn-1) or \
             searchFrom(maze, startRow, startColumn+1)
+            
+    # 如果其中一个方向 通过，该点是一条路
     if found:
         maze.updatePosition(startRow, startColumn, PART_OF_PATH)
-    else:
         
+    else:
+        # 如果所有四个递归调用返回 False，那么认为是一个死胡同 DEAD_END 。
         maze.updatePosition(startRow, startColumn, DEAD_END)
     return found
 
 
 ```
 
+drawMaze 方法使用这个内部表示在屏幕上绘制迷宫的初始视图。
+      
+     示例地图文件数据文件：
+      ++++++++++++++++++++++
+      +   +   ++ ++     +
+      + +   +       +++ + ++
+      + + +  ++  ++++   + ++
+      +++ ++++++    +++ +  +
+      +          ++  ++    +
+      +++++ ++++++   +++++ +
+      +     +   +++++++  + +
+      + +++++++      S +   +
+      +                + +++
+      ++++++++++++++++++ +++   
+      
 
+地图内部数据 列表的列表：
 
+      [ ['+','+','+','+',...,'+','+','+','+','+','+','+'],
+        ['+',' ',' ',' ',...,' ',' ',' ','+',' ',' ',' '],
+        ['+',' ','+',' ',...,'+','+',' ','+',' ','+','+'],
+        ['+',' ','+',' ',...,' ',' ',' ','+',' ','+','+'],
+        ['+','+','+',' ',...,'+','+',' ','+',' ',' ','+'],
+        ['+',' ',' ',' ',...,'+','+',' ',' ',' ',' ','+'],
+        ['+','+','+','+',...,'+','+','+','+','+',' ','+'],
+        ['+',' ',' ',' ',...,'+','+',' ',' ','+',' ','+'],
+        ['+',' ','+','+',...,' ',' ','+',' ',' ',' ','+'],
+        ['+',' ',' ',' ',...,' ',' ','+',' ','+','+','+'],
+        ['+','+','+','+',...,'+','+','+',' ','+','+','+']]
+      
+      
+地图实现
 
+```python
+class Maze:
+    # 读取 文件数据，生成 数据化地图
+    def __init__(self,mazeFileName):
+        # 地图总大小
+        rowsInMaze = 0
+        columnsInMaze = 0
+        self.mazelist = []
+        # 打开地图文件
+        mazeFile = open(mazeFileName,'r')
+        rowsInMaze = 0 # 行id=====
+        # 读取每一行数据
+        for line in mazeFile:
+            rowList = []
+            col = 0    # 列 id=====
+            # 每一行 的各一个格子数据
+            for ch in line[:-1]:
+                rowList.append(ch) # 一行数据
+                # 起点====
+                # 通过使用 + 字符表示墙壁，空格表示空心方块，并使用字母 S 表示起始位置
+                if ch == 'S':
+                    self.startRow = rowsInMaze #行
+                    self.startCol = col        #列
+                # 行id ++
+                col = col + 1
+            # 行id
+            rowsInMaze = rowsInMaze + 1
+            # 行数据 列表
+            self.mazelist.append(rowList)
+            
+            # 列数量
+            columnsInMaze = len(rowList)
+        # 迷宫的内部表示是列表的列表。 mazelist 实例变量的每一行也是一个列表。
+        self.rowsInMaze = rowsInMaze # 总行数
+        self.columnsInMaze = columnsInMaze# 总列数
+        # 中点 坐标 偏移量
+        self.xTranslate = -columnsInMaze/2
+        self.yTranslate = rowsInMaze/2
+        self.t = Turtle(shape='turtle')
+        setup(width=600,height=600)
+        # 世界坐标系
+        setworldcoordinates(-(columnsInMaze-1)/2 - 0.5,
+                            -(rowsInMaze-1)/2    - 0.5,
+                            (columnsInMaze-1)/2  + 0.5,
+                            (rowsInMaze-1)/2     + 0.5)
+                            
+    # drawMaze 方法使用这个内部表示在屏幕上绘制迷宫的初始视图 
+    def drawMaze(self):
+        for y in range(self.rowsInMaze):
+            for x in range(self.columnsInMaze):
+                if self.mazelist[y][x] == OBSTACLE:
+                    self.drawCenteredBox(x+self.xTranslate,
+                                           -y+self.yTranslate,
+                                           'tan')
+        self.t.color('black','blue')
+
+    def drawCenteredBox(self,x,y,color):
+        tracer(0)
+        self.t.up()
+        self.t.goto(x-.5,y-.5)
+        self.t.color('black',color)
+        self.t.setheading(90)
+        self.t.down()
+        self.t.begin_fill()
+        for i in range(4):
+            self.t.forward(1)
+            self.t.right(90)
+        self.t.end_fill()
+        update()
+        tracer(1)
         
-      
-      
-      
+    # updatePosition 方法使用两个辅助方法moveTurtle 和 dropBreadCrumb 来更新屏幕上的视图。
+    def moveTurtle(self,x,y):
+        self.t.up()
+        self.t.setheading(self.t.towards(x+self.xTranslate,
+                                           -y+self.yTranslate))
+        self.t.goto(x+self.xTranslate,-y+self.yTranslate)
+
+    def dropBreadcrumb(self,color):
+        self.t.dot(color)
+        
+    # updatePosition 方法使用相同的内部表示来查看乌龟是否遇到了墙。
+    # 它还用 . 或 - 更新内部表示，以表示乌龟已经访问了特定格子或者格子是死角。
+    def updatePosition(self,row,col,val=None):
+        if val:
+            self.mazelist[row][col] = val
+        # updatePosition 方法使用两个辅助方法moveTurtle 和 dropBreadCrumb 来更新屏幕上的视图。
+        self.moveTurtle(col,row)
+
+        if val == PART_OF_PATH:
+            color = 'green'
+        elif val == OBSTACLE:
+            color = 'red'
+        elif val == TRIED:
+            color = 'black'
+        elif val == DEAD_END:
+             color = 'red'
+        else:
+             color = None
+
+        if color:
+             self.dropBreadcrumb(color)
+    # 最后，isExit 方法使用乌龟的当前位置来检测退出条件。
+    # 退出条件是当乌龟已经到迷宫的边缘时，即行零或列零，或者在最右边列或底部行         
+    def isExit(self,row,col):
+        return (row == 0 or
+                row == self.rowsInMaze-1 or
+                col == 0 or
+                col == self.columnsInMaze-1 )
+                
+    # 重载索引运算符 =======================
+    # 以便我们的算法可以轻松访问任何特定格的状
+    def __getitem__(self,idx):
+        return self.mazelist[idx]
+     
+```
       
          
 
