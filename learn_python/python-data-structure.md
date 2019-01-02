@@ -1799,9 +1799,118 @@ print(toStr(1453,16))
 ```
 ![](https://facert.gitbooks.io/python-data-structure-cn/4.%E9%80%92%E5%BD%92/4.5.%E6%95%B4%E6%95%B0%E8%BD%AC%E6%8D%A2%E4%B8%BA%E4%BB%BB%E6%84%8F%E8%BF%9B%E5%88%B6%E5%AD%97%E7%AC%A6%E4%B8%B2/assets/4.5.%E6%95%B4%E6%95%B0%E8%BD%AC%E6%8D%A2%E4%B8%BA%E4%BB%BB%E6%84%8F%E8%BF%9B%E5%88%B6%E5%AD%97%E7%AC%A6%E4%B8%B2.figure4.png)
        
+![](https://facert.gitbooks.io/python-data-structure-cn/4.%E9%80%92%E5%BD%92/4.6.%E6%A0%88%E5%B8%A7%EF%BC%9A%E5%AE%9E%E7%8E%B0%E9%80%92%E5%BD%92/assets/4.6.%E6%A0%88%E5%B8%A7%EF%BC%9A%E5%AE%9E%E7%8E%B0%E9%80%92%E5%BD%92.figure6.png)
        
        
+## 栈帧：实现递归
+      假设不是将递归调用的结果与来自 convertString 的字符串拼接到 toStr，
+      我们修改了算法，以便在进行递归调用之前将字符串入栈。
+```python
+from pythonds.basic.stack import Stack
+
+rStack = Stack()
+
+def toStr(n,base):
+    convertString = "0123456789ABCDEF"
+    # 循环 代替递归
+    while n > 0:
+        # 最小情况
+        if n < base:
+            # 直接转换原数
+            rStack.push(convertString[n])
+        # 其他情况，转换 原数/基数 的余数 后压入栈
+        else:
+            rStack.push(convertString[n % base])
+        # 更新，子问题规模
+        # 使用原数/基数的 商 更新目标数，
+        n = n // base
+    # 生成最后的字符串
+    res = ""
+    while not rStack.isEmpty():
+        res = res + str(rStack.pop())
+    return res
+
+print(toStr(1453,16))
+
+
+```
+![](https://facert.gitbooks.io/python-data-structure-cn/4.%E9%80%92%E5%BD%92/4.6.%E6%A0%88%E5%B8%A7%EF%BC%9A%E5%AE%9E%E7%8E%B0%E9%80%92%E5%BD%92/assets/4.6.%E6%A0%88%E5%B8%A7%EF%BC%9A%E5%AE%9E%E7%8E%B0%E9%80%92%E5%BD%92.figure5.png)
+     
+     
+     
+## 可视化递归
+    插图的工具是 Python 的 turtle 模块称为 turtle。
+    turtle 是 Python 所有版本的标准库，并且非常易于使用
+    。比喻很简单。你可以创建一只乌龟，乌龟能前进，后退，左转，右转等。
+    乌龟可以让它的尾巴或上或下。当乌龟的尾巴向下，它移动时会画一条线。
+    为了增加乌龟的艺术价值，你可以改变尾巴的宽度以及尾巴浸入的墨水的颜色。  
+    
+    我们将使用 turtle 模块递归绘制螺旋。
+    
+    导入 turtle 模块后，我们创建一个乌龟。当乌龟被创建时，它也创建一个窗口来绘制。
+    接下来我们定义 drawSpiral 函数。
+    这个简单函数的基本情况是当我们想要绘制的线的长度（由 len 参数给出）减小到零或更小时。
+    如果线的长度大于零，我们让乌龟以 len 单位前进，然后向右转 90 度。
+    当我们再次调用 drawSpiral 并缩短长度时递归。
+    结束时，会调用函数 myWin.exitonclick()，这是一个方便的缩小窗口的方法，
+    使乌龟进入等待模式，直到你单击窗口，然后程序清理并退出。
+      
+```python
+
+import turtle
+# 创建一个乌龟
+myTurtle = turtle.Turtle()
+# 创建一个窗口来绘制
+myWin = turtle.Screen()
+
+# 想要绘制的线的长度
+def drawSpiral(myTurtle, lineLen):
+    if lineLen > 0:
+        # 让乌龟以 len 单位前进
+        myTurtle.forward(lineLen)
+        # 然后向右转 90 度
+        myTurtle.right(90)
+        # 递归调用本身，并缩短长度
+        drawSpiral(myTurtle,lineLen-5)
+# 
+drawSpiral(myTurtle,100)
+# 缩小窗口的方法，使乌龟进入等待模式，直到你单击窗口，然后程序清理并退出
+myWin.exitonclick()
+
+```
+      
+      
+    绘制一个分形树。分形来自数学的一个分支，并且与递归有很多共同之处。
+    分形的定义是，当你看着它时，无论你放大多少，分形有相同的基本形状。
+    大自然的一些例子是大陆的海岸线，雪花，山脉，甚至树木或灌木。
+    这些自然现象中的许多的分形性质使得程序员能够为计算机生成的电影生成非常逼真的风景。
+    在我们的下一个例子中，将生成一个分形树。   
        
+    一棵树是树干，一棵较小的树向右走，另一棵较小的树向左走。
+    如果你用递归的思想考虑这个定义，这意味着我们将树的递归定义应用到较小的左树和右树。   
+    
+    
+```python
+def tree(branchLen,t):
+    if branchLen > 5:
+        t.forward(branchLen)
+        
+        # 乌龟向右转 20 度之后立即进行递归调用,这是右树。
+        t.right(20)
+        tree(branchLen-15,t)
+        
+        # 左转 40（需要撤消原来的向右转 20 度，然后再向左转 20 度），以绘制左树。
+        t.left(40)
+        tree(branchLen-10,t)
+        
+        # 每次我们对树进行递归调用时，我们从 branchLen 参数中减去一些量; 这是为了确保递归树越来越小。
+        
+        # 在右转20度，摆正方向
+        t.right(20)
+        t.backward(branchLen)
+
+
+```
       
       
       
