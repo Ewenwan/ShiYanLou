@@ -2008,8 +2008,126 @@ main()
 
 ```
       
+### 汉诺塔游戏
+      在开始的时候，牧师们被给予三根杆和一堆 64 个金碟，每个盘比它下面一个小一点。
+      他们的任务是将所有 64 个盘子从三个杆中一个转移到另一个。
+      有两个重要的约束，它们一次只能移动一个盘子，并且它们不能在较小的盘子顶部上放置更大的盘子。
       
+![](https://facert.gitbooks.io/python-data-structure-cn/4.%E9%80%92%E5%BD%92/4.10.%E6%B1%89%E8%AF%BA%E5%A1%94%E6%B8%B8%E6%88%8F/assets/4.10.%E6%B1%89%E8%AF%BA%E5%A1%94%E6%B8%B8%E6%88%8F.figure1.png)
+      
+    步骤：
+      1. 借助目标杆(toPole) 将 起始杆(fromPole)上方height-1 个盘子 移动到中间杆(withPole)。
+      2. 将起始杆(fromPole)上 剩余的盘子 移动到 目标杆(toPole)。
+      3. 借助起始杆(fromPole) 将中间杆(withPole)上 height-1 个盘子 移动到目标杆(toPole)。
+      
+    只要我们遵守规则，较大的盘子保留在栈的底部，我们可以使用递归的三个步骤，处理任何更大的盘子。
+    上面概要中唯一缺失的是识别基本情况。最简单的汉诺塔是一个盘子的塔。
+    在这种情况下，我们只需要将一个盘子移动到其最终目的地。 
+    一个盘子的塔将是我们的基本情况。 
+    此外，上述步骤通过在步骤1和3中减小塔的高度，使我们趋向基本情况。   
+    
+```python
+# 具体的执行操作，从 fp 到 tp
+def moveDisk(fp,tp):
+    print("moving disk from",fp,"to",tp)
+
+
+def moveTower(height,fromPole, toPole, withPole):
+    if height >= 1:
+        # 1. 利用 toPole  从 fromPole 移动 height-1个盘子 到 withPole
+        moveTower(height-1,fromPole,withPole,toPole)
+        # 2. 把 fromPole 上的一个盘子 移动 到 toPole
+        moveDisk(fromPole,toPole)
+        # 3. 再利用fromPole 从withPole 移动 剩下的 height-1 个盘子 到 toPole 上
+        moveTower(height-1,withPole,toPole,fromPole)
+'''
+如果要明确地跟踪盘子，需要使用三个 Stack 对象，每个杆一个。 
+Python 提供了我们需要调用的隐含的栈。
+'''
+
+```
         
+### 探索迷宫
+      解决的问题是帮助我们的乌龟在虚拟迷宫中找到出路。
+
+![](https://facert.gitbooks.io/python-data-structure-cn/4.%E9%80%92%E5%BD%92/4.11.%E6%8E%A2%E7%B4%A2%E8%BF%B7%E5%AE%AB/assets/4.11.%E6%8E%A2%E7%B4%A2%E8%BF%B7%E5%AE%AB.figure2.png)
+      
+      我们假设我们的迷宫被分成“正方形”。迷宫的每个正方形是开放的或被一段墙壁占据。
+      乌龟只能通过迷宫的空心方块。 如果乌龟撞到墙上，它必须尝试不同的方向。
+      乌龟将需要一个程序，以找到迷宫的出路。这里是过程：
+       1. 从我们的起始位置，我们将首先尝试 向北(上)一格，然后从那里 递归 地尝试我们的程序。
+       2. 如果我们通过尝试 向北(上) 作为 第一步 没有成功，我们将向南(下)一格，并 递归 地重复我们的程序。
+       3. 如果向南(下)也不行，那么我们将尝试 向西(左) 一格，并 递归 地重复我们的程序。
+       4. 如果北，南和西都没有成功，则应用程序从当前位置 递归 向东(右)。
+       5. 如果这些方向都没有成功，那么没有办法离开迷宫，我们失败。  
+      
+      但如果北面被一堵墙阻挡，我们必须看看程序的下一步，并试着向南。
+      不幸的是，向南使我们回到原来的起点。
+      如果我们从那里再次应用递归过程，我们将又回到向北一格，并陷入无限循环。
+      所以，我们必须有一个策略来记住我们去过哪。
+      
+      我们假设有一袋面包屑可以撒在我们走过的路上。
+      如果我们沿某个方向迈出一步，发现那个位置上已经有面包屑，
+      我们应该立即后退并尝试程序中的下一个方向。
+      
+      有四种基本情况要考虑：
+       1. 乌龟撞到了墙。由于这一格被墙壁占据，不能进行进一步的探索。
+       2. 乌龟找到一个已经探索过的格。我们不想继续从这个位置探索，否则会陷入循环。
+       3. 我们发现了一个外边缘，没有被墙壁占据。换句话说，我们发现了迷宫的一个出口。
+       4. 我们探索了一格在四个方向上都没有成功。
+      
+      地图表示：
+       我们将使用 turtle 模块来绘制和探索我们的迷宫，以使我们看到这个算法的功能。
+       迷宫对象 将提供以下方法让我们在编写搜索算法时使用：
+
+        1. __init__ 读取迷宫的数据文件，初始化迷宫的内部表示，并找到乌龟的起始位置。
+        2. drawMaze 在屏幕上的一个窗口中绘制迷宫。
+        3. updatePosition 更新迷宫的内部表示，并更改窗口中乌龟的位置。
+        4. isExit 检查当前位置是否是迷宫的退出位置。
+       Maze 类还重载索引运算符 [] ，以便我们的算法可以轻松访问任何特定格的状态。
+      
+搜索路径算法：
+```python
+# 迷宫对象 maze ，起始行 startRow  和 起始列 startColumn
+# 这很重要，因为作为递归函数，搜索在每次递归调用时开始。
+def searchFrom(maze, startRow, startColumn):
+    # 为了可视化算法，以便你可以看到乌龟如何探索通过迷宫。
+    maze.updatePosition(startRow, startColumn)
+    # 检查四种基本情况中的前三种
+    #  1. 乌龟是否碰到墙，返回 false
+    if maze[startRow][startColumn] == OBSTACLE :
+        return False
+    #  2. 找到一个已经探索过的格
+    if maze[startRow][startColumn] == TRIED:
+        return False
+    # 3. 乌龟有没有到达出口，返 True
+    if maze.isExit(startRow,startColumn):
+        # 到达出口了，更新地图
+        maze.updatePosition(startRow, startColumn, PART_OF_PATH)
+        return True
+    # 更新地图显示，该块格子已被探索
+    maze.updatePosition(startRow, startColumn, TRIED)
+
+    # 如果这些条件都不为真，则我们继续递归搜索。
+    
+    # 递归步骤中有四个对 searchFrom 的递归调用(上下左右四个方向)
+    # 很难预测将有多少个递归调用，因为它们都由 or 语句连接。
+    # 如果对 searchFrom 的第一次调用返回 True ，则不需要最后三个调用。
+    found = searchFrom(maze, startRow-1, startColumn) or \
+            searchFrom(maze, startRow+1, startColumn) or \
+            searchFrom(maze, startRow, startColumn-1) or \
+            searchFrom(maze, startRow, startColumn+1)
+    if found:
+        maze.updatePosition(startRow, startColumn, PART_OF_PATH)
+    else:
+        
+        maze.updatePosition(startRow, startColumn, DEAD_END)
+    return found
+
+
+```
+
+
 
 
         
