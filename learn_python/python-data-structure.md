@@ -2457,3 +2457,228 @@ main()
        4. 引入映射抽象数据类型。
        5. 使用哈希实现 Map 抽象数据类型。
 
+## 1. 顺序查找
+      从列表中的第一个项目开始，我们按照基本的顺序排序，
+      简单地从一个项移动到另一个项，直到找到我们正在寻找的项或遍历完整个列表。
+      如果我们遍历完整个列表，则说明正在搜索的项不存在。
+      
+      项列表不以任何方式排序。
+      项随机放置到列表中。
+      换句话说，项在列表任何位置的概率是一样的。
+      
+![](https://facert.gitbooks.io/python-data-structure-cn/5.%E6%8E%92%E5%BA%8F%E5%92%8C%E6%90%9C%E7%B4%A2/5.3.%E9%A1%BA%E5%BA%8F%E6%9F%A5%E6%89%BE/assets/5.3.%E9%A1%BA%E5%BA%8F%E6%9F%A5%E6%89%BE.figure1.png)
+
+无序列表的顺序查找：
+
+      最好 最坏 平均
+      1    n   n/2
+      1    n   n
+      
+```python
+# 一个列表 和 我们正在寻找的项作为参数
+def sequentialSearch(alist, item):
+    pos = 0 # 元素位置
+    found = False # 是否找到标志
+    # 未遍历到最后且未找到
+    while pos < len(alist) and not found:
+        # 如果我们发现列表中的项，则赋值为 True。
+        if alist[pos] == item:
+            found = True
+        # 否者检测下一个位置
+        else:
+            pos = pos+1
+    # 返回一个是否存在的布尔值
+    return found
+
+testlist = [1, 2, 32, 8, 17, 19, 42, 13, 0]
+print(sequentialSearch(testlist, 3))
+print(sequentialSearch(testlist, 13))
+
+```
+
+
+有序列表的顺序查找：
+
+      如果我们正在寻找的项存在于列表中，它在 n 个位置中的概率依旧相同。
+      我们仍然会有相同数量的比较来找到该项。然而，如果该项不存在，则有一些优点。
+      1   n   n/2
+      1   n   n/2
+      
+![](https://facert.gitbooks.io/python-data-structure-cn/5.%E6%8E%92%E5%BA%8F%E5%92%8C%E6%90%9C%E7%B4%A2/5.3.%E9%A1%BA%E5%BA%8F%E6%9F%A5%E6%89%BE/assets/5.3.%E9%A1%BA%E5%BA%8F%E6%9F%A5%E6%89%BE.figure2.png)
+      
+      
+```python
+# 一个列表 和 我们正在寻找的项作为参数
+def orderedSearch(alist, item):
+    pos = 0 # 元素位置
+    found = False # 是否找到标志
+    stop = False  # 停止查找标志
+    # 未遍历到最后且未找到
+    while pos < len(alist) and not found and not stop:
+        # 如果我们发现列表中的项，则赋值为 True。
+        if alist[pos] == item:
+            found = True
+        # 否者检测下一个位置
+        else:
+            if alist[pos] > item:
+                # 算法不必继续查看所有项,它可以立即停止.
+                stop = True
+            else:
+                pos = pos+1
+    # 返回一个是否存在的布尔值
+    return found
+    
+testlist = [0, 1, 2, 8, 13, 17, 19, 32, 42,]
+print(orderedSequentialSearch(testlist, 3))
+print(orderedSequentialSearch(testlist, 13))
+
+```
+
+
+## 2. 有序列表的 二分查找\折半查找  log(n)
+      分而治之，分治思想
+      有序列表对于我们的比较是很有用的。
+      在顺序查找中，当我们与第一个项进行比较时，如果第一个项不是我们要查找的，则最多还有 n-1 个项目。
+      二分查找从中间项开始，而不是按顺序查找列表。
+      如果该项是我们正在寻找的项，我们就完成了查找。
+      如果它不是，我们可以使用列表的有序性质来消除剩余项的一半。
+      如果我们正在查找的项大于中间项，就可以消除中间项以及比中间项小的一半元素。
+      如果该项在列表中，肯定在大的那半部分。
+      
+![](https://facert.gitbooks.io/python-data-structure-cn/5.%E6%8E%92%E5%BA%8F%E5%92%8C%E6%90%9C%E7%B4%A2/5.4.%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE/assets/5.4.%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE.figure3.png)
+
+循环版本：
+```python
+def binarySearch(alist, item):
+    first = 0            # 起始
+    last  = len(alist)-1 # 结束
+    found = False        # 是否找到标志
+    
+    # 未遍历到最后且未找到
+    while first <= last and not found:
+        # 当前区域的二分区域
+        midpoint = (first + last) // 2 # 整除
+        # 如果我们发现列表中的项，则赋值为 True。
+        if alist[midpoint] == item:
+            found = True
+        # 否者检测下一个位置
+        else:
+            if item < alist[midpoint]:
+                # 查找元素较小，在左半区间
+                last = midpoint-1
+            else:
+                # 查找元素较大，在右半区间
+                first = midpoint+1
+                
+    # 返回一个是否存在的布尔值
+    return found
+
+testlist = [0, 1, 2, 8, 13, 17, 19, 32, 42,]
+print(binarySearch(testlist, 3))
+print(binarySearch(testlist, 13))
+
+```
+
+      这个算法是分而治之策略的一个很好的例子。
+      分和治意味着我们将问题分成更小的部分，以某种方式解决更小的部分，
+      然后重新组合整个问题以获得结果。 
+      当我们执行列表的二分查找时，我们首先检查中间项。
+      如果我们正在搜索的项小于中间项，我们可以简单地对原始列表的左半部分执行二分查找。
+      同样，如果项大，我们可以执行右半部分的二分查找。
+      无论哪种方式，都是递归调用二分查找函数。
+      
+递归版本:
+```python
+def binarySearch(alist, item):
+    # 递归最小情况是，列表长度变为0
+    if len(alist) == 0:
+        return False
+    else:
+        midpoint = len(alist) // 2 # 长度整除
+        # 如果我们发现列表中的项，则赋值为 True。
+        if alist[midpoint] == item:
+            return True
+        # 否者检测下一个位置
+        else:
+            if item < alist[midpoint]:
+                # 递归查找 左半区间
+                return binarySearch(alist[:midpoint], item)
+            else:
+                # 递归查找 右半区间
+                return binarySearch(alist[midpoint+1:], item)
+
+testlist = [0, 1, 2, 8, 13, 17, 19, 32, 42,]
+print(binarySearch(testlist, 3))
+print(binarySearch(testlist, 13))
+
+
+```
+      
+      
+## 3. Hash查找
+      哈希表 是以一种容易找到它们的方式存储的项的集合。
+      哈希表的每个位置，通常称为一个槽，可以容纳一个项，并且由从 0 开始的整数值命名。
+      例如，我们有一个名为 0 的槽，名为 1 的槽，名为 2 的槽，以上。
+      最初，哈希表不包含项，因此每个槽都为空。
+      我们可以通过使用列表来实现一个哈希表，每个元素初始化为None 。
+      Figure 4 展示了大小 m = 11 的哈希表。换句话说，在表中有 m 个槽，命名为 0 到 10。
+![](https://facert.gitbooks.io/python-data-structure-cn/5.%E6%8E%92%E5%BA%8F%E5%92%8C%E6%90%9C%E7%B4%A2/5.5.Hash%E6%9F%A5%E6%89%BE/assets/5.5.Hash%E6%9F%A5%E6%89%BE.figure4.png)
+
+      项和该项在散列表中所属的槽之间的映射被称为 hash 函数。
+      hash 函数将接收集合中的任何项，并在槽名范围内（0和 m-1之间）返回一个整数。
+      假设我们有整数项 54,26,93,17,77 和 31 的集合。
+      我们的第一个 hash 函数，有时被称为 余数法 ，只需要一个项并将其除以表大小，
+      返回剩余部分作为其散列值（h(item) = item％11）。 
+      注意，这种余数方法（模运算）通常以某种形式存在于所有散列函数中，因为结果必须在槽名的范围内。
+      
+      一旦计算了哈希值，我们可以将每个项插入到指定位置的哈希表中，如 Figure 5 所示。
+      注意，11 个插槽中的 6 个现在已被占用。
+      这被称为负载因子，通常表示为 λ=项数/表大小, 在这个例子中，λ = 6/11 。 
+
+![](https://facert.gitbooks.io/python-data-structure-cn/5.%E6%8E%92%E5%BA%8F%E5%92%8C%E6%90%9C%E7%B4%A2/5.5.Hash%E6%9F%A5%E6%89%BE/assets/5.5.Hash%E6%9F%A5%E6%89%BE.figure5.png)
+      
+      现在，当我们要搜索一个项时，我们只需使用哈希函数来计算项的槽名称，然后检查哈希表以查看它是否存在。
+      该搜索操作是 O(1)O(1)，因为需要恒定的时间量来计算散列值，然后在该位置索引散列表。
+      如果一切都正确的话，我们已经找到了一个恒定时间搜索算法。
+      
+      你可能已经看到，只有每个项映射到哈希表中的唯一位置，这种技术才会起作用。 
+      例如，如果项 44 是我们集合中的下一个项，则它的散列值为0（44％11 == 0）。
+      因为 77 的哈希值也是 0，我们会有一个问题。根据散列函数，两个或更多项将需要在同一槽中。
+      
+      这种现象被称为碰撞（它也可以被称为“冲突”）。
+      显然，冲突使散列技术产生了问题。
+      
+      
+      我们的目标是创建一个 散列hash函数，最大限度地减少冲突数，易于计算，并均匀分布在哈希表中的项。
+      有很多常用的方法来扩展简单余数法。
+      
+      1. 分组求和法
+        将项划分为相等大小的块（最后一块可能不是相等大小）。然后将这些块加在一起以求出散列值。
+        例如，如果我们的项是电话号码 436-555-4601，我们将取出数字，并将它们分成2位数（43,65,55,46,01）。
+        43 + 65 + 55 + 46 + 01，我们得到 210。
+        我们假设哈希表有 11 个槽，那么我们需要除以 11 。
+        在这种情况下，210％11 为 1，因此电话号码 436-555-4601 散列到槽 1 。
+        
+        一些分组求和法会在求和之前 每隔一个项 进行 反转。
+                                65->56    46->64
+        对于上述示例，我们得到 43 + 56 + 55 + 64 + 01 = 219，其给出 219％11 = 10 。
+        
+      2. 平方取中法
+        我们首先 对该项 平方，然后提取一部分数字结果。
+        例如，如果项是 44，我们将首先计算 44^2 = 1,936 。
+        通过 提取 中间两个数字 93 ，我们得到 5（93％11）
+        
+      3. 为基于字符的项（如字符串）创建哈希函数
+        
+        
+        
+        
+        
+        
+        
+        
+        
+      
+      
+
+
