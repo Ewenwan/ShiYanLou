@@ -2669,9 +2669,39 @@ print(binarySearch(testlist, 13))
         通过 提取 中间两个数字 93 ，我们得到 5（93％11）
         
       3. 为基于字符的项（如字符串）创建哈希函数
-        
-        
-        
+
+            词 cat 可以被认为是 ascii 值的序列。
+            >>> ord('c')
+            99
+            >>> ord('a')
+            97
+            >>> ord('t')
+            116
+        我们可以获取这三个 ascii 值，将它们相加，并使用余数方法获取散列值.
+![](https://facert.gitbooks.io/python-data-structure-cn/5.%E6%8E%92%E5%BA%8F%E5%92%8C%E6%90%9C%E7%B4%A2/5.5.Hash%E6%9F%A5%E6%89%BE/assets/5.5.Hash%E6%9F%A5%E6%89%BE.figure6.png)
+      
+```python
+def hash(astring, tablesize):
+    sum = 0
+    for pos in range(len(astring)):
+        sum = sum + ord(astring[pos])
+
+    return sum%tablesize
+
+```
+      
+      有趣的是，当使用此散列函数时，字符串总是返回相同的散列值。
+      为了弥补这一点，我们可以使用字符的位置作为权重。
+      下图展示了使用位置值作为加权因子的一种可能的方式。  
+![](https://facert.gitbooks.io/python-data-structure-cn/5.%E6%8E%92%E5%BA%8F%E5%92%8C%E6%90%9C%E7%B4%A2/5.5.Hash%E6%9F%A5%E6%89%BE/assets/5.5.Hash%E6%9F%A5%E6%89%BE.figure7.png)
+      
+      你可以思考一些其他方法来计算集合中项的散列值。
+      重要的是要记住，哈希函数必须是高效的，以便它不会成为存储和搜索过程的主要部分。
+      如果哈希函数太复杂，则计算槽名称的程序要比之前所述的简单地进行基本的顺序或二分搜索更耗时。 
+      这将打破散列的目的。
+      
+      
+      
         
         
         
