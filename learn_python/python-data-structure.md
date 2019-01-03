@@ -2170,6 +2170,7 @@ class Maze:
         # 地图总大小
         rowsInMaze = 0
         columnsInMaze = 0
+        # 地图内部形式，列表的列表
         self.mazelist = []
         # 打开地图文件
         mazeFile = open(mazeFileName,'r')
@@ -2186,9 +2187,9 @@ class Maze:
                 if ch == 'S':
                     self.startRow = rowsInMaze #行
                     self.startCol = col        #列
-                # 行id ++
+                # 列id ++
                 col = col + 1
-            # 行id
+            # 行id++  ====
             rowsInMaze = rowsInMaze + 1
             # 行数据 列表
             self.mazelist.append(rowList)
@@ -2211,8 +2212,11 @@ class Maze:
                             
     # drawMaze 方法使用这个内部表示在屏幕上绘制迷宫的初始视图 
     def drawMaze(self):
+        # 每一行
         for y in range(self.rowsInMaze):
+            # 每一列
             for x in range(self.columnsInMaze):
+                # 数据内容为障碍物的话，显示为格子
                 if self.mazelist[y][x] == OBSTACLE:
                     self.drawCenteredBox(x+self.xTranslate,
                                            -y+self.yTranslate,
@@ -2222,23 +2226,27 @@ class Maze:
     def drawCenteredBox(self,x,y,color):
         tracer(0)
         self.t.up()
-        self.t.goto(x-.5,y-.5)
+        self.t.goto(x - 0.5, y - 0.5)
         self.t.color('black',color)
         self.t.setheading(90)
         self.t.down()
+        # 填充颜色==========
         self.t.begin_fill()
         for i in range(4):
             self.t.forward(1)
             self.t.right(90)
         self.t.end_fill()
+        
         update()
         tracer(1)
         
     # updatePosition 方法使用两个辅助方法moveTurtle 和 dropBreadCrumb 来更新屏幕上的视图。
     def moveTurtle(self,x,y):
         self.t.up()
+        # 朝向
         self.t.setheading(self.t.towards(x+self.xTranslate,
                                            -y+self.yTranslate))
+        # 移动到
         self.t.goto(x+self.xTranslate,-y+self.yTranslate)
 
     def dropBreadcrumb(self,color):
@@ -2251,13 +2259,17 @@ class Maze:
             self.mazelist[row][col] = val
         # updatePosition 方法使用两个辅助方法moveTurtle 和 dropBreadCrumb 来更新屏幕上的视图。
         self.moveTurtle(col,row)
-
+        
+        # 路径
         if val == PART_OF_PATH:
             color = 'green'
+        # 障碍物
         elif val == OBSTACLE:
             color = 'red'
+        # 已经探索过
         elif val == TRIED:
             color = 'black'
+        # 死胡同
         elif val == DEAD_END:
              color = 'red'
         else:
@@ -2265,6 +2277,7 @@ class Maze:
 
         if color:
              self.dropBreadcrumb(color)
+             
     # 最后，isExit 方法使用乌龟的当前位置来检测退出条件。
     # 退出条件是当乌龟已经到迷宫的边缘时，即行零或列零，或者在最右边列或底部行         
     def isExit(self,row,col):
@@ -2280,7 +2293,167 @@ class Maze:
      
 ```
       
-         
+### 动态规划
+      计算机科学中的许多程序是为了优化一些值而编写的。
+      动态规划 是这些类型的优化问题的一个策略。
+      
+      找零问题：
+      如果金额不匹配，我们有几个选项。
+      我们想要的是 
+      最低一个一分钱 加上  原始金额减去一分钱   所需的硬币数量，
+      或者一个 5 美分加上  原始金额减去 5 美分  所需的硬币数量，
+      或者一个 10 美分加上 原始金额减去 10 美分 所需的硬币数量，
+      或者一个 250 美分加上 原始金额减去 30 美分 所需的硬币数量。
+      因此，需要对原始金额找零硬币数量可以根据下式计算：
+![](https://facert.gitbooks.io/python-data-structure-cn/4.%E9%80%92%E5%BD%92/4.12.%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/assets/4.12.%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92.1.png)
+
+贪婪算法，方法太低效，很多重复工作：
+```python
+# coinValueList 可找零 币值列表 change找零所需总钱数
+def recMC(coinValueList,change):
+    minCoins = change
+    # 最小情况：找零总钱数 正好在 可找零 币值列表中
+    if change in coinValueList:
+        return 1 # 返回1个钱币
+    # 其他情况
+    else:
+        for i in [c for c in coinValueList if c <= change]:
+            # 一张各种币值 + 剩余找零所需 张数(递归)
+            numCoins = 1 + recMC(coinValueList,change-i)
+            # 保留 这几种 策略中 最好的，找零钱币张数最少
+            if numCoins < minCoins:
+                minCoins = numCoins
+    return minCoins
+
+print(recMC([1,5,10,25],63))
+
+```
+
+![](https://facert.gitbooks.io/python-data-structure-cn/4.%E9%80%92%E5%BD%92/4.12.%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/assets/4.12.%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92.figure5.png)
+      
+      计算 找零15的 至少计算了3次，太多重复
+
+      减少我们工作量的关键是记住一些过去的结果，这样我们可以避免重新计算我们已经知道的结果。
+      一个简单的解决方案是将最小数量的硬币的结果存储在表中。
+      然后在计算新的最小值之前，我们首先检查表，看看结果是否已知。
+      如果表中已有结果，我们使用表中的值，而不是重新计算。
+      
+贪婪+查表算法(使用缓存技术，记忆)：
+
+```python
+def recDC(coinValueList,change,knownResults):
+   minCoins = change
+   if change in coinValueList:
+      # 已知找零结果 表
+      knownResults[change] = 1
+      return 1
+   # 查看该找零 结果 是否已经在 结果记录表中
+   elif knownResults[change] > 0:
+      return knownResults[change]
+   #
+   else:
+       for i in [c for c in coinValueList if c <= change]:
+         # 递归计算最小值
+         numCoins = 1 + recDC(coinValueList, change-i,
+                              knownResults)
+         # 几种找零方案中 最好的
+         if numCoins < minCoins:
+            minCoins = numCoins
+            # 记录该 找零方案 的结果======
+            knownResults[change] = minCoins
+   return minCoins
+
+# 多传入一个，找零结果列表
+print(recDC([1,5,10,25],63,[0]*64))
+
+
+```
+      
+用一个动态规划算法来解决我们的找零问题：
+
+```python
+# 有三个参数：一个有效硬币值的列表，我们要求的找零额，以及一个包含每个找零值所需最小硬币数量的列表。 
+# 当函数完成时，minCoins 将包含从 0 到找零值的所有值的解。
+def dpMakeChange(coinValueList,change,minCoins):
+    # 遍历每一个找零值
+    for cents in range(change+1):
+        coinCount = cents
+        # 遍历 每一种可找零的 币值，考虑使用所有可能的硬币对指定的金额进行找零。
+        for j in [c for c in coinValueList if c <= cents]:
+            # 使用币值j + 找零cents-j 的最小找零数量
+            if minCoins[cents-j] + 1 < coinCount:
+                coinCount = minCoins[cents-j] + 1
+        # 该找零 所需最小硬币数量
+        minCoins[cents] = coinCount
+    return minCoins[change]
+```
+
+记录找零币值：
+```python
+# 比上述函数 多返回一个 找零币值列表
+def dpMakeChange(coinValueList,change,minCoins,coinsUsed):
+    # 遍历每一个找零值
+    for cents in range(change+1):
+        coinCount = cents
+        newCoin = 1
+        # 遍历 每一种可找零的 币值，考虑使用所有可能的硬币对指定的金额进行找零。
+        for j in [c for c in coinValueList if c <= cents]:
+            if minCoins[cents-j] + 1 < coinCount:
+                coinCount = minCoins[cents-j]+1
+                # 使用该币值
+                newCoin = j
+        # 更新 结果方案 列表
+        minCoins[cents] = coinCount
+        # 记录使用的 币值
+        coinsUsed[cents] = newCoin
+     return minCoins[change]
+
+# 打印使用的 币值
+def printCoins(coinsUsed,change):
+   coin = change
+   while coin > 0:
+      thisCoin = coinsUsed[coin]
+      print(thisCoin)
+      coin = coin - thisCoin
+
+def main():
+    # 需要找零 总数
+    amnt = 63
+    # 可找零币值列表
+    clist = [1,5,10,21,25]
+    # 找零使用列表
+    coinsUsed = [0]*(amnt+1)
+    # 找零结果记录
+    coinCount = [0]*(amnt+1)
+
+    print("Making change for",amnt,"requires")
+    print(dpMakeChange(clist,amnt,coinCount,coinsUsed),"coins")
+    print("They are:")
+    printCoins(coinsUsed,amnt)
+    print("The used list is as follows:")
+    print(coinsUsed)
+
+main()
+
+```
+
+### 总结
+      在本章中，我们讨论了几个递归算法的例子。 
+      选择这些算法来揭示几个不同的问题，其中递归是一种有效的问题解决技术。 
+      本章要记住的要点如下：
+        1. 所有递归算法都必须具有基本情况。
+        2. 递归算法必须改变其状态并朝基本情况发展。
+        3. 递归算法必须调用自身（递归）。
+        4. 递归在某些情况下可以代替迭代。
+        5. 递归算法通常可以自然地映射到你尝试解决的问题的表达式。
+        6. 递归并不总是答案。有时，递归解决方案可能比迭代算法在计算上更昂贵。
 
     
-      
+# 排序和搜索
+      目标
+       1. 能够解释和实现顺序查找和二分查找。
+       2. 能够解释和实现选择排序，冒泡排序，归并排序，快速排序，插入排序和希尔排序。
+       3. 理解哈希作为搜索技术的思想。
+       4. 引入映射抽象数据类型。
+       5. 使用哈希实现 Map 抽象数据类型。
+
