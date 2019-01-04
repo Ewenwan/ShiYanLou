@@ -1,6 +1,9 @@
 # 学习C++
 
 ## 鱼C工作室 C++快速入门
+
+[C++ 入门教程](https://www.ctolib.com/docs-cpp-getting-started-guide-c-85ddd5e55c8156076e75d45a2b33c972.html#)
+
 [鱼C工作室 C++快速入门](http://blog.fishc.com/category/cpp/page/5)
 
 [C++ Primer 5 代码](https://github.com/Ewenwan/Cpp-Primer)
