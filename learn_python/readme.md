@@ -24,7 +24,10 @@
 
 [python cuda gpu编程](https://github.com/PacktPublishing/Hands-On-GPU-Programming-with-Python-and-CUDA)
 
+[Python多线程编程 ](https://www.ctolib.com/docs-Python-Multithreading-c-index.html)
+
 [python 马尔科夫模型](https://github.com/PacktPublishing/Hands-On-Markov-Models-with-Python)
+
 
 # window python 开发环境
 ## 1. anaconda
