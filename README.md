@@ -1,4 +1,8 @@
 # 参考资料
+[计算机科学 面试笔记](https://github.com/PLester/Interview-Notebook/tree/master/notes)
+
+[计算机科学 面试笔记2 ](https://github.com/CyC2018/CS-Notes/tree/master/docs/notes)
+
 [可视化代码过程](http://pythontutor.com/)
 
 [各种工程实践代码参考 ](https://github.com/Ewenwan/practice)
