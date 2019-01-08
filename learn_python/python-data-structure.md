@@ -2449,7 +2449,7 @@ main()
         6. 递归并不总是答案。有时，递归解决方案可能比迭代算法在计算上更昂贵。
 
     
-# 排序和搜索
+# 排序和搜索====================================
       目标
        1. 能够解释和实现顺序查找和二分查找。
        2. 能够解释和实现选择排序，冒泡排序，归并排序，快速排序，插入排序和希尔排序。
@@ -2702,10 +2702,146 @@ def hash(astring, tablesize):
       
       
       
+### 实现 map 抽象数据类型
+      字典是一种关联数据类型，你可以在其中存储键-值对。
+      该键用于查找关联的值。
+      
+      map 抽象数据类型定义如下。该结构是键与值之间的关联的无序集合。
+      map 中的键都是唯一的，因此键和值之间存在一对一的关系。
+      操作如下。
+       1. Map() 创建一个新的 map 。它返回一个空的 map 集合。
+       2. put(key，val) 向 map 中添加一个新的键值对。如果键已经在 map 中，那么用新值替换旧值。
+       3. get(key) 给定一个键，返回存储在 map 中的值或 None。
+       4. del 使用 del map[key] 形式的语句从 map 中删除键值对。
+       5. len() 返回存储在 map 中的键值对的数量。
+       6. in 返回 True 对于 key in map 语句，如果给定的键在 map 中，否则为False。
+
+      我们可以使用具有顺序或二分查找的列表，
+      但是使用如上所述的哈希表将更好，
+      因为查找哈希表中的项可以接近 O(1) 性能.
+      
+实现
+```python
+class HashTable:
+    def __init__(self):
+        self.size = 11 # 哈希表的初始大小已经被选择为 11
+        # 重要的是，大小是质数，使得冲突解决算法可以尽可能高效。
+        self.slots = [None] * self.size # slots列表将保存键 key: 项
+        # 将 键列表 视为 哈希表。
+        self.data = [None] * self.size  # data 的并行列表将保存数据值 value
+        # 当我们查找一个键时，data 列表中的相应位置将保存相关的数据值。
+
+# 把 键key:值data 存入 map=====================
+def put(self,key,data):
+    # 对 键值 执行哈希函数，计算元素位置
+    hashvalue = self.hashfunction(key,len(self.slots))
+    # 该位置为空，直接放入 data值
+    if self.slots[hashvalue] == None:
+        self.slots[hashvalue] = key  # 键
+        self.data[hashvalue] = data  # 值
+    # 目标槽位已经有数据
+    else:
+        # 原来数据的键值 和 当前key相同，使用新数据值data替换原来的值
+        if self.slots[hashvalue] == key:
+            self.data[hashvalue] = data  #replace
+        # 目标槽位 键key不同
+        else:
+            # 使用冲突函数 计算一个新的 目标位置
+            nextslot = self.rehash(hashvalue,len(self.slots))
+            while self.slots[nextslot] != None and \
+                      self.slots[nextslot] != key:
+                # 如果该槽不为空，则迭代 rehash 函数，直到出现空槽或者和当前 键key相同的槽位
+                nextslot = self.rehash(nextslot,len(self.slots))
+            
+            # 找到的新的槽位为空，直接放入对应 键key 和 值data value
+            if self.slots[nextslot] == None:
+                self.slots[nextslot]=key
+                self.data[nextslot]=data
+            # 替换已经存在 键 的槽位内的值
+            else:
+                self.data[nextslot] = data #replace
         
+# hash 函数实现简单的余数方法=======
+def hashfunction(self,key,size):
+     return key%size
+     
+# 冲突解决技术是 加1 rehash 函数的线性探测=====
+def rehash(self,oldhash,size):
+    return (oldhash+1)%size
+
+
+# 按 键值key取出，值value=================================
+def get(self,key):
+    # 根据键值key使用 哈希函数计算出 目标槽位
+    startslot = self.hashfunction(key,len(self.slots))
+    data = None
+    stop = False
+    found = False
+    position = startslot# 初始位置
+    # 查找
+    while self.slots[position] != None and  \
+                       not found and not stop:
+        # 键值是否 和 目标键值相同
+        if self.slots[position] == key:
+            # 找到
+            found = True
+            data = self.data[position]
+        else:
+            # 第一个可能的位置没有，使用冲突解决函数，得到下一个可能的位置
+            position=self.rehash(position,len(self.slots)) #更新 position
+            if position == startslot:
+                # 第 15 行保证搜索将通过检查以确保我们没有返回到初始槽来终止 
+                # 如果发生这种情况，我们已用尽所有可能的槽，并且项不存在。
+                stop = True # 提前结束
+    return data
+
+# 使用 [] 取值的 内置实现函数
+def __getitem__(self,key):
+    return self.get(key)
+# 使用 [] 赋值的内置实现函数
+def __setitem__(self,key,data):
+    self.put(key,data)
+
+# 使用
+>>> H=HashTable()
+>>> H[54]="cat"
+>>> H[26]="dog"
+>>> H[93]="lion"
+>>> H[17]="tiger"
+>>> H[77]="bird"
+>>> H[31]="cow"
+>>> H[44]="goat"
+>>> H[55]="pig"
+>>> H[20]="chicken"
+>>> H.slots # 键
+[77, 44, 55, 20, 26, 93, 17, None, None, 31, 54]
+>>> H.data  # 值(与键一一对应)
+['bird', 'goat', 'pig', 'chicken', 'dog', 'lion',
+       'tiger', None, None, 'cow', 'cat']
+
+```
+      
         
-        
-        
+## 排序   
+       排序是以某种顺序从集合中放置元素的过程。
+       例如，单词列表可以按字母顺序或按长度排序。
+       城市列表可按人口，按地区或邮政编码排序。
+       我们已经看到了许多能够从排序列表中获益的算法（回忆之前的回文例子和二分查找）。 
+       
+       有许多开发和分析的排序算法。
+       表明排序是计算机科学的一个重要研究领域。
+       对大量项进行排序可能需要大量的计算资源。
+       与搜索一样，排序算法的效率与正在处理的项的数量有关。
+       对于小集合，复杂的排序方法可能更麻烦，开销太高。
+       另一方面，对于更大的集合，我们希望利用尽可能多的改进。
+       
+       排序过程的操作。首先，必须比较两个值以查看哪个更小（或更大）。
+       为了对集合进行排序，需要一些系统的方法来比较值，以查看是否有问题。
+       比较的总数将是测量排序过程的最常见方法。
+       第二，当值相对于彼此不在正确的位置时，可能需要交换它们。
+       这种交换是一种昂贵的操作，并且交换的总数对于评估算法的整体效率也将是很重要的。
+       
+       
         
         
       
