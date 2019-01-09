@@ -2953,12 +2953,206 @@ print(alist)
 
 ```
       
+### 3. 插入排序
+      插入排序，尽管仍然是 O(n^2)，工作方式略有不同。
+      它始终在列表的较低位置维护一个排序的子列表。
+      然后将每个新项 “插入” 回先前的子列表，使得排序的子列表称为较大的一个项。
+      下图展示了插入排序过程。 阴影项表示算法进行每次遍历时的有序子列表。  
       
+![](https://facert.gitbooks.io/python-data-structure-cn/5.%E6%8E%92%E5%BA%8F%E5%92%8C%E6%90%9C%E7%B4%A2/5.9.%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F/assets/5.9.%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F.figure4.png)
+      
+```python
+def insertionSort(alist):
+    # [0,n-1] 中 [1,n-1] 子项插入到前面 有序的序列中
+    for index in range(1,len(alist)):
+        # 当前 选取的数
+        currentvalue = alist[index]
+        # 对应位置
+        position = index
+        # 插入到前面有序的序列中，当前位置之前 到 0
+        while position>0 and alist[position-1]>currentvalue:
+            # 找到一个 比 当前 选取数 currentvalue 小的位置
+            # 大的值依次后移一位
+            alist[position]=alist[position-1]
+            position = position-1
+        # 找到对应位置后，把选取的数放入合适的位置
+        alist[position]=currentvalue
 
+
+alist = [54,26,93,17,77,31,44,55,20]
+insertionSort(alist)
+print(alist)
+
+
+```
       
         
-        
+### 4. 希尔排序
+      希尔排序（有时称为“递减递增排序”）通过将原始列表分解为
+      多个较小的子列表来改进插入排序，每个子列表使用插入排序进行排序。
+      选择这些子列表的方式是希尔排序的关键。不是将列表拆分为连续项的子列表，
+      希尔排序使用增量i（有时称为 gap），通过选择 i 个项的所有项来创建子列表。
+![](https://facert.gitbooks.io/python-data-structure-cn/5.%E6%8E%92%E5%BA%8F%E5%92%8C%E6%90%9C%E7%B4%A2/5.10.%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F/assets/5.10.shell%E6%8E%92%E5%BA%8F.figure9.png)
+      
+      增量的选择方式是希尔排序的独特特征。 ActiveCode 1中展示的函数使用不同的增量集。
+      在这种情况下，我们从 n/2 子列表开始。
+      下一次，n/4 子列表排序。 
+      最后，单个列表按照基本插入排序进行排序。
+      上图 展示了我们使用此增量的示例的第一个子列表。
+      
+```python
+def shellSort(alist):
+    sublistcount = len(alist)//2 #gap 
+    while sublistcount > 0:
+
+      for startposition in range(sublistcount):
+        gapInsertionSort(alist,startposition,sublistcount)
+
+      print("After increments of size",sublistcount,
+                                   "The list is",alist)
+      # 
+      sublistcount = sublistcount // 2
+
+def gapInsertionSort(alist,start,gap):
+    for i in range(start+gap,len(alist),gap):
+
+        currentvalue = alist[i]
+        position = i
+
+        while position>=gap and alist[position-gap]>currentvalue:
+            alist[position]=alist[position-gap]
+            position = position-gap
+
+        alist[position]=currentvalue
+
+alist = [54,26,93,17,77,31,44,55,20]
+shellSort(alist)
+print(alist)
+
+```
       
       
 
 
+### 5. 归并排序
+![](https://facert.gitbooks.io/python-data-structure-cn/5.%E6%8E%92%E5%BA%8F%E5%92%8C%E6%90%9C%E7%B4%A2/5.11.%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/)
+
+      我们现在将注意力转向使用分而治之策略作为提高排序算法性能的一种方法。 
+      我们将研究的第一个算法是归并排序。归并排序是一种递归算法，不断将列表拆分为一半。
+      如果列表为空或有一个项，则按定义（基本情况）进行排序。
+      如果列表有多个项，我们分割列表，并递归调用两个半部分的合并排序。
+      一旦对这两半排序完成，就执行称为合并的基本操作。
+      合并是获取两个较小的排序列表并将它们组合成单个排序的新列表的过程。 
+      Figure 10 展示了我们熟悉的示例列表，它被mergeSort 分割。 
+      Figure 11 展示了归并后的简单排序列表。
+![](https://facert.gitbooks.io/python-data-structure-cn/5.%E6%8E%92%E5%BA%8F%E5%92%8C%E6%90%9C%E7%B4%A2/5.11.%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F/assets/5.11.%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F.figure10.png)
+      
+```python
+def mergeSort(alist):
+    print("Splitting ",alist)
+    if len(alist)>1:
+        mid = len(alist)//2
+        lefthalf = alist[:mid]
+        righthalf = alist[mid:]
+
+        mergeSort(lefthalf)
+        mergeSort(righthalf)
+
+        i=0
+        j=0
+        k=0
+        while i < len(lefthalf) and j < len(righthalf):
+            if lefthalf[i] < righthalf[j]:
+                alist[k]=lefthalf[i]
+                i=i+1
+            else:
+                alist[k]=righthalf[j]
+                j=j+1
+            k=k+1
+
+        while i < len(lefthalf):
+            alist[k]=lefthalf[i]
+            i=i+1
+            k=k+1
+
+        while j < len(righthalf):
+            alist[k]=righthalf[j]
+            j=j+1
+            k=k+1
+    print("Merging ",alist)
+
+alist = [54,26,93,17,77,31,44,55,20]
+mergeSort(alist)
+print(alist)
+
+```
+      
+### 6.   
+      快速排序首先选择一个值，该值称为 枢轴值。
+      虽然有很多不同的方法来选择枢轴值，我们将使用列表中的第一项。
+      枢轴值的作用是帮助拆分列表。
+      枢轴值属于最终排序列表（通常称为拆分点）的实际位置，将用于将列表划分为快速排序的后续调用。
+      使用首尾 两个指针，左指针 寻找大于 轴值的元素
+                       右指针 寻找小于  轴值的元素
+                       然后交换左右两个数
+![](https://facert.gitbooks.io/python-data-structure-cn/5.%E6%8E%92%E5%BA%8F%E5%92%8C%E6%90%9C%E7%B4%A2/5.12.%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F/assets/5.12.%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F.figure13.png)
+      
+      
+```python
+def quickSort(alist):
+   quickSortHelper(alist,0,len(alist)-1)
+
+def quickSortHelper(alist,first,last):
+   if first<last:
+
+       splitpoint = partition(alist,first,last)
+
+       quickSortHelper(alist,first,splitpoint-1)
+       quickSortHelper(alist,splitpoint+1,last)
+
+
+def partition(alist,first,last):
+   pivotvalue = alist[first]
+
+   leftmark = first+1
+   rightmark = last
+
+   done = False
+   while not done:
+
+       while leftmark <= rightmark and alist[leftmark] <= pivotvalue:
+           leftmark = leftmark + 1
+
+       while alist[rightmark] >= pivotvalue and rightmark >= leftmark:
+           rightmark = rightmark -1
+
+       if rightmark < leftmark:
+           done = True
+       else:
+           temp = alist[leftmark]
+           alist[leftmark] = alist[rightmark]
+           alist[rightmark] = temp
+
+   temp = alist[first]
+   alist[first] = alist[rightmark]
+   alist[rightmark] = temp
+
+
+   return rightmark
+
+alist = [54,26,93,17,77,31,44,55,20]
+quickSort(alist)
+print(alist)
+
+
+````
+### 总结
+      对于有序和无序列表，顺序搜索是 O(n)。
+      在最坏的情况下，有序列表的二分查找是 O(logn)。
+      哈希表可以提供恒定时间搜索。
+      冒泡排序，选择排序和插入排序是 O(n^2)算法。
+      希尔排序通过排序增量子列表来改进插入排序。它落在 O(n)和 O(n^2)之间。
+      归并排序是 O(nlogn)O(nlogn)，但是合并过程需要额外的空间。
+      快速排序是 O(nlogn)O(nlogn)，但如果分割点不在列表中间附近，可能会降级到O(n^2)。它不需要额外的空间。
+      
+# 
