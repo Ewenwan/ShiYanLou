@@ -2927,8 +2927,31 @@ print(alist)
       第一遍放置 93，第二遍放置 77，第三遍放置 55 等。
 ![](https://facert.gitbooks.io/python-data-structure-cn/5.%E6%8E%92%E5%BA%8F%E5%92%8C%E6%90%9C%E7%B4%A2/5.8.%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F/assets/5.8.%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F.activecode1.png)
       
-      
-      
+```python
+def selectionSort(alist):
+    # 还是 n-1次遍历
+    for fillslot in range(len(alist)-1,0,-1):
+        positionOfMax=0 #选取的最大元素的位置
+        # 比较 fillslot次找剩余元素中的最大值
+        for location in range(1,fillslot+1):
+            if alist[location]>alist[positionOfMax]:
+                # 记录最大元素的位置
+                positionOfMax = location
+        # 交换 右边目标位置元素  和 最大元素
+        temp = alist[fillslot] # 右边 目标位置元素
+        alist[fillslot] = alist[positionOfMax] # 最大元素->目标位置
+        alist[positionOfMax] = temp # 目标位置元素 -> 原最大元素位置
+
+alist = [54,26,93,17,77,31,44,55,20]
+selectionSort(alist)
+print(alist)
+
+# 你可能会看到选择排序与冒泡排序有相同数量的比较，因此也是 O(n^2)。
+# 然而，由于交换数量的减少，选择排序通常在基准研究中执行得更快。 
+# 事实上，对于我们的列表，冒泡排序有 20 次交换，而选择排序只有 8 次。+
+
+
+```
       
       
 
