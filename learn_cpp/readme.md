@@ -20,6 +20,9 @@
 
 [C++ Template 进阶指南](https://github.com/wuye9036/CppTemplateTutorial)
 
+
+[C++17 高性能计算](https://github.com/Ewenwan/Cpp-High-Performance)
+
 # C++类成员和数据成员初始化总结
     C++为类中提供类成员的初始化列表
     类对象的构造顺序是这样的：
