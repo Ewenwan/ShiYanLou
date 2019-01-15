@@ -245,6 +245,10 @@ Ubuntu14.04升级CMake：
         cd build
 
 
-
-
+# linux 命令行查看 十六进制
+    https://github.com/sharkdp/hexyl
+    
+    安装: 
+    wget "https://github.com/sharkdp/hexyl/releases/download/v0.4.0/hexyl_0.4.0_amd64.deb"
+    sudo dpkg -i hexyl_0.4.0_amd64.deb
 
