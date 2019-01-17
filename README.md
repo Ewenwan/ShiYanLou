@@ -1,4 +1,6 @@
 # 参考资料
+[数据结构和算法动态可视化](https://visualgo.net/zh)
+
 [计算机科学 面试笔记](https://github.com/PLester/Interview-Notebook/tree/master/notes)
 
 [计算机科学 面试笔记2 ](https://github.com/CyC2018/CS-Notes/tree/master/docs/notes)
