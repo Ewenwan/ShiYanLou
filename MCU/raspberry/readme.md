@@ -27,6 +27,8 @@
 
 [树莓派 python 机器人编程](https://github.com/PacktPublishing/Learn-Robotics-Programming)
 
+[树莓派3B+英特尔神经计算棒进行高速目标检测](https://github.com/ahangchen/windy-afternoon/blob/master/linux/raspbian/ncs_detection.md)
+
 # 1. 无屏幕和键盘配置树莓派WiFi和SSH，连接wifi后，支持远程登录
 
 ## a. WiFi 网络配置
