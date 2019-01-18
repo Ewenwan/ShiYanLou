@@ -8,6 +8,10 @@
 
 [linux 系统编程](https://github.com/PacktPublishing/Hands-on-System-Programming-with-Linux)
 
+
+[双系统安装 ](https://github.com/ahangchen/windy-afternoon/blob/master/linux/ubuntu_init.md)
+
+
 # ucore实验中的常用工具
 
 在ucore实验中，一些基本的常用工具如下：
