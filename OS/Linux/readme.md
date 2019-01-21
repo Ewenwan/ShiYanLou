@@ -3,7 +3,7 @@
 
 [linux 软硬件驱动 ](https://github.com/Ewenwan/linux-study)
 
-[Linux程序设计 中文版 第四版](https://github.com/scnb/Beginning-Linux-Programming)
+[Linux程序设计 中文版 第四版](https://github.com/Ewenwan/Beginning-Linux-Programming)
 
 # 操作系统启动过程
 	1. bootloader bootasm.S 使能A20 加载全局描述符表GDT 使能并进入保护模式　调用bootmain
