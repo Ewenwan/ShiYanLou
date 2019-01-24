@@ -128,7 +128,10 @@ double getCubeRoot(double num)
 }
 
 ```
-
+	数值计算中文版  链接：https://pan.baidu.com/s/1C_HJPVXncqTXQSys2bTCxw 
+	提取码：gprx 
+        
+        配合英文版，在本目录下
 
 # 数组系列
 # 例如：求给定序列中 最大子序列的和
