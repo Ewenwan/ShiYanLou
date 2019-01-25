@@ -1,10 +1,11 @@
-1.在文本环境下，shell作为命令解释器，建立了用户和操作系统之间的接口。
-  当用户键入一个命令时，shell将对该命令进行解释，并调用相应的程序。
-  
-2.Linux下有多个shell，最常用的3个shell: bash   tcsh   zsh
+## shell
+	1.在文本环境下，shell作为命令解释器，建立了用户和操作系统之间的接口。
+	  当用户键入一个命令时，shell将对该命令进行解释，并调用相应的程序。
 
-3.shell 脚本：shell除了具有解释键盘命令并将其发送到操作系统的功能外,
-  shell命令可以安排在一个文件中供以后执行，这些文件在linux系统称为shell脚本。
+	2.Linux下有多个shell，最常用的3个shell: bash   tcsh   zsh
+
+	3.shell 脚本：shell除了具有解释键盘命令并将其发送到操作系统的功能外,
+	  shell命令可以安排在一个文件中供以后执行，这些文件在linux系统称为shell脚本。
   
 ## 4.进程间的通信
 
@@ -15,8 +16,9 @@
 
 ## 5.主分区、扩展分区、逻辑分区
 
-	5.1一个磁盘至多可以有4个主分区，每个主分区还可以划分多个逻辑分区，把被划分的主分区称为扩展分区。
-	5.2典型的分区是将磁盘划分为3个主分区和1个扩展分区，3个主分区的大小即你所希望的最终分区的大小，1个扩展分区占用剩余的磁盘空间。
+	5.1 一个磁盘至多可以有4个主分区，每个主分区还可以划分多个逻辑分区，把被划分的主分区称为扩展分区。
+	5.2 典型的分区是将磁盘划分为3个主分区和1个扩展分区，3个主分区的大小即你所希望的最终分区的大小，
+	    1个扩展分区占用剩余的磁盘空间。
   
 ## 6.磁盘分区
 
@@ -66,8 +68,8 @@
 ## 9.管道|   实现进程间的通信
 
 	管道将一个进程的标准输出重定向为另一个进程的标准输入。
-  进程显示的内容一般都要发送到标准输出，如果没有重定向，
-  此输出就会显示在屏幕上。 ls  |  wc  -w  显示某个文件目录下的文件个数
+	进程显示的内容一般都要发送到标准输出，如果没有重定向，
+	此输出就会显示在屏幕上。 ls  |  wc  -w  显示某个文件目录下的文件个数
 
 ## 10.	4个有用的实用工具
 
@@ -82,7 +84,7 @@
 	date  +"%A  %B  %d"
 
 ## 12.unix2dos：
-  将linux文件转为windows格式
+	将linux文件转为windows格式
 	unix2dos  文件名
 
 ## 13.压缩和归档文件
@@ -220,59 +222,59 @@
            但是现在必须在该文件系统下创建一个新的目录并存储大量的文件，
            那么可以把另一个剩余空间较多的文件系统中的目录链接到该文件系统中。
            删除软链接并不影响被指向的文件，但若被指向的原文件被删除，则相关软连接就变成了死链接。
-				
-				软连接和硬链接的特点：
-        
-					软链接：
-						1.软链接是存放另一个文件的路径的形式存在。
-						2.软链接可以 跨文件系统 ，硬链接不可以。
-						3.软链接可以对一个不存在的文件名进行链接，硬链接必须要有源文件。
-						4.软链接可以对目录进行链接。
-            
-					硬链接：
-						1. 硬链接，以文件副本的形式存在。但不占用实际空间。
-						2. 不允许给目录创建硬链接。
-						3. 硬链接只有在同一个文件系统中才能创建。
-						4. 删除其中一个硬链接文件并不影响其他有相同 inode 号的文件。
 
-				创建硬链接ln：
-						cd  linux_tutorials/src
-						touch  fileA
-						ln   fileA  fileA_hard_link       在默认不带参数情况下，ln命令创建的是硬链接。
-						ls  -l
-            
-				创建软链接:
-						ln  -s  fileA  fileA_soft_link   创建软链接用s参数 符号
-						ls  -l
-            
-				硬链接有着相同 inode 号仅文件名不同的文件，用ls  -li命令查看
-						8835 -rw-rw-r-- 2 cdl cdl     0 10月 31 16:41 fileA
-						8835 -rw-rw-r-- 2 cdl cdl     0 10月 31 16:41 fileA_hard_link
-						8836 lrwxrwxrwx 1 cdl cdl     5 10月 31 16:47 fileA_soft_link -> fileA
-						上面源文件和硬链接文件inode号相同 （第一列就是inode号），指向同一个索引节点。
-						软链接是一个链接文件，文件模式那块前面有个l字母，表示是个链接文件。
-            
-				硬链接不能指向目录,但是软链接可以
-						cd ~/linux_tutorials/
-						ln  src  fileA      不允许将硬链接指向目录src
-						ln  -s  src fileA  允许将软链接指向目录src
-            
-				删除源文件后，两种情况对比
-						echo  'this is a file'  >  fileA     向文件中写入数据
-						cat  fileA    查看文件内容
-						cat fileA_soft_link  fileA_hard_link    查看软链接和硬链接文件内容一致
-						rm  -f  fileA  删除源文件
-						ls   -li
-							8831 -rw-rw-r-- 1 cdl cdl    22 10月 29 15:49 src_rename.txt
-							8830 -rw-rw-r-- 1 cdl cdl 10240 10月 30 14:54 src.txt
-							8829 -rw-rw-r-- 1 cdl cdl 20480 10月 30 14:56 all.tar
-							8833 -rwxrwxr-x 1 cdl cdl     0 10月 30 16:19 hi
-							8836 lrwxrwxrwx 1 cdl cdl     5 10月 31 16:47 fileA_soft_link -> fileA
-							8835 -rw-rw-r-- 1 cdl cdl    15 10月 31 16:55 fileA_hard_link
-							硬链接文件存在 内容和源文件内容一样,虽然删除源文件，但仍然有硬链接指向源文件inode节点，
-              所以不会被释放删除，这里只是删除fileA到inode节点的链接。
-						cat fileA_soft_link   软链接文件已经不存在了，目录还会显示这个文件，就是软链接文件已经失效。
-            
-				删除软链接
-						 rm -f fileA_soft_link   直接删除这个软链接文件即可
+		软连接和硬链接的特点：
+
+		软链接：
+			1.软链接是存放另一个文件的路径的形式存在。
+			2.软链接可以 跨文件系统 ，硬链接不可以。
+			3.软链接可以对一个不存在的文件名进行链接，硬链接必须要有源文件。
+			4.软链接可以对目录进行链接。
+
+		硬链接：
+			1. 硬链接，以文件副本的形式存在。但不占用实际空间。
+			2. 不允许给目录创建硬链接。
+			3. 硬链接只有在同一个文件系统中才能创建。
+			4. 删除其中一个硬链接文件并不影响其他有相同 inode 号的文件。
+
+		创建硬链接ln：
+			cd  linux_tutorials/src
+			touch  fileA
+			ln   fileA  fileA_hard_link       在默认不带参数情况下，ln命令创建的是硬链接。
+			ls  -l
+
+		创建软链接:
+			ln  -s  fileA  fileA_soft_link   创建软链接用s参数 符号
+			ls  -l
+
+		硬链接有着相同 inode 号仅文件名不同的文件，用ls  -li命令查看
+			8835 -rw-rw-r-- 2 cdl cdl     0 10月 31 16:41 fileA
+			8835 -rw-rw-r-- 2 cdl cdl     0 10月 31 16:41 fileA_hard_link
+			8836 lrwxrwxrwx 1 cdl cdl     5 10月 31 16:47 fileA_soft_link -> fileA
+			上面源文件和硬链接文件inode号相同 （第一列就是inode号），指向同一个索引节点。
+			软链接是一个链接文件，文件模式那块前面有个l字母，表示是个链接文件。
+
+		硬链接不能指向目录,但是软链接可以
+			cd ~/linux_tutorials/
+			ln  src  fileA      不允许将硬链接指向目录src
+			ln  -s  src fileA  允许将软链接指向目录src
+
+		删除源文件后，两种情况对比
+			echo  'this is a file'  >  fileA     向文件中写入数据
+			cat  fileA    查看文件内容
+			cat fileA_soft_link  fileA_hard_link    查看软链接和硬链接文件内容一致
+			rm  -f  fileA  删除源文件
+			ls   -li
+			8831 -rw-rw-r-- 1 cdl cdl    22 10月 29 15:49 src_rename.txt
+			8830 -rw-rw-r-- 1 cdl cdl 10240 10月 30 14:54 src.txt
+			8829 -rw-rw-r-- 1 cdl cdl 20480 10月 30 14:56 all.tar
+			8833 -rwxrwxr-x 1 cdl cdl     0 10月 30 16:19 hi
+			8836 lrwxrwxrwx 1 cdl cdl     5 10月 31 16:47 fileA_soft_link -> fileA
+			8835 -rw-rw-r-- 1 cdl cdl    15 10月 31 16:55 fileA_hard_link
+			硬链接文件存在 内容和源文件内容一样,虽然删除源文件，但仍然有硬链接指向源文件inode节点，
+		        所以不会被释放删除，这里只是删除fileA到inode节点的链接。
+			cat fileA_soft_link   软链接文件已经不存在了，目录还会显示这个文件，就是软链接文件已经失效。
+
+		删除软链接
+			 rm -f fileA_soft_link   直接删除这个软链接文件即可
 
