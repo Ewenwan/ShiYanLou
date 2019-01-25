@@ -1,4 +1,6 @@
 # learn python in action
+[python_tutorials 教程 较全 待整合](https://github.com/Ewenwan/python_tutorials)
+
 [以撸代码的形式学习Python](https://github.com/Ewenwan/LearnPython)
 
 [鱼C 零基础入门学习Python](http://blog.fishc.com/category/python/page/10)
