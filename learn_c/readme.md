@@ -2,6 +2,8 @@
 
 # 学习 C 语言
 
+[小项目学习 扫雷小游戏 贪吃蛇小游戏 学生成绩管理系统 图书管理系统 小说分析软件](https://github.com/Ewenwan/Curriculum-Design)
+
 ## 鱼C工作室 >带你学C带你飞
 [鱼C工作室 >带你学C带你飞](http://blog.fishc.com/category/c/page/7)
 
