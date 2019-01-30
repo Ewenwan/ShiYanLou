@@ -12,6 +12,7 @@
     关于Pi如何在未来发挥作用的猜想。
 
 # 树莓派应用
+[Game Utility library for the Raspberry PI 树莓派游戏库](https://github.com/progschj/pigu)
 
 [C/C++ Library for Raspberry Pi. ](https://github.com/Ewenwan/raspberryX)
 
