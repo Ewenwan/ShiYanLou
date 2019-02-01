@@ -119,7 +119,7 @@ ps = &s2; // ps 现在指向 s2;
     1. static_cast
     
        static_cast<type>(expression) 
-        1. 基础类型之间互转。如：float转成int、int转成unsigned int等。
+        a. 基础类型之间互转。如：float转成int、int转成unsigned int等。
         
             int firstNumber, secondNumber;
             ...
@@ -130,15 +130,71 @@ ps = &s2; // ps 现在指向 s2;
             static_cast 不能从表达式中去除 const 属性，
             因为另一个新的类型转换操作符 const_cast 有这样的功能。
             const_cast 最普通的用途就是转换掉对象的 const 属性。
-            
-            
-            
-        2. 指针与void*之间互转。如：float*转成void*、CBase*转成void*、函数指针转成void*、void*转成CBase*等
-        3. 派生类指针【引用】转成基类指针【引用】。如：Derive*转成Base*、Derive&转成Base&等
-        4. 非virtual继承时，可将基类指针【引用】转成派生类指针【引用】（多继承时，会做偏移处理）。
-           如：Base*转成Derive*、Base&转成Derive&等
 
-    
+        b. 指针与void*之间互转。如：float*转成void*、CBase*转成void*、函数指针转成void*、void*转成CBase*等
+        c. 派生类指针【引用】转成基类指针【引用】。如：Derive*转成Base*、Derive&转成Base&等
+        d. 非virtual继承时，可将基类指针【引用】转成派生类指针【引用】（多继承时，会做偏移处理）。
+           如：Base*转成Derive*、Base&转成Derive&等
+```c
+class Widget { ... };
+class SpecialWidget: public Widget { ... };
+void update(SpecialWidget *psw);
+SpecialWidget sw; // sw 是一个非 const 对象。
+const SpecialWidget& csw = sw; // csw 是 sw 的一个引用
+ // 它是一个 const 对象
+update(&csw); // 错误!不能传递一个 const SpecialWidget* 变量
+ // 给一个处理 SpecialWidget*类型变量的函数
+update(const_cast<SpecialWidget*>(&csw));
+ // 正确，csw 的 const 被显示地转换掉（
+ // csw 和 sw 两个变量值在 update
+ //函数中能被更新）
+update((SpecialWidget*)&csw);
+ // 同上，但用了一个更难识别
+ //的 C 风格的类型转换
+Widget *pw = new SpecialWidget;
+update(pw); // 错误！pw 的类型是 Widget*，但是 
+            // update 函数处理的是 SpecialWidget*类型
+update(const_cast<SpecialWidget*>(pw));
+ // 错误！const_cast 仅能被用在影响
+ // constness or volatileness 的地方上。,
+ // 不能用在向继承子类进行类型转换。 
+
+
+```
+
+    2. dynamic_cast  
+        dynamic_cast<type>(expression) 
+        专门用于处理多态机制，对继承体系内的对象（类中必须含有至少一个虚函数）
+        的指针【引用】进行转换，转换时会进行类型检查.
+        它被用于安全地沿着类的继承关系向下进行类型转换。
+        用 dynamic_cast 把指向基类的指针或引用转换成指向其派生类或其兄弟类的指针或引用，而且你能知道转换是否成功。
+        失败的转换将返回空指针（当对指针进行类型转换时）或者抛出异常（当对引用进行类型转换时）： 
+```c
+Widget *pw; // 基类 对象 指针
+...
+update(dynamic_cast<SpecialWidget*>(pw));
+ // 正确，传递给 update 函数一个指针
+ // 是指向变量类型为 SpecialWidget 的 pw 的指针
+ // 如果 pw 确实指向一个对象,
+ // 否则传递过去的将使空指针。
+void updateViaRef(SpecialWidget& rsw);
+updateViaRef(dynamic_cast<SpecialWidget&>(*pw));
+ //正确。 传递给 updateViaRef 函数
+ // SpecialWidget pw 指针，如果 pw
+ // 确实指向了某个对象
+ // 否则将抛出异常 
+
+int firstNumber, secondNumber;
+...
+double result = dynamic_cast<double>(firstNumber)/secondNumber;
+ // 错误！没有继承关系，想在没有继承关系的类型中进行转换，你可能想到 static_cast。
+const SpecialWidget sw;
+...
+update(dynamic_cast<SpecialWidget*>(&sw));
+ // 错误! dynamic_cast 不能转换掉 const。
+ // 为了去除const，你总得用 const_cast。 
+```
+        
 # C++类成员和数据成员初始化总结
     C++为类中提供类成员的初始化列表
     类对象的构造顺序是这样的：
