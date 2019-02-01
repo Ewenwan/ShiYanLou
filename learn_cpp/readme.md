@@ -57,6 +57,9 @@
 ## 指针与引用的区别
     指针与引用看上去完全不同（指针用操作符“*”和“->”，引用使用操作符“. ”），
     但是它们似乎有相同的功能。指针与引用都是让你间接引用其他对象。
+    
+    引用内部实现为常量指针
+    
 ```c
 string& rs; // 错误，引用必须被初始化
 string s("xyzzy");
@@ -144,6 +147,9 @@ const SpecialWidget& csw = sw; // csw 是 sw 的一个引用
  // 它是一个 const 对象
 update(&csw); // 错误!不能传递一个 const SpecialWidget* 变量
  // 给一个处理 SpecialWidget*类型变量的函数
+ 
+             // 2.const_cast<type>(expression)  转换掉对象的 const 属性====
+            
 update(const_cast<SpecialWidget*>(&csw));
  // 正确，csw 的 const 被显示地转换掉（
  // csw 和 sw 两个变量值在 update
@@ -154,6 +160,8 @@ update((SpecialWidget*)&csw);
 Widget *pw = new SpecialWidget;
 update(pw); // 错误！pw 的类型是 Widget*，但是 
             // update 函数处理的是 SpecialWidget*类型
+            
+
 update(const_cast<SpecialWidget*>(pw));
  // 错误！const_cast 仅能被用在影响
  // constness or volatileness 的地方上。,
@@ -162,7 +170,7 @@ update(const_cast<SpecialWidget*>(pw));
 
 ```
 
-    2. dynamic_cast  
+    3. dynamic_cast  
         dynamic_cast<type>(expression) 
         专门用于处理多态机制，对继承体系内的对象（类中必须含有至少一个虚函数）
         的指针【引用】进行转换，转换时会进行类型检查.
@@ -195,6 +203,70 @@ update(dynamic_cast<SpecialWidget*>(&sw));
  // 为了去除const，你总得用 const_cast。 
 ```
         
+        
+        4.reinterpret_cast   重新解释
+        reinterpret_cast <new_type> (expression)
+        用来处理无关类型之间的转换；
+        它会产生一个新的值，这个值会有与原始参数（expressoin）有完全相同的比特位.
+        字面意思：重新解释（类型的比特位）
+            a.从指针类型到一个足够大的整数类型
+            b.从整数类型或者枚举类型到指针类型
+            c.从一个指向函数的指针到另一个不同类型的指向函数的指针
+            d.从一个指向对象的指针到另一个不同类型的指向对象的指针
+            e.从一个指向类函数成员的指针到另一个指向不同类型的函数成员的指针
+            f.从一个指向类数据成员的指针到另一个指向不同类型的数据成员的指针
+            
+        使用reinterpret_casts 的代码很难移植。
+        reinterpret_casts 的最普通的用途就是在函数指针类型之间进行转换。
+```c  
+typedef void (*FuncPtr)(); // FuncPtr is 一个指向函数的指针，该函数没有参数
+                           // 返回值类型为 void
+FuncPtr funcPtrArray[10]; // funcPtrArray 是一个能容纳10 个 FuncPtrs 指针的数组 
+
+//  如果要把一个指向下面函数的指针存入 funcPtrArray 数组：
+// int doSomething();      
+
+// 你不能不经过类型转换而直接去做，因为 doSomething 函数对于 funcPtrArray 数组来说有一个错误的类型。
+// 在 FuncPtrArray 数组里的函数返回值是 void 类型，而 doSomething函数返回值是 int 类型。
+funcPtrArray[0] = &doSomething; // 错误！类型不匹配
+// reinterpret_cast 可以让你迫使编译器以你的方法去看待它们：
+funcPtrArray[0] = // 可编译通过
+       reinterpret_cast<FuncPtr>(&doSomething);
+```
+
+可以用下面的宏替换来模拟新的类型转换语法：
+```c
+#define static_cast(TYPE,EXPR) ((TYPE)(EXPR))   // 后面为 c语言强转方式
+#define const_cast(TYPE,EXPR) ((TYPE)(EXPR))
+#define reinterpret_cast(TYPE,EXPR) ((TYPE)(EXPR))
+```
+你可以象这样使用使用：
+```c
+double result = static_cast(double, firstNumber)/secondNumber; 
+update(const_cast(SpecialWidget*, &sw));
+funcPtrArray[0] = reinterpret_cast(FuncPtr, &doSomething); 
+
+
+#define dynamic_cast(TYPE,EXPR) (TYPE)(EXPR)
+// 请记住，这个模拟并不能完全实现 dynamic_cast 的功能，它没有办法知道转换是否失败。
+``` 
+
+## 不要对数组使用多态 
+    类继承的最重要的特性是你可以通过基类(父类) 指针或引用 来 操作 派生类(子类)。
+    多态和指针算法不能混合在一起来用，所以数组与多态也不能用在一起。 
+    
+## 避免无用的缺省构造函数
+    在一个完美的世界里，无需任何数据即可建立对象的类可以包含缺省构造函数，
+    而需要数据来建立对象的类则不能包含缺省构造函数。
+    唉！可是我们的现实世界不是完美的，所以我们必须考虑更多的因素。
+    特别是如果一个类没有缺省构造函数，就会存在一些使用上的限制。 
+    
+    
+    
+    
+    
+    
+
 # C++类成员和数据成员初始化总结
     C++为类中提供类成员的初始化列表
     类对象的构造顺序是这样的：
