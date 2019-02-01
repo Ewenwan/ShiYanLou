@@ -1,5 +1,24 @@
 # 学习C++
-
+    C++ 是一个难学易用的语言！
+    C++ 的难学，不仅在其广博的语法，以及语法背後的语意，以及语意背後的深层思维，以及深层思维背後的物件模型；
+    C++ 的难学，还在於它提供了四种不同（但相辅相成）的程式设计思维模式：
+       基于程序procedural-based，基于对象object-based，面向对象object-oriented，泛型思想/设计generic paradigm。
+    世上没有白吃的午餐。又要有效率，又要有弹性，又要前瞻望远，又要回溯相容，
+    又要能治大国，又要能烹小鲜，学习起来当然就不可能太简单。
+    
+    C++ 相关书籍之多，车载斗量；如天上繁星，如过江之鲫。
+    广博如四库全书者有之（The C++ Programming Language、C++ Primer），
+    深奥如重山复水者有之（The Annotated C++ Reference Manual, Inside the C++ Object Model），
+    细说历史者有之（The Design and Evolution of C++, Ruminations on C++），
+    独沽一味者有之（Polymorphism in C++, Genericity in C++），
+    独树一帜者有之（Design Patterns,Large Scale C++ Software Design, C++ FAQs），
+    程式库大全有之（The C++ Standard Library），
+    另辟蹊径者有之（Generic Programming and the STL），
+    工程经验之累积亦有之（Effective C++, More Effective C++, Exceptional C++）。
+    这其中，「工程经验之累积」对已具 C++ 相当基础的程式员而言，有著致命的吸引力与立竿见影的帮助。
+    Scott Meyers 的 Effective C++ 和 More Effective C++ 是此类佼佼，
+    Herb Sutter 的 Exceptional C++ 则是後起之秀。 
+    
 ## 鱼C工作室 C++快速入门
 
 [Effective Modern C++](https://github.com/Ewenwan/Effective-Modern-Cpp-Zh)
@@ -28,6 +47,98 @@
 
 [数据结构和算法动态可视化](https://visualgo.net/zh)
 
+# 基础议题
+    pointers（指针）
+    references（引用）
+    casts（类型转换）
+    arrays（数组）
+    constructors（构造） default constructors（默认构造函数）
+    
+## 指针与引用的区别
+    指针与引用看上去完全不同（指针用操作符“*”和“->”，引用使用操作符“. ”），
+    但是它们似乎有相同的功能。指针与引用都是让你间接引用其他对象。
+```c
+string& rs; // 错误，引用必须被初始化
+string s("xyzzy");
+string& rs = s; // 正确，rs 指向 s
+指针没有这样的限制。
+string *ps; // 未初始化的指针
+ // 合法但危险
+```
+不存在指向空值的引用这个事实意味着使用引用的代码效率比使用指针的要高。
+因为在使用引用之前不需要测试它的合法性。
+```c
+void printDouble(const double& rd)
+{
+ cout << rd; // 不需要测试 rd,它
+} // 肯定指向一个 double 值
+
+// 相反，指针则应该总是被测试，防止其为空：
+void printDouble(const double *pd)
+{
+ if (pd) { // 检查是否为 NULL
+    cout << *pd;
+  }
+}
+```
+指针与引用的另一个重要的不同是指针可以被重新赋值以指向另一个不同的对象。但是
+引用则总是指向在初始化时被指定的对象，以后不能改变。
+```c
+string s1("Nancy");
+string s2("Clancy");
+string& rs = s1; // rs 引用 s1
+string *ps = &s1; // ps 指向 s1
+rs = s2; // rs 仍旧引用 s1,
+ // 但是 s1 的值现在是 "Clancy"
+ 
+ps = &s2; // ps 现在指向 s2;
+ // s1 没有改变 
+ 
+```
+    在以下情况下你应该使用指针，
+     一是你考虑到存在不指向任何对象的可能（在这种情况下，你能够设置指针为空），
+     二是你需要能够在不同的时刻指向不同的对象（在这种情况下，你能改变指针的指向）。
+     
+    如果总是指向一个对象并且一旦指向一个对象后就不会改变指向，那么你应该使用引用。 
+
+## 尽量使用 C++风格的类型转换 
+    仔细想想地位卑贱的类型转换功能（cast），其在程序设计中的地位就象 goto 语句一样令人鄙视。
+    但是它还不是无法令人忍受，因为当在某些紧要的关头，类型转换还是必需的，这时它是一个必需品。
+    
+    C风格的类型转换,过于粗鲁，能允许你在任何类型之间进行转换.
+    C风格的类型转换在程序语句中难以识别。在语法上，类型转换由圆括号和标识符组成，而这些可以用在 Cpp中的任何地方。
+    C++通过引进四个新的类型转换操作符克服了 C 风格类型转换的缺点，这四个操作符是,
+    
+    static_cast,
+    const_cast,
+    dynamic_cast, 
+    和 reinterpret_cast。
+    
+    c强制类型转换  (type) expression
+    
+    1. static_cast
+    
+       static_cast<type>(expression) 
+        1. 基础类型之间互转。如：float转成int、int转成unsigned int等。
+        
+            int firstNumber, secondNumber;
+            ...
+            double result = ((double)firstNumber)/secondNumber; // c风格 
+            如果用上述新的类型转换方法，你应该这样写：
+            double result = static_cast<double>(firstNumber)/secondNumber;// c++风格
+            
+            static_cast 不能从表达式中去除 const 属性，
+            因为另一个新的类型转换操作符 const_cast 有这样的功能。
+            const_cast 最普通的用途就是转换掉对象的 const 属性。
+            
+            
+            
+        2. 指针与void*之间互转。如：float*转成void*、CBase*转成void*、函数指针转成void*、void*转成CBase*等
+        3. 派生类指针【引用】转成基类指针【引用】。如：Derive*转成Base*、Derive&转成Base&等
+        4. 非virtual继承时，可将基类指针【引用】转成派生类指针【引用】（多继承时，会做偏移处理）。
+           如：Base*转成Derive*、Base&转成Derive&等
+
+    
 # C++类成员和数据成员初始化总结
     C++为类中提供类成员的初始化列表
     类对象的构造顺序是这样的：
