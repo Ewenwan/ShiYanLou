@@ -1,4 +1,6 @@
 # 摘要
+[playWithRaspberryPi 实战笔记](https://github.com/summer2009/playWithRaspberryPi/tree/master/posts)
+    
     树莓派(Raspberry Pi)是一种小型的单片机计算机；
     它可以通过其引脚和接口与外部硬件通信。
     Pi(树莓派的简称)展示了我们可以如何分解大型的Realbox机器，
