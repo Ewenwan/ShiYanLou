@@ -10,6 +10,9 @@
 
 [LLVM](https://github.com/Ewenwan/llvm-release/blob/master/README.md)
 
+[gcc五分钟系列 介绍 gcc 的基本用法 ](https://github.com/Ewenwan/gcc_five_minute)
+
+
 ## GCC, G++, CPP, GPP
     随着开源运动的兴起，自由软件基金会开发了自己的开源免费的C语言编译器GNU C Compiler，简称GCC。
     GCC中提供了C Preprocessor这个C语言的预处理器，简称CPP。后来GCC又加入了对C++等其它语言的支持，
