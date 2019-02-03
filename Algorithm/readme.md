@@ -1,5 +1,7 @@
 # 各种 算法 数学建模算法 群体智能算法 数组 字符串 链表 树 图 桶 森林 
 
+[动态规划的思考艺术 寻路 背包问题](https://github.com/tianyicui/DP-Book)
+
 [学习中的算法笔记，面向面试](https://github.com/lchy1037/Algorithm-Notes)
 
 [算法与数据结构 - 课程官方代码仓 !!!!!!! 推荐](https://github.com/Ewenwan/Play-with-Algorithms)
