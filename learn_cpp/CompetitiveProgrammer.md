@@ -155,6 +155,36 @@ S = (bk − a)/(k-1)
 ```
 
 ### 2. 复杂度
+> loops循环
+```c
+for (int i = 1; i <= n; i++)  // for (int i = 1; i <= 3*n; i++) // i <= n+5;  i += 2;
+{
+    // code  一层循环 O(n)
+}
+
+for (int i = 1; i <= n; i++) 
+{
+    for (int j = 1; j <= n; j++) 
+    {
+        // code 二层循环 O(n^2)
+    }
+}
+// n层循环 O(n^k)====
+
+for (int i = 1; i <= n; i++) {
+    for (int j = 1; j <= m; j++) {
+        // code   两层变量不一致  O(n*m)
+    }
+}
+```
+
+> 递归 Recursion
+```c
+
+
+```
+
+
 
 ### 3. 排序
 
