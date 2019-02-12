@@ -1,6 +1,8 @@
 # learn python in action
 [python_tutorials 教程 较全 待整合](https://github.com/Ewenwan/python_tutorials)
 
+[python实现的全部算法](https://github.com/Ewenwan/Python)
+
 [教程](https://github.com/googleliyang/python)
 
 [以撸代码的形式学习Python](https://github.com/Ewenwan/LearnPython)
