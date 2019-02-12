@@ -49,8 +49,13 @@
 [《Python Parallel Programming Cookbook》中文版](https://github.com/Ewenwan/python-parallel-programming-cookbook-cn)
 	
 	结合Python讨论了线程、进程和异步编程三种模型，是Python并行编程不错的参考书籍。
+
+[Effective-Python](https://github.com/Ewenwan/Effective-Python)
 	
-	
+	59个编写高质量Python代码
+
+
+
 # window python 开发环境
 ## 1. anaconda
 [下载](https://www.anaconda.com/download/)
