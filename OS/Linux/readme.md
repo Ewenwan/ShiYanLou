@@ -9,6 +9,7 @@
 
 [Vim Practice ](https://github.com/oldratlee/vim-practice)
 
+[Linux命令必知必会](https://github.com/mylxsw/growing-up/blob/master/doc/Linux%E5%91%BD%E4%BB%A4%E5%BF%85%E7%9F%A5%E5%BF%85%E4%BC%9A.md)
 
 # 操作系统启动过程
 	1. bootloader bootasm.S 使能A20 加载全局描述符表GDT 使能并进入保护模式　调用bootmain
