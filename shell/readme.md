@@ -5,8 +5,10 @@
 
 [Linux-Shell脚本编程书籍代码](https://github.com/PacktPublishing/Linux-Shell-Scripting-Cookbook-Third-Edition)
 
-
 [把平时有用的手动操作做成脚本，这样可以便捷的使用](https://github.com/Ewenwan/useful-scripts)
+
+[awk 与 sed 学习，包括了知识点介绍，和一些习题练习](https://github.com/Ewenwan/awk-sed)
+
 
 # 文本分析
 ```sh
