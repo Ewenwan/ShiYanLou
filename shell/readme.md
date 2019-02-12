@@ -9,6 +9,13 @@
 
 [awk 与 sed 学习，包括了知识点介绍，和一些习题练习](https://github.com/Ewenwan/awk-sed)
 
+[三十分钟学会AWK](https://github.com/mylxsw/growing-up/blob/master/doc/%E4%B8%89%E5%8D%81%E5%88%86%E9%92%9F%E5%AD%A6%E4%BC%9AAWK.md)
+
+[三十分钟学会SED](https://github.com/mylxsw/growing-up/blob/master/doc/%E4%B8%89%E5%8D%81%E5%88%86%E9%92%9F%E5%AD%A6%E4%BC%9ASED.md)
+
+[]()
+
+[]()
 
 # 文本分析
 ```sh
