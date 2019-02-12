@@ -18,10 +18,12 @@ JavaScript语言精粹
 
     犀牛书/『JavaScript第一书』，基本上所有人都会推荐它。特点是权威、全面、详尽，可以当手册用。
     
-[]()
+[JavaScript DOM编程艺术 （第2版）](https://github.com/Ewenwan/notes-for-javascript-dom-2nd)
+  
+    循序渐进，适合初学者，非常容易上手，系统的介绍了如何使用JavaScript、HTML及CSS创建可用的Web页面。
+    学习JavaScript从HTML、DOM开始，是JavaScript设计的初衷。
 
-
-[]()
+[JavaScript: The Good Parts]()
 
 
 []()
