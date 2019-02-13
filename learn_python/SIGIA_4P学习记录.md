@@ -397,7 +397,7 @@ sudo pip install --upgrade pip
 ```
 
 
-# 多重List 的 浅拷⻉ 与深拷⻉ 
+# 多重List 的 浅拷贝 与深拷贝
 
 ```python
     import copy
@@ -457,7 +457,7 @@ TypeError: Can't convert 'list' object to str implicitly
 [None, None, None, None, None, None, None, None, None, None]
 
 
-# 序列列的常⻅见内置方方法=
+# 序列列的常见内置方方法=
 ## 序列列的包含关系: in===================================
 >>> s
 'sigai'
@@ -619,9 +619,37 @@ Get Item     O(1)       O(n)
 Set Item[1]  O(1)       O(n)
 Delete Item  O(1)       O(n)
 Iteration[2] O(n)       O(n) 
+```
 
 
-# list comprehension  Python的递推式构造列表
+# 列表推导式 list comprehension  Python的递推式构造列表
+
+形式1：[表达式 for 变量 in 列表]
+
+形式2：[表达式 for 变量 in 列表 if 条件]
+
+列表推导式较为简洁的实现 将一个函数应用于整个列表，或是删除不需要的列表项；
+
+
+
+```python
+ll=[1,2,3,4,5,6,7,8,9]
+
+print([v*10 for v in ll if v>4])
+
+      表达式: v*10
+      变量:   v
+      列表:   ll
+      条件:   if v>4
+# 打印输出如下的列表：
+[50,60,70,80,90]
+
+# 列表推导式构造字典
+
+dd==dict([(v:v*10) for v in ll])
+建立的字典为：
+{1:10,2:20,3:30,4:40,5:50,6:60,7:70,8:80,9:90}
+
 >>> sum([x for x in range(101) if x % 2 == 0]) # 0到100 内所有偶数的和
 2550
 >>> sum([1 if x % 3 == 2 else -1 if x % 3 == 1 else 0 for x in range(101)])
@@ -630,6 +658,13 @@ Iteration[2] O(n)       O(n)
 -1
 
 # List Comprehension与lambda以及map/reduce还有filter连用用功能更更强大大
+
+# 匿名函数lambda+列表推导 在后面有介绍
+
+[lambda 变量:表达式 for 变量 in 列表]
+
+[lambda 变量:表达式 for 变量 in 列表 if 条件]
+
 ```
 
 
@@ -1276,7 +1311,7 @@ Hello SigAI
 
 ```
 
-## 匿匿名函数
+## 匿匿名函数 lambda
 
 	定义:
 	     使用lambda表达式创建的函数,函数本身没有名字
@@ -1310,7 +1345,7 @@ Hello SigAI
 12
 ```
 
-> List + lambda 可以得到行为列列表
+> List + lambda 可以得到行为列列表 匿名函数lambda+列表推导
 
 ```python
 >>> f_list = [lambda x: x + 1, lambda x: x ** 2, lambda x: x ** 3]
@@ -1319,6 +1354,13 @@ Hello SigAI
 
 >>> [f_list[j](10) for j in range(3)]
 [11, 100, 1000]
+
+
+# 匿名函数lambda+列表推导
+
+[lambda 变量:表达式 for 变量 in 列表]
+
+[lambda 变量:表达式 for 变量 in 列表 if 条件]
 ```
 
 > 问题=========
