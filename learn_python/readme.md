@@ -36,6 +36,7 @@
 
 [59个编写高质量Python代码](https://github.com/Ewenwan/effectivepython)
 
+[集体智慧编程 python实现 收集并分析用户的数据和反馈信息，以便创造新的用户价值和商业价值](https://github.com/Ewenwan/Programming-Collective-Intelligence-Source-Code)
 
 # 书籍
 [Python Pocket Reference ](https://github.com/Ewenwan/python-pocket-reference) 
