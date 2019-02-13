@@ -3,7 +3,10 @@
 # 前端攻城狮的自我修养 – 零基础入门学习Web开发
 [鱼C](http://blog.fishc.com/category/web)
 
-[Java](https://github.com/Ewenwan/lifelong-learning/blob/master/knowledge-structure/cs/java.md)
+[Java 知识结构](https://github.com/Ewenwan/lifelong-learning/blob/master/knowledge-structure/cs/java.md)
+
+
+[Java 学习笔记 ](https://www.cnblogs.com/xiaoYu3328/p/5224724.html)
 
 # js 书籍
 [Javascript高级程序设计(第3版)](https://github.com/devphc/Javascript-Book)
