@@ -15,7 +15,6 @@
 
 [关于Python的面试题  Python语言特性 操作系统 数据库 网络 编程题 红黑树](https://github.com/Ewenwan/interview_python)
 
-
 [HackerRank刷题之路---Python](http://www.cnblogs.com/dn-harris/p/6048255.html?utm_source=itdadao&utm_medium=referral)
 
 [python 学习线性代数](https://github.com/Ewenwan/Play-with-Linear-Algebra)
@@ -37,6 +36,9 @@
 [59个编写高质量Python代码](https://github.com/Ewenwan/effectivepython)
 
 [集体智慧编程 python实现 收集并分析用户的数据和反馈信息，以便创造新的用户价值和商业价值](https://github.com/Ewenwan/Programming-Collective-Intelligence-Source-Code)
+
+[商业爬虫项目](https://github.com/VcrTing/Scrapy_BackUp)
+
 
 # 书籍
 [Python Pocket Reference ](https://github.com/Ewenwan/python-pocket-reference) 
