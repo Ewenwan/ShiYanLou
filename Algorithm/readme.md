@@ -1,4 +1,7 @@
 # 各种 算法 数学建模算法 群体智能算法 数组 字符串 链表 树 图 桶 森林 
+[算法周知 LeetCode, HackRank, 剑指offer, classic algorithm implementation](https://github.com/apachecn/awesome-algorithm)
+
+[Leetcode_Solutions c++/python/java](https://github.com/apachecn/awesome-algorithm/tree/master/docs/Leetcode_Solutions)
 
 [动态规划的思考艺术 寻路 背包问题](https://github.com/tianyicui/DP-Book)
 
