@@ -11,6 +11,10 @@
 
 [【Java学习+面试指南】 一份涵盖大部分Java程序员所需要掌握的核心知识](https://github.com/Snailclimb/JavaGuide)
 
+[Java 编程技巧 lambda 中如何处理异常？
+从开源框架聊聊责任链模式的应用
+不做 BUG 仔，必须 GET 的 IDEA 调试技巧
+异常处理最佳实践](https://github.com/biezhi/java-tips)
 
 # js 书籍
 [Javascript高级程序设计(第3版)](https://github.com/devphc/Javascript-Book)
