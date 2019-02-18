@@ -9,6 +9,9 @@
 
 [Java资源大全中文版，包括开发库、开发工具、网站、博客、微信、微博等](https://github.com/biezhi/awesome-java-cn#awesome-java-cn)
 
+[【Java学习+面试指南】 一份涵盖大部分Java程序员所需要掌握的核心知识](https://github.com/Snailclimb/JavaGuide)
+
+
 # js 书籍
 [Javascript高级程序设计(第3版)](https://github.com/devphc/Javascript-Book)
   
