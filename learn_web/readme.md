@@ -5,8 +5,9 @@
 
 [Java 知识结构](https://github.com/Ewenwan/lifelong-learning/blob/master/knowledge-structure/cs/java.md)
 
-
 [Java 学习笔记 ](https://www.cnblogs.com/xiaoYu3328/p/5224724.html)
+
+[Java资源大全中文版，包括开发库、开发工具、网站、博客、微信、微博等](https://github.com/biezhi/awesome-java-cn#awesome-java-cn)
 
 # js 书籍
 [Javascript高级程序设计(第3版)](https://github.com/devphc/Javascript-Book)
