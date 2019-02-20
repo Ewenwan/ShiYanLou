@@ -40,7 +40,9 @@ JavaScript语言精粹
 # Java三大平台
     Java SE、Java EE、Java ME
     
-    1. Java SE可以分为四个主要的部分：JVM、JRE、JDK和Java语言。
+## 1. Java SE  （J2SE）（Java2 Platform Standard Edition，java平台标准版）
+     
+       可以分为四个主要的部分：JVM、JRE、JDK和Java语言。
        为了能够运行Java撰写好的程序，必须有Java虚拟机（Java Virtual Machine，JVM）。
        JVM包括在Java执行环境（Java SE Runtime Environment，JRE）中，
        所以为了要运行Java程序，必须安装JRE。
@@ -71,12 +73,16 @@ JavaScript语言精粹
 ![](https://camo.githubusercontent.com/8f6eceddf64b5948c69a398d1a0e777c9c7f8e5b/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f4a6176612532302545372541382538422545352542412538462545382542462539302545382541312538432545382542462538372545372541382538422e706e67)
 
 
-     2. Java EE以Java SE为基础，定义了一系列的服务、API、协议等，
+##  2. Java EE (J2EE)(Java 2 Platform,Enterprise Edition，java平台企业版)
+     
+       以Java SE为基础，定义了一系列的服务、API、协议等，
        适用于开发分布式、多层次、已组建为基础、以Web为基础的应用程序，整个Java EE的体系是相当庞大的，
        比较为人熟悉的技术像是JSP、Servlet、JavaMail、Enterprise JavaBeans（EJB）等。
        必须在JavaSE上奠定良好的基础，再来学习Java EE的开发。  
      
-     3. Java ME是Java平台上版本中最小的一个，目的是作为小型数字设备上开发及部署应用程序的平台，
+##   3. Java ME (J2ME)(Java 2 Platform Micro Edition，java平台微型版)。
+
+       是Java平台上版本中最小的一个，目的是作为小型数字设备上开发及部署应用程序的平台，
        像是消费型电子产品或嵌入式系统等，最为人熟悉的设备如手机、PDA、股票机等，
        可以使用Java ME来开发这些设备上的应用程序，如Java游戏、记事程序等。
        
