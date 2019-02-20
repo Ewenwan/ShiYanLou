@@ -36,12 +36,64 @@ JavaScript语言精粹
     循序渐进，适合初学者，非常容易上手，系统的介绍了如何使用JavaScript、HTML及CSS创建可用的Web页面。
     学习JavaScript从HTML、DOM开始，是JavaScript设计的初衷。
 
-[JavaScript: The Good Parts]()
 
-
-[]()
-
-
+# Java三大平台
+    Java SE、Java EE、Java ME
+    
+    1. Java SE可以分为四个主要的部分：JVM、JRE、JDK和Java语言。
+       为了能够运行Java撰写好的程序，必须有Java虚拟机（Java Virtual Machine，JVM）。
+       JVM包括在Java执行环境（Java SE Runtime Environment，JRE）中，
+       所以为了要运行Java程序，必须安装JRE。
+       如果要开发Java程序，必须取得JDK（Java SE Development Kits），
+       JDK包括JRE及开发过程中需要的一些工具程序，像是javac、java、appletviewer等工具程序。
+       
+       javap 是一个Java类文件反汇编程序，可以查看Java编译器生成的字节码，是分析代码的一个好工具。
+       jvisualvm 是一个Java虚拟机监控和分析工具，
+           该工具提供了一个图形界面窗口，并且可以直观的了解Java应用程序的运行时信息。
+       jcmd主要用来把诊断命令请求发送到Java JVM中，当JVM进程中没有jcmd参数列表时，jcmd就会立即运行。
+       jhat的全称是Java heap analysis tool。它主要是用来解析和浏览堆文件，jhat有时更像是一个可视化工具。
+       
+       JVM会架构在Windows、Linux、Mac OS等各种操作系统平台上，从而让Java实现跨平台。
+       对Java程序而言，只认识一种操作系统，这个系统叫JVM，JVM就负责了Java程序的各种资源管理。
+       
+       JDK包括了Java程序语言、工具程序与JRE，JRE则包括了部署技术、JavaSE API与JVM。
+       更简单点，要撰写Java程序就需要JDK，如果只是想运行，那么只要安装JRE就好了。
+       （当然现在JDK安装包都是包括了JRE的）
+       
+     2. Java EE以Java SE为基础，定义了一系列的服务、API、协议等，
+       适用于开发分布式、多层次、已组建为基础、以Web为基础的应用程序，整个Java EE的体系是相当庞大的，
+       比较为人熟悉的技术像是JSP、Servlet、JavaMail、Enterprise JavaBeans（EJB）等。
+       必须在JavaSE上奠定良好的基础，再来学习Java EE的开发。  
+     
+     3. Java ME是Java平台上版本中最小的一个，目的是作为小型数字设备上开发及部署应用程序的平台，
+       像是消费型电子产品或嵌入式系统等，最为人熟悉的设备如手机、PDA、股票机等，
+       可以使用Java ME来开发这些设备上的应用程序，如Java游戏、记事程序等。
+       
+       Android的优势在于开发性和开源，是一个优秀的移动设备操作系统。 
+       Java Me 是一个移动设备软件开发包，跨平台是其主要特点。
+       
+       Android应用程序不能在JavaME环境下运行，JavaME程序也不能直接在Android里运行，因为它们都有自己的API。
+       
+     
+# 建议的学习路径
+    1. 深入了解JVM、JRE、JDK
+    2. 理解封装、继承、多态
+    3. 掌握常用JavaSE API架构
+    4. 学习容器概念
+    5. 研究开放源码项目
+    6. 学习设计模式与重构
+    7. 熟悉相关开发工具（推荐Eclipse和IntelliJ IDEA,网上均有下载资源）
+   
+    Java 1.6 在线API（http://www.javaweb.cc/help/JavaAPI1.6/）经常查阅API是非常好的习惯
+    
+    ImportNew -专注Java & Android技术分享（http://www.importnew.com/）很好的Java文章咨询网站
+    
+    菜鸟教程--学的不仅是技术，更是梦想！（http://www.runoob.com/）
+        提供诸多方面的基础知识，包括Java以及JavaWeb、数据库等。
+    
+    极客学院(http://www.jikexueyuan.com/)，丰富的视频教学资源，需要办理会员才能观看所有视频资源。
+    
+    
 
 # js语法 Javascript 语法
 
