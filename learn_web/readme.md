@@ -101,6 +101,8 @@ JavaScript语言精粹
     
     菜鸟教程--学的不仅是技术，更是梦想！（http://www.runoob.com/）
         提供诸多方面的基础知识，包括Java以及JavaWeb、数据库等。
+    在线运行工具 http://www.runoob.com/try/runcode.php?filename=HelloWorld&type=java
+        
     
     极客学院(http://www.jikexueyuan.com/)，丰富的视频教学资源，需要办理会员才能观看所有视频资源。
     
