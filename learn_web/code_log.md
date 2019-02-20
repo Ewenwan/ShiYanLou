@@ -2,6 +2,8 @@
 
 [在线运行](http://www.runoob.com/try/runcode.php?filename=HelloWorld&type=java)
 
+[本地运行环境配置](http://www.runoob.com/java/java-environment-setup.html)
+
 ## 基础
 
 ```java
