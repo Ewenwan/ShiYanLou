@@ -121,7 +121,8 @@ Hello World
 		final修饰一个类时，表明这个类不能被继承。
 
 		synchronized java线程同步中的同步锁。
-
+                synchronized 关键字声明的方法同一时间只能被一个线程访问。
+		
 		abstract 修饰类和方法时，表示抽象类/抽象方法。
 
 > Java枚举
@@ -274,5 +275,109 @@ $ java EmployeeTest
 */
 ```
 
+> 基本数据类型 
 
+
+```java
+public class PrimitiveTypeTest {  
+    public static void main(String[] args) {  
+        // byte  
+        System.out.println("基本类型：byte 二进制位数：" + Byte.SIZE);  
+        System.out.println("包装类：java.lang.Byte");  
+        System.out.println("最小值：Byte.MIN_VALUE=" + Byte.MIN_VALUE);  
+        System.out.println("最大值：Byte.MAX_VALUE=" + Byte.MAX_VALUE);  
+        System.out.println();  
+  
+        // short  
+        System.out.println("基本类型：short 二进制位数：" + Short.SIZE);  
+        System.out.println("包装类：java.lang.Short");  
+        System.out.println("最小值：Short.MIN_VALUE=" + Short.MIN_VALUE);  
+        System.out.println("最大值：Short.MAX_VALUE=" + Short.MAX_VALUE);  
+        System.out.println();  
+  
+        // int  
+        System.out.println("基本类型：int 二进制位数：" + Integer.SIZE);  
+        System.out.println("包装类：java.lang.Integer");  
+        System.out.println("最小值：Integer.MIN_VALUE=" + Integer.MIN_VALUE);  
+        System.out.println("最大值：Integer.MAX_VALUE=" + Integer.MAX_VALUE);  
+        System.out.println();  
+  
+        // long  
+        System.out.println("基本类型：long 二进制位数：" + Long.SIZE);  
+        System.out.println("包装类：java.lang.Long");  
+        System.out.println("最小值：Long.MIN_VALUE=" + Long.MIN_VALUE);  
+        System.out.println("最大值：Long.MAX_VALUE=" + Long.MAX_VALUE);  
+        System.out.println();  
+  
+        // float  
+        System.out.println("基本类型：float 二进制位数：" + Float.SIZE);  
+        System.out.println("包装类：java.lang.Float");  
+        System.out.println("最小值：Float.MIN_VALUE=" + Float.MIN_VALUE);  
+        System.out.println("最大值：Float.MAX_VALUE=" + Float.MAX_VALUE);  
+        System.out.println();  
+  
+        // double  
+        System.out.println("基本类型：double 二进制位数：" + Double.SIZE);  
+        System.out.println("包装类：java.lang.Double");  
+        System.out.println("最小值：Double.MIN_VALUE=" + Double.MIN_VALUE);  
+        System.out.println("最大值：Double.MAX_VALUE=" + Double.MAX_VALUE);  
+        System.out.println();  
+  
+        // char  
+        System.out.println("基本类型：char 二进制位数：" + Character.SIZE);  
+        System.out.println("包装类：java.lang.Character");  
+        // 以数值形式而不是字符形式将Character.MIN_VALUE输出到控制台  
+        System.out.println("最小值：Character.MIN_VALUE="  
+                + (int) Character.MIN_VALUE);  
+        // 以数值形式而不是字符形式将Character.MAX_VALUE输出到控制台  
+        System.out.println("最大值：Character.MAX_VALUE="  
+                + (int) Character.MAX_VALUE); 
+		
+		
+	// 在 Java 中使用 final 关键字来修饰常量，声明方式和变量类似：
+        final double PI = 3.1415927;
+	
+// 转换从低级到高级。
+// 低  ------------------------------------>  高
+// byte,short,char—> int —> long—> float —> double 
+
+int a, b, c;         // 声明三个int型整数：a、 b、c
+int d = 3, e = 4, f = 5; // 声明三个整数并赋予初值
+byte z = 22;         // 声明并初始化 z
+String s = "runoob";  // 声明并初始化字符串 s
+double pi = 3.14159; // 声明了双精度浮点型变量 pi
+char x = 'x';        // 声明变量 x 的值是字符 'x'。 
+  
+    static int allClicks=0;    // 类变量（静态变量）, 独立于方法之外的变量，用 static 修饰。
+ // 无论一个类创建了多少个对象，类只拥有类变量的一份拷贝
+ // 静态变量在第一次被访问时创建，在程序结束时销毁。
+ 
+ 
+    String str="hello world";  // 实例变量, 独立于方法之外的变量，不过没有 static 修饰。
+    // 实例变量在对象创建的时候创建，在对象被销毁的时候销毁
+    // 实例变量可以声明在使用前或者使用后；
+    // 访问修饰符可以修饰实例变量
+    // 实例变量对于类中的方法、构造方法或者语句块是可见的
+    
+   // 这个实例变量对子类可见
+   public String name;
+   // 私有 实例变量，仅在该类可见
+   private double salary;
+    
+    
+    public void method(){
+        int i =0;  // 局部变量,类的方法中的变量。
+// 当它们执行完成后，局部变量 将会被销毁；
+// 访问修饰符不能用于局部变量
+// 局部变量只在声明它的方法、构造方法或者语句块中可见；
+// 局部变量是在栈上分配的。
+// 局部变量没有默认值，所以局部变量被声明后，必须经过初始化，才可以使用。
+// int age; // 错误，局部变量被声明后，必须经过初始化
+    }
+    
+    
+    }  
+}
+
+```
 
