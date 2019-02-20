@@ -552,7 +552,7 @@ Java语言使用new操作符来创建数组，语法如下：
 
 arrayRefVar = new dataType[arraySize];
 ```
-示例
+> 示例1
 
 ```java
 public class TestArray {
@@ -581,3 +581,104 @@ public class TestArray {
 }
 
 ```
+> 示例2
+```java
+public class TestArray {
+   public static void main(String[] args) {
+      double[] myList = {1.9, 2.9, 3.4, 3.5};
+ 
+      // 打印所有数组元素
+      for (int i = 0; i < myList.length; i++) {
+         System.out.println(myList[i] + " ");
+      }
+/*
+// for-each 循环或者加强型循环，它能在不使用下标的情况下遍历数组。
+// 打印所有数组元素
+for (double element : myList) {
+     System.out.println(element);
+}
+*/
+      
+      // 计算所有元素的总和
+      double total = 0;
+      for (int i = 0; i < myList.length; i++) {
+         total += myList[i];
+      }
+      System.out.println("Total is " + total);
+      // 查找最大元素
+      double max = myList[0];
+      for (int i = 1; i < myList.length; i++) {
+         if (myList[i] > max) max = myList[i];
+      }
+      System.out.println("Max is " + max);
+   }
+}
+/*
+以上实例编译运行结果如下：
+
+1.9
+2.9
+3.4
+3.5
+Total is 11.7
+Max is 3.5
+*/
+```
+> 数组其他用法
+
+```java
+// 数组作为函数的参数
+public static void printArray(int[] array) {
+  for (int i = 0; i < array.length; i++) {
+  // 也可用 for-each循环
+    System.out.print(array[i] + " ");
+  }
+}
+printArray(new int[]{3, 1, 2, 6, 4, 2});// 调用
+
+// 数组作为函数的返回值
+public static int[] reverse(int[] list) {
+  int[] result = new int[list.length];
+ 
+  for (int i = 0, j = result.length - 1; i < list.length; i++, j--) {
+    result[j] = list[i]; // 数组元素逆序=================
+  }
+  return result;
+}
+
+
+// 多维数组
+type arrayName = new type[arraylenght1][arraylenght2];
+String str[][] = new String[3][4];
+int a[][]      = new int[2][3];// 可以看成一个两行三列的数组
+
+String s[][] = new String[2][];
+s[0] = new String[2];
+s[1] = new String[3];  // 每一行不同尺寸
+s[0][0] = new String("Good");
+s[0][1] = new String("Luck");
+s[1][0] = new String("to");
+s[1][1] = new String("you");
+s[1][2] = new String("!");
+
+
+// Arrays 类
+// java.util.Arrays 类能方便地操作数组，它提供的所有方法都是静态的。
+/*
+具有以下功能：
+
+给数组赋值：通过 fill 方法。
+      public static void fill(int[] a, int val)
+对数组排序：通过 sort 方法,按升序。
+      public static void sort(Object[] a)
+比较数组：通过 equals 方法比较数组中元素值是否相等。
+      public static boolean equals(long[] a, long[] a2)
+查找数组元素：通过 binarySearch 方法能对排序好的数组进行二分查找法操作。
+      public static int binarySearch(Object[] a, Object key) 
+*/
+```
+
+
+
+
+
