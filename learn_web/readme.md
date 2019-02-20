@@ -18,6 +18,8 @@
 
 [《跟上 Java 8》视频课程源码](https://github.com/biezhi/learn-java8)
 
+[Java 8 新特性](http://www.runoob.com/java/java8-new-features.html)
+
 # js 书籍
 [Javascript高级程序设计(第3版)](https://github.com/devphc/Javascript-Book)
   
