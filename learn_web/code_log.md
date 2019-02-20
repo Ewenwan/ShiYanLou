@@ -4,6 +4,10 @@
 
 [本地运行环境配置](http://www.runoob.com/java/java-environment-setup.html)
 
+
+[Java 实例 实战](http://www.runoob.com/java/java-examples.html)
+
+
 ## Java 基础语法
 一个Java程序可以认为是一系列对象的集合，而这些对象通过调用彼此的方法来协同工作。
 
@@ -677,6 +681,902 @@ s[1][2] = new String("!");
       public static int binarySearch(Object[] a, Object key) 
 */
 ```
+
+# Java 日期时间  Date  java.util 包  
+```java
+// 获取当前日期时间
+import java.util.Date;
+  
+public class DateDemo {
+   public static void main(String args[]) {
+       // 初始化 Date 对象
+       Date date = new Date();
+        
+       // 使用 toString() 函数显示日期时间
+       System.out.println(date.toString());
+       
+       // 使用 SimpleDateFormat 格式化日期
+       SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss");
+/*
+其中 yyyy 是完整的公元年，MM 是月份，dd 是日期，HH:mm:ss 是时、分、秒。
+
+注意:有的格式大写，有的格式小写，例如 MM 是月份，mm 是分；HH 是 24 小时制，而 hh 是 12 小时制。
+*/
+       System.out.println("当前时间为: " + ft.format(dNow));
+    
+    
+// 使用printf格式化日期============= 
+    //c的使用  
+    System.out.printf("全部日期和时间信息：%tc%n",date);          
+    //f的使用  
+    System.out.printf("年-月-日格式：%tF%n",date);  
+    //d的使用  
+    System.out.printf("月/日/年格式：%tD%n",date);  
+    //r的使用  
+    System.out.printf("HH:MM:SS PM格式（12时制）：%tr%n",date);  
+    //t的使用  
+    System.out.printf("HH:MM:SS格式（24时制）：%tT%n",date);  
+    //R的使用  
+    System.out.printf("HH:MM格式（24时制）：%tR",date);  
+    
+   }
+}
+// 运行结果
+// Wed Feb 20 11:26:06 UTC 2019
+
+
+// 解析字符串为时间===================
+// SimpleDateFormat 类有一些附加的方法，特别是parse()，
+// 它试图按照给定的SimpleDateFormat 对象的格式化存储来解析字符串。
+import java.util.*;
+import java.text.*;
+  
+public class DateDemo {
+ 
+   public static void main(String args[]) {
+      SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd"); 
+ 
+      String input = args.length == 0 ? "1818-11-11" : args[0]; 
+ 
+      System.out.print(input + " Parses as "); 
+ 
+      Date t; 
+ 
+      try { 
+          t = ft.parse(input); 
+          System.out.println(t); 
+      } catch (ParseException e) { 
+          System.out.println("Unparseable using " + ft); 
+      }
+   }
+}
+
+```
+ 
+ 
+## Java 正则表达式
+http://www.runoob.com/java/java-regular-expressions.html
+```java
+import java.util.regex.*;
+ 
+class RegexExample1{
+   public static void main(String args[]){
+      String content = "I am noob " +
+        "from runoob.com.";
+ 
+      String pattern = ".*runoob.*";// 匹配模式
+ 
+      boolean isMatch = Pattern.matches(pattern, content);// 匹配器按模式进行匹配
+      
+      System.out.println("字符串中是否包含了 'runoob' 子字符串? " + isMatch);
+   }
+}
+
+
+```
+
+
+## java方法
+```java
+public class TestMax {
+   /** 主方法 */
+   public static void main(String[] args) {
+   
+   
+      int i = 5;
+      int j = 2;
+      int k = max(i, j);
+      System.out.println( i + " 和 " + j + " 比较，最大值是：" + k);
+      
+      
+    int num1 = 1;
+    int num2 = 2;
+    System.out.println("交换前 num1 的值为：" +
+                        num1 + " ，num2 的值为：" + num2);
+    // 调用swap方法
+    swap(num1, num2);
+    System.out.println("交换后 num1 的值为：" +
+                       num1 + " ，num2 的值为：" + num2);
+      
+   }
+ 
+   /** 返回两个整数变量较大的值 */
+   public static int max(int num1, int num2) {
+      int result;
+      if (num1 > num2)
+         result = num1;
+      else
+         result = num2;
+ 
+      return result; 
+   }
+   // 函数重载===== 重载(Overload) 
+public static double max(double num1, double num2) {
+  if (num1 > num2)
+    return num1;
+  else
+    return num2;
+}
+   
+  /** 交换两个变量的方法 */
+  public static void swap(int n1, int n2) {
+    System.out.println("\t进入 swap 方法");
+    System.out.println("\t\t交换前 n1 的值为：" + n1
+                         + "，n2 的值：" + n2);
+    // 交换 n1 与 n2的值
+    int temp = n1;
+    n1 = n2;
+    n2 = temp;
+ 
+    System.out.println("\t\t交换后 n1 的值为 " + n1
+                         + "，n2 的值：" + n2);
+  }
+   
+}
+
+
+// 命令行参数的使用=============================
+public class CommandLine {
+   public static void main(String args[]){ 
+      for(int i=0; i<args.length; i++){
+         System.out.println("args[" + i + "]: " + args[i]);
+      }
+   }
+}
+/*
+如下所示，运行这个程序：
+$ javac CommandLine.java 
+$ java CommandLine this is a command line 200 -100
+args[0]: this
+args[1]: is
+args[2]: a
+args[3]: command
+args[4]: line
+args[5]: 200
+args[6]: -100
+*/
+
+
+// 可变参数===============
+public class VarargsDemo {
+    public static void main(String args[]) {
+        // 调用可变参数的方法
+        printMax(34, 3, 3, 2, 56.5);
+        printMax(new double[]{1, 2, 3});
+    }
+    // 可变参数 typeName... parameterName ===========
+    public static void printMax( double... numbers) {
+        if (numbers.length == 0) {
+            System.out.println("No argument passed");
+            return;
+        }
+        double result = numbers[0];// 初始最大值
+        for (int i = 1; i <  numbers.length; i++){
+            if (numbers[i] >  result) {
+                result = numbers[i];  // 最大值
+            }
+        }
+        System.out.println("The max value is " + result);
+    }
+}
+
+
+// 类似c++里面的 类析构函数=======
+protected void finalize()
+{
+   // 在这里终结代码
+}
+
+```
+
+
+## Java 流(Stream)、文件(File)和IO
+http://www.runoob.com/java/java-files-io.html
+```java
+// 从控制台读取多字符输入
+//使用 BufferedReader 在控制台读取字符 
+import java.io.*;
+public class BRRead {
+    public static void main(String args[]) throws IOException {
+        char c;
+        // 使用 System.in 创建 BufferedReader
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("输入字符, 按下 'q' 键退出。");
+        // 读取字符
+        do {
+            c = (char) br.read();
+            System.out.println(c);
+        } while (c != 'q');
+    }
+}
+/*
+以上实例编译运行结果如下:
+
+输入字符, 按下 'q' 键退出。
+runoob
+r
+u
+n
+o
+o
+b
+
+
+q
+q
+*/
+
+
+// 从控制台读取字符串=========
+//使用 BufferedReader 在控制台读取字符
+import java.io.*;
+ 
+public class BRReadLines {
+    public static void main(String args[]) throws IOException {
+        // 使用 System.in 创建 BufferedReader
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String str;
+        System.out.println("Enter lines of text.");
+        System.out.println("Enter 'end' to quit.");
+        do {
+            str = br.readLine();
+            System.out.println(str);
+        } while (!str.equals("end"));
+    }
+}
+/*
+以上实例编译运行结果如下:
+
+Enter lines of text.
+Enter 'end' to quit.
+This is line one
+This is line one
+This is line two
+This is line two
+end
+end
+*/
+
+// JDK 5 后的版本我们也可以使用 Java Scanner 类来获取控制台的输入。
+import java.util.Scanner; 
+ 
+public class ScannerDemo {
+    public static void main(String[] args) {
+        Scanner scan = new Scanner(System.in);
+        // 从键盘接收数据
+ 
+        // next方式接收字符串
+        System.out.println("next方式接收：");
+        // 判断是否还有输入
+        if (scan.hasNext()) {
+            String str1 = scan.next();
+	    // String str2 = scan.nextLine();
+            System.out.println("输入的数据为：" + str1);
+        }
+        scan.close();
+    }
+}
+
+
+```
+
+## Java 异常处理
+```java
+// 文件名 : ExcepTest.java
+import java.io.*;
+public class ExcepTest{
+ 
+   public static void main(String args[]){
+      try
+      {
+         int a[] = new int[2];
+         System.out.println("Access element three :" + a[3]);
+      }
+      catch(ArrayIndexOutOfBoundsException e)
+      {
+         System.out.println("Exception thrown  :" + e);
+      }
+      System.out.println("Out of the block");
+   }
+}
+/*
+以上代码编译运行输出结果如下：
+Exception thrown  :java.lang.ArrayIndexOutOfBoundsException: 3
+Out of the block
+*/
+
+
+//  多重捕获块
+// 一个 try 代码块后面跟随多个 catch 代码块的情况就叫多重捕获。
+try {
+    file = new FileInputStream(fileName);
+    x = (byte) file.read();
+} catch(FileNotFoundException f) { // Not valid!
+    f.printStackTrace();
+    return -1;
+} catch(IOException i) {
+    i.printStackTrace();
+    return -1;
+}
+finally{
+  // 程序代码, 可以运行清理类型等收尾善后性质的语句。
+  // 无论是否发生异常，finally 代码块中的代码总会被执行。
+}
+
+```
+
+
+
+## Java 继承
+```java
+// 类的继承格式
+class 父类 {
+}
+
+class 子类 extends 父类 {
+}
+```
+![](http://www.runoob.com/wp-content/uploads/2013/12/types_of_inheritance.png)
+
+继承的特性
+
+	1. 子类拥有父类非 private 的属性、方法。
+	2. 子类可以拥有自己的属性和方法，即子类可以对父类进行扩展。
+	3. 子类可以用自己的方式实现父类的方法。 覆盖
+	4. Java 的继承是单继承，但是可以多重继承，单继承就是一个子类只能继承一个父类，
+	   多重继承就是，例如 A 类继承 B 类，B 类继承 C 类，
+	   所以按照关系就是 C 类是 B 类的父类，B 类是 A 类的父类，
+	   这是 Java 继承区别于 C++ 继承的一个特性。
+	5. 提高了类之间的耦合性（继承的缺点，耦合度高就会造成代码之间的联系越紧密，代码独立性越差）。
+
+## Java 重写(Override)与重载(Overload)
+```java
+
+// 重写(Override)
+// 重写是子类对父类的允许访问的方法的实现过程进行重新编写, 返回值和形参都不能改变。
+// 即外壳不变，核心重写！
+
+class Animal{
+   public void move(){
+      System.out.println("动物可以移动");
+   }
+}
+ 
+class Dog extends Animal{
+   public void move(){
+      System.out.println("狗可以跑和走"); // 重写(Override)
+   }
+}
+ 
+public class TestDog{
+   public static void main(String args[]){
+      Animal a = new Animal(); // Animal 对象
+      Animal b = new Dog(); // Dog 对象
+ 
+      a.move();// 执行 Animal 类的方法
+ 
+      b.move();//执行 Dog 类的方法
+   }
+}
+
+/*
+以上实例编译运行结果如下：
+
+动物可以移动
+狗可以跑和走
+
+*/
+
+/*
+重载(Overload)
+重载(overloading) 是在一个类里面，方法名字相同，而参数不同。返回类型可以相同也可以不同。
+每个重载的方法（或者构造函数）都必须有一个独一无二的参数类型列表。
+最常用的地方就是构造器的重载。
+
+区别点     重载方法     重写方法
+参数列表   必须修改     一定不能修改
+返回类型   可以修改     一定不能修改
+异常       可以修改    可以减少或删除，一定不能抛出新的或者更广的异常
+访问       可以修改    一定不能做更严格的限制（可以降低限制）
+*/
+```
+
+## Java 多态 多态性是对象多种表现形式的体现 
+多态是同一个行为具有多个不同表现形式或形态的能力。
+
+多态就是同一个接口，使用不同的实例而执行不同操作，如图所示：
+
+![](http://www.runoob.com/wp-content/uploads/2013/12/dt-java.png)
+
+多态存在的三个必要条件
+
+	继承
+	重写
+	父类引用 指向 子类对象！！！！  Parent p = new Child();
+	
+当使用多态方式调用方法时，首先检查父类中是否有该方法，如果没有，则编译错误；如果有，再去调用子类的同名方法。
+
+多态的好处：可以使程序有良好的扩展，并可以对所有类的对象进行通用处理。
+
+```java
+
+public class Test {
+    public static void main(String[] args) {
+      show(new Cat());  // 以 Cat 对象调用 show 方法
+      show(new Dog());  // 以 Dog 对象调用 show 方法
+                
+      Animal a = new Cat();  // 向上转型  
+      a.eat();               // 调用的是 Cat 的 eat
+      Cat c = (Cat)a;        // 向下转型  
+      c.work();        // 调用的是 Cat 的 work
+  }  
+            
+    public static void show(Animal a)  {
+      a.eat();  
+        // 类型判断
+        if (a instanceof Cat)  {  // 猫做的事情 
+            Cat c = (Cat)a;  
+            c.work();  
+        } else if (a instanceof Dog) { // 狗做的事情 
+            Dog c = (Dog)a;  
+            c.work();  
+        }  
+    }  
+}
+ 
+abstract class Animal {  
+    abstract void eat();  
+}  
+  
+class Cat extends Animal {  
+    public void eat() {  
+        System.out.println("吃鱼");  
+    }  
+    public void work() {  
+        System.out.println("抓老鼠");  
+    }  
+}  
+  
+class Dog extends Animal {  
+    public void eat() {  
+        System.out.println("吃骨头");  
+    }  
+    public void work() {  
+        System.out.println("看家");  
+    }  
+}
+/*
+执行以上程序，输出结果为：
+
+吃鱼
+抓老鼠
+吃骨头
+看家
+吃鱼
+抓老鼠
+
+*/
+
+
+// 虚方法
+/*
+我们将介绍在Java中，当设计类时，被重写的方法的行为怎样影响多态性。
+
+我们已经讨论了方法的重写，也就是子类能够重写父类的方法。
+
+当子类对象调用重写的方法时，调用的是子类的方法，而不是父类中被重写的方法。
+
+要想调用父类中被重写的方法，则必须使用关键字super。
+*/
+
+
+```
+
+
+## Java 抽象类
+在面向对象的概念中，所有的对象都是通过类来描绘的，但是反过来，并不是所有的类都是用来描绘对象的，如果一个类中没有包含足够的信息来描绘一个具体的对象，这样的类就是抽象类。
+
+抽象类除了不能实例化对象之外，类的其它功能依然存在，成员变量、成员方法和构造方法的访问方式和普通类一样。
+
+由于抽象类不能实例化对象，所以抽象类必须被继承，才能被使用。也是因为这个原因，通常在设计阶段决定要不要设计抽象类。
+
+父类包含了子类集合的常见的方法，但是由于父类本身是抽象的，所以不能使用这些方法。
+
+在Java中抽象类表示的是一种继承关系，一个类只能继承一个抽象类，而一个类却可以实现多个接口。
+
+http://www.runoob.com/java/java-abstraction.html
+
+
+## Java 封装
+在面向对象程式设计方法中，封装（英语：Encapsulation）是指一种将抽象性函式接口的实现细节部份包装、隐藏起来的方法。
+
+封装可以被认为是一个保护屏障，防止该类的代码和数据被外部类定义的代码随机访问。
+
+要访问该类的代码和数据，必须通过严格的接口控制。
+
+封装最主要的功能在于我们能修改自己的实现代码，而不用修改那些调用我们代码的程序片段。
+
+适当的封装可以让程式码更容易理解与维护，也加强了程式码的安全性。
+
+封装的优点
+
+1. 良好的封装能够减少耦合。
+
+2. 类内部的结构可以自由修改。
+
+3. 可以对成员变量进行更精确的控制。
+
+4. 隐藏信息，实现细节。
+
+```java
+public class Person{
+    private String name;
+    private int age;
+    public int getAge(){
+      return age;
+    }
+    public String getName(){
+      return name;
+    }
+    public void setAge(int age){
+      this.age = age;
+    }
+    public void setName(String name){
+      this.name = name;
+    }
+}
+// 采用 this 关键字是为了
+// 解决实例变量（private String name）和 局部变量（setName(String name)中的name变量）之间发生的同名的冲突。
+
+```
+
+## Java 接口
+
+接口（英文：Interface），在JAVA编程语言中是一个抽象类型，是抽象方法的集合，接口通常以interface来声明。一个类通过继承接口的方式，从而来继承接口的抽象方法。
+
+接口并不是类，编写接口的方式和类很相似，但是它们属于不同的概念。类描述对象的属性和方法。接口则包含类要实现的方法。
+
+除非实现接口的类是抽象类，否则该类要定义接口中的所有方法。
+
+接口无法被实例化，但是可以被实现。一个实现接口的类，必须实现接口内所描述的所有方法，否则就必须声明为抽象类。另外，在 Java 中，接口类型可用来声明一个变量，他们可以成为一个空指针，或是被绑定在一个以此接口实现的对象。
+
+接口与类相似点：
+
+	一个接口可以有多个方法。
+	接口文件保存在 .java 结尾的文件中，文件名使用接口名。
+	接口的字节码文件保存在 .class 结尾的文件中。
+	接口相应的字节码文件必须在与包名称相匹配的目录结构中。
+	接口与类的区别：
+	接口不能用于实例化对象。
+	接口没有构造方法。
+	接口中所有的方法必须是抽象方法。
+	接口不能包含成员变量，除了 static 和 final 变量。
+	接口不是被类继承了，而是要被类实现。
+	接口支持多继承。
+接口特性
+接口中每一个方法也是隐式抽象的,接口中的方法会被隐式的指定为 public abstract（只能是 public abstract，其他修饰符都会报错）。
+接口中可以含有变量，但是接口中的变量会被隐式的指定为 public static final 变量（并且只能是 public，用 private 修饰会报编译错误）。
+接口中的方法是不能在接口中实现的，只能由实现接口的类来实现接口中的方法。
+抽象类和接口的区别
+
+	1. 抽象类中的方法可以有方法体，就是能实现方法的具体功能，但是接口中的方法不行。
+	2. 抽象类中的成员变量可以是各种类型的，
+	   而接口中的成员变量只能是 public static final 类型的。
+	3. 接口中不能含有静态代码块以及静态方法(用 static 修饰的方法)，
+	   而抽象类是可以有静态代码块和静态方法。
+	4. 一个类只能继承一个抽象类，而一个类却可以实现多个接口。
+
+http://www.runoob.com/java/java-interfaces.html
+
+## Java 包(package)
+为了更好地组织类，Java 提供了包机制，用于区别类名的命名空间。
+
+包的作用
+1、把功能相似或相关的类或接口组织在同一个包中，方便类的查找和使用。
+
+2、如同文件夹一样，包也采用了树形目录的存储方式。同一个包中的类名字是不同的，不同的包中的类的名字是可以相同的，当同时调用两个不同包中相同类名的类时，应该加上包名加以区别。因此，包可以避免名字冲突。
+
+3、包也限定了访问权限，拥有包访问权限的类才能访问某个包中的类。
+
+Java 使用包（package）这种机制是为了防止命名冲突，访问控制，提供搜索和定位类（class）、接口、枚举（enumerations）和注释（annotation）等。
+
+http://www.runoob.com/java/java-package.html
+
+
+
+## Java 数据结构
+Java工具包提供了强大的数据结构。在Java中的数据结构主要包括以下几种接口和类：
+
+	1. 枚举（Enumeration）
+	   枚举（Enumeration）接口虽然它本身不属于数据结构,但它在其他数据结构的范畴里应用很广。
+	   http://www.runoob.com/java/java-enumeration-interface.html
+	   
+	2. 位集合（BitSet）
+	   位集合类实现了一组可以单独设置和清除的位或标志。
+	   http://www.runoob.com/java/java-bitset-class.html
+	   
+	3. 向量（Vector）
+	   向量（Vector）类和传统数组非常相似，但是Vector的大小能根据需要动态的变化。
+	   http://www.runoob.com/java/java-vector-class.html
+	   
+	4. 栈（Stack）
+	   栈（Stack）实现了一个后进先出（LIFO）的数据结构。
+	   http://www.runoob.com/java/java-stack-class.html
+	   
+	5. 字典（Dictionary）
+	   字典（Dictionary） 类是一个抽象类，它定义了键映射到值的数据结构。
+	   Dictionary 类是一个抽象类，用来存储键/值对，作用和Map类相似。
+	   http://www.runoob.com/java/java-dictionary-class.html
+	   
+	6. 哈希表（Hashtable）
+	   Hashtable类提供了一种在用户定义键结构的基础上来组织数据的手段。
+	   http://www.runoob.com/java/java-hashTable-class.html
+	   
+	7. 属性（Properties）
+           Properties 继承于 Hashtable.Properties 类表示了一个持久的属性集.
+	   属性列表中每个键及其对应值都是一个字符串。
+	   http://www.runoob.com/java/java-properties-class.html
+	   
+	   
+## Java 集合框架  Collection 
+	   
+![](http://www.runoob.com/wp-content/uploads/2014/01/2243690-9cd9c896e0d512ed.gif)   
+
+集合框架是一个用来代表和操纵集合的统一架构。所有的集合框架都包含如下内容：
+
+接口：是代表集合的抽象数据类型。例如 Collection、List、Set、Map 等。之所以定义多个接口，是为了以不同的方式操作集合对象
+
+实现（类）：是集合接口的具体实现。从本质上讲，它们是可重复使用的数据结构，例如：ArrayList、LinkedList、HashSet、HashMap。
+
+算法：是实现集合接口的对象里的方法执行的一些有用的计算，例如：搜索和排序。这些算法被称为多态，那是因为相同的方法可以在相似的接口上有着不同的实现。
+
+除了集合，该框架也定义了几个 Map 接口和类。Map 里存储的是键/值对。尽管 Map 不是集合，但是它们完全整合在集合中。
+
+![](http://www.runoob.com/wp-content/uploads/2014/01/java-coll.png)
+
+http://www.runoob.com/java/java-collections.html
+
+
+
+
+## Java 泛型 类似c++的 template  参数化类型 
+	泛型的本质是参数化类型，也就是说所操作的数据类型被指定为一个参数。
+	http://www.runoob.com/java/java-generics.html
+```java
+public class GenericMethodTest
+{
+   // 泛型方法 printArray                         
+   public static < E > void printArray( E[] inputArray )
+   {
+      // 输出数组元素            
+         for ( E element : inputArray ){        
+            System.out.printf( "%s ", element );
+         }
+         System.out.println();
+    }
+ 
+    public static void main( String args[] )
+    {
+        // 创建不同类型数组： Integer, Double 和 Character
+        Integer[] intArray = { 1, 2, 3, 4, 5 };
+        Double[] doubleArray = { 1.1, 2.2, 3.3, 4.4 };
+        Character[] charArray = { 'H', 'E', 'L', 'L', 'O' };
+ 
+        System.out.println( "整型数组元素为:" );
+        printArray( intArray  ); // 传递一个整型数组
+ 
+        System.out.println( "\n双精度型数组元素为:" );
+        printArray( doubleArray ); // 传递一个双精度型数组
+ 
+        System.out.println( "\n字符型数组元素为:" );
+        printArray( charArray ); // 传递一个字符型数组
+    } 
+}
+
+/*
+编译以上代码，运行结果如下所示：
+
+整型数组元素为:
+1 2 3 4 5 
+
+双精度型数组元素为:
+1.1 2.2 3.3 4.4 
+
+字符型数组元素为:
+H E L L O 
+*/
+```
+	
+# Java 网络编程
+	http://www.runoob.com/java/java-networking.html
+	
+网络编程是指编写运行在多个设备（计算机）的程序，这些设备都通过网络连接起来。
+
+java.net 包中 J2SE 的 API 包含有类和接口，它们提供低层次的通信细节。你可以直接使用这些类和接口，来专注于解决问题，而不用关注通信细节。
+
+java.net 包中提供了两种常见的网络协议的支持：
+
+TCP：TCP 是传输控制协议的缩写，它保障了两个应用程序之间的可靠通信。通常用于互联网协议，被称 TCP / IP。
+
+UDP：UDP 是用户数据报协议的缩写，一个无连接的协议。提供了应用程序之间要发送的数据的数据包。
+
+
+> Socket 编程
+
+套接字使用TCP提供了两台计算机之间的通信机制。 客户端程序创建一个套接字，并尝试连接服务器的套接字。
+
+当连接建立时，服务器会创建一个 Socket 对象。客户端和服务器现在可以通过对 Socket 对象的写入和读取来进行通信。
+
+java.net.Socket 类代表一个套接字，并且 java.net.ServerSocket 类为服务器程序提供了一种来监听客户端，并与他们建立连接的机制。
+
+以下步骤在两台计算机之间使用套接字建立TCP连接时会出现：
+
+服务器实例化一个 ServerSocket 对象，表示通过服务器上的端口通信。
+
+服务器调用 ServerSocket 类的 accept() 方法，该方法将一直等待，直到客户端连接到服务器上给定的端口。
+
+服务器正在等待时，一个客户端实例化一个 Socket 对象，指定服务器名称和端口号来请求连接。
+
+Socket 类的构造函数试图将客户端连接到指定的服务器和端口号。如果通信被建立，则在客户端创建一个 Socket 对象能够与服务器进行通信。
+
+在服务器端，accept() 方法返回服务器上一个新的 socket 引用，该 socket 连接到客户端的 socket。
+
+
+> Socket 客户端实例
+
+如下的 GreetingClient 是一个客户端程序，该程序通过 socket 连接到服务器并发送一个请求，然后等待一个响应。
+
+GreetingClient.java 文件代码：
+
+```java
+// 文件名 GreetingClient.java
+ 
+import java.net.*;
+import java.io.*;
+ 
+public class GreetingClient
+{
+   public static void main(String [] args)
+   {
+      String serverName = args[0];
+      int port = Integer.parseInt(args[1]);
+      try
+      {
+         System.out.println("连接到主机：" + serverName + " ，端口号：" + port);
+         Socket client = new Socket(serverName, port);
+         System.out.println("远程主机地址：" + client.getRemoteSocketAddress());
+         OutputStream outToServer = client.getOutputStream();
+         DataOutputStream out = new DataOutputStream(outToServer);
+ 
+         out.writeUTF("Hello from " + client.getLocalSocketAddress());
+         InputStream inFromServer = client.getInputStream();
+         DataInputStream in = new DataInputStream(inFromServer);
+         System.out.println("服务器响应： " + in.readUTF());
+         client.close();
+      }catch(IOException e)
+      {
+         e.printStackTrace();
+      }
+   }
+}
+```
+
+
+> Socket 服务端实例
+
+如下的GreetingServer 程序是一个服务器端应用程序，使用 Socket 来监听一个指定的端口。
+
+GreetingServer.java 文件代码：
+```java
+// 文件名 GreetingServer.java
+ 
+import java.net.*;
+import java.io.*;
+ 
+public class GreetingServer extends Thread
+{
+   private ServerSocket serverSocket;
+   
+   public GreetingServer(int port) throws IOException
+   {
+      serverSocket = new ServerSocket(port);
+      serverSocket.setSoTimeout(10000);
+   }
+ 
+   public void run()
+   {
+      while(true)
+      {
+         try
+         {
+            System.out.println("等待远程连接，端口号为：" + serverSocket.getLocalPort() + "...");
+            Socket server = serverSocket.accept();
+            System.out.println("远程主机地址：" + server.getRemoteSocketAddress());
+            DataInputStream in = new DataInputStream(server.getInputStream());
+            System.out.println(in.readUTF());
+            DataOutputStream out = new DataOutputStream(server.getOutputStream());
+            out.writeUTF("谢谢连接我：" + server.getLocalSocketAddress() + "\nGoodbye!");
+            server.close();
+         }catch(SocketTimeoutException s)
+         {
+            System.out.println("Socket timed out!");
+            break;
+         }catch(IOException e)
+         {
+            e.printStackTrace();
+            break;
+         }
+      }
+   }
+   public static void main(String [] args)
+   {
+      int port = Integer.parseInt(args[0]);
+      try
+      {
+         Thread t = new GreetingServer(port);
+         t.run();
+      }catch(IOException e)
+      {
+         e.printStackTrace();
+      }
+   }
+}
+```
+编译以上两个 java 文件代码，并执行以下命令来启动服务，使用端口号为 6066：
+
+	$ javac GreetingServer.java 
+	$ java GreetingServer 6066
+	等待远程连接，端口号为：6066...
+	新开一个命令窗口，执行以上命令来开启客户端：
+
+	$ javac GreetingClient.java 
+	$ java GreetingClient localhost 6066
+	连接到主机：localhost ，端口号：6066
+	远程主机地址：localhost/127.0.0.1:6066
+	服务器响应： 谢谢连接我：/127.0.0.1:6066
+	Goodbye!
+
+## Java 发送邮件
+	http://www.runoob.com/java/java-sending-email.html
+	
+## Java 多线程编程
+	http://www.runoob.com/java/java-multithreading.html
+	
+Java 给多线程编程提供了内置的支持。 一条线程指的是进程中一个单一顺序的控制流，一个进程中可以并发多个线程，每条线程并行执行不同的任务。
+
+多线程是多任务的一种特别的形式，但多线程使用了更小的资源开销。
+
+这里定义和线程相关的另一个术语 - 进程：一个进程包括由操作系统分配的内存空间，包含一个或多个线程。一个线程不能独立的存在，它必须是进程的一部分。一个进程一直运行，直到所有的非守护线程都结束运行后才能结束。
+
+多线程能满足程序员编写高效率的程序来达到充分利用 CPU 的目的。
+
+
+> 一个线程的生命周期
+
+线程是一个动态执行的过程，它也有一个从产生到死亡的过程。
+
+![](http://www.runoob.com/wp-content/uploads/2014/01/java-thread.jpg)
+
 
 
 
