@@ -453,3 +453,131 @@ toRadians() // 将角度转换为弧度。
 random()    // 返回一个随机数。
 
 ```
+
+
+## Java Character 类
+	Character 类用于对单个字符进行操作。
+
+	Character 类在对象中包装一个基本类型 char 的值
+```java
+// 原始字符 'a' 装箱到 Character 对象 ch 中
+Character ch = 'a';
+```
+## Java String 类
+	String 类来创建和操作字符串。
+	String 类是不可改变的，所以你一旦创建了 String 对象，那它的值就无法改变了。
+	
+```java
+String greeting = "菜鸟教程"; // 直接创建字符串
+// 字符数组创建 字符串
+char[] helloArray = { 'r', 'u', 'n', 'o', 'o', 'b'};
+String helloString = new String(helloArray); 	
+
+String site = "www.runoob.com";
+int len = site.length(); // 字符串长度
+System.out.println( "菜鸟教程网址长度 : " + len );
+
+// 连接字符串 String 类提供了连接两个字符串的方法：
+string1.concat(string2);
+"1" + string1 + "www.runoob.com" // 直接使用 + 号进行连接
+
+
+// 输出格式化字符串
+System.out.printf("浮点型变量的值为 " +
+                  "%f, 整型变量的值为 " +
+                  " %d, 字符串变量的值为 " +
+                  "is %s", floatVar, intVar, stringVar);
+
+// 创建格式化字符串
+String fs;
+fs = String.format("浮点型变量的值为 " +
+                   "%f, 整型变量的值为 " +
+                   " %d, 字符串变量的值为 " +
+                   " %s", floatVar, intVar, stringVar);
+```
+	
+## Java StringBuffer 和 StringBuilder 类
+	当对字符串进行修改的时候，需要使用 StringBuffer 和 StringBuilder 类。
+	和 String 类不同的是，
+	StringBuffer 和 StringBuilder 类的对象能够被多次的修改，
+	并且不产生新的未使用对象。
+	
+	StringBuilder 类在 Java 5 中被提出，
+	它和 StringBuffer 之间的最大不同在于 StringBuilder 的方法不是线程安全的（不能同步访问）。
+
+	由于 StringBuilder 相较于 StringBuffer 有速度优势，
+	所以多数情况下建议使用 StringBuilder 类。
+	然而在应用程序要求线程安全的情况下，则必须使用 StringBuffer 类。
+	
+```java
+public class Test{
+  public static void main(String args[]){
+    StringBuffer sBuffer = new StringBuffer("菜鸟教程官网：");
+    sBuffer.append("www");
+    sBuffer.append(".runoob");
+    sBuffer.append(".com");
+    System.out.println(sBuffer);  
+  }
+}
+// 以上实例编译运行结果如下：
+// 菜鸟教程官网：www.runoob.com
+
+```
+	
+
+## Java 数组
+	数组对于每一门编程语言来说都是重要的数据结构之一，当然不同语言对数组的实现及处理也不尽相同。
+
+	Java 语言中提供的数组是用来存储固定大小的同类型元素。
+
+	你可以声明一个数组变量，如 numbers[100] 
+	来代替直接声明 100 个独立变量 number0，number1，....，number99。
+```java	
+声明数组变量
+
+首先必须声明数组变量，才能在程序中使用数组。
+
+下面是声明数组变量的语法：
+
+dataType[] arrayRefVar;   // 首选的方法
+或
+dataType arrayRefVar[];  // 效果相同，但不是首选方法,风格是来自 C/C++ 语言
+	
+double[] myList;         // 首选的方法
+或
+double myList[];         //  效果相同，但不是首选方法
+
+创建数组
+Java语言使用new操作符来创建数组，语法如下：
+
+arrayRefVar = new dataType[arraySize];
+```
+示例
+
+```java
+public class TestArray {
+   public static void main(String[] args) {
+      // 数组大小
+      int size = 10;
+      // 定义数组
+      double[] myList = new double[size];
+      myList[0] = 5.6;
+      myList[1] = 4.5;
+      myList[2] = 3.3;
+      myList[3] = 13.2;
+      myList[4] = 4.0;
+      myList[5] = 34.33;
+      myList[6] = 34.0;
+      myList[7] = 45.45;
+      myList[8] = 99.993;
+      myList[9] = 11123;
+      // 计算所有元素的总和
+      double total = 0;
+      for (int i = 0; i < size; i++) {
+         total += myList[i];
+      }
+      System.out.println("总和为： " + total);
+   }
+}
+
+```
