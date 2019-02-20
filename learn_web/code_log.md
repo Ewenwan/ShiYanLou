@@ -189,3 +189,90 @@ public class Puppy{ // class 类 Puppy
 * 如果源文件包含import语句，那么应该放在package语句和类定义之间。
 * 如果没有package语句，那么import语句应该在源文件中最前面。
 * import语句和package语句对源文件中定义的所有类都有效。在同一源文件中，不能给不同的类不同的包声明。
+
+```java
+import java.io.*; // 会载入java_installation/java/io路径下的所有类
+
+// 一个简单的例子 我们创建两个类：Employee 和 EmployeeTest。
+// EmployeeTest 调用 Employee   
+
+// Employee.java 文件代码： 员工类
+import java.io.*; // 会载入java_installation/java/io路径下的所有类
+public class Employee{
+// 属性
+   String name;  // 名字
+   int age;      // 年龄
+   String designation; // 职位
+   double salary;      // 薪水
+   
+   // Employee 类的构造器 构造函数 无返回类型
+   public Employee(String name){
+      this.name = name;
+   }
+   // 设置age的值 方法
+   public void empAge(int empAge){
+      age =  empAge;
+   }
+   // 设置designation的值
+   public void empDesignation(String empDesig){
+      designation = empDesig;
+   }
+   // 设置salary的值 
+   public void empSalary(double empSalary){
+      salary = empSalary;
+   }
+   
+   // 打印类属性信息 员工信息
+   public void printEmployee(){
+      System.out.println("名字:"+ name );
+      System.out.println("年龄:" + age );
+      System.out.println("职位:" + designation );
+      System.out.println("薪水:" + salary);
+   }
+}
+
+// 程序都是从main方法开始执行。为了能运行这个程序，必须包含main方法并且创建一个实例对象。
+// EmployeeTest.java 文件代码：
+import java.io.*;
+
+public class EmployeeTest{
+   
+   // 仅包含一个 主方法
+   public static void main(String []args)
+   {
+      /* 使用构造器创建两个对象 */
+      Employee empOne = new Employee("xiaoming");
+      Employee empTwo = new Employee("xiaohong");
+ 
+      // 调用这两个对象的成员方法
+      empOne.empAge(26);
+      empOne.empDesignation("高级程序员");
+      empOne.empSalary(1000);
+      empOne.printEmployee();
+ 
+      empTwo.empAge(21);
+      empTwo.empDesignation("菜鸟程序员");
+      empTwo.empSalary(500);
+      empTwo.printEmployee();
+   }
+}
+
+/*
+编译这两个文件并且运行 EmployeeTest 类，可以看到如下结果：
+
+$ javac EmployeeTest.java
+$ java EmployeeTest 
+名字:xiaoming
+年龄:26
+职位:高级程序员
+薪水:1000.0
+名字:xiaohong
+年龄:21
+职位:菜鸟程序员
+薪水:500.0
+
+*/
+```
+
+
+
