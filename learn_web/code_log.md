@@ -375,9 +375,81 @@ char x = 'x';        // 声明变量 x 的值是字符 'x'。
 // int age; // 错误，局部变量被声明后，必须经过初始化
     }
     
-    
+// instanceof 运算符，检查该对象是否是一个特定类型
+String name = "James";
+boolean result = name instanceof String; // 由于 name 是 String 类型，所以返回真
+
     }  
 }
 
 ```
 
+> while for if else switch 语句 和 c++语言差不多
+
+## Java Number 基本数据类型 类 & Math 类
+
+所有的包装类（Integer、Long、Byte、Double、Float、Short）都是抽象类 Number 的子类。
+
+![](http://www.runoob.com/wp-content/uploads/2013/12/number1.png)
+
+装箱---装包---当内置数据类型被当作对象使用的时候，编译器会把内置类型装箱为包装类。
+
+拆箱---拆包---相似的，编译器也可以把一个对象拆箱为内置类型。
+
+Number 类属于 java.lang 包
+
+```java
+public class Test{
+ 
+   public static void main(String args[]){
+      Integer x = 5; // 由于x是一个对象，所以编译器要对x 进行 装箱
+      x =  x + 10;   // 为了使x能进行加运算，所以要对x 进行 拆箱。
+      System.out.println(x); 
+   }
+}
+
+```
+> Java 的 Math 包
+
+Java 的 Math 包含了用于执行基本数学运算的属性和方法，如初等指数、对数、平方根和三角函数。
+
+Math 的方法都被定义为 static 形式，通过 Math 类可以在主函数中直接调用。
+```java
+public class Test {  
+    public static void main (String []args)  
+    {  
+        System.out.println("90 度的正弦值：" + Math.sin(Math.PI/2));  
+        System.out.println("0度的余弦值：" + Math.cos(0));  
+        System.out.println("60度的正切值：" + Math.tan(Math.PI/3));  
+        System.out.println("1的反正切值： " + Math.atan(1));  
+        System.out.println("π/2的角度值：" + Math.toDegrees(Math.PI/2));  
+        System.out.println(Math.PI);  
+    }  
+}
+/*
+以上实例编译运行结果如下：
+90 度的正弦值：1.0
+0度的余弦值：1.0
+60度的正切值：1.7320508075688767
+1的反正切值： 0.7853981633974483
+π/2的角度值：90.0
+3.141592653589793
+*/
+
+// Number & Math 类方法
+xxxValue()  // 将 Number 对象转换为xxx数据类型的值并返回。 拆包
+compareTo() // 将number对象与参数比较。
+equals()    // 判断number对象是否与参数相等。
+toString()  // 以字符串形式返回值。
+parseInt()  // 将字符串解析为int类型。
+abs()  ceil() floor() 
+
+rint()     // 返回与参数最接近的整数。返回类型为double。
+round()    // 它表示四舍五入
+
+min() max() exp() log() pow() sqrt() sin() cos() tan() 
+toDegrees() // 将参数转化为角度。
+toRadians() // 将角度转换为弧度。
+random()    // 返回一个随机数。
+
+```
