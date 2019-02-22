@@ -58,7 +58,7 @@ Spark 由一个驱动程序构成，它运行用户的 main 函数并在聚类�
 * 高频交易
 * 税收欺诈监测，恐怖行为检测
 * 信用卡交易评分(欺诈检测)
-
+* 计算广告 [计算广告-在线广告市场与背景](https://github.com/Nianchese/bloop_blog_article/blob/e20332ec9ff19539cc1da78471d03947718daf35/ComputationalAdvertising1.md)
 
 > 必备技能
 * 1、 机器学习，统计学技能是基础
