@@ -58,7 +58,7 @@ Spark 由一个驱动程序构成，它运行用户的 main 函数并在聚类�
 * 高频交易
 * 税收欺诈监测，恐怖行为检测
 * 信用卡交易评分(欺诈检测)
-* 计算广告 [计算广告-在线广告市场与背景](https://github.com/Nianchese/bloop_blog_article/blob/e20332ec9ff19539cc1da78471d03947718daf35/ComputationalAdvertising1.md) -- [计算广告-在线广告商品逻辑](https://github.com/Nianchese/bloop_blog_article/blob/e20332ec9ff19539cc1da78471d03947718daf35/ComputationalAdvertising2.md)-- [重读计算广告](https://github.com/SummerBuger/mblog-source/blob/5919575ae37711ac429a99da1ce44614af1c70d1/source/_posts/%E8%AE%A1%E7%AE%97%E5%B9%BF%E5%91%8A/2018-05-14-%E9%87%8D%E8%AF%BB%E8%AE%A1%E7%AE%97%E5%B9%BF%E5%91%8A.md)
+* 计算广告 [计算广告-在线广告市场与背景](https://github.com/Nianchese/bloop_blog_article/blob/e20332ec9ff19539cc1da78471d03947718daf35/ComputationalAdvertising1.md) -- [计算广告-在线广告商品逻辑](https://github.com/Nianchese/bloop_blog_article/blob/e20332ec9ff19539cc1da78471d03947718daf35/ComputationalAdvertising2.md)-- [重读计算广告](https://github.com/SummerBuger/mblog-source/blob/5919575ae37711ac429a99da1ce44614af1c70d1/source/_posts/%E8%AE%A1%E7%AE%97%E5%B9%BF%E5%91%8A/2018-05-14-%E9%87%8D%E8%AF%BB%E8%AE%A1%E7%AE%97%E5%B9%BF%E5%91%8A.md)--[计算广告笔记](https://github.com/csuncs89/learn-machine-learning/tree/8ceb2467cb2a2def0adb047fa17e4b3c8f5a123e/misc/computational_advertising)
 
 
 
