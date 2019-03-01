@@ -3,6 +3,8 @@
 
 [数据结构和算法动态可视化](https://visualgo.net/zh)
 
+[基础数据结构和算法的纯C语言实现](https://github.com/Ewenwan/Data-Structures-and-Algorithms-in-C)
+
 [计算机科学 面试笔记](https://github.com/PLester/Interview-Notebook/tree/master/notes)
 
 [计算机科学 面试笔记2 ](https://github.com/CyC2018/CS-Notes/tree/master/docs/notes)
