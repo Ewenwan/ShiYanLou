@@ -13,6 +13,8 @@
     通过向Pi发送完整程序来进行远程控制，而不是用一些动力不足的控制语言与之通信。
     关于Pi如何在未来发挥作用的猜想。
 
+[基于树莓派的智能小车 python](https://github.com/Ewenwan/robot_car)
+
 # 树莓派应用
 [Game Utility library for the Raspberry PI 树莓派游戏库](https://github.com/progschj/pigu)
 
