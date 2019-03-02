@@ -4,7 +4,38 @@
 
 [Arduino 大师](https://github.com/PacktPublishing/Mastering-Arduino)
 
+# 1. 软件安装及教程资源链接
 
+[Windows软件下载](https://coding.net/u/coloz/p/arduino-installer/git/raw/master/1.8.5/arduino-1.8.5-windows.exe) 
+
+[Mac os软件下载](https://coding.net/u/coloz/p/arduino-installer/git/raw/master/1.8.5/arduino-1.8.5-macosx.zip) 
+
+[驱动安装方法](https://www.arduino.cn/thread-1008-1-1.html)
+
+[Arduino教程汇总](https://www.arduino.cn/thread-1066-1-1.html)
+
+[Arduino官网](http://www.arduino.cc/)
+
+# 2. Arduino语言
+
+1. **Arduino使用C/C++编写程序**，虽然C++兼容C语言，但这是两种语言，C语言是一种面向过程的编程语言，C++是一种面向对象的编程语言。早期的Arduino核心库使用C语言编写，后来引进了面向对象的思想，目前最新的Arduino核心库采用C与C++混合编写而成。  
+
+2. 传统开发方式中，你需要厘清每个**寄存器**的意义及之间的关系，然后通过配置多个寄存器来达到目的。  而在Arduino中，使用了清楚明了的**API**替代繁杂的寄存器配置过程，如以下代码： `pinMode(13,OUTPUT);digitalwrite(13,HIGH)`，`pinMode(13,OUTPUT)`即是设置引脚的模式，这里设定了13脚为输出模式；而`digitalWrite(13,HIGH) `是让13脚输出高电平数字信号。 
+
+3. 如果你使用过C/C++语言，你会发现Arduino的程序结构与传统的C/C++结构的不同——Arduino程序中没有main函数。  其实并不是Arduino没有main函数，而是main函数的定义隐藏在了Arduino的核心库文件中。Arduino开发一般不直接操作main函数，而是使用`setup()`和`loop()`这个两个函 数。
+
+   Arduino控制器通电或复位后，**即会开始执行`setup() `函数中的程序，该部分只会执行一次**。 通常我们会在`setup() `函数中完成Arduino的初始化设置，如**配置I/O口状态，初始化串口等操作。** 
+
+   在`setup()` 函数中的程序执行完后，Arduino会接着执行`loop()` 函数中的程序。而`loop()`函数是一个死循环，其中的程序会不断的重复运行。 通常我们会在`loop() `函数中完成程序的主要功能，如**驱动各种模块，采集数据**等。
+
+4. C/C++编程基础（补充）
+
+   ```c
+   常量定义：const 类型 常量名 = 常量值
+   布尔型变量，即boolean。它的值只有两个：false（假）和true（真）。boolean会占用1个字节的内存空间。
+   ```
+# 3. 示例总结
+   
 # io
 ```c
 // LED 延时 闪烁=================
