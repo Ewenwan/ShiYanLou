@@ -8,6 +8,8 @@
 
 [arduino_course_es 课程 课件](https://github.com/simonmonk/arduino_course_es)
 
+[CC1101_arduino 无线模块](https://github.com/simonmonk/CC1101_arduino)
+
 # 1. 软件安装及教程资源链接
 
 [Windows软件下载](https://coding.net/u/coloz/p/arduino-installer/git/raw/master/1.8.5/arduino-1.8.5-windows.exe) 
