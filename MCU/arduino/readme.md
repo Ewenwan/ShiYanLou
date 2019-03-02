@@ -6,6 +6,7 @@
 
 [Programming Arduino: Getting Started with Sketches 示例](https://github.com/Ewenwan/programming_arduino_ed2)
 
+[arduino_course_es 课程 课件](https://github.com/simonmonk/arduino_course_es)
 
 # 1. 软件安装及教程资源链接
 
