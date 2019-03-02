@@ -4,6 +4,9 @@
 
 [Arduino 大师](https://github.com/PacktPublishing/Mastering-Arduino)
 
+[Programming Arduino: Getting Started with Sketches 示例](https://github.com/Ewenwan/programming_arduino_ed2)
+
+
 # 1. 软件安装及教程资源链接
 
 [Windows软件下载](https://coding.net/u/coloz/p/arduino-installer/git/raw/master/1.8.5/arduino-1.8.5-windows.exe) 
