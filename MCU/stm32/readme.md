@@ -2,6 +2,8 @@
 
 [Open source flash program for the STM32 ARM processors using the ST serial bootloader over UART or I2C](https://github.com/ARMinARM/stm32flash)
 
+[ebox是类似于arduino的一层api，简化stm32编程](https://github.com/eboxmaker/eBox_Framework)
+
 ## stm32103xxxx 开发工具
 
     keil5 开发环境：
