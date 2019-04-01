@@ -476,67 +476,180 @@ DWORD GetCurrentDirectory( DWORD BufferLength, LPTSTR Buffer );
 * 规则3.5 对于数值或者字符串等等常量的定义，建议采用全大写字母，单词之间加下划线„_‟的方式命名（枚举同样建议使用此方式定义）。
 
 示例：
-
+```c
 #define PI_ROUNDED 3.14
+```
+* 规则3.6 除了头文件或编译开关等特殊标识定义，宏定义不能使用下划线„_‟开头和结尾。
 
-* 
-
-* 
-
-* 
-
-* 
-
-* 
-
-* 
-
-* 
-
-* 
-
-* 
-
-* 
-
-* 
-
-* 
-
-* 
-
-* 
-
+说明：一般来说，‟_‟开头、结尾的宏都是一些内部的定义.
 
 ## 4.变量
 
-* 
+* 原则4.1 一个变量只有一个功能，不能把一个变量用作多种用途。
 
-* 
+说明：一个变量只用来表示一个特定功能，不能把一个变量作多种用途，即同一变量取值不同时，其代表的意义也不同。
 
-* 
+示例：具有两种功能的反例.
 
-* 
+```c
+WORD DelRelTimeQue(void)
+{
+WORD Locate;
+Locate = 3;// 删除元素在队列中的位置
+Locate = DeleteFromQue(Locate); /* Locate具有两种功能：位置 和 函数DeleteFromQue的返回值 */
+return Locate; // 函数返回值，是否成功等
+}
+```
 
-* 
+正确做法：使用两个变量
+```c
+WORD DelRelTimeQue(void)
+{
+WORD Ret;// 函数返回值，是否成功等
+WORD Locate;// 删除元素在队列中的位置
+Locate = 3;
+Ret = DeleteFromQue(Locate);
+return Ret;
+}
+```
 
-* 
+* 原则4.2 结构功能单一；不要设计面面俱到的数据结构。
 
-* 
+* 说明：相关的一组信息才是构成一个结构体的基础，结构的定义应该可以明确的描述一个对象，而不是一组相关性不强的数据的集合。
 
-* 
+设计结构时应力争使结构代表一种现实事务的抽象，而不是同时代表多种。结构中的各元素应代表同一事务的不同侧面，而不应把描述没有关系或关系很弱的不同事务的元素放到同一结构中。
 
-* 
+示例：如下结构不太清晰、合理。
+```c
+typedef struct STUDENT_STRU
+{
+unsigned char name[32]; /* student's name 姓名*/
+unsigned char age; /* student's age  年龄*/
+unsigned char sex; /* student's sex, as follows 性别 */
+/* 0 - FEMALE; 1 - MALE */
 
-* 
+unsigned char teacher_name[32]; /* the student teacher's name 老师的名字*/
+unsigned char teacher_sex; /* his teacher sex 老师的性别*/
+} STUDENT;
 
-* 
+```
 
-* 
+若改为如下，会更合理些。
+```c
+// 老师信息结构体
+typedef struct TEACHER_STRU
+{
+   unsigned char name[32]; /* teacher name 老师的名字*/
+   unsigned char sex; /* teacher sex, as follows 老师的性别*/
+   /* 0 - FEMALE; 1 - MALE */
+   unsigned int teacher_ind; /* teacher index 老师编号*/
+} TEACHER;
 
-* 
+// 学生信息结构体
+typedef struct STUDENT_STRU
+{
+unsigned char name[32]; /* student's name 名字*/
+unsigned char age; /* student's age 年龄*/
+unsigned char sex; /* student's sex, as follows 性别*/
+/* 0 - FEMALE; 1 - MALE */
 
-* 
+unsigned int teacher_ind; /* his teacher index学生老师的编号 */
+} STUDENT;
+```
+
+* 原则4.3 不用或者少用全局变量。
+
+说明：**单个文件内部可以使用static的全局变量，可以将其理解为类的私有成员变量。**
+
+全局变量应该是模块的私有数据，不能作用对外的接口使用，使用static类型定义，可以有效防止外部文件的非正常访问，建议定义一个STATIC宏，在调试阶段，将STATIC定义为static，版本发布时，改为空，以便于后续的打补丁等操作。
+
+直接使用其他模块的私有数据，将使模块间的关系逐渐走向“剪不断理还乱”的耦合状态，这种情形是不允许的。
+
+* 规则4.1 防止局部变量与全局变量同名。
+
+说明：尽管局部变量和全局变量的作用域不同而不会发生语法错误，但容易使人误解。
+
+* 规则4.2 通讯过程中使用的结构，必须注意字节序。
+
+说明：通讯报文中，字节序是一个重要的问题，我司设备使用的cpu类型复杂多样，大小端、32位/64位的处理器也都有，如果结构会在报文交互过程中使用，必须考虑字节序问题。
+
+由于位域在不同字节序下，表现看起来差别更大，所以更需要注意。
+
+对于这种跨平台的交互，数据成员发送前，都应该进行主机序到网络序的转换；接收时，也必须进行网络序到主机序的转换。
+
+* 规则4.3 严禁使用未经初始化的变量作为右值。
+
+说明：坚持建议4.3（在首次使用前初始化变量，初始化的地方离使用的地方越近越好。）可以有效避免未初始化错误。
+
+* 建议4.1 构造仅有一个模块或函数可以修改、创建，而其余有关模块或函数只访问的全局变量，防止多个不同模块或函数都可以修改、创建同一全局变量的现象。
+
+说明：降低全局变量耦合度。
+
+* **建议4.2 使用面向接口编程思想，通过API访问数据：如果本模块的数据需要对外部模块开放，应提供接口函数来设置、获取，同时注意全局数据的访问互斥。**
+
+说明：避免直接暴露内部数据给外部模型使用，是防止模块间耦合最简单有效的方法。
+定义的接口应该有比较明确的意义，比如一个风扇管理功能模块，有自动和手动工作模式，那么设置、查询工作模块就可以定义接口为SetFanWorkMode，GetFanWorkMode；查询转速就可以定义为GetFanSpeed；风扇支持节能功能开关，可以定义EnabletFanSavePower等等。
+
+* 建议4.3 在首次使用前初始化变量，初始化的地方离使用的地方越近越好。
+
+说明：未初始化变量是C和C++程序中错误的常见来源。在变量首次使用前确保正确初始化。
+
+在较好的方案中，变量的定义和初始化要做到亲密无间。
+
+```c
+示例：
+//不可取的初始化：无意义的初始化
+int speedup_factor ＝ 0;// 无用
+if (condition)
+{
+   speedup_factor = 2;
+}
+else
+{
+   speedup_factor = -1;
+}
+
+// 不可取的初始化：初始化和声明分离
+int speedup_factor;
+if (condition)
+{
+   speedup_factor = 2;
+}
+else
+{
+speedup_factor = -1;
+}
+
+//较好的初始化：使用默认有意义的初始化
+int speedup_factor = -1;
+if (condition)
+{
+   speedup_factor = 2;
+}
+
+//较好的初始化使用?:减少数据流和控制流的混合
+int speedup_factor = condition?2:-1;
+//较好的初始化：使用函数代替复杂的计算流
+int speedup_factor = ComputeSpeedupFactor()；
+```
+
+* 建议4.4 明确全局变量的初始化顺序，避免跨模块的初始化依赖。
+
+说明：系统启动阶段，使用全局变量前，要考虑到该全局变量在什么时候初始化，使用全局变量和初始化全局变量，两者之间的时序关系，谁先谁后，一定要分析清楚，不然后果往往是低级而又灾难性的。
+
+* 建议4.5 尽量减少没有必要的数据类型默认转换与强制转换。
+
+说明：当进行数据类型强制转换时，其数据的意义、转换后的取值等都有可能发生变化，而这些细节若考虑不周，就很有可能留下隐患。
+
+示例：如下赋值，多数编译器不产生告警，但值的含义还是稍有变化。
+```c
+char ch;
+unsigned short int exam;
+ch = -1;
+exam = ch; // 编译器不产生告警，此时exam为0xFFFF。
+```
+
+
 ## 5.宏 常量
 * 
 
