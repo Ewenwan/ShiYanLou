@@ -127,16 +127,21 @@ while (!flag); //‐‐‐‐‐‐‐‐‐‐‐> loop:
 
 * 寄存器分配(Register Allocation) ：下例将对g的2次读取优化成了1次
 ```c
-a = g;  //‐‐‐‐‐‐‐‐‐‐‐> load %r1, 0($mem1)
-b += a; // rewrite     add %r2, %r2, %r1
+a = g;  //‐‐‐‐‐‐‐‐‐‐‐> load %r1, 0($mem1)  // 载入g到r1寄存器为a
+b += a; // rewrite     add %r2, %r2, %r1   // r2寄存器存储b，a+b后赋值给b
 a = g;  //
-c += a; //             add %r3, %r3, %r1
+c += a; //             add %r3, %r3, %r1   // r3寄存器存储c，a+c后赋值给c
 
 ```
 
-* 
+* 指令调度(Instruction Scheduling) ：下例重排的后一条指令不必等待前一条的结果，减少了停顿(这里的静态流水线调度缓解了RAW Hazard )
 ```c
-
+load %r0, 0($mem0)  //        load %r0, 0($mem0)
+mul %r1, %r1, %r0   //‐-----> load %r2, 0($mem2)
+store 0($mem1), %r1 //rewrite mul %r1, %r1, %r0
+load %r2, 0($mem2)  //        mul %r3, %r3, %r2
+mul %r3, %r3, %r2   //        store 0($mem1), %r1
+store 0($mem3), %r3 //        store 0($mem3), %r3
 
 ```
 
