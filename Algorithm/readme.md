@@ -1,4 +1,6 @@
 # 各种 算法 数学建模算法 群体智能算法 数组 字符串 链表 树 图 桶 森林 
+[《算法导论》第三版中算法的C++实现](https://github.com/Ewenwan/cplusplus-_Implementation_Of_Introduction_to_Algorithms)
+
 [剑指Offer——名企面试官精讲典型编程题](https://github.com/Ewenwan/CodingInterviews)
 
 [浙大PAT甲级、乙级c/c++源码](https://github.com/Ewenwan/ZJU_PAT)
