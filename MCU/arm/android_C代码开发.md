@@ -76,6 +76,8 @@ Android.mk
 
 具体Android.mk的更详细的配置自行Google
 
+[Android.mk参考](https://blog.csdn.net/the_Sunshine_of_King/article/details/78405149)
+
 ```mk
 LOCAL_PATH := $(call my-dir)
 
