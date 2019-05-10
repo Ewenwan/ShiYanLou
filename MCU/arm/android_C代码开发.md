@@ -1,6 +1,31 @@
 # android_C代码开发
 
-使用NDK编译一个用C写的小demo，放在Android平台上通过命令行调用。
+[Android NDK开发(一)C语言基础语法](https://blog.csdn.net/weixin_42580207/article/details/80901614)
+
+[JNI开发系列①JNI概念及开发流程](https://www.jianshu.com/p/68bca86a84ce)
+
+[NDK开发基础①使用Android Studio编写NDK](https://www.jianshu.com/p/f1b8b97d2ef8)
+
+[C语言基础及指针 结构体与指针 结构体数组 结构体嵌套 结构体内函数指针 结构体动态内存分配 ](https://www.jianshu.com/p/36cc18151e87)
+
+[C语言基础及指针⑨联合体与枚举](https://www.jianshu.com/p/0bd682066106)
+
+[C语言基础及指针⑩预编译 宏函数](https://www.jianshu.com/p/569f968bcdce)
+
+
+
+使用NDK(原生开发集：Native Development Kit)编译一个用C写的小demo，放在Android平台上通过命令行调用。
+
+NDK是一个包含API、构建工具、交叉编译、调试器、文档示例等一系列的工具集，可以帮助开发者快速开发C（或C++）的动态库，并能自动将so和java应用一起打包成APK。
+
+JNI：Java Native Interface 也就是java本地接口，它是一个协议，这个协议用来沟通java代码和本地代码(c/c++)。通过这个协议，Java类的某些方法可以使用原生实现，同时让它们可以像普通的Java方法一样被调用和使用，而原生方法也可以使用Java对象，调用和使用Java方法。也就是说，使用JNI这种协议可以实现：java代码调用c/c++代码，而c/c++代码也可以调用java代码。
+
+
+为什么要使用NDK开发呢？
+
+1.我们都知道，java是半解释型语言，很容易被反汇编后拿到源代码文件，在开发一些重要协议时，我们为了安全起见，使用C语言来编写这些重要的部分，来增大系统的安全性。
+2.在一些复杂性的计算中，要求高性能的场景中，C/C++更加的有效率，代码也更便于复用。
+
 
 **（如果要生成可以通过Java代码直接调用的so库，c代码的入口不能是main()，需要按包名改，
 如:JNIEXPORT jint JNICALL Java_com_example_jnitest_MainActivity_main() )**
@@ -40,8 +65,6 @@
 1,在项目根目录下建立文件夹libs/armeabi文件夹。最好文件夹名是armeabi，换了别的名字的话，试了一下，装上之后在data/data/程序/lib下是没有的
 
  2,将so库放入libs/armeabi文件夹注意事项： 1,如果采用静态注册的方式请注意C文件中严格按照命名规则Java_packageName_className_method()的方式命名 2,在Android项目中建立同上述命名规则中packageName中相同的包名,在此包名下建立同上述命名规则中className相同的类名 3,在className声明native方法 4,程序中加载so库System.loadLibrary(data/data/xxx.xxx.xxx/lib/xx.so)或者System.loadLibrary(xx)。这里的xx一定是方法名，即method（），不是类名或者文件名。
-
-
 
 
 ## NDK 使用
@@ -137,5 +160,14 @@ $ adb shell '/data/local/tmp/demo'
 
 
 
+## NDK编程的一个坑—Arm平台下的类型转换
 
+最近在做DNN定点化相关的工作，DNN定点化就是把float表示的模型压缩成char表示，虽然会损失精度，但是由于DNN训练的模型值比较接近且范围较小，实际上带来的性能损失非常小。DNN定点化的好处是可以以4倍的效率压缩模型，这个在移动端会具有比较大的优势。 
+做完定点化之后，在x86服务器上验证没有问题，但是利用NDK移植到arm移动端却一直得不到正确结果，真是一时头大。通过仔细调试，最终发现问题所在—所有值为负的float值定点化成char之后都变为0！在网上搜了很久终于知道这个居然是arm平台本身的问题。Arm平台下，char默认其实是unsigned char，正是由于char是无符号的，导致一个不在范围内的数被强转时会产生未定义的行为，在Stack Overflow上有一个很好的解释。 
+找到问题所在，解决方法就非常简单，强制让arm平台下的char是有符号的，具体就是在编译的时候加-fsigned-char选项。
+
+
+## ARM 优化
+
+[利用ARM NEON intrinsic优化常用数学运算 向量点积 + 指数运算](https://blog.csdn.net/yutianzuijin/article/details/79944292)
 
