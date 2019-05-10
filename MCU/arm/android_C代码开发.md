@@ -1,4 +1,5 @@
 # android_C代码开发
+[官方 NDK 入门指南](https://developer.android.google.cn/ndk/guides)
 
 [Android NDK开发(一)C语言基础语法](https://blog.csdn.net/weixin_42580207/article/details/80901614)
 
