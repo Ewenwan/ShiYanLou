@@ -1,4 +1,7 @@
 # learn python in action
+
+[Python各类图像库的图片读写方式总结](https://www.cnblogs.com/skyfsm/p/8276501.html)
+
 [Python学习手册 笔记](https://github.com/Ewenwan/python_learning_notes)
 
 [python_tutorials 教程 较全 待整合](https://github.com/Ewenwan/python_tutorials)
