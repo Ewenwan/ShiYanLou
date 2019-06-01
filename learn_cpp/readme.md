@@ -19,7 +19,7 @@
     Scott Meyers 的 Effective C++ 和 More Effective C++ 是此类佼佼，
     Herb Sutter 的 Exceptional C++ 则是後起之秀。 
     
-##  C++快速入门
+##  参考资料
 [鸡啄米：C++编程入门系列之目录和总结 ](www.jizhuomi.com/software/129.html)
 
 [++98基础上学习C++11新特性](https://www.cnblogs.com/skyfsm/p/9038814.html)
@@ -49,6 +49,8 @@
 [CPP-Data-Structures-and-Algorithms](https://github.com/Ewenwan/CPP-Data-Structures-and-Algorithms)
 
 [数据结构和算法动态可视化](https://visualgo.net/zh)
+
+[VS2010/MFC编程入门教程之目录和总结](www.jizhuomi.com/software/257.html)
 
 # 基础议题
     pointers（指针）
