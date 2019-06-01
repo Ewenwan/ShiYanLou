@@ -19,7 +19,9 @@
     Scott Meyers 的 Effective C++ 和 More Effective C++ 是此类佼佼，
     Herb Sutter 的 Exceptional C++ 则是後起之秀。 
     
-## 鱼C工作室 C++快速入门
+##  C++快速入门
+[鸡啄米：C++编程入门系列之目录和总结 ](www.jizhuomi.com/software/129.html)
+
 [++98基础上学习C++11新特性](https://www.cnblogs.com/skyfsm/p/9038814.html)
 
 [Effective Modern C++](https://github.com/Ewenwan/Effective-Modern-Cpp-Zh)
