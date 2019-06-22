@@ -46,10 +46,34 @@
   print(300)
   print(100+300)
   print('100 + 300 =', 100+300) >>> 100 + 300 = 400   # 注意,打印了空格
+  
+for i in range(1,21): # 遍历 1到 21-1的整数i
+    print(i,end='')   # 不换行打印 i
+    print(' ',end='') # 不换行打印空格
+	
+	
+	
+for i in range(1,21):    # 遍历 1到 21-1的整数i
+    if i%5 == 0:         # 当 i取余5为0时，即为5 10 15 20 时
+	print(i,end='')  # 不换行打印 i
+	print('')        # 换行
+    else:
+        print(i,end='')  # 不换行打印 i
+        print(' ',end='')# 不换行打印 空格	
+  
+  
   # 输入
   name = input()
   print(name)
   name = input('input your name: ') # 带有提示符
+  
+  
+str = input("input a number\n") #输入一个字符
+number = int(str)#字符转换成 int整数类型
+for i in range(number):# for循环遍历 0到number-1
+    if i%2==0:         # 偶数的话，取余2为0
+        print(i)       # 符合条件打印数字
+  
   
 ```
 > 注意点
