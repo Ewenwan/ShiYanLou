@@ -1,4 +1,4 @@
-# arm 学习
+https://wenku.baidu.com/view/72c12e4133687e21af45a990.html# arm 学习
 [ARM](https://www.cnblogs.com/lvdongjie/category/975651.html)
 
 [ARMv8 架构与指令集.学习笔记](https://www.cnblogs.com/lvdongjie/p/6644821.html)
@@ -8,6 +8,9 @@
 [嵌入式 arm linux c编程](https://github.com/PacktPublishing/Mastering-Embedded-Linux-Programming-Second-Edition)
 
 [linux 设备驱动开发](https://github.com/PacktPublishing/Linux-Device-Drivers-Development)
+
+[ARM内嵌汇编示例](https://wenku.baidu.com/view/72c12e4133687e21af45a990.html)
+
 
 # ARM与单片机到底有啥区别
 
