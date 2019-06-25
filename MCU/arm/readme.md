@@ -1,4 +1,4 @@
-https://wenku.baidu.com/view/72c12e4133687e21af45a990.html# arm 学习
+# arm 学习
 [ARM](https://www.cnblogs.com/lvdongjie/category/975651.html)
 
 [ARMv8 架构与指令集.学习笔记](https://www.cnblogs.com/lvdongjie/p/6644821.html)
