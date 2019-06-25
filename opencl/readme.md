@@ -223,7 +223,7 @@ cl_mem res_d = clCreateBuffer(context, CL_MEM_WRITE_ONLY, mem_size, NULL, &error
 ```
 
 
-### 程序和kernel
+### 编译 程序和kernel
 
 到现在为止，你可能会问自己一些问题，比如：我们怎么调用kernel？编译器怎么知道如何将代码放到设备上？我们怎么编译kernel？
 下面是我们在对比OpenCL程序和OpenCL kernel时的一些容易混乱的概念：
@@ -265,3 +265,145 @@ cl_int clGetProgramBuildInfo (cl_program program,
 		    void *param_value, // The answer
 		    size_t *param_value_size_ret);
 ```
+
+最后，我们需要“提取”program的入口点。使用cl_kernel：
+
+```c
+cl_kernel clCreateKernel (cl_program program, // The program where the kernel is
+
+const char *kernel_name, // The name of the kernel, i.e. the name of the kernel function as it's declared in the code
+
+cl_int *errcode_ret);
+```
+
+
+注意我们可以创建多个OpenCL program，每个program可以拥有多个kernel。
+
+```c
+// 创建程序
+// Uses NVIDIA helper functions to get the code string and it's size (in bytes)
+size_t src_size = 0;
+const char* path = shrFindFilePath("vector_add_gpu.cl", NULL);
+const char* source = oclLoadProgSource(path, "", &src_size);
+cl_program program = clCreateProgramWithSource(context, 1, &source, &src_size, &error);
+assert(error == CL_SUCCESS);
+
+// 编译程序
+error = clBuildProgram(program, 1, &device, NULL, NULL, NULL);
+assert(error == CL_SUCCESS);
+
+// 查看编译日志
+char* build_log;
+size_t log_size;
+// First call to know the proper size
+clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
+build_log = new char[log_size+1];
+// Second call to get the log
+clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, log_size, build_log, NULL);
+build_log[log_size] = '\0';
+cout << build_log << endl;
+delete[] build_log;
+
+// 提取编译好的kernel
+cl_kernel vector_add_kernel = clCreateKernel(program, "vector_add_gpu", &error);
+assert(error == CL_SUCCESS);
+
+```
+
+
+### 运行 kernel
+
+一旦我们的kernel建立好，我们就可以运行它。
+
+首先，我们必须设置kernel的参数
+
+```c
+cl_int clSetKernelArg (cl_kernel kernel, // Which kernel
+    cl_uint arg_index, // Which argument
+    size_t arg_size, // Size of the next argument (not of the value pointed by it!)
+    const void *arg_value);// Value
+ ```
+ 
+每个参数都需要调用一次这个函数。
+
+当所有参数设置完毕，我们就可以调用这个kernel：
+
+```c
+cl_int  clEnqueueNDRangeKernel (
+	cl_command_queue command_queue, 
+	cl_kernel kernel, 
+	cl_uint  work_dim,    // Choose if we are using 1D, 2D or 3D work-items and work-groups
+	const size_t *global_work_offset,
+	const size_t *global_work_size,   // The total number of work-items (must have work_dim dimensions)
+	const size_t *local_work_size,     // The number of work-items per work-group (must have work_dim dimensions)
+	cl_uint num_events_in_wait_list, 
+	const cl_event *event_wait_list, 
+	cl_event *event);
+```
+运行实例：
+
+```c
+// 设置kernel的参数 Enqueuing parameters
+// Note that we inform the size of the cl_mem object, not the size of the memory pointed by it
+error = clSetKernelArg(vector_add_k, 0, sizeof(cl_mem), &src_a_d);
+error |= clSetKernelArg(vector_add_k, 1, sizeof(cl_mem), &src_b_d);
+error |= clSetKernelArg(vector_add_k, 2, sizeof(cl_mem), &res_d);
+error |= clSetKernelArg(vector_add_k, 3, sizeof(size_t), &size);
+assert(error == CL_SUCCESS);
+
+// 启动kernel Launching kernel
+const size_t local_ws = 512;    // Number of work-items per work-group
+// shrRoundUp returns the smallest multiple of local_ws bigger than size
+const size_t global_ws = shrRoundUp(local_ws, size);    // Total number of work-items
+error = clEnqueueNDRangeKernel(queue, vector_add_k, 1, NULL, &global_ws, &local_ws, 0, NULL, NULL);
+assert(error == CL_SUCCESS);
+
+
+```
+
+
+
+### 读取结果
+
+
+读取结果非常简单。与之前讲到的写入内存（设备内存）的操作相似，现在我们需要存入队列一个读取缓冲区的操作：
+```c
+cl_int  clEnqueueReadBuffer (cl_command_queue command_queue, 
+                      cl_mem buffer,   // from which buffer
+                      cl_bool blocking_read,   // whether is a blocking or non-blocking read
+                      size_t offset,   // offset from the beginning
+                      size_t cb,   // size to be read (in bytes)
+                      void *ptr,   // pointer to the host memory
+                      cl_uint num_events_in_wait_list,
+                      const cl_event *event_wait_list, 
+                      cl_event *event);
+ ```
+ 
+使用方法如下：
+
+```c
+// Reading back
+float* check = new float[size];
+clEnqueueReadBuffer(queue, res_d, CL_TRUE, 0, mem_size, check, 0, NULL, NULL);
+```
+
+
+清理
+作为一名牛X的程序员我们肯定要考虑如何清理内存！
+你需要知道最基本东西：使用clCreate申请的（缓冲区、kernel、队列）必须使用clRelease释放。
+代码如下：
+```c
+// cpu 上内存清理
+delete[] src_a_h;
+delete[] src_b_h;
+delete[] res_h;
+delete[] check;
+// gpu上内存清理
+clReleaseKernel(vector_add_k);
+clReleaseCommandQueue(queue);
+clReleaseContext(context);
+clReleaseMemObject(src_a_d);
+clReleaseMemObject(src_b_d);
+clReleaseMemObject(res_d);
+````
+
