@@ -38,7 +38,7 @@ ND-Range： 跟CUDA中的网格是同一个概念，定义了Work-group的组织
 上下文（Context）： 定义了整个OpenCL的运行环境，包括Kernel、Device、程序对象和内存对象：
 
 设备：OpenCL程序调用的计算设备。
-
+Device（设备）：通过cl_device来表现，使用下面的代码：
 内核：在计算设备上执行的并行程序。
 
 程序对象：内核程序的源代码(.cl文件)和可执行文件。
@@ -60,4 +60,88 @@ ND-Range： 跟CUDA中的网格是同一个概念，定义了Work-group的组织
       10）将内核发送给命令队列，执行内核–>clEnqueueNDRangeKernel
       11）获取计算结果–>clEnqueueReadBuffer
       12）释放资源–>clReleaseXX**
+
+## 示例 
+> 向量相加
+```c
+// c 语言版本
+void vector_add_cpu (const float* src_a, // 向量a, 常量指针
+                     const float* src_b,
+                     float*  res,        // 结果向量
+                     const int num)      // 数据数量
+{
+   for (int i = 0; i < num; i++)
+      res[i] = src_a[i] + src_b[i];      // 一个线程在做
+}
+
+// gpu kernel版本
+// 在GPU上，逻辑就会有一些不同。我们使每个线程计算一个元素的方法来代替cpu程序中的循环计算。每个线程的index与要计算的向量的index相同。
+__kernel void vector_add_gpu (__global const float* src_a, // gpu 上的 常量指针 数据
+                              __global const float* src_b,
+                              __global float* res,
+                              const int num)
+{
+   /* get_global_id(0) 返回正在执行的这个线程的ID。
+   许多线程会在同一时间开始执行同一个kernel，
+   每个线程都会收到一个不同的ID，所以必然会执行一个不同的计算。*/
+   const int idx = get_global_id(0);
+
+   /* 每个work-item都会检查自己的id是否在向量数组的区间内[0~num)。
+   如果在，work-item就会执行相应的计算。*/
+   if (idx < num)
+      res[idx] = src_a[idx] + src_b[idx];
+}
+```
+
+> 主机 准备工作 建立基本OpenCL运行环境
+
+Plantform（平台）：主机加上OpenCL框架管理下的若干设备构成了这个平台，通过这个平台，应用程序可以与设备共享资源并在设备上执行kernel。平台通过cl_plantform来展现，可以使用下面的代码来初始化平台：
+
+```c
+// Returns the error code 
+// 获取平台ID
+cl_int oclGetPlatformID (cl_platform_id *platforms) // Pointer to the platform object
+
+```
+
+Device（设备）：通过cl_device来表现，使用下面的代码：
+
+```C
+// Returns the error code
+// 获取设备ID
+cl_int clGetDeviceIDs (cl_platform_id platform,
+	cl_device_type device_type, // Bitfield identifying the type. For the GPU we use CL_DEVICE_TYPE_GPU
+	cl_uint num_entries, // Number of devices, typically 1
+	cl_device_id *devices, // Pointer to the device object
+	cl_uint *num_devices) // Puts here the number of devices matching the device_type
+
+```
+
+Context（上下文）：定义了整个OpenCL化境，包括OpenCL kernel、设备、内存管理、命令队列等。上下文使用cl_context来表现。使用以下代码初始化：
+
+```c
+// Returs the context
+// 创建上下文 环境
+cl_context clCreateContext (const cl_context_properties *properties, // Bitwise with the properties (see specification)
+
+	cl_uint num_devices, // Number of devices
+	const cl_device_id *devices, // Pointer to the devices object
+	void (*pfn_notify)(const char *errinfo, const void *private_info, size_t cb, void *user_data), // (don't worry about this)
+	void *user_data, // (don't worry about this)
+	cl_int *errcode_ret) // error code result
+```
+
+Command-Queue（指令队列）：就像它的名字一样，他是一个存储需要在设备上执行的OpenCL指令的队列。“指令队列建立在一个上下文中的指定设备上。多个指令队列允许应用程序在不需要同步的情况下执行多条无关联的指令。”
+
+```c
+// 创建指令队列
+cl_command_queue clCreateCommandQueue (cl_context context,
+	cl_device_id device,
+	cl_command_queue_properties properties, // Bitwise with the properties
+	cl_int *errcode_ret) // error code result
+```
+
+> 综合示例
+
+
 
