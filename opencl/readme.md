@@ -184,7 +184,11 @@ cl_platform_id platform;   // 平台id
 cl_device_id device;       // 设别id
 cl_context context;        // 上下文环境
 cl_command_queue queue;    // 指令队列
-
+主要分为host memory和device memory。而device memory 一共有4种内存：
+private memory：是每个work-item各自私有
+local memory: 在work-group里的work-item共享该内存
+global memory: 所有memory可访问
+constant memory: 所有memory可访问，只读，host负责初始化
 // Platform 获取平台id
 error = oclGetPlatformID(&platform);
 if (error != CL_SUCCESS) {
@@ -214,6 +218,62 @@ if (error != CL_SUCCESS) {
 ```
 
 ### 变量内存分配
+
+#### 内存模型  Memory Model
+
+不同平台的内存模型不一样，为了可移植性，OpenCL定义了一个抽象模型，程序的实现只需要关注抽象模型，而具体的向硬件的映射由驱动来完成。
+
+主要分为host memory和device memory。而device memory 一共有4种内存：
+
+	private memory：是每个work-item各自私有
+	local memory: 在work-group里的work-item共享该内存
+	global memory: 所有memory可访问
+	constant memory: 所有memory可访问，只读，host负责初始化
+
+#### Program Model
+
+OpenCL支持数据并行，任务并行编程，同时支持两种模式的混合。
+
+分散收集（scatter-gather）：数据被分为子集，发送到不同的并行资源中，然后对结果进行组合，也就是数据并行；如两个向量相加，对于每个数据的+操作应该都可以并行完成。
+
+分而治之（divide-and-conquer）：问题被分为子问题，在并行资源中运行，也就是任务并行；比如多CPU系统，每个CPU执行不同的线程。还有一类流水线并行，也属于任务并行。流水线并行，数据从一个任务传送到另外一个任务中，同时前一个任务又处理新的数据，即同一时刻，每个任务都在同时运行。
+
+#### 并行编程就要考虑到数据的同步与共享问题。
+
+in-order vs out-of-order:
+
+创建命令队列时，如果没有为命令队列设置 CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE 属性，提交到命令队列的命令将按照 in-order 的方式执行。
+
+OpenCL支持两种同步：
+
+同一工作组内(work-group)工作项(work-item)的同步(实现方式barrier)：
+reduction的实现中，需要进行数据同步，所谓reduction就是使用多个数据生成一个数据，如tensorflow中的reduce_mean, reduce_sum等。在执行reduce之前，必须保证这些数据已经是有效的，执行过的，
+
+命令队列中处于同一个上下文中的命令的同步(使用clWaitForEvents，clEnqueueMarker, clEnqueueBarrier 或者执行kernel时加入等待事件列表)。
+
+有2种方式同步：
+
+锁（Locks）：在一个资源被访问的时候，禁止其他访问；
+
+栅栏（Barriers）：在一个运行点中进行等待，直到所有运行任务都完成；（典型的BSP编程模型就是这样）
+
+数据共享：
+
+（1）shared memory
+
+当任务要访问同一个数据时，最简单的方法就是共享存储shared memory（很多不同层面与功能的系统都有用到这个方法），大部分多核系统都支持这一模型。shared memory可以用于任务间通信，可以用flag或者互斥锁等方法进行数据保护，它的优缺点：
+
+优点：易于实现，编程人员不用管理数据搬移；
+
+缺点：多个任务访问同一个存储器，控制起来就会比较复杂，降低了互联速度，扩展性也比较不好。
+
+（2）message passing
+
+数据同步的另外一种模型是消息传递模型，可以在同一器件中，或者多个数量的器件中进行并发任务通信，且只在需要同步时才启动。
+
+优点：理论上可以在任意多的设备中运行，扩展性好；
+
+缺点：程序员需要显示地控制通信，开发有一定的难度；发送和接受数据依赖于库方法，因此可移植性差。
 
 ```c
 // 主机 端  内存分配
