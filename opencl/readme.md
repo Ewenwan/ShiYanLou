@@ -135,8 +135,19 @@ Plantform（平台）：主机加上OpenCL框架管理下的若干设备构成�
 ```c
 // Returns the error code 
 // 获取平台ID
-cl_int oclGetPlatformID (cl_platform_id *platforms) // Pointer to the platform object
+cl_int oclGetPlatformIDs(输入数量,cl_platform_id *platforms,平台数量指针) // Pointer to the platform object
 
+// 获取平台数量
+clGetPlatformIDs(0,NULL,&plat_num);
+// 获取平台id
+cl_platform_id platforms[5]={0};
+oclGetPlatformIDs(plat_num,platforms,NULL)
+// 取第一个
+cl_platform_id * plat_form = platforms[0];
+
+
+// 获取平台名
+clGetPlatformInfo(,CL_DEVICE_NAME/CL_DEVICE_VERSION/CL_DEVICE_MAX_COMPUTE_UNITS/..,)
 ```
 
 Device（设备）：通过cl_device来表现，使用下面的代码：
@@ -150,6 +161,16 @@ cl_int clGetDeviceIDs (cl_platform_id platform,
 	cl_device_id *devices, // Pointer to the device object
 	cl_uint *num_devices) // Puts here the number of devices matching the device_type
 
+// 获取平台设备数量
+clGetDeviceIDs(*plat_form, CL_DEVICE_TYPE_GPU,0,NULL,&DeviceNmus);
+// 获取设备
+cl_device_id devices[5] = {0};
+clGetDeviceIDs(*plat_form, CL_DEVICE_TYPE_GPU,DeviceNmus,devices,NULL);
+// 取第一个
+cl_device_id *device = devices[0];
+
+
+
 ```
 
 Context（上下文）：定义了整个OpenCL化境，包括OpenCL kernel、设备、内存管理、命令队列等。上下文使用cl_context来表现。使用以下代码初始化：
@@ -157,12 +178,12 @@ Context（上下文）：定义了整个OpenCL化境，包括OpenCL kernel、设
 ```c
 // Returs the context
 // 创建上下文 环境
-cl_context clCreateContext (const cl_context_properties *properties, // Bitwise with the properties (see specification)
-
-	cl_uint num_devices, // Number of devices
-	const cl_device_id *devices, // Pointer to the devices object
-	void (*pfn_notify)(const char *errinfo, const void *private_info, size_t cb, void *user_data), // (don't worry about this)
-	void *user_data, // (don't worry about this)
+cl_context clCreateContext (
+        const cl_context_properties *properties, // 优先权 Bitwise with the properties (see specification)
+	cl_uint num_devices,                     // 使用的设备数量 Number of devices
+	const cl_device_id *devices,             // 上面获取的设备id指针  Pointer to the devices object
+	void (*pfn_notify)(const char *errinfo, const void *private_info, size_t cb, void *user_data), //NULL指针(don't worry about this)
+	void *user_data,                         // NULL 指针 (don't worry about this)
 	cl_int *errcode_ret) // error code result
 ```
 
@@ -170,9 +191,10 @@ Command-Queue（指令队列）：就像它的名字一样，他是一个存储�
 
 ```c
 // 创建指令队列
-cl_command_queue clCreateCommandQueue (cl_context context,
-	cl_device_id device,
-	cl_command_queue_properties properties, // Bitwise with the properties
+cl_command_queue clCreateCommandQueue (
+        cl_context context,   // 上面创建的 上下文环境
+	cl_device_id device,  // 设备id
+	cl_command_queue_properties properties, // 优先权 0 Bitwise with the properties
 	cl_int *errcode_ret) // error code result
 ```
 
@@ -344,10 +366,10 @@ Program：OpenCL Program由kernel函数、其他函数和声明组成。它通�
 
 ```c
 // Returns the OpenCL program
-cl_program clCreateProgramWithSource (cl_context context,
-				     cl_uint count, // number of files
-				     const char **strings, // array of strings, each one is a file
-				     const size_t *lengths, // array specifying the file lengths
+cl_program clCreateProgramWithSource (cl_context context,  // 上面创建的 上下文
+				     cl_uint count,        // 需要编译的文件数量 number of files
+				     const char **strings, // 从文件读取的字符数组指针 带有\0结束符 array of strings, each one is a file
+				     const size_t *lengths, // 源码字符串长度 array specifying the file lengths
 				     cl_int *errcode_ret) // error code to be returned
 
 ```
@@ -355,12 +377,12 @@ cl_program clCreateProgramWithSource (cl_context context,
 当我们创建了Program我们可以用下面的函数执行 编译 操作：
 
 ```c
-cl_int clBuildProgram (cl_program program,
-    cl_uint num_devices,
-    const cl_device_id *device_list,
-    const char *options, // Compiler options, see the specifications for more details
-    void (*pfn_notify)(cl_program, void *user_data),
-    void *user_data);
+cl_int clBuildProgram (cl_program program, // 上面创建的程序
+    cl_uint num_devices,                   // 使用的设备数量
+    const cl_device_id *device_list,       // 上面获取的设备id列表指针
+    const char *options,                   // 编译选项 Compiler options, see the specifications for more details
+    void (*pfn_notify)(cl_program, void *user_data), // NULL 空指针
+    void *user_data); // NULL 空指针
 ```
 
 查看编译log，必须使用下面的函数：
@@ -656,7 +678,7 @@ delete[] src_b_h;
 delete[] res_h;
 delete[] check;
 // gpu上内存清理
-clReleaseKernel(vector_add_k);
+clReleaseKernel(vector_add_k);   // 有先后顺序，后创建的先释放!!!!
 clReleaseCommandQueue(queue);
 clReleaseContext(context);
 clReleaseMemObject(src_a_d);
