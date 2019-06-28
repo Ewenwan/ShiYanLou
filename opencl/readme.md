@@ -12,7 +12,7 @@ CUDA只支持NVIDIA自家的GPU。
 CUDA C语言与OpenCL的定位不同，或者说是使用人群不同。CUDA C是一种高级语言，那些对硬件了解不多的非专业人士也能轻松上手；而OpenCL则是针对硬件的应用程序开发接口，它能给程序员更多对硬件的控制权，相应的上手及开发会比较难一些。
 
 
-CUDA 与 opencl 名词比较：
+> **CUDA 与 opencl 名词比较：**
 
 	Block: 相当于 opencl 中的work-group
 	Thread：相当于opencl 中的work-item
@@ -20,6 +20,43 @@ CUDA 与 opencl 名词比较：
 	SM: 相当于opencl 中的CU
 	warp: 相当于opencl 中的wavefront(简称wave)，基本的调试单位
 
+> **Host端基本是串行的，CUDA和OpenCL的差别主要表现在调用Device的API的差异。** 	
+		
+C Runtime for CUDA	CUDA Driver API	      OpenCL API
+
+1. Setup 环境初始化	
+
+	        Initialize driver 	Initialize plauorm 
+	        Get device(s) 	        Get devices 
+	        (Choose device) 	Choose device 
+	         Create context	        Create context 
+		                        Create command queue		
+2. Device and host memory buffer setup内存初始化		
+
+       Allocate host memory 	                Allocate host memory 	                Allocate host memory 
+       Allocate device memory for input 	Allocate device memory for input 	Allocate device memory for input       
+       Copy host memory to device memory 	Copy host memory to device memory 	Copy host memory to device memory 
+       Allocate device memory for result	Allocate device memory for result	Allocate device memory for result
+
+3. Initialize kernel 初始化内核函数程序	
+
+	       Load kernel module	Load kernel source     
+	       (Build program)	        Create program object
+	       Get module function	Build program
+		                        Create kernel object bound to kernel function
+4. Execute the kernel 执行内核函数程序	
+
+       Setup execution configuration	Setup kernel arguments 	Setup kernel arguments 
+       Invoke the kernel (directly with its parameters)	Setup execution configuration 	Setup execution configuration
+	                                Invoke the kernel	Invoke the kernel
+				 
+5. Copy results to host 拷贝结果到主机	
+
+       Copy results from device memory	Copy results from device memory	Copy results from device memory
+
+6. Cleanup 善后清理	
+
+       Cleanup all set up above 	Cleanup all set up above	Cleanup all set up above
 
 
 ## 框架组成
