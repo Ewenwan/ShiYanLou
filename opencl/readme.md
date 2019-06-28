@@ -436,15 +436,14 @@ cl_int clGetProgramBuildInfo (cl_program program,
 最后，我们需要“提取”program的入口点。使用cl_kernel：
 
 ```c
-cl_kernel clCreateKernel (cl_program program, // The program where the kernel is
-
-const char *kernel_name, // The name of the kernel, i.e. the name of the kernel function as it's declared in the code
-
-cl_int *errcode_ret);
+cl_kernel clCreateKernel (
+            cl_program program,      //  clBuildProgram 编译好的程序 program
+            const char *kernel_name, //  kernel 函数名 xxx.cl文件内
+            cl_int *errcode_ret);
 ```
 
 
-注意我们可以创建多个OpenCL program，每个program可以拥有多个kernel。
+注意我们可以创建多个OpenCL program，每个program可以拥有多个kernel函数。
 
 ```c
 // 创建程序
@@ -471,7 +470,7 @@ build_log[log_size] = '\0';
 cout << build_log << endl;
 delete[] build_log;
 
-// 提取编译好的kernel
+// 提取编译好的kernel   vector_add_gpu 是 vector_add_gpu.cl 文件中的一个函数名
 cl_kernel vector_add_kernel = clCreateKernel(program, "vector_add_gpu", &error);
 assert(error == CL_SUCCESS);
 
@@ -485,10 +484,11 @@ assert(error == CL_SUCCESS);
 首先，我们必须设置kernel的参数
 
 ```c
-cl_int clSetKernelArg (cl_kernel kernel, // Which kernel
-    cl_uint arg_index, // Which argument
-    size_t arg_size, // Size of the next argument (not of the value pointed by it!)
-    const void *arg_value);// Value
+cl_int clSetKernelArg (
+    cl_kernel kernel,  // clCreateKernel 创建的 kernel
+    cl_uint arg_index, // 参数id
+    size_t arg_size,   // sizeof(参数)  参数的大小
+    const void *arg_value);// 参数地址
  ```
  
 每个参数都需要调用一次这个函数。
@@ -539,6 +539,9 @@ const size_t local_ws = 512;    // Number of work-items per work-group
 const size_t global_ws = shrRoundUp(local_ws, size);    // Total number of work-items
 error = clEnqueueNDRangeKernel(queue, vector_add_k, 1, NULL, &global_ws, &local_ws, 0, NULL, NULL);
 assert(error == CL_SUCCESS);
+
+// clWaitForEvents()
+
 
 
 ```
