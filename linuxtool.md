@@ -80,7 +80,8 @@
     2.4-测试运行以下命令来显示一下共享出来的目录：
         showmount -e
 
-
+    !!!需要修改 远程挂载目录 /home/ewenwan/nfs的权限   chmod 777  /home/ewenwan/nfs   !!!!!!!
+    
     ## 客户端访问配置
 
 
