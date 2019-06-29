@@ -103,6 +103,7 @@
 ### 远程 命令行登陆服务器 shell
 [Xmanager 服务器远程控制程序 ](https://www.netsarang.com/products/xme_overview.html)
 
+[putty ssh远程登录 命令行shell](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html)
  
 # 三、 linux配置
 [ubuntu大法-快速翻墙装驱动配置开发环境](https://github.com/DragonFive/myblog/blob/master/source/_posts/nvidiaDriverInstall.md)
