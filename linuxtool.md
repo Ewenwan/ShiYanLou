@@ -46,8 +46,11 @@
 ### 2、修改配置文件   
     sudo vim /etc/exports
 
-    修改内容如下：
+    修改添加内容如下：
     /home *(rw,sync,no_root_squash)
+    
+    更长 ：
+    /home/ewenwan/nfs *(insecure,rw,sync,nohide,no_root_squash,no_subtree_check)
 
     /home   ：共享的目录
     *       ：指定哪些用户可以访问
