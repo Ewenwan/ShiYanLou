@@ -381,6 +381,38 @@ host_ptr只有在CL_MEM_USE_HOST_PTR， CL_MEM_COPY_HOST_PTR时才有效。
 对于输出参数，使用CL_MEM_WRITE_ONLY表示device只写，位置在device上，host权限为可读可写。
 如果进行host与device之间的内存传递，可以使用clEnqueueReadBuffer读取device上的内存到host上, clEnqueueWriteBuffer可以将host上内存写到device上。
 
+
+
+
+创建一个ImageBuffer:
+cl_mem clCreatImage()
+参数
+context
+flags, 同clCreateBuffer里的flags
+image_format, 图像的属性，包含两个变量: image_channel_order, 指定通道数和形式，通常为RGBA；image_channel_data_type, 定义数据类型， CL_UNORM_INT8表示为unsigned规一化的INT8，CL_UNSIGNED_INT8
+表示 为非规一化的unsigned int8
+image_desc, 定义图像的维度大小，
+host_ptr, 输入图像地址
+errorce_ret, 返回状态
+
+
+写一个ImageBuffer:
+cl_mem clEnqueueWriteImage()
+参数：
+command_queue
+image, 目标图像
+block_writing, 是否阻塞，如果TRUE，则阻塞
+origin, 图像的偏移，通常为（0, 0, 0）
+region, 图像的区域，(width, height, depth)
+input_row_pitch，每行字节数，可能有对齐；如果设为0,则程序根据每个像素的字节数 乘以 width 计算
+input_slice_pitch，3D图像的2D slice块，如果是1D或2D图像，这个值必须为0
+ptr, host端输入源图像地址
+num_events_in_wait_list, 需等待事件个数
+evnet_wait_list, 需要等待的事件列表
+event, 返回这个命令的事件，用于后续使用
+
+
+cl_mem clCreatImage2D()
 */
 
 // 使用
