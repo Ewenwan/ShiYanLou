@@ -98,7 +98,7 @@ Device（设备）：通过cl_device来表现，使用下面的代码：
 内存对象：计算设备执行OpenCL程序所需的变量。
 
 ## 编写OpenCL程序的基本步骤
-    0. 载入opencl库
+    0. 载入opencl库  (这种方法可使得程序在编译时脱离OpenCL库)
        handel = dlopen("dlOpenCL.so",其他参数); // 打开so共享库
        dlsym(handel,#func_name)                // 注册库内部的函数
     1. 检测申请计算资源 （初始化，一般只需要执行一次）
