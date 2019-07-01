@@ -98,11 +98,16 @@ Device（设备）：通过cl_device来表现，使用下面的代码：
 内存对象：计算设备执行OpenCL程序所需的变量。
 
 ## 编写OpenCL程序的基本步骤
-    1. 检测申请计算资源
-      1）获取平台–>clGetPlatformIDs
-      2）从平台中获取设备–>clGetDeviceIDs
-      3）创建上下文–>clCreateContext
-      4）创建命令队列–>clCreateCommandQueue
+    0. 载入opencl库
+       handel = dlopen("dlOpenCL.so",其他参数); // 打开so共享库
+       dlsym(handel,#func_name)                // 注册库内部的函数
+    1. 检测申请计算资源 （初始化，一般只需要执行一次）
+      1）获取平台 –>      clGetPlatformIDs   先获取平台数量，再获取平台id列表
+      2）从平台中获取设备–>clGetDeviceIDs     先获取设备数量，再获取设备id列表
+                         clGetDeviceInfo     获取设备信息(名字 版本 最大计算单元 全局内存缓冲区大小等信息)
+      3）创建上下文–>     clCreateContext
+      4）创建命令队列–>   clCreateCommandQueue
+      
       前面为 平台层，后面为 运行时层
       5）创建缓存->clCreateBuffer
     2. 拷贝主机数据到设备device  clCreateBuffer
