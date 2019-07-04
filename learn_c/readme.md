@@ -65,6 +65,8 @@ gtest是一个跨平台的(Liunx、Mac OS X、Windows、Cygwin、Windows CE and 
 
 https://www.cnblogs.com/helloworldcode/p/9606838.html
 
+https://www.cnblogs.com/coderzh/category/183698.html
+
 # 1. 关键字 
 ```c
 * 1. auto 自动变量声明 
