@@ -15,7 +15,7 @@
 
 [Shell脚本学习笔记](https://github.com/mylxsw/growing-up/blob/master/doc/Shell%E8%84%9A%E6%9C%AC%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.md)
 
-[]()
+[LinuxShell命令行及脚本编程实例详解 推荐 百度下载 ](https://pan.baidu.com/s/1fSvfu4CD-R5BSdqrQdBpVw)
 
 # 文本分析
 ```sh
