@@ -17,6 +17,7 @@
 
 [LinuxShell命令行及脚本编程实例详解 推荐 百度下载 ](https://pan.baidu.com/s/1fSvfu4CD-R5BSdqrQdBpVw)
 
+[LinuxShell命令行及脚本编程实例详解 推荐 CSDN下载](https://download.csdn.net/download/test0037/10571213)
 # 文本分析
 ```sh
 cat demo.log | awk '
