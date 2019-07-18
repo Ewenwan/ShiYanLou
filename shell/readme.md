@@ -1,4 +1,6 @@
 # shell 编程
+[window 下 从零开始——PowerShell应用入门（全例子入门讲解） ](https://www.cnblogs.com/lavender000/p/6935589.html)
+
 [参考代码1](https://github.com/Ewenwan/Linux_Code_Test/tree/master/Samples_Shell)
 
 [参考代码2](https://github.com/keyboard-man/c_cpp/tree/master/boost)
@@ -18,6 +20,8 @@
 [LinuxShell命令行及脚本编程实例详解 推荐 百度下载 ](https://pan.baidu.com/s/1fSvfu4CD-R5BSdqrQdBpVw)
 
 [LinuxShell命令行及脚本编程实例详解 推荐 CSDN下载](https://download.csdn.net/download/test0037/10571213)
+
+
 # 文本分析
 ```sh
 cat demo.log | awk '
