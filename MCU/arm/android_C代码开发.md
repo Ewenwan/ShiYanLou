@@ -15,6 +15,8 @@
 
 [linux安装android NDK](https://blog.csdn.net/zmlovelx/article/details/80262979)
 
+[Windows 下编译ncnn的android端的库](www.voidcn.com/article/p-cyxkeoaj-bpp.html)
+
 使用NDK(原生开发集：Native Development Kit)编译一个用C写的小demo，放在Android平台上通过命令行调用。
 
 NDK是一个包含API、构建工具、交叉编译、调试器、文档示例等一系列的工具集，可以帮助开发者快速开发C（或C++）的动态库，并能自动将so和java应用一起打包成APK。
