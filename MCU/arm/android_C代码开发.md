@@ -15,7 +15,7 @@
 
 [linux安装android NDK](https://blog.csdn.net/zmlovelx/article/details/80262979)
 
-[Windows 下编译ncnn的android端的库](www.voidcn.com/article/p-cyxkeoaj-bpp.html)
+[Windows 下编译ncnn的android端的库](http://www.voidcn.com/article/p-cyxkeoaj-bpp.html)
 
 使用NDK(原生开发集：Native Development Kit)编译一个用C写的小demo，放在Android平台上通过命令行调用。
 
