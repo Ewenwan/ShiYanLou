@@ -13,7 +13,7 @@
 
 [C语言基础及指针⑩预编译 宏函数](https://www.jianshu.com/p/569f968bcdce)
 
-
+[linux安装android NDK](https://blog.csdn.net/zmlovelx/article/details/80262979)
 
 使用NDK(原生开发集：Native Development Kit)编译一个用C写的小demo，放在Android平台上通过命令行调用。
 
