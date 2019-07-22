@@ -161,7 +161,58 @@ $ adb shell 'chmod 777 /data/local/tmp/demo'
 
 $ adb shell '/data/local/tmp/demo'
 
+```
+Android adb命令
 
+1. 查看设备
+adb devices
+这个命令是查看当前连接的设备, 连接到计算机的android设备或者模拟器将会列出显示
+
+2. 安装软件
+adb install
+这个命令将指定的apk文件安装到设备上
+
+3. 卸载软件
+adb uninstall <软件名>
+adb uninstall -k <软件名>
+如果加 -k 参数,为卸载软件但是保留配置和缓存文件.
+
+4. 登录设备shell
+adb shell
+adb shell
+这个命令将登录设备的shell.
+后面加将是直接运行设备命令, 相当于执行远程命令
+
+5. 从电脑上发送文件到设备
+adb push <本地路径> <远程路径>
+用push命令可以把本机电脑上的文件或者文件夹复制到设备(手机)
+
+6. 从设备上下载文件到电脑
+adb pull <远程路径> <本地路径>
+用pull命令可以把设备(手机)上的文件或者文件夹复制到本机电脑
+
+7. 显示帮助信息
+adb help
+这个命令将显示帮助信息
+
+8.删除文件和文件夹
+tools>adb remount 
+tools>adb shell 
+#su 
+#cd system/sd/data //进入系统内指定文件夹 
+#ls //列表显示当前文件夹内容 
+#rm -r xxx //删除名字为xxx的文件夹及其里面的所有文件 
+#rm xxx //删除文件xxx 
+#rmdir xxx //删除xxx的文件夹
+
+9.使用mkdir命令新建文件夹。例如：mkdir images
+到此，文件夹已经新建完成，到eclipse中的DDMS中查看，打开新建文件夹的位置，可以看到，新建的文件夹已经存在该目录中。
+
+10.通过adb命令 发送坐标给模拟器
+
+（1）在DDMS下通过设置经纬度并send，则在该模拟器中可以得到该经纬度，并且该模拟器下所有应用都以之为本机的经纬度 
+（2）有些 情况下不支持在DDMS中设置经纬度，因此需要通过cmd下telnet localhost 5444来进入5444这个模拟器（这个数字可能会变化）——注意在win7下telnet服务是没有打开的，于是要进入控制面板/程序/打开或关闭 windows功能/勾选telnet服务端和客户端来启动telnet服务。然后再使用geo fix 经度 纬度的形式设置经纬度达到同样效果。
+```
 
 ## NDK编程的一个坑—Arm平台下的类型转换
 
