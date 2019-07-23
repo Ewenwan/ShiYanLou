@@ -1,6 +1,8 @@
 # mekefile 编写
 [参考](https://github.com/Ewenwan/Linux_Code_Test/tree/master/Samples_Make)
 
+[Linux下使用  autoconf和automake 自动构建 项目 make file文件](https://www.cnblogs.com/codingking/p/4381160.html)
+
 # 示例
 ```make
 # 变量定义 ( = or := )
