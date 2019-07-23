@@ -13,6 +13,9 @@
 
 [Unix环境高级编程 代码&学习笔记](https://github.com/Ewenwan/APUE)
 
+[ubuntu deb软件包搜索下载](https://packages.ubuntu.com/)
+
+
 # 操作系统启动过程
 	1. bootloader bootasm.S 使能A20 加载全局描述符表GDT 使能并进入保护模式　调用bootmain
 	2. bootmain.c 从硬盘读取ELF格式的os，以程序块格式存入内存,跳转到 操作系统入口函数处, kern/init.c中的kern_init函数
