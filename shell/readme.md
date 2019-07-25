@@ -1,4 +1,4 @@
- # shell 编程
+# shell 编程
 [window 下 从零开始——PowerShell应用入门（全例子入门讲解） ](https://www.cnblogs.com/lavender000/p/6935589.html)
 
 [参考代码1](https://github.com/Ewenwan/Linux_Code_Test/tree/master/Samples_Shell)
@@ -24,6 +24,11 @@
 
 # awk 文本分析
 ```sh
+# cat demo.log
+2011-08-23 19:57:00,610 [] INFO  bo.CommodityCerOrderBO - =====>属性订正任务执行开始|每页读取100条数据  
+2011-08-23 19:57:05,012 [] INFO  bo.CommodityCerOrderBO - 当前正在处理页数:1  
+2011-08-23 19:57:30,688 [] INFO  bo.CommodityCerOrderBO - order-fix.curr_id:10117,status:attr_ids不含0跳过  
+
 cat demo.log | awk '
 {
 	for(i=1;i<=NF;i++)
