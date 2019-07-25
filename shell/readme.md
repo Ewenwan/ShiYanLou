@@ -1,4 +1,4 @@
-# shell 编程
+ # shell 编程
 [window 下 从零开始——PowerShell应用入门（全例子入门讲解） ](https://www.cnblogs.com/lavender000/p/6935589.html)
 
 [参考代码1](https://github.com/Ewenwan/Linux_Code_Test/tree/master/Samples_Shell)
@@ -22,7 +22,7 @@
 [LinuxShell命令行及脚本编程实例详解 推荐 CSDN下载](https://download.csdn.net/download/test0037/10571213)
 
 
-# 文本分析
+# awk 文本分析
 ```sh
 cat demo.log | awk '
 {
@@ -35,6 +35,37 @@ cat demo.log | awk '
 
 
 ```
+< awk 和格式化printf
+```sh
+对于%-Ns (N表示具体的正整数)，表示左对齐，同时该域的位数至少为N，原有的域值不足N位的，用空格补齐，超过N位的，采用原有的域值。
+#cat grade.txt 
+1        2        3        4        5        6        7
+Zhao        05/99        48311        Green        8        40        44
+Qian        06/99        48317        green        9        24        26
+Sun        02/99        48        Yellow        42        35        28
+Li        07/99        4842        Brown        12        28        26
+#awk '{printf "%-15s",$1 }{print $2}' grade.txt
+1              2
+Zhao           05/99
+Qian           06/99
+Sun            02/99
+Li             07/99
+#awk '{printf "%-25s",$1 }{print $2}' grade.txt
+1                        2
+Zhao                     05/99
+Qian                     06/99
+Sun                      02/99
+Li                       07/99
+
+#awk '{printf "%-1s",$1 }{print $2}' grade.txt 
+12
+Zhao05/99
+Qian06/99
+Sun02/99
+Li07/99
+
+```
+
 
 
 # if 条件语句
