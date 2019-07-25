@@ -1,4 +1,7 @@
 # 数据结构 learn  datastructure
+
+[数据结构思维 中文翻译](https://github.com/Kivy-CN/think-dast-zh)
+
 [大话数据结构](https://github.com/Ewenwan/Big-Data-Structure)
 
 [数据结构与算法系列 目录 博客整理 强烈推荐](http://www.cnblogs.com/skywang12345/p/3603935.html)
