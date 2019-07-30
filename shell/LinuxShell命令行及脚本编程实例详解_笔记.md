@@ -170,6 +170,83 @@ one
 ## readonly 变量名=变量值  声明只读变量
 ## unset 变量名 删除 export 定义的全局变量，不能删除 readonly 只读变量
 
+## 检查变量是否存在 变量名? 不存在提示语 或 ${变量名:? 不存在提示语}
+```sh
+JAVA_HOME=/usr/local/jdk
+export JAVA_HOME
+echo ${JAVA_HOME:? Error variable is not defined}
+>>> /usr/local/jdk
+
+unset JAVA_HOME
+echo ${JAVA_HOME:? Error variable is not defined}
+>>> -bash JAVA_HOME: Error variable is not defined
+
+
+还有一种更简单的检查变量是否存在的方法 使用 if语句来判断
+```
+
+## 回调 历史命令
+```sh
+#### 回调 历史命令
+history
+>>>
+会显示之前输入过的命令 
+id1 命令
+...
+idn 命令
+
+!! 输入两个! 会执行就一条指令
+!+id号 会执行历史命令中对应id号的命令
+!+历史命令开头的字符  会执行历史命令中有已字符开头的命令
+```
+
+
+## shell中的扩展 展开 繁殖 
+大括号扩展 波浪号扩展 参数和变量扩展 命令替换 算术扩展 进程替换 单词拆分 和 文件名扩展
+
+### 大括号扩展   前缀字符{字符1,字符2,...,字符n}后缀字符
+```sh
+echo a{b,c,d}e
+>>> abe ace ade
+
+echo {a..z}  # 按字母表顺序显示 a~z字母
+>>> a b c d ... x y z
+
+echo {0..10} # 显示0~10的数字
+>>> 0 1 2 3 ... 9 10
+
+echo {6..-4} # 显示6~-4的数字
+>>> 6 5 4 3 ... 0 -1 -2 -3 -4
+
+echo {g..a} # 显示g~a的字母 反向
+>>> g f e d c b a
+
+echo {1..3}{a..c}
+>>> 1a 1b 1c 2a 2b 2c 3a 3b 3c
+
+## 嵌套
+echo a{{b,c}1,{d,e}3,f}h
+ab1h ac1h ad3h ae3h afh
+
+## 大括号扩展 繁殖命令
+在 当前目录下创建三个文件夹 son1 son2 son3
+mkdir ./{son1,son2,son3}
+
+## bash 4.0 新功能 {起点..终点..步长}
+echo {0..10..2}
+>>> 0 2 4 6 8 10
+
+echo {10..3..-2}
+>>> 10 8 6 4 2
+
+echo {a..k..2}
+>>> a c e g i k
+
+echo {0001..11..5}   # 指定形式
+>>> 0001 0006 0011
+
+```
+### ~ 波浪号 指代用户主目录
 
 
 
