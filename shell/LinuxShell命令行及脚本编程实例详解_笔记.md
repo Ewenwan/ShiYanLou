@@ -93,6 +93,7 @@ printf "%s\n" $var   类似于c语言的printf()函数
 %n      指定打印字符的个数
 %%      打印一个%
 
+转义字符
 \"      打印一个双引号 "
 \\ 
 \a      警告音
@@ -103,6 +104,9 @@ printf "%s\n" $var   类似于c语言的printf()函数
 \t      一个制表符
 \v      竖直制表符
 
+### echo中 使用转移字符  需要 -e 选项使能转移字符
+$ echo -e "User name: $USER\tHome Directory: $HOME\n"
+>>> User name: ywy  Home Directory: /home/wyw
 
 ######字符串#####
 var=shell
@@ -138,5 +142,35 @@ $printf "%10.3f\n" $varr #打印长度10，保留小数点后3位，只有7位�
    123.457
 
 ```
+
+## 变量引用 双引号 "$变量名" 将变量整体化
+```sh
+
+LIST="one two three"
+
+for var in $LIST   # 将变量的值分成3个参数传递给了for循环
+do
+    echo "$var"
+done
+>>>
+one
+two
+three
+    
+for var in "$LIST"   # 将变量的值作为一个整体传递给了for循环
+do
+    echo "$var"
+done
+>>>
+one
+
+```
+
+## export 变量名=变量值  声明定义全局变量 多bash环境可用
+## readonly 变量名=变量值  声明只读变量
+## unset 变量名 删除 export 定义的全局变量，不能删除 readonly 只读变量
+
+
+
 
 
