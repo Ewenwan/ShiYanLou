@@ -247,7 +247,21 @@ echo {0001..11..5}   # 指定形式
 
 ```
 ### ~ 波浪号 指代用户主目录
+```sh
+cd ~
+pwd
+>>> /home/wyw
+cd ~wyw
+pwd
+>>> /home/wyw
 
+~+指代 shell变量 PWD的值
+echo ~+
+>>> /tmp
+echo $PWD
+>>> /tmp
+
+```
 
 
 
