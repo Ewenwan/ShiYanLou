@@ -255,13 +255,84 @@ cd ~wyw
 pwd
 >>> /home/wyw
 
-~+指代 shell变量 PWD的值
+~+ 指代 shell变量 PWD的值
 echo ~+
 >>> /tmp
 echo $PWD
 >>> /tmp
 
+~-  指代 shell变量 LODPWD 的值
+echo ~1
+>>> /home/wyw
+echo $LODPWD
+>>> /home/wyw
+
+```
+
+### 文件名扩展
+```sh
+* 匹配任意字符，包括空格,多个字符,单个字符
+? 匹配任意单个字符
+[xyx] 匹配阔靠内的任意单个字符
+
+ls ./*.txt
+>>> 列出 当前目录下 所有以.txt结尾的文件
+
+ls ./[abc]*.cfg
+>>> 列出 当前目录下 以a或b或c开头，以.cfg结尾的文件
+
+ls ./image?.jpg
+>>> 显示所有 image1.jpg\image2.jpg\...\image9.jpg 文件
+
+ls ./image1[0-9]*.jpg
+>>>  列出 以 image10 \ image11 \...\image19开头，以.jpg结尾的文件
+```
+
+### 命令别名
+
+```sh
+alias 别名='完整命令'
+
+例如：
+alias ll='ls -l'
+
+是 cp\mv\rm等命令交互式地执行并解释执行了哪些操作
+alias cp='cp -iv'
+alias mv='mv -iv'
+alias rm='rm -iv'
+
+查看磁盘使用情况
+
+alias dus='df -h'
+查看所有定义的别名命令
+alias
+不带参数
+
+```
+
+## 第三章 常用 shell 命令
+### ls 列出文件名和目录
+```sh
+
+ls
+ls -l
+-l 显示全部文件信息:
+第一个字符：-,普通文件 d,文件夹 s,套接字文件 l,链接文件
+后面9个字符: 文件权限，rwx 读r 写w 执行x 分别为 所有者、用户组、其他用户的权限
+
+ls -lh 文件大小显示为KB MB GB 单位
+
+ls -ls 安装文件大小顺序列出文件和文件夹
+
+ls -a 显示所有文件
+
+# 生成文件名变量
+prototxt_file_name=$(ls *.prototxt)
+#.prototxt文件数量
+count=$(grep -c ".prototxt" $prototxt_file_name | wc)
+
 ```
 
 
+### cat 链接 显示 文件内容
 
