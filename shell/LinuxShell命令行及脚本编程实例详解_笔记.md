@@ -334,5 +334,70 @@ count=$(grep -c ".prototxt" $prototxt_file_name | wc)
 ```
 
 
-### cat 链接 显示 文件内容
+### cat 显示文件 more  less head tail file
+
+```sh
+cat 查看文件内容 连接文件 创建一个或多个文件 重定向输出到终端或文件
+
+# 查看文件内容   cat 正序显示   tat 倒序显示文件内容
+cat wyw.txt  / cat -n wyw.txt 显示行号  / cat -b wyw.txt 显示非空白行行号 
+
+cat -e  wyw.txt 会在每行末尾 多显示 $ 符号 （多行内容转换成一行时很有用）
+
+#使用命令行输入创建文件 并连接多个文件
+
+cat >test1
+>>> hello!
+cat >test2
+>>> world!
+cat test1 test2 > test3
+#显示 test3
+cat test3
+>>> 
+hello!
+world!
+
+
+# more 分屏显示文件内容
+more /etc/inittab  / more -10 /etc/inittab 指定一次显示的行号
+
+# less 查看文件速度快 可快速查找关键字
+less /etc/inittab 
+输入 /关键字  然后回车 向后搜索关键字 
+     ?关键字  然后回车 向前搜索关键字 
+     
+Ctrl+B 向回翻一个窗口的内容 Ctrl+F 向后翻一个窗口的内容 
+
+
+# 显示 文件 头 head  显示 文件尾 tail
+
+head /etc/inittab / head -10 /etc/inittab   显示开头前10行
+tail /etc/inittab / tail -20  /etc/inittab  显示末尾倒数20行
+
+
+# file 文件名 显示文件类型
+
+file /etc/inittab 
+>>> /etc/inittab: ASCII English text
+file -i /etc/inittab 
+```
+
+
+## wc 查看文件统计信息
+```sh
+wc 文件名
+>>> 行数 单词数 字节数 文件名
+wc -l 文件名  只统计行数
+wc -w 文件名  只统计单词数
+wc -c 文件名  只统计字节数
+wc -L 文件名  统计文件中最长行的长度
+
+```
+
+## find 查找文件/目录
+
+
+
+
+
 
