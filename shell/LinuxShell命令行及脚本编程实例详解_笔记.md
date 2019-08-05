@@ -395,9 +395,50 @@ wc -L 文件名  统计文件中最长行的长度
 ```
 
 ## find 查找文件/目录
+```sh
+# 查找文件
 
+find ./wanyouwen/*.txt  # 查找 ./wanyouwen 目录下的 txt文件
+find ./wanyouwen -type f -name "*.txt" 
+find ./wanyouwen -type f -perm 0777  查找权限是777的文件
+find ./wanyouwen -type f ! -perm 777  查找权限不是777的文件
+find ./wanyouwen -type f -perm /a+x  查找可执行文件
 
+find ./wanyouwen -type f empty  查找空文件
 
+# 查找文件夹
+find ./ -type d -name wanyouwn
+find ./wanyouwen -type d empty  查找空文件夹(目录)
 
+```
+
+## touch 创建文件  mkdir 创建文件夹  cp 复制文件/文件夹  ln -s 创建符号链接文件 mv移动/重命名文件/目录
+```sh
+# 创建文件
+touch 文件1 文件2 文件3
+touch -c 已有的文件名 只更新 文件时间戳
+touch -m 已有的文件名 只更新 文件的修改时间
+
+# 创建文件夹
+mkdir 文件名1
+mkdir -p 文件名2/文件夹3  递归创建 带有父目录
+
+# 复制文件/文件夹
+cp 文件1 ./xxx/ 复制
+
+# 创建符号链接文件
+ln -s  原地址  目标地址  # 在目标地址创建一个 原地址的快捷链接
+
+# 移动/重命名文件/目录
+mv 原地址文件/目录 新地址文件/目录
+
+# 删除文件/目录
+rm 文件名
+rm -rf 文件夹
+rm *.txt
+rm *[0-9].txt
+````
+
+## 管理文件或目录权限
 
 
