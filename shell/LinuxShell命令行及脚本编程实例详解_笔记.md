@@ -440,5 +440,139 @@ rm *[0-9].txt
 ````
 
 ## 管理文件或目录权限
+```sh
+# 显示权限
+ls -l
+# 修改权限
+chmod 777 文件   r(4)  w(2) x(1)
+chmod a+r 文件
+chmod a+w 文件
+chmod a+x 文件
+chmod o+r 文件
+chmod o+w 文件
+chmod o+x 文件
+chmod u+r 文件
+chmod u+w 文件
+chmod u+x 文件
+chmod g+r 文件
+chmod g+w 文件
+chmod g+x 文件
+# 修改所有者 和 用户组
+chown
+chgrp
+# 设置(用户、组)权限位
+setuid
+setgid
 
+```
+## 文本处理
+### 文本排序 sort
+```sh
+
+$ cat tep.txt
+abc
+def
+ghi
+def
+$ sort tep.txt  # 将文件内容按字母顺序排序
+abc
+def
+def
+ghi
+$ sort -u tep.txt # 排序 并去除重复的行
+abc
+def
+ghi
+
+$ cat digit.txt
+10
+30
+20
+100
+$ sort -n digit.txt # 按数字大小排序
+10
+20
+30
+100
+$ sort -n -r digit.txt # 按数字大小 倒序 排序
+100
+30
+20
+10
+
+# 多列数字排序
+$ cat  dig.txt
+abc,30
+def,10
+ghi,20
+def,50
+$ sort   dig.txt # 默认按每行的第一列进行排序
+abc,30
+def,10
+def,50
+ghi,20
+
+$ sort -t ',' -k2n,2 dig.txt # 按第二列 数字大小顺序排序 -t 指定分隔符 -k 指定列数
+def,10
+ghi,20
+abc,30
+def,50
+
+$ sort -t ',' -k2nr,2 dig.txt # 按第二列 数字大小倒序排序 -t 指定分隔符 -k 指定列数 r倒序
+def,50
+abc,30
+ghi,20
+def,10
+
+```
+### 文本去重 uniq   (unique)  独一无二
+```sh
+$ cat  tep.txt
+aaa
+aaa
+bbb
+ccc
+ccc
+$ uniq tep.txt  # 去除重复行
+aaa
+bbb
+ccc
+$ uniq -c  tep.txt  # 记录每行出现次数
+2 aaa
+1 bbb
+2 ccc
+$ uniq -d  tep.txt  # 只显示有重复的行，只显示一次
+aaa
+ccc
+$ uniq -D  tep.txt  # 只显示有重复的行，显示所有
+aaa
+aaa
+ccc
+ccc
+$ uniq -u  tep.txt  # 只显示不重复的行
+bbb
+
+$ uniq -w 3 tep.txt  # 限定每行的前3个字符来比较每行是否重复
+$ uniq -f 1 tep.txt  # 跳过每行前1个字符来比较每行是否重复
+```
+### 替换或删除字符 tr
+```sh
+# 大小写转换
+$ echo linuxShell | tr [:lower:] [:upper:]
+LINUXSHELL
+$  echo linuxShell | tr a-z A-Z  # 功能同上 
+LINUXSHELL
+
+# 替换空格
+$ echo "Hello world" | tr -s [:space:] '\t'
+Hello   world   # 空格 换成 制表符  -s 多个连续的空格算一个
+
+# 删除 字符 -d 选项
+$ echo "Hello world" | tr -d a-z # 删除全部小写字母
+$ echo "Hello world 12345" | tr -d [:digit:] # 删除全部数字
+$ echo "Hello world 12345" | tr -cd [:digit:] # 删除全部数字以外的字符
+```
+### 字符串查找 grep 常用 
+
+### 文件比较 diff
 
