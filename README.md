@@ -1,4 +1,6 @@
 # 参考资料
+[自动编程体系设想 ](https://blog.csdn.net/jxt1234and2010/article/details/45201421)
+
 [程序猿成长计划](https://github.com/mylxsw/growing-up)
 
 [数据结构和算法动态可视化](https://visualgo.net/zh)
