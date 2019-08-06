@@ -4,3 +4,6 @@
 
 [Android Skia2D引擎库 深度优化的算法、完善的渲染体系和精炼的代码框架](https://blog.csdn.net/jxt1234and2010/article/list/3?)
 
+[Android图形显示系统](https://blog.csdn.net/jxt1234and2010/article/details/44503019)
+
+[AndroidlibJpeg库解码OpenCL优化](https://blog.csdn.net/jxt1234and2010/article/details/45200441)
