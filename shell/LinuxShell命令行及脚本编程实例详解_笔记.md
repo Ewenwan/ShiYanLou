@@ -573,6 +573,53 @@ $ echo "Hello world 12345" | tr -d [:digit:] # 删除全部数字
 $ echo "Hello world 12345" | tr -cd [:digit:] # 删除全部数字以外的字符
 ```
 ### 字符串查找 grep 常用 
+```sh
+grep  关键字 目标文件/目标文件夹/字符串
+grep -r 关键字 目标文件夹   # 递归查找  或者 grep -R 关键字 目标文件夹
+grep -c 关键字 目标文件/目标文件夹/字符串  # 查找出现的次数
+grep -n 关键字 目标文件/目标文件夹/字符串  # 显示行号和对应出现的位置
 
+```
 ### 文件比较 diff
+```sh
+diff 文件1  文件2   # 比较两个文件的差异
+diff -yw 文件1  文件2   # 并排显示两个文件的差异
+```
+
+## 其他常用命令
+```sh
+hostname  # 查看主机名
+hostname 新主机名  # 临时修改主机名，下次重启恢复原主机名
+
+who/w   # 列出系统登录用户
+who -b  # 显示系统启动时间
+who -l  # 显示系统登录进程时间
+who -m  # 只显示与当前用户相关的信息
+
+
+uptime   # 查看系统运行时间
+
+uname    # 查看系统信息，内核名
+uname -r # 内核版本信息
+uname -p # 系统硬件CPU类型
+uname -i # 硬件平台信息
+uname -n # 打印主机名
+uname -a # 显示上述所有信息
+
+#### 获取日期信息 data 
+
+year = $(data +%Y)
+>>> 2019
+year = $(data +%y)
+>>> 19
+mouth = $(data +%m)
+>>> 08
+mouth = $(data +%d)
+>>> 10
+
+```
+
+# shell命令进阶
+
+
 
