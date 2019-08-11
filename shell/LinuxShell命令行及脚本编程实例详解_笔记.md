@@ -310,7 +310,7 @@ alias
 
 ```
 
-## 第三章 常用 shell 命令
+# 第三章 常用 shell 命令
 ### ls 列出文件名和目录
 ```sh
 
@@ -619,7 +619,81 @@ mouth = $(data +%d)
 
 ```
 
-# shell命令进阶
+# 第四章 shell命令进阶
+## 文档处理 和 归档 paste合并文件 dd备份和拷贝文件
+```sh
+### paste 合并多个文件的相应行到同一行
+$ cat t.txt
+>>>
+1
+2
+3
+
+$ cat d.txt
+>>>
+a
+b
+c
+
+$ paste t.txt d.txt
+>>>
+1 a
+2 b
+3 c
+
+$ paste -d'|' t.txt d.txt # 指定合并时的分隔符
+1|a
+2|b
+3|c
+
+$ paste -d':,' t.txt d.txt y.txt # 合并多个文件时指定多个分隔符
+
+
+### 文档复制 dd
+# dd if=输入文件的路径(默认标准输入) of=输出文件的路径(默认标准输出)
+
+# 实例：
+dd if=/dev/sda of=/dev/sdb   #将磁盘/dev/sda 数据复制到 磁盘/dev/sdb
+dd if=/dev/dvd of=dvd.iso    #将磁盘/dev/dvd 数据复制变为一个iso文件
+dd if=/dev/zero of=/dev/sda2 #擦除/dev/sda2分区的数据(格式化)
+
+### 压缩和归档文件 gzip bzip2
+### 解压缩文件    gunzip bunzip2
+### 打包/解包文件  tar -czvf xxx（打包）  tar -xzvf xxx (解包)
+```
+
+
+## 监测和管理磁盘
+```sh
+### 挂载mount 和 卸载umount 存储介质 到 文件系统某节点
+
+### df 报告文件系统磁盘空间利用率
+df -a  # 显示所有文件系统信息
+df -h  # 以GB MB 单位来显示文件大小 和 使用率等信息
+df -t  # 显示文件系统类型
+df -m  # 以为块大小单位显示文件系统信息
+
+### du 评估文件空间利用率
+du -h
+du -sh
+du -h --time # 显示大小和修改时间
+
+```
+
+## 后台执行命令
+```sh
+
+
+
+
+
+```
+
+
+
+
+
+
 
 
 
