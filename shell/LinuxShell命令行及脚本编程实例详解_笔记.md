@@ -706,6 +706,132 @@ at noon 在中午12点前 midnight 凌晨12点 teatime下午4点 ...
 
 # 第二篇 shell 脚本编程 
 ## 5. shell 编程基础
+```sh
+#!/bin/bash  # 第一行，指示行，指定解释器，若没有，则默认使用 /bin/sh作为解释器
+
+### 单行注释
+# xxxxx代码
+
+### 多行注释 1
+:<<!
+xxx 代码
+xxxx
+xxxxx
+!
+
+### 多行注释2
+<<COMMENT
+代码1
+代码2
+...
+COMMENT
+
+### 给脚本执行权限
+chmod 777 xxx.sh
+
+### 将脚本路径当如系统环境变量中可不加路径直接执行
+export PATH=$PATH:/home/wanyouwen/shscrips
+xxx.sh
+
+
+### 变量进阶
+# 定义变量
+变量名=xxxx
+# 使用变量
+$变量名 或者 ${变量名}
+
+#  字符串修改
+FILENAME=linux_bash.txt
+
+echo ${FILENAME%.*}   # 移除文件名后缀保留文件名 %.*
+>>> linux_bash        
+
+echo ${FILENAME##*.}  # 移除文件名，保留后缀 ##*.
+>>> txt
+
+FILENAMEPATH=home/wanyouwen/linux_bash.txt
+
+echo ${FILENAME%/*}   # 移除文件名保留目录路径 %/*
+>>> home/wanyouwen/
+echo ${FILENAME##*/}   # 移除目录路径保留文件名 ##*/
+>>> linux_bash.txt
+
+### 字符串长度
+
+${#变量名}  # 获取变量名指定的字符串长度
+TEX="123456789a"
+${#TEX}
+>>> 10
+
+### 获取子字符串
+#{变量名:起点:长度}   索引从0开始
+${TEX:3:4}
+>>> 4567
+
+#### bash 脚本参数
+./xxx.bash  参数1  参数2 参数3 参数4
+
+param1=$1
+param2=$2
+param3=$3
+param4=$4
+
+
+#### declare 指定变量类型
+declare -r var=1   # 设定只读变量 var 其值为1
+var=2              # 只读变量不能被修改，会报错
+declare -i 变量    # 指定变量为整数型变量
+
+declare -a 变量    # 声明数组变量
+declare -a linux={'ubuntu','redhat'}
+# 获取数组变量元素
+echo ${linux[@]}  或者 echo ${linux[*]}  # 索引编号 @/* 代表所有元素
+>>> ubuntu redhat
+echo ${linux[0]}
+>>> ubuntu
+echo ${linux}    # 数组名指代第一个元素
+>>> ubuntu
+
+```
+
+### shell 算数运算
+```sh
+id++  id--  变量后递增和后递减
+++id  --id  变量前递增和前递减
+- 单目 负号
+= 单目 正号
++
+! 逻辑反  ~按位取反
+** 求幂
+* 乘  /除 %取余 +加 -减
+<< 按位左移   >> 按位右移
+<=  >= <>  小于等于 大于等于 不等于
+& 按位与
+^ 按位异或
+| 按位或
+&& 逻辑与
+|| 逻辑或
+
+expr?值1:值2
+
+
+
+10   普通数字开头 十进制数
+020  0数字开头为  八进制数
+0x30 0x开头为     十六进制数
+
+2#111 #前面指定进制数  2进制数
+32#20 #32进制数
+
+
+##### 64 进制数   
+let base64=64#@_
+64进制数，0~9;a~z;A~Z;@ _
+@表示62
+_表示63
+
+```
+
 
 ## 6. shell 的条件执行
 
