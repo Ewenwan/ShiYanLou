@@ -10,3 +10,8 @@
 
       Vmware14版本 破解密钥！AA510-2DF1Q-H882Q-XFPQE-Q30A0
       Vmware15版本 破解密钥！FC502-8AD82-08D4P-4FQEE-ZC8D0
+
+
+## VS
+
+[微软nuget 包管理器 软件搜索下载界面](https://www.nuget.org/packages/)
