@@ -104,6 +104,21 @@
     AnonymousUid = 0
     AnonymousGid = 0
 
+## linux 系统之间挂载共享目录
+
+在工作主机下:
+  
+  mount -t nfs 目标机ip:目标机目标目录 工作机目录 -o nolock
+  
+  例如:
+  
+     mount -t nfs 10.1.110.123:/home/ws /home/wanyouwen -o nolock
+     
+     就可以在 当前主机的 /home/wanyouwen 目录访问 远程主机10.1.110.123  下的目录 /home/ws
+    
+
+
+
 ### winscp 访问 远程服务器文件 ftp协议
 [百度参考](https://jingyan.baidu.com/article/d621e8da79ee562865913fce.html)
 
