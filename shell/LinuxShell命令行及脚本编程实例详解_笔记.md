@@ -617,6 +617,8 @@ mouth = $(data +%m)
 mouth = $(data +%d)
 >>> 10
 
+week = 'data +%a' # 星期几
+
 ```
 
 ## 第四章 shell命令进阶
@@ -834,9 +836,81 @@ _表示63
 
 
 ## 6. shell 的条件执行
+```sh
+### test 测试文件属性 字符串测试 算术测试
+
+### if 条件语句
+if [ $变量 == $变量2]
+then
+   xxxx
+else 
+   xxxx
+fi
+
+if [ $变量 == $变量2]    
+then
+   xxxx
+elif [ $变量 -gt $变量2]      ### -gt大于-ge大于等于 -eq等于 -ne不等于 -lt小于 -le小于等于
+then
+   xxxx
+else
+   xxxx
+fi
+
+### 查看脚本的命令行参数数量 ###################
+
+if [ $# -ne 1]
+then
+     echo "usage: $0 param1"
+     exit 1
+fi
+
+num=$1 # 获取第一个命令行参数
+
+if [ $num -ge 90 ] && [ $num -le 100 ]  
+# 多条件 与&& （-a 也表示与 and   或|| （-o 也表示或 or） 逻辑非！
+then
+   echo " 90 <= num <= 100"
+fi
+
+```
+### case  多分支
+```sh
+if [ $# -lt 2 ]
+then
+   echo "usage: $0 param1 param2 "
+fi
+
+# 多case语句
+case "$1" in
+1)
+  xxxx
+;;  # 1)分支结束 必须要两个;来结束
+2)
+  xxxx
+;;
+3) 
+  xxxxx
+;;
+4 | 5 | 6)    # 多重case 匹配
+   XXXXX
+;;
+esac  # 结束case语句
+  
+
+```
 
 ## 7. bash 循环
+### 7.1 for 循环
 
+### 7.2 while循环
+
+### 7.3 until循环
+
+### 7.4 select循环
+
+
+### 7.5 循环控制 break 和 continue
 
 ## 8. shell 函数
 
