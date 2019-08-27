@@ -23,6 +23,7 @@
 
 
 # awk 文本分析
+[awk使用shell变量及shell使用awk中的变量](https://blog.csdn.net/rj042/article/details/72860177)
 ```sh
 # cat demo.log
 2011-08-23 19:57:00,610 [] INFO  bo.CommodityCerOrderBO - =====>属性订正任务执行开始|每页读取100条数据  
