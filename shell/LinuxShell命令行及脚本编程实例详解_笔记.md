@@ -873,6 +873,10 @@ then
    echo " 90 <= num <= 100"
 fi
 
+if [ ! -f xxx.txt ]; then echo " xxx.txt not exit "; fi
+
+-d 路径存不存在  
+
 ```
 ### case  多分支
 ```sh
@@ -902,15 +906,94 @@ esac  # 结束case语句
 
 ## 7. bash 循环
 ### 7.1 for 循环
+```sh
+for 变量 in  列表
+do
+ ...
+done
+
+# 例如
+param="1 2 3 4 5 6 7 8 9 10"
+for num in $param
+do
+   echo $num
+done
+
+
+for i in 1 2 3
+do
+...
+done
+
+for s in aa bb cc dd
+do
+...
+done
+
+
+for (( i = 0; i < 3; i++ ))
+do
+   for (( j = 0; j < 5; j++ ))
+   do
+     ...
+   done
+   ...
+done
+
+```
+
 
 ### 7.2 while循环
+```sh
+while [ $var -le 3 ]
+do
+  var=$(( var + 1)) # 变量自加1
+done
 
-### 7.3 until循环
+
+# while  和 read  读取文件
+
+while read -r line
+do
+   echo $line
+done < "$file_name"
+
+
+# 读取文件 成 多列
+
+while read -r col1 col2 col3   # 每一行分成三列
+do
+   echo $col1 $col2 $col3
+done < "$file_name"
+
+
+
+
+# 无限循环
+
+while :
+do
+...
+sleep 3
+done
+
+while true
+do
+...
+done
+
+
+```
+### 7.3 until循环  与 while类似 只不过 在条件为假时执行
 
 ### 7.4 select循环
 
 
 ### 7.5 循环控制 break 和 continue
+
+break  跳出整个循环，退出循环
+
+continue 跳过当前次循环，执行下一次循环
 
 ## 8. shell 函数
 
