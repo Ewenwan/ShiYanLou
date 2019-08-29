@@ -6,10 +6,34 @@
 
 [HiSi的Hi3559，Hi3519，Hi3516 NNIE 硬件加速器使用 真机调试](https://blog.csdn.net/u011728480/article/details/92069793)
 
+[海思AI芯片(Hi3519A/3559A)方案学习（一）资料以及术语介绍 ](https://blog.csdn.net/ltshan139/article/category/9293521/1)
+
 海思半导体是一家半导体公司，海思半导体有限公司成立于2004年10月，前身是创建于1991年的华为集成电路设计中心。海思公司总部位于深圳，在北京、上海、美国硅谷和瑞典设有设计分部。
 海思的产品覆盖无线网络、固定网络、数字媒体等领域的芯片及解决方案，成功应用在全球100多个国家和地区；在数字媒体领域，已推出SoC网络监控芯片及解决方案、可视电话芯片及解决方案、DVB芯片及解决方案和IPTV芯片及解决方案。
 
 HI3559A是专业（移动摄像机） 8K ultra HD Mobile Camera SOC,提供8K30/4K120广播级图像质量的数字视频录制，支持多了sensor输入，支持H.265编码输出或影视级的RAW数据输出，并集成高性能ISP处理，集成4个arm核，2个nnie硬核，4个dsp软核，同时采用先进低功耗工艺和低功耗架构设计，可应用于多功能的运动相机、无人一体机、专业相机和VR相机。
+
+海思AI芯片Hi35xx系列具体包括的型号Hi3559A V100, Hi3559C V100, Hi3519A V100, Hi3516C V500以及Hi3516D V300。
+
+3519A里面有一个硬件NNIE（Neural Network Inference Egine），这个是寒武纪IP（下一代估计就要用海思自己开发的IP了），顾名思义，它可以定点并行运算来进行深度学习算法模型推理。
+
+常用容易糊涂的术语：
+
+MPP: Media Processing plaform  多媒体处理平台 和 音视频H264编码等相关
+
+IPC: Internet Protocol Camera  网络摄像机 
+
+LDC: Lens Distortion Correction  镜头畸变校正
+
+AI： Auto Iris Control  自动光圈控制  这里不是我们所说的人工智能啊
+
+VPSS: video process sub-system  视频前处理单元
+
+VEDU: Video Encoder Unit  视频编码单元
+
+IVE: Intelligent Video Engine 智能加速引擎  常用图像处理 视觉算法的硬件处理单元 不要和AI引擎NNIE 混淆
+
+DPU: Depth Process Unit  深度信息处理单元 用来双目三维建模的
 
 ## IVE
 IVE是用来图像加速处理的，那么我们必须要有一个图像结构(海思自带的是IVE_IMAGE_S)
