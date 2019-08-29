@@ -51,11 +51,79 @@ HI3518C的物理通道1，水平、垂直均最大支持 8 倍缩小，水平、
 
 ## NNIE(Neural Network Inference Engine)硬核 深度学习专用加速器
 
+NNIE简介
+
+NNIE是 Neural Network Inference Engine 的 简 称 是 海思 媒体 S oC 中 专门针对神经网
+络特别是深度学习卷积神经网络进行加速处理的硬件单元。----- 摘自hisi sdk svp部分《HiSVP开发指南.pdf》
+
+NNIE 工作流程简介
+
+海思提供了一个NNIE Mapper的工具（Linux ， Win都有）。由于NNIE只支持Caffe框架，我们需要的是把Caffe的模型转换为NNIE可以使用的模型。
+在我们转换的时候，需要我们提供一个NNIE转换的配置文件，然后根据配置文件把相关的caffe模型转换为NNIE的模型。然后我们在板子上加载这个模型，调用相关的API就可以完成这个网络的加速计算。
+
+NNIE 环境搭建
+
+工欲善其事必先利其器。NNIE最开始接触的时候，我觉得贼难受，觉得很难。但是当你把环境配置好了，你就会觉得事半功倍，很舒服。
+以下内容，我都是按照HISI SDK的SVP部分的《HI SVP开发指南.pdf》做的，只是由于时效性的原因，有些内容需要做一定的改变适应才行。
 
 
 
 # SVP smart vision processing 智能视觉异构加速平台
 
+hisi svp 整体框架:
 
+vision app  做图像数据的准备以及结果处理
+
+--------------------
+
+mpi(MPP Program Interface)   做mmz内存分配（海思特有的内存空间）
+
+--------------------
+
+driver(ko)   驱动
+
+--------------------
+
+nnie（hardware）   nnie做forward
+
+## 开发
+```c
+/*
+* mpp System init  海思特有的内存空间系统初始化
+*/
+HI_MPI_SYS_Exit()
+HI_MPI_VB_Exit()
+//设置MPP 视频缓存 池 属性 。
+HI_MPI_VB_SetConfig()
+HI_MPI_VB_Init()
+HI_MPI_SYS_Init()
+
+
+/// 载入模型
+//load model
+//在mmz中分配一部分内存来存放model
+HI_MPI_SYS_MmzAlloc()
+//从mmz内存中解析模型
+HI_MPI_SVP_NNIE_LoadModel()
+
+
+//NNIE 初始化
+
+//NNIE  Param  Init
+
+//forward prepare
+//------------------------根据model的配置，为每一段（这里你可以简单理解为层）的forward ctrl param , src Blob, dst Blob.也就是初始化SVP_NNIE_FORWARD_CTRL_S[]，SVP_NNIE_FORWARD_WITHBBOX_CTRL_S[]，SVP_SRC_BLOB_S[]，SVP_DST_BLOB_S[]数组元素的值。
+HI_MPI_SVP_NNIE_GetTskBufSize()//获取给定网络任务 各段 辅助内存
+HI_MPI_SVP_NNIE_AddTskBuf()//记录TskBuf 地址 信息
+
+//----------------给第一层送入预处理好的图片到SVP_SRC_BLOB_S
+
+HI_MPI_SYS_MmzFlushCache()//刷新内存
+HI_MPI_SVP_NNIE_Forward()//forward
+HI_MPI_SVP_NNIE_Query()//查询forward任务是否完成
+HI_MPI_SYS_MmzFlushCache()//刷新内存
+
+
+```
 
 
