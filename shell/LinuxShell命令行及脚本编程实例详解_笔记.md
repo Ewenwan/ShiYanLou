@@ -859,8 +859,7 @@ fi
 
 ### 查看脚本的命令行参数数量 ###################
 
-if [ $# -ne 1]
-then
+if [ $# -ne 1 ]; then
      echo "usage: $0 param1"
      exit 1
 fi
