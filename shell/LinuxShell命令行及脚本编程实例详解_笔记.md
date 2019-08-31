@@ -840,17 +840,17 @@ _表示63
 ### test 测试文件属性 字符串测试 算术测试
 
 ### if 条件语句
-if [ $变量 == $变量2]
+if [ $变量 == $变量2 ]
 then
    xxxx
 else 
    xxxx
 fi
 
-if [ $变量 == $变量2]    
+if [ $变量 == $变量2 ]    
 then
    xxxx
-elif [ $变量 -gt $变量2]      ### -gt大于-ge大于等于 -eq等于 -ne不等于 -lt小于 -le小于等于
+elif [ $变量 -gt $变量2 ]      ### -gt大于-ge大于等于 -eq等于 -ne不等于 -lt小于 -le小于等于
 then
    xxxx
 else
@@ -995,6 +995,59 @@ break  跳出整个循环，退出循环
 continue 跳过当前次循环，执行下一次循环
 
 ## 8. shell 函数
+```sh
+# 格式1
+function_name()
+{
+# 函数体
+# 返回值 可选
+return int
+}
+
+# 格式2
+function function_name()
+{
+# 函数体
+}
+
+# 格式3
+function function_name
+{
+# 函数体
+local xxx  #函数内部变量
+}
+
+# 函数放在后台运行
+function_name &
+
+
+```
+
+### 函数参数
+```sh
+fname()
+{
+# 获取函数参数
+func_name=$0  # 函数名
+arg1=$1
+arg2=$2
+# 函数参数总数
+arg_num=$#
+# $* / $@ 所有参数
+
+# 以上同脚本的参数获取和统计方法
+# 关于参数的语句
+
+# 遍历所有参数
+for  arg  in $* ; do 
+...
+done
+}
+```
+
+# 调用函数 并传递参数给函数
+fname foo bar
+# 函数名 参数1 ($1)  参数2 ($2)
 
 
 ## 9. 正则表达式
