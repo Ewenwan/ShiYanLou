@@ -4,7 +4,7 @@ Linux 典藏大师系列丛书
 
 shell 脚本的构成:
 
-    1. shell 关键字 if ...else; for ...done
+    1. shell 关键字 if ...then else; for ...done; while do done
     2. shell 命令 export,echo,exit,pwd,return
     3. linux 命令 data rm mkdir cd 
     4. 文本处理功能 awk cut sed grep
