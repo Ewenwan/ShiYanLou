@@ -1,6 +1,8 @@
 # shell 编程
 [window 下 从零开始——PowerShell应用入门（全例子入门讲解） ](https://www.cnblogs.com/lavender000/p/6935589.html)
 
+[各种逗比脚本参考](https://github.com/Ewenwan/doubi)
+
 [参考代码1](https://github.com/Ewenwan/Linux_Code_Test/tree/master/Samples_Shell)
 
 [参考代码2](https://github.com/keyboard-man/c_cpp/tree/master/boost)
