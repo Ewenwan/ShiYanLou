@@ -69,6 +69,37 @@ Halide的思想与元编程有着密切的关系，不仅是其设计思路或�
 [参考](https://oldpan.me/archives/learn-a-little-halide)
 
 ```c
+
+Halide 基本语法
+
+
+Halide 关键字
+
+Algorithm部分：
+
+Halide::func 对应图像流水线处理中的一个步骤。这个func定义了一个图像中每一个像素应该是什么值。这里只是一个定义。
+Halide::Var 用于定义func的变量。
+Halide::Expr 用于定义一个表达式。
+Halide::cast 强制类型转换。
+Halide::min 
+Halide::Buffer<T>用于定义缓存
+
+Schedule部分：Vectorize，parallelize，unroll
+Halide在定义func的时候没有真正计算每个像素点的值，只有在调用func的realize方法时才会真正执行。
+Halide Debug手段
+
+_.compile_to_lowered_stmt("_.html", {}, HTML)可以将中间结果生成html预览。
+trace_stores用于跟踪执行过程。
+在func中直接print部分内容。
+cout可以打印Expr的具体表达式内容。
+_.print_loop_nest()可以将调度的伪代码打印出来。
+
+
+
+```
+
+
+```c
 // 定义函数
 Func gradient("gradient"); // 利用Func 定义一个待执行的function，并起名为gradient
 
@@ -116,6 +147,47 @@ produce gradient_col_major:
 
 
 ```
+
+> **demo示例**
+
+```c
+
+// Halide.h包含了整个Halide, 只需要include这个头文件即可
+#include "Halide.h"
+//c头文件是为了使用c函数
+#include <stdio.h>
+
+int main(int argc, char **argv) {
+
+    //定义函数
+    Halide::Func gradient;
+    //定义变量
+    Halide::Var x, y;
+    //定义计算
+    Halide::Expr e = x + y;
+
+    gradient(x, y) = e;
+    //获取计算结果
+    Halide::Buffer<int32_t> output = gradient.realize(800, 600);
+
+    //验证计算结果
+    for (int j = 0; j < output.height(); j++) {
+        for (int i = 0; i < output.width(); i++) {
+            if (output(i, j) != i + j) {
+                printf("Something went wrong!\n"
+                       "Pixel %d, %d was supposed to be %d, but instead it's %d\n",
+                       i, j, i+j, output(i, j));
+                return -1;
+            }
+        }
+    }
+    printf("Success!\n");
+    return 0;
+}
+
+```
+
+
 
 > **拆分 Split**
 
