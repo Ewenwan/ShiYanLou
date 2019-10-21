@@ -44,6 +44,9 @@
 
 [商业爬虫项目](https://github.com/VcrTing/Scrapy_BackUp)
 
+[清华大学 anaconda 软件包 site-page ](https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/win-64)
+
+
 
 # 书籍
 [Python Pocket Reference ](https://github.com/Ewenwan/python-pocket-reference) 
