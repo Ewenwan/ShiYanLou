@@ -1194,14 +1194,14 @@ int main()
 	}
         
 	// 分配GPU变量
-	cudaMalloc((void **)&d_a,      size*size * sizeof(int));
-	cudaMalloc((void **)&d_b,      size*size * sizeof(int));
-	cudaMalloc((void **)&d_result, size*size * sizeof(int));
+	cudaMalloc((void **)&d_a,      size*size * sizeof(float));
+	cudaMalloc((void **)&d_b,      size*size * sizeof(float));
+	cudaMalloc((void **)&d_result, size*size * sizeof(float));
 
 
 	// 从CPU 拷贝两个输入矩阵到 GPU
-	cudaMemcpy(d_a, h_a, size*size* sizeof(int), cudaMemcpyHostToDevice);
-	cudaMemcpy(d_b, h_b, size*size* sizeof(int), cudaMemcpyHostToDevice);
+	cudaMemcpy(d_a, h_a, size*size* sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(d_b, h_b, size*size* sizeof(float), cudaMemcpyHostToDevice);
 	
 	// 定义GPU 使用情况
 	dim3 dimGrid(size / TILE_SIZE, size / TILE_SIZE, 1); // 2D 线程格 每格 有 (size / TILE_SIZE)^2 个线程块
@@ -1214,7 +1214,7 @@ int main()
 	gpu_Matrix_Mul_shared << <dimGrid, dimBlock >> > (d_a, d_b, d_result, size);
         
 	// 从 GPU 拷贝 结果数据 到 CPU
-	cudaMemcpy(h_result, d_result, size*size * sizeof(int),	cudaMemcpyDeviceToHost);
+	cudaMemcpy(h_result, d_result, size*size * sizeof(float),	cudaMemcpyDeviceToHost);
 	
 	// 打印结果
 	printf("The result of Matrix multiplication is: \n");
