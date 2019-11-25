@@ -1,6 +1,8 @@
 # CUDA编程
 CUDA（Compute Unified Device Architecture）的中文全称为计算统一设备架构。
 
+[pycuda](https://github.com/inducer/pycuda)
+
 [CUDA编程之快速入门!!!!!推荐](https://www.cnblogs.com/skyfsm/p/9673960.html)
 
 [参考](https://www.cnblogs.com/cuancuancuanhao/category/1236273.html)
