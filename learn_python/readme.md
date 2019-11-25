@@ -1,5 +1,7 @@
 # learn python in action
 
+[python 代码调试软件](https://github.com/inducer/pudb)
+
 [Python各类图像库的图片读写方式总结](https://www.cnblogs.com/skyfsm/p/8276501.html)
 
 [Python学习手册 笔记](https://github.com/Ewenwan/python_learning_notes)
