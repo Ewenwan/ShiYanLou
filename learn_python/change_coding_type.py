@@ -6,7 +6,7 @@ import chardet
 
  
 
-def convert(filename,out_enc="UTF-8"):
+def convert(filename,out_enc="UTF-8"): // "ASSIC"
 	try:
 		content=codecs.open(filename,'r').read()
 		source_encoding=chardet.detect(content)['encoding']
@@ -21,7 +21,7 @@ def convert(filename,out_enc="UTF-8"):
 def explore(dir):
 	for root,dirs,files in os.walk(dir):
 		for file in files:
-			if os.path.splitext(file)[1]=='.cpp':
+			if os.path.splitext(file)[1] in ['.cpp','.c','.h','.hpp']:
 				print file
 				path=os.path.join(root,file)
 				convert(path)
