@@ -18,6 +18,8 @@
 
 [文言文編程語言](https://github.com/LingDong-/wenyan-lang)
 
+[pycparser C代码解析器 AST树 ](https://github.com/Ewenwan/pycparser)
+
 # 编译器
 ```
 词法分析; 
