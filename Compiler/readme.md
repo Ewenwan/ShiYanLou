@@ -20,6 +20,10 @@
 
 [pycparser C代码解析器 AST树 ](https://github.com/Ewenwan/pycparser)
 
+[方舟编译器开源代码 ](https://gitee.com/harmonyos/OpenArkCompiler)
+
+[Shedskin 引擎系统 Python转 C/C++](https://github.com/Ewenwan/shedskin)
+
 # 编译器
 ```
 词法分析; 
