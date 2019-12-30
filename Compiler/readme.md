@@ -104,6 +104,16 @@ LLVM与GCC
     制定了LLVM IR这一中间代码表示语言。LLVM IR充分考虑了各种应用场景，
     例如在IDE中调用LLVM进行实时的代码语法检查，对静态语言、动态语言的编译、优化等。
 
+```
+传统编译器架构
+Frontend:前端
+    词法分析、语法分析、语义分析、生成中间代码
+Optimizer:优化器
+    中间代码优化
+Backend:后端
+    生成机器码
+```
+    
 ## LLVM Compiler
 
     从上面这个图中我们发现LLVM与GCC在三段式架构上并没有本质区别。
@@ -113,8 +123,25 @@ LLVM与GCC
     PassB算法则提供了XYZ语言与其它语言共性的优化算法。
     那么我可以选择XYZ优化器在链接的时候把LLVM提供的算法链接进来。
     LLVM不仅仅是编译器，也是一个SDK。
+    
+```   
+LLVM架构:
+
+不同的前端后端使用统一的中间代码LLVM Intermediate Representation (LLVM IR)
+如果需要支持一种新的编程语言，那么只需要实现一个新的前端
+如果需要支持一种新的硬件设备，那么只需要实现一个新的后端
+优化阶段是一个通用的阶段，它针对的是统一的LLVM IR，不论是支持新的编程语言，还是支持新的硬件设备，都不需要对优化阶段做修改
+相比之下，GCC的前端和后端没分得太开，前端后端耦合在了一起。所以GCC为了支持一门新的语言，或者为了支持一个新的目标平台，就 变得特别困难
+LLVM现在被作为实现各种静态和运行时编译语言的通用基础结构(GCC家族、Java、.NET、Python、Ruby、Scheme、Haskell、D等)
+
+```
+
+
 
 ## Pass Linkage
+
+
+
 
     Apple LLVM compiler 4.2和LLVM GCC 4.2
     现在我们可以回答本文最前面我遇到的那个问题了。Apple LLVM compiler 4.2是一个真正的LLVM编译器，
