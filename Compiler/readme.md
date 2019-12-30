@@ -38,7 +38,6 @@
 数组和对象的实现.
 
 
-
 预处理阶段 预处理器 (cpp) 根据以字符 # 开头的命令, 修改原始的 C 程序. 
           比如 hello.c 中第一行的 #include <stdio.h> 命令告诉预处理器读取系统头文件 stdio.h 的内容, 
           并把它直接插入到程序文本中. 结果就得到另一个 C 程序, 通常是以 .i 作为文件扩展名.
@@ -116,6 +115,10 @@ Backend:后端
     
 ## LLVM Compiler
 
+[用LLVM开发新语言---官方教程](https://llvm-tutorial-cn.readthedocs.io/en/latest/)
+
+
+
     从上面这个图中我们发现LLVM与GCC在三段式架构上并没有本质区别。
     LLVM与其它编译器最大的差别是，它不仅仅是Compiler Collection，也是Libraries Collection。
     举个例子，假如说我要写一个XYZ语言的优化器，我自己实现了PassXYZ算法，
@@ -135,6 +138,74 @@ LLVM架构:
 LLVM现在被作为实现各种静态和运行时编译语言的通用基础结构(GCC家族、Java、.NET、Python、Ruby、Scheme、Haskell、D等)
 
 ```
+
+
+什么是Clang :
+
+LLVM项目的一个子项目，基于LLVM架构的C/C++/Objective-C编译器前端。
+相比于GCC，Clang具有如下优点:
+
+          编译速度快:在某些平台上，Clang的编译速度显著的快过GCC(Debug模式下编译OC速度比GGC快3倍)
+          占用内存小:Clang生成的AST所占用的内存是GCC的五分之一左右
+          模块化设计:Clang采用基于库的模块化设计，易于 IDE 集成及其他用途的重用
+          诊断信息可读性强:在编译过程中，Clang 创建并保留了大量详细的元数据 (metadata)，有利于调试和错误报告
+          设计清晰简单，容易理解，易于扩展增强
+
+编译过程：
+
+          0.找到main.m文件
+          1.预处理器，处理include、import、宏定义
+          2.编译器编译，编译成ir中间代码
+          3.后端，生成目标代码
+          4.汇编
+          5.链接其他动态库静态库
+          6.编译成适合某个架构的代码
+
+词法分析：
+
+          词法分析，生成Token: $ clang -fmodules -E -Xclang -dump-tokens main.m
+          将代码分成一个个小单元（token）
+
+语法树-AST：
+
+          语法分析，生成语法树(AST，Abstract Syntax Tree): $ clang -fmodules -fsyntax-only -Xclang -ast-dump main.m
+          通过语法树，我们能知道这个代码是做什么的。
+
+LLVM IR：
+
+          LLVM IR有3种表示形式（本质是等价的）
+                    text:便于阅读的文本格式，类似于汇编语言，拓展名.ll， $ clang -S -emit-llvm main.m
+                    memory:内存格式
+                    bitcode:二进制格式，拓展名.bc， $ clang -c -emit-llvm main.m
+                    我们以text形式编译查看：
+```asm
+; Function Attrs: noinline nounwind optnone ssp uwtable
+define void @test(i32, i32) #2 {
+  %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+  %5 = alloca i32, align 4
+  store i32 %0, i32* %3, align 4
+  store i32 %1, i32* %4, align 4
+  %6 = load i32, i32* %3, align 4
+  %7 = load i32, i32* %4, align 4
+  %8 = add nsw i32 %6, %7
+  %9 = sub nsw i32 %8, 3
+  store i32 %9, i32* %5, align 4
+  ret void
+}
+```
+
+IR基本语法:
+
+          注释以分号 ; 开头
+          全局标识符以@开头，局部标识符以%开头
+          alloca，在当前函数栈帧中分配内存
+          i32，32bit，4个字节的意思
+          align，内存对齐
+          store，写入数据
+          load，读取数据
+          
+[官方语法参考](https://llvm.org/docs/LangRef.html)
 
 
 
