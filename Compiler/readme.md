@@ -24,6 +24,9 @@
 
 [Shedskin 引擎系统 Python转 C/C++](https://github.com/Ewenwan/shedskin)
 
+[oclint 静态代码检查 ](https://github.com/Ewenwan/oclint)
+
+
 # 编译器
 ```
 词法分析; 
