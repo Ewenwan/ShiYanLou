@@ -28,6 +28,9 @@
 
 [CodeChecker 静态代码检查 ](https://github.com/Ewenwan/codechecker)
 
+
+[LLVM  cmu 教案](http://www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/15745-s14/public/lectures/)
+
 # 编译器
 ```
 词法分析; 
