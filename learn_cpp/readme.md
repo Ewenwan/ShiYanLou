@@ -19,6 +19,9 @@
     Scott Meyers 的 Effective C++ 和 More Effective C++ 是此类佼佼，
     Herb Sutter 的 Exceptional C++ 则是後起之秀。 
     
+[适合学生学习时能够方便的在浏览器里直接编c++程序](https://github.com/felixhao28/JSCPP)
+    
+    
 ##  参考资料
 [鸡啄米：C++编程入门系列之目录和总结 ](www.jizhuomi.com/software/129.html)
 
