@@ -28,8 +28,10 @@
 
 [CodeChecker 静态代码检查 ](https://github.com/Ewenwan/codechecker)
 
-
 [LLVM  cmu 教案](http://www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/15745-s14/public/lectures/)
+
+[收集一些如何使用 clang 库的例子](https://github.com/loarabia/Clang-tutorial)
+
 
 # 编译器
 ```
