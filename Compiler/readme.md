@@ -34,6 +34,8 @@
 
 [代码质量分析 圈复杂度 ](https://github.com/Ewenwan/Code-Quality-Analyzer)
 
+[编译优化算法](https://www.jianshu.com/u/8866e26199f3)
+
 # 编译器
 ```
 词法分析; 
