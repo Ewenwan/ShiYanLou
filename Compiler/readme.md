@@ -8,7 +8,7 @@
 
 [编译技术 西电](http://www.xuetangx.com/courses/course-v1:XIYOU+20180208+sp/about)
 
-[LLVM](https://github.com/Ewenwan/llvm-release/blob/master/README.md)
+[LLVM](https://github.com/Ewenwan/llvm-project/blob/master/README.md)
 
 [gcc五分钟系列 介绍 gcc 的基本用法 ](https://github.com/Ewenwan/gcc_five_minute)
 
