@@ -36,6 +36,8 @@
 
 [编译优化算法](https://www.jianshu.com/u/8866e26199f3)
 
+[初识 LLVM ](https://xiaozhuanlan.com/topic/0542687193)
+
 # 编译器
 ```
 词法分析; 
