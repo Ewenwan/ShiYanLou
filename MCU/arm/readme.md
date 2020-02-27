@@ -15,6 +15,8 @@
 
 [YUV转RGB（NV21-ARGB）的Neon优化代码](https://blog.csdn.net/jxt1234and2010/article/details/46620001)
 
+[使用ARM NEON Intrinsics加速Video Codec](https://www.jianshu.com/p/70601b36540f)
+
 # ARM与单片机到底有啥区别
 
 ## 1、软件方面
