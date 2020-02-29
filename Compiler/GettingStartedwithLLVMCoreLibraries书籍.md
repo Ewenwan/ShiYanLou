@@ -34,5 +34,75 @@
   每个步骤中间交互有两种介质：1) in-memory; 2) by-file，前者变现出来通过一些高层的工具如clang，自动进行指定的动作；后者可以每一步每一步分离开来，通过一个个独立的工具完成。
   
   
+## External Projects 附加工具
+
+    Clang extra tools 前段附加工具
+    Compiler-RT       编译器运行时
+    DragonEgg         利用GCC(不仅支持类c语言解析) 得到 IR
+    LLVM test suite   测试
+    LLDB              类 gdb 调试器
+    libc++            底层运行时库 系统动态链接库
   
-  
+## Frontend  前段  Clang
+    1. 使用 libclang
+    2. 理解Clang diagnostics
+    3. the frontend phases：
+       词法分析 Lexical analysis
+       语法分析 Syntactic analysis（AST） 抽象语法树
+               TranslationUnitDecl 翻译单元
+               TypedefDecl   类型定义
+               FunctionDecl  函数定义
+               CFG
+       语义分析 Semantic analysis
+
+
+## LLVM IR  中间表达
+    1. 语法syntax
+        Module
+        Function
+        BasicBlock
+        Instruction
+        use-def与def-use链
+            Value
+            User
+    2. 生成器 generator
+    3. IR级优化：pass
+        -Ox
+        -print-stats
+        理解pass间依赖：
+            e.g. Loop Info and Dominator Tree
+        理解pass API
+        定制pass
+
+
+## Backend 后端
+    1. TableGen
+    2. SelectionDAG
+    3. Scheduler           调度器
+    4. MachineInstr
+    5. Register allocation 寄存器分配
+    6. Prologue and epilogue
+    7. MCInst
+
+
+
+## 运行时 JIT
+
+
+## 交叉编译   仿真平台 QEMU
+
+
+
+## Clang静态分析
+    1. （后端指令生成的）性能优化 & （基于前端AST的）静态分析，编译器技术的两大法宝！
+    2. 竞争对手：HP Fortify and Synopsis Coverity
+    3. exponential-time complexity，不支持inter-module analysis
+    4. forward data flow analysis  数据流分析
+        给变量符号关联一些属性，然后在后面用到的地方检查约束是否满足
+        False positives：往往导致程序员忽略所有的警告信息
+
+
+
+
+
+
