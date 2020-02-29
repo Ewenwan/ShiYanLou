@@ -40,6 +40,9 @@
 
 [利用LLVM，Clang制作自己的编译器   示例代码  强烈推荐](https://github.com/Ewenwan/llvm-clang-samples)
 
+
+[LLVM 每日谈](https://blog.csdn.net/snsn1984/article/details/8036032)
+
 # 编译器
 ```
 词法分析; 
