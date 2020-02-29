@@ -38,6 +38,8 @@
 
 [初识 LLVM ](https://xiaozhuanlan.com/topic/0542687193)
 
+[利用LLVM，Clang制作自己的编译器   示例代码  强烈推荐](https://github.com/Ewenwan/llvm-clang-samples)
+
 # 编译器
 ```
 词法分析; 
