@@ -95,13 +95,28 @@ CodeGen负责将语法树从顶至下遍历，翻译成LLVM IR，LLVM IR是Front
 
 ## LLVM IR  中间表达
     1. 语法syntax
-        Module
-        Function
-        BasicBlock
-        Instruction
+        a. Module: Module类声明了一个迭代器，可以遍历module中的function
+        b. Function:
+          Function对象可能是函数声明，可能是函数定义，获取这两个不同对象的内容可调用不同的函数。
+          使用isDeclaration()方法check对象是否是函数声明，包含函数原型.
+          通过getArgumentList()方法或是用arg_iterator迭代器遍历可获得函数参数。
+          函数定义 遍历函数内容
+             (Function::iterator i = function. begin(), e = function.end(); i != e; ++i) 
+        c. BasicBlock 基本块 Basic Block类
+          BB中包含了一系列指令，可以通过getTerminator()方法获取最后一条指令。
+          以通过CFG，例如通过getSinglePredecessor()方法，访问前一个BB。
+          
+        d. Instruction 指令
+          它的确切功能可以通过getOpcode（）来获取，它返回代表LLVM IR操作码的llvm::Instruction枚举的成员。
+          也可以通过op_begin()和op_end()来获取操作数，这两个方法继承自User类。
+          
           3层概念：Function::iterator --> BasicBlock::iterator --> i->getOpcodeName()
-        use-def与def-use链
+        e. use-def与def-use链
+          【很重要的两个类——Value类和User类】
+          个继承了Value类的类意味着类内定义了可能被其他类使用的结果，一个继承了User类的类意味着这个实体可能使用了一个或多个Value接口。
             Value
+             Value类定义了use_begin()和use_end()方法，用于遍历Users，访问def-use链，即访问所有使用了value的user。
+            
             User
            
     2. 生成器 generator
@@ -116,13 +131,24 @@ CodeGen负责将语法树从顶至下遍历，翻译成LLVM IR，LLVM IR是Front
         优化pass管理器 LLVMPassManagerRef PM: unwrap(PM)->add(pass);
 
     LVM类           功能
-    LLVMContext     上下文类，基本是最核心的保存上下文符号的类
+    LLVMContext     上下文类，基本是最核心的保存上下文符号的类 环境相关部分，如Contexts
     Module          模块类，一般一个文件是一个模块，里面有函数列表和全局变量表
     Function        函数类，函数类，生成出来就是一个C函数
     Constant        常量类，各种常量的定义，都是从这里派生出来的
     Value           各值类型的基类，几乎所以的函数、常量、变量、表达式，都可以转换成Value型
     Type            类型类，表示各种内部类型或用户类型，每一个Value都有个getType方法来获取其类型。
     BasicBlock      基本块，一般是表示一个标签，注意这个块不是嵌套形式的结构，而是每个块结尾可以用指令跳转 到其他块，类似C语言中的标签的功能
+    
+Values中使用最多就是常量Constant，从上图可以看到Constant主要可以概括为以下几个部分:
+
+    标量常量Scalar Constants，比如整形常量ConstantInt，浮点型常量ConstantFP
+    组合常量Composite Constants，比如常量结构体ConstStruct，常量数组ConstantDataArray等
+    常量表达式Constant Expressions，主要是ConstantExpr这个类，该类有一个及其重要的API接口getGetElementPtr用来从多元素常量中获取首地址，比如获取数组，字符串的首地址
+    全局值Global Values，是全局变量和函数值的间接基类，换而言之就是全局值包括全局变量GlobalVariable和函数Function，全局值都有一个很重要的属性就是连接属性
+    全局变量Global Variables
+    全局别名Global Aliases
+    函数值Function values
+    
 
 首先要介绍的是LLVM类型系统的使用，因为LLVM的每条语句都是带有类型的，LLVM语句可以转换成Value型指针，那么我们用如下的方法就可以获取到当前value的类型：
 
