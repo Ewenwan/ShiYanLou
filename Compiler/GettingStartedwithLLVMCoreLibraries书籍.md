@@ -129,8 +129,37 @@ CodeGen负责将语法树从顶至下遍历，翻译成LLVM IR，LLVM IR是Front
         定制pass
         
         优化pass管理器 LLVMPassManagerRef PM: unwrap(PM)->add(pass);
+        
+        
+        The ImmutablePass class
 
-    LVM类           功能
+1. ModulePass class   模块pass 类
+
+2. CallGraphSCCPass class
+
+3. FunctionPass class  函数pass类
+       
+       LLVM::Function类 getName() 成员函数 取得了函数的名字
+       
+       virtual bool runOnFunction(Function &F) 是 FunctionPass class 的虚函数
+       一个FunctionPass的子类要想做一些实际的工作，就必须对这个虚函数进行实现。
+       
+       注册pass static RegisterPass<Hello> X("hello", "Hello World Pass");
+       对hello PASS进行注册，只有PASS进行了注册之后，才可以进行使用。
+
+[HELLO PASS](http://llvm.org/doxygen/Hello_8cpp_source.html)
+
+4. LoopPass class     循环pass类
+
+5. RegionPass class
+
+6. BasicBlockPass class  基本快pass类
+
+7. MachineFunctionPass class
+
+
+>  LVM类           功能
+
     LLVMContext     上下文类，基本是最核心的保存上下文符号的类 环境相关部分，如Contexts
     Module          模块类，一般一个文件是一个模块，里面有函数列表和全局变量表
     Function        函数类，函数类，生成出来就是一个C函数
