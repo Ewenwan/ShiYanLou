@@ -7,3 +7,5 @@
 [LLVM_proj](https://github.com/Ewenwan/llvm-project/blob/master/README.md)
 
 [LLVM编程索引](http://llvm.org/docs/ProgrammersManual.html)
+
+[llvm源码浏览带跳转](http://androidxref.com/4.2.2_r1/xref/external/llvm/)
