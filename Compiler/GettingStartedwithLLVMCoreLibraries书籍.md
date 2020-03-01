@@ -93,6 +93,83 @@ CodeGen负责将语法树从顶至下遍历，翻译成LLVM IR，LLVM IR是Front
 对于表达式，递归下降还不够用，至少运算符还有优先级啊。所以针对表达式，我们还需要运算符优先分析法。SLR，LALR和LR暂时还用不上。
 
 
+### ASTMatcher   抽象语法树匹配器   查找全局变量及其调用函数
+
+[参考](https://blog.csdn.net/whdAlive/article/details/80292777?depth_1-utm_source=distribute.pc_relevant.none-task&utm_source=distribute.pc_relevant.none-task)
+
+ASTMatcher 是 Clang 中用来帮助我们实现 code-to-code 的转译或者完成某些查询的工具。
+
+ ASTMatcher提供了一个领域特定语言（DSL）来创建基于Clang AST的谓词，同时支持C++，这意味着允许用户编写一个程序来匹配AST节点并能通过访问节点的c++接口来获取该AST节点的属性、源位置等任何信息。
+
+其主要由宏与模板驱动，用法和 函数式编程 及其类似。
+
+ASTMatcher用来匹配AST的节点，它通过调用构造函数创建，也可以构建成一个ASTMatchers的树，其内部可以嵌套多个ASTMatcher，使得匹配更加具体准确。
+
+所有匹配器都是名词描述实体并且可以绑定，这样它们就会指向匹配到的内容。为此，只需要在这些匹配器中调用 bind() 方法，例
+
+```c
+variable(hasType(isInteger())).bind("intvar");
+```
+由于Clang AST中有上千个class，我们显然不可能一个个去看去分析。
+
+这时候我们要清楚一点：使用ASTMatcher的前提是了解你想匹配的AST的样子。
+
+通常情况下，创建合适的ASTMatcher的策略如下：
+
+    1. 寻找想匹配的节点的最外层的类
+    2. 在 AST Matcher Reference 中查看所写的Matcher要么匹配到需要的节点，要么进行”细化”处理
+    3. 创建外部匹配表达式，验证它是否按预期运行。
+    4. 为接下来你想匹配的内部节点检查匹配器。
+    5. 重复以上步骤,直到完成匹配器。
+
+示例代码：
+```c
+#include<stdio.h>
+int a;
+int main(){
+    a = 1;
+    return 0;   
+}
+```
+clang 编译得到 AST
+
+clang -cc1 -ast-dump
+
+```
+|-VarDecl 0xf4a0b8 <F:\1.c:2:1, col:5> col:5 used a 'int'
+`-FunctionDecl 0xf4a160 <line:3:1, line:6:1> line:3:5 main 'int ()'
+  `-CompoundStmt 0xf4a248 <col:11, line:6:1>
+    |-BinaryOperator 0xf4a200 <line:4:1, col:5> 'int' '='
+    | |-DeclRefExpr 0xf4a1c8 <col:1> 'int' lvalue Var 0xf4a0b8 'a' 'int'
+    | `-IntegerLiteral 0xf4a1e0 <col:5> 'int' 1
+    `-ReturnStmt 0xf4a238 <line:5:1, col:8>
+      `-IntegerLiteral 0xf4a218 <col:8> 'int' 0
+```
+我们可以清楚的看到，全局变量a对应的节点类型为 VarDecl ，引用该变量处的节点类型为 DeclRefExpr ，而DeclRefExpr 最外层有一层函数，对应 FunctionDecl节点类型。
+
+得到这些信息，我们就可以总结出来”匹配模型”。
+
+对于使用了的全局变量，我们找它的引用，这个引用需要对应于一个全局变量声明，而且引用是在某个函数内部。这种模式下，我们即可得到所有已使用了的全局变量的信息，包括在哪个函数内部调用。
+
+转换到AST 节点来看：它首先是一个DeclRefExpr类型节点，同时它对应于一个VarDecl全局节点，而且这个DeclRefExpr节点在某个FunctionnDecl下。
+
+因此，我们写出如下的Matcher：
+```C
+StatementMatcher GlobalVarMatcher = declRefExpr(
+    to(
+        varDecl(
+            hasGlobalStorage()
+        ).bind("gvarName")     // 变量引用declRefExpr --> 全局变量varDecl 节点绑定为 “gvarName”
+    ) // to
+    , hasAncestor(
+        functionDecl().bind("function")  // 该节点其外层有函数定义 则绑定到 ”function”
+    )
+).bind("globalReference");               // declRefExpr节点绑定到字符串”globalReference”
+
+```
+在上述Matcher中，为匹配特定AST节点，我们把匹配的varDecl节点绑定到字符串“gvarName”，functionDecl节点绑定到字符串”function”，declRefExpr节点绑定到字符串”globalReference”，以便稍后在匹配回调中检索。
+
+
 ## LLVM IR  中间表达
     1. 语法syntax
         a. Module: Module类声明了一个迭代器，可以遍历module中的function
@@ -133,11 +210,18 @@ CodeGen负责将语法树从顶至下遍历，翻译成LLVM IR，LLVM IR是Front
         
         The ImmutablePass class
 
+Pass类的函数getAnalysisIfAvailable()、getAnalysis()、getAnalysisID()这三个常用的函数，也都是在这个头文件中使用的。Pass之间的交互，是会经常用到这样的函数的。
+
 1. ModulePass class   模块pass 类
+      
+       增加/删除 函数
+       处理MetaData（元数据，在函数之外）
 
 2. CallGraphSCCPass class
 
 3. FunctionPass class  函数pass类
+       
+       处理函数内部的信息
        
        LLVM::Function类 getName() 成员函数 取得了函数的名字
        
