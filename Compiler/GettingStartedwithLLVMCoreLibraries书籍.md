@@ -169,6 +169,10 @@ StatementMatcher GlobalVarMatcher = declRefExpr(
 ```
 在上述Matcher中，为匹配特定AST节点，我们把匹配的varDecl节点绑定到字符串“gvarName”，functionDecl节点绑定到字符串”function”，declRefExpr节点绑定到字符串”globalReference”，以便稍后在匹配回调中检索。
 
+> 获取匹配节点
+
+定义了matcher后将需要添加更多的工具来运行它们。Matchers与MatchCallback配对，并注册一个MatchFinder对象，然后从一个ClangTool运行。
+
 
 ## LLVM IR  中间表达
     1. 语法syntax
