@@ -9,3 +9,7 @@
 [LLVM编程索引](http://llvm.org/docs/ProgrammersManual.html)
 
 [llvm源码浏览带跳转](http://androidxref.com/4.2.2_r1/xref/external/llvm/)
+
+[llvm-clang-samples ](https://github.com/Ewenwan/llvm-clang-samples/tree/master/src_clang)
+
+[llvm-tutor  A collection of LLVM passes (with tests and build scripts)](https://github.com/Ewenwan/llvm-tutor)
