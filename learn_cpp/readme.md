@@ -55,6 +55,8 @@
 
 [VS2010/MFC编程入门教程之目录和总结](www.jizhuomi.com/software/257.html)
 
+[cpp-tutor  Code examples for tutoring modern C++  string Dynamic memory allocation C++ Unit testing  Smart pointers ](https://github.com/banach-space/cpp-tutor)
+
 # 基础议题
     pointers（指针）
     references（引用）
