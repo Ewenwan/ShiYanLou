@@ -14,6 +14,14 @@
 
 [llvm-tutor  A collection of LLVM passes (with tests and build scripts)](https://github.com/Ewenwan/llvm-tutor)
 
+[Clang 中 AST 相关类简介（不定时更新）](https://blog.csdn.net/qq_23599965/article/details/94595735)
+
+[设计文档 —— Clang CFE 内部手册](https://blog.csdn.net/qq_23599965/article/details/91046137)
+
+[关于LLVM，这些东西你必须要知道！](https://blog.csdn.net/hypercode/article/details/53815894?depth_1-utm_source=distribute.pc_relevant.none-task&utm_source=distribute.pc_relevant.none-task)
+
+[LLVM学习笔记——目录（含7.0更新）](https://blog.csdn.net/wuhui_gdnt/article/details/61194221)
+
 ## LLVM开发者手册
 
 [英文参考](http://llvm.org/docs/ProgrammersManual.html)
