@@ -70,6 +70,23 @@ dyn_cast_or_null<>操作符的工作原理与 dyn_cast<> 操作符类似，只�
 
 这些是泛型类，它们需要能够接受可能包含空字符的字符串。因此，它们不能简单地接受const char *，而接受const std::string&要求客户机执行堆分配，这通常是不必要的。代替的是，许多LLVM APIs使用StringRef或const twine&来有效地传递字符串。
 
+**1.StringRef类**
 
+StringRef数据类型表示对常量字符串（一个字符数组和一个长度）的引用，并支持std::string上可用的公共操作，但不需要堆分配。
+它可以使用一个C风格的以null结尾的字符串、一个std::string隐式地被造，也可以使用一个字符指针和长度显式地构造。例如，StringRef find函数声明为：
 
+ iterator find(StringRef Key);
+
+client可以用以下任意一种方式调用这个函数：Map是  StringMap 类对象
+```c
+Map.find("foo");                 // Lookup "foo"    C风格的以null结尾的字符串构造 StringRef 
+Map.find(std::string("bar"));    // Lookup "bar"    C风格的以null结尾的字符串构造 std::string 再构造成 StringRef 
+Map.find(StringRef("\0baz", 4)); // Lookup "\0baz"  一个字符指针 和 长度   显式地构造 StringRef 
+```
+
+类似地，需要返回string的APIs可能会返回一个StringRef实例，该实例可以直接使用，也可以使用str成员函数将其转换为std::string。有关更多信息，请查看 [llvm/ADT/StringRef.h](http://llvm.org/doxygen/StringRef_8h_source.html)
+
+您应该很少直接使用StringRef类，因为它包含指向外部内存的指针，所以存储该类的实例通常是不安全的（除非您知道不会释放外部存储）。StringRef在 LLVM 中足够小和普遍，因此它应该总是通过值传递。
+
+**2. **
 
