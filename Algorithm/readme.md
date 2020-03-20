@@ -88,6 +88,8 @@
 
 [CPP-Data-Structures-and-Algorithms](https://github.com/Ewenwan/CPP-Data-Structures-and-Algorithms)
 
+[Mastering Algorithms with C 《算法精解：C语言描述》源码及Xcode工程、Linux工程 ](https://github.com/yourtion/LearningMasteringAlgorithms-C)
+
 	常用算法
 	 二叉树和前中后序遍历
 	 线索二叉树
