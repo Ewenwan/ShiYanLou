@@ -23,6 +23,8 @@
 
 [LinuxShell命令行及脚本编程实例详解 推荐 CSDN下载](https://download.csdn.net/download/test0037/10571213)
 
+# jq 解析json文件
+
 
 # awk 文本分析
 [awk使用shell变量及shell使用awk中的变量](https://blog.csdn.net/rj042/article/details/72860177)
