@@ -21,6 +21,37 @@ CUDA（Compute Unified Device Architecture）的中文全称为计算统一设�
 
 [并行编程 CUDA openMP 等 中文版](https://github.com/thirdwing/ParaBook)
 
+# 0. 安装
+
+cuda 下载 https://developer.nvidia.com/cuda-toolkit-archive   包含英伟达驱动
+
+cudnn 下载 https://developer.nvidia.com/rdp/cudnn-download
+
+旧版本驱动卸载 
+
+sudo apt-get remove --purge nvidia*
+
+关闭图像服务 X 服务
+
+sudo service lightdm stop
+
+cuda 和 驱动安装
+
+sudo sh   cuda_xxxx.run
+
+安装 cudnn
+
+	# 复制cudnn头文件
+	sudo cp cuda/include/* /usr/local/cuda-10.0/include/
+	# 复制cudnn的库
+	sudo cp cuda/lib64/* /usr/local/cuda-10.0/lib64/
+	# 添加可执行权限
+	sudo chmod +x /usr/local/cuda-10.0/include/cudnn.h
+	sudo chmod +x /usr/local/cuda-10.0/lib64/libcudnn*
+
+        输入如下命令查看是否安装成功：
+        cat /usr/local/cuda/include/cudnn.h | grep CUDNN_MAJOR -A 2
+
 # 1. GPU架构特点
 
 首先我们先谈一谈串行计算和并行计算。我们知道，高性能计算的关键利用多核处理器进行并行计算。
