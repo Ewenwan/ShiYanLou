@@ -275,3 +275,50 @@ Ubuntu14.04升级CMake：
     wget "https://github.com/sharkdp/hexyl/releases/download/v0.4.0/hexyl_0.4.0_amd64.deb"
     sudo dpkg -i hexyl_0.4.0_amd64.deb
 
+# linux 命令行 shell 命令 解析 json文件 jq工具
+
+jq 是一个轻量级的json处理命令。可以对json数据进行分片、过滤、映射和转换
+
+
+cat ./json.txt
+```json
+[{"name": "zhangsan","age": 21,"courses": ["语文", "数学", "英语"]},{"name": "lisi","age": 22,"courses": ["物理", "化学", "生物"]}]
+
+```
+
+cat ./json.txt | jq .
+```json
+[
+  {
+    "name": "zhangsan",
+    "age": 21,
+    "courses": [
+      "语文",
+      "数学",
+      "英语"
+    ]
+  },
+  {
+    "name": "lisi",
+    "age": 22,
+    "courses": [
+      "物理",
+      "化学",
+      "生物"
+    ]
+  }
+]
+```
+
+取json中的某个字段
+```json
+# 取json中第一个分片 中的name
+
+cat ./json.txt | jq '.[0].name'
+"zhangsan"
+# 取courses 中第一个下标的课程
+cat ./json.txt | jq '.[].courses[0]'
+"语文"
+"物理"
+```
+
