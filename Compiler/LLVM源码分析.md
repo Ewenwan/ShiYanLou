@@ -63,11 +63,11 @@ if (auto *AI = dyn_cast<AllocationInst>(Val)) { // 如果Val可以转换成 Allo
 注意，dyn_cast<>操作符可以被滥用，就像c++的dynamic_cast<>或Java的instanceof操作符一样。特别是，不应该使用大的if/then/else块来检查类的许多不同变体。如果您发现自己想这样做，那么使用 InstVisitor 类直接分派指令类型会更清晰、更有效。
 
 
-**4.cast_or_null<>：**
+**4.cast_or_null<>**
 
 cast_or_null<>操作符的工作原理与 cast<>操作符类似，只是它允许一个空指针作为参数(然后将其传播)。这有时很有用，允许您将多个null检查合并到一个检查中。
 
-**5.dyn_cast_or_null<>：**
+**5.dyn_cast_or_null<>**
 
 dyn_cast_or_null<>操作符的工作原理与 dyn_cast<> 操作符类似，只是它允许一个空指针作为参数(然后将其传播)。这有时很有用，允许您将多个null检查合并到一个检查中。
 
@@ -96,7 +96,7 @@ Map.find(StringRef("\0baz", 4)); // Lookup "\0baz"  一个字符指针 和 长�
 
 您应该很少直接使用StringRef类，因为它包含指向外部内存的指针，所以存储该类的实例通常是不安全的（除非您知道不会释放外部存储）。StringRef在 LLVM 中足够小和普遍，因此它应该总是通过值传递。
 
-**2. Twine 字符串连接 **
+**2. Twine 字符串连接**
 
 Twine类是 APIs 接受连接字符串的有效方法。例如，一个常见的LLVM范型是根据带有后缀的另一条指令的名称来命名一条指令。
 
@@ -145,7 +145,6 @@ std::vector<int> V = {8, 9, 10};
 S = formatv("{0}", make_range(V.begin(), V.end())); // S == "8, 9, 10"
 S = formatv("{0:$[+]}", make_range(V.begin(), V.end())); // S == "8+9+10"
 S = formatv("{0:$[ + ]@[x]}", make_range(V.begin(), V.end())); // S == "0x8 + 0x9 + 0xA"
-
 
 ```
 
@@ -221,22 +220,21 @@ SmallString是SmallVector的子类，它添加了一些方便的api，比如+=�
 
 > **Set-Like Containers 集合类容器 (std::set, SmallSet, SetVector, etc)**
 
-
 > **Map-Like Containers (std::map, DenseMap, etc) 字典映射类容器**
 
 > **Bit storage containers 位存储容器(BitVector, SparseBitVector)**
 
 ## 遍历程序
-### 遍历一个module模块中的 函数 
+### module类简介 
 Module类表示LLVM程序中的顶层结构。
-一个LLVM Module实际上要么是原始程序的一个翻译单元，要么是链接器合并的几个翻译单元的一个组合。Module类跟踪
+一个LLVM Module实际上要么是原始程序的一个翻译单元，要么是链接器合并的几个翻译单元的一个组合。Module 模块包含 Functions列表 + GlobalVariables全局变量列 + SymbolTable符号表
 
 1.一个Functions列表
 
 Module::FunctionListType &getFunctionList()
 返回Function列表。当您需要更新列表或执行没有转发方法的复杂操作时，这是必需的。
 
-2.一个GlobalVariables列表
+2.一个GlobalVariables全局变量列表
 ```c
 Module::global_iterator —— 全局变量列表iterator的类型定义
 Module::const_global_iterator —— const_iterator的类型定义。
@@ -246,39 +244,48 @@ Module::GlobalListType &getGlobalList()
 
 ```
 
-
-3.一个SymbolTable。此外，它还包含一些有用的成员函数，这些函数试图简化常见操作。
+3.一个SymbolTable符号表。此外，它还包含一些有用的成员函数，这些函数试图简化常见操作。
 ```c
 SymbolTable *getSymbolTable()
 返回对这个Module的SymbolTable的一个引用。
 
 Function *getFunction(StringRef Name) const
 在Module SymbolTable中查找指定的函数。如果不存在，返回null。
+
 FunctionCallee getOrInsertFunction(const std::string &Name, const FunctionType *T)
-在Module SymbolTable中查找指定的函数。如果它不存在，则为函数添加一个外部声明并返回它。注意，已经存在的函数签名可能与请求的签名不匹配。因此，为了支持将结果直接传递给EmitCall的常见用法，返回类型是{FunctionType *T, Constant *FunctionPtr}的一个结构体，而不是具有潜在的意外签名的简单Function*。
+在Module SymbolTable中查找指定的函数。如果它不存在，则为函数添加一个外部声明并返回它。注意，已经存在的函数签名可能与请求的签名不匹配。因此，为了支持将结果直接传递给EmitCall的常见用法，
+返回类型是{FunctionType *T, Constant *FunctionPtr}的一个结构体，而不是具有潜在的意外签名的简单Function*。
+
 std::string getTypeName(const Type *Ty)
 如果指定Type的SymbolTable中至少有一个条目，则返回它。否则返回空字符串。
+
 bool addTypeName(const std::string &Name, const Type *Ty)
 在将Name映射到Ty的SymbolTable中插入一个条目。如果已经有该名称的条目，则返回true，并且不修改SymbolTable。
 
 
 ```
 
-**函数类 FunctionType**
+**a. 函数类 FunctionType**
 
-Function类表示LLVM中的一个过程。它实际上是LLVM层次结构中比较复杂的类之一，因为它必须跟踪大量数据。Function类跟踪基本块列表、形式参数列表和符号表。
-基本块列表是函数对象中最常用的部分。该列表强制函数中块的隐式排序，这指示代码将如何由后端布局。此外，第一个基本块是函数的隐式入口节点。在LLVM中显式地分支到这个初始块是不合法的。不存在隐式的退出节点，实际上一个函数可能有多个退出节点。如果BasicBlock列表是空的，这表明函数实际上是一个函数声明:函数的实际主体还没有被链接进来。
+Function类表示LLVM中的一个过程。它实际上是LLVM层次结构中比较复杂的类之一，因为它必须跟踪大量数据。Function类跟踪基本块列表BBtable、形式参数列表param list和符号表SymbolTable。
+
+基本块basic block table列表是函数对象中最常用的部分。该列表强制函数中块的隐式排序，这指示代码将如何由后端布局。此外，第一个基本块是函数的隐式入口节点。在LLVM中显式地分支到这个初始块是不合法的。不存在隐式的退出节点，实际上一个函数可能有多个退出节点。
+
+如果BasicBlock列表是空的，这表明函数实际上是一个函数声明:函数的实际主体还没有被链接进来。
+
 除了基本块列表之外，函数类还跟踪函数接收到的形式参数列表。这个容器管理参数节点的生存期，就像BasicBlock列表管理BasicBlock一样。
-SymbolTable是一个很少使用的LLVM特性，只在必须按名称查找值时才使用。除此之外，符号表还用于内部，以确保函数体中指令、基本块或参数的名称之间没有冲突。
+
+SymbolTable是一个很少使用的LLVM特性，只在必须**按名称查找值**时才使用。除此之外，符号表还用于内部，以确保函数体中指令、基本块或参数的名称之间没有冲突。
+
 注意，函数是一个全局值，因此也是一个常量。函数的值是它的地址(链接后)，它保证是常量。
 
-
 ```c
-DerivedTypes的子类，用于function类型。
-bool isVarArg() cons：如果它是一个vararg函数，则返回true。
-const Type * getReturnType() const：返回函数的返回类型。
-const Type * getParamType (unsigned i)：返回第i个参数的类型。
-const unsigned getNumParams() const：返回形式参数的数量。
+DerivedTypes 的子类，用于function类型。
+bool isVarArg() cons：                  如果它是一个vararg函数，则返回true。
+const Type * getReturnType() const：    返回函数的返回类型。
+const Type * getParamType (unsigned i)：返回第i个参数的类型。  参数名字在哪里??
+const unsigned getNumParams() const：   返回形式参数的数量。
+FunctionType *getFunctionType()：       返回函数类型
 
 Function(const FunctionType *Ty, LinkageTypes Linkage, const std::string &N = "", Module* Parent = 0)
 //构造函数，用于在需要创建新函数来添加程序时使用。构造函数必须指定要创建的函数的类型以及函数应该具有哪种类型的链接。FunctionType参数指定函数的形式参数和返回值。同一个FunctionType值可用于创建多个函数。父参数指定定义函数的模块。如果提供了这个参数，函数将自动插入该模块的函数列表中。
@@ -315,64 +322,77 @@ SymbolTable *getSymbolTable()
 
 ```
 
-**BasicBlock类**
+**b. BasicBlock类**
 
-该类表示代码的单个入口和单个出口部分，编译器社区通常将其称为基本块。BasicBlock类维护一个Instructions列表，这些指令构成了块的主体。与语言定义匹配，此指令列表的最后一个元素始终是一个终止符指令。
+该类表示代码的单个入口和单个出口部分，编译器社区通常将其称为基本块。
 
-除了跟踪组成块的指令列表外，BasicBlock类还跟踪它所嵌入的Function。
+BasicBlock类维护一个Instructions指令列表，这些指令构成了块的主体。与语言定义匹配，此指令列表的最后一个元素始终是一个终止符指令。
+
+除了跟踪组成块的指令列表外，BasicBlock类还跟踪它所嵌入的Function（调用的外部函数 函数调用指令）。
+
 注意，BasicBlocks本身是Values，因为它们由branches之类的指令引用，所以可以放在switch表中。BasicBlocks有类型label。
 
 BasicBlock类的重要Public成员
 
-```
+```c
 
 BasicBlock(const std::string &Name = "", Function *Parent = 0)
-BasicBlock构造函数用于创建用于插入函数的新基本块。构造函数可选地接受新块的一个名称和将其插入其中的一个Function。如果指定了Parent参数，则在指定Function的末尾自动插入新的BasicBlock；如果没有指定，则必须手动将BasicBlock插入Function。
+
+//BasicBlock构造函数用于创建用于插入函数的新基本块。构造函数可选地接受新块的一个名称和将其插入其中的一个Function。
+//如果指定了Parent参数，则在指定Function的末尾自动插入新的BasicBlock；如果没有指定，则必须手动将BasicBlock插入Function。
+
 BasicBlock::iterator —— 指令列表iterator的类型定义
 BasicBlock::const_iterator —— const_iterator的类型定义。
 用于访问指令列表的begin(), end(), front(), back(), size(), empty() STL样式函数。
+
 这些方法和typedefs是转发函数，它们具有与相同名称的标准库方法相同的语义。这些方法以易于操作的方式公开基本块的底层指令列表。要获得完整的容器操作(包括更新列表的操作)，必须使用getInstList()方法。
+
 BasicBlock::InstListType &getInstList()
 此方法用于访问实际包含指令的底层容器。当BasicBlock类中没有要执行的操作的转发函数时，必须使用此方法。因为没有用于“更新”操作的转发函数，所以如果想更新BasicBlock的内容，就需要使用这个函数。
+
 Function *getParent()
 返回一个指针，它指向这个块所嵌套的Function，或者返回一个空指针(如果它是无家可归的)。
+
 Instruction *getTerminator()
 返回一个指向出现在BasicBlock末尾的终止符指令的指针。如果没有终止符指令，或者如果块中的最后一条指令不是终止符，则返回一个空指针。
 
 ```
 
-**Argument类 函数参数类**
+**c. Argument类 函数参数类**
 
 这个Value的子类为函数的传入形式参数定义接口。一个函数维护其一个形式参数的列表。一个参数有一个指向父Function的指针。
 
-**Value类**
+**d. Value类 包含了我被哪些指令（LLVM User）使用**
 
-是LLVM源库中最重要的类。它表示一个类型化值，可以(除其他外)用作一条指令的操作数。有许多不同类型的Values，比如常量、参数。甚至指令和函数也是Values。
+Value类是LLVM源库中最重要的类。它表示一个类型化值，可以(除其他外)用作一条指令的操作数。有许多不同类型的Values，比如常量、参数。甚至指令和函数也是Values。
 
 一个特定的Value可以在程序的LLVM表示中多次使用。例如，一个函数的一个传入参数(用Argument类的一个实例表示)被引用该参数的函数中的每条指令“使用”。为了跟踪这种关系，Value类保存了使用它的所有Users的一个列表(User类是LLVM图中所有可以引用Values的节点的基类)。这个use列表是LLVM在程序中表示def-use信息的方式，并且可以通过use_*方法访问，如下所示。
 
-因为LLVM是一个类型化表示，所以每个LLVM Value都是类型化的，并且这种Type可以通过getType()方法获得。此外，所有LLVM values都可以被命名。Value的“name”是可在LLVM代码中打印的一个符号字符串：
+因为LLVM是一个类型化表示，所以每个LLVM Value都是类型化的，并且这种Type可以通过 getType() 方法获得。此外，所有LLVM values都可以被命名。Value的“name”是可在LLVM代码中打印的一个符号字符串：
 %foo = add i32 1, 2
 
 这个指令的名称是“foo”。注意，任何值的名称都可能丢失(一个空字符串)，所以名称应该只用于调试(使源代码更容易阅读，调试打印输出)，不应该用于跟踪值或在它们之间映射。为此，使用指向这个Value本身的一个std::map代替。
 
-LLVM的一个重要方面是，SSA变量和生成它的操作之间没有区别。因此，任何对指令生成的值的引用(例如，作为传入参数可用的值)都表示为指向表示该值的类实例的直接指针。虽然这可能需要一些时间来适应，但它简化了表示，使操作更容易。
+LLVM的一个重要方面是，SSA变量(静态单赋值 三地址)和生成它的操作之间没有区别。因此，任何对指令生成的值的引用(例如，作为传入参数可用的值)都表示为指向表示该值的类实例的直接指针。虽然这可能需要一些时间来适应，但它简化了表示，使操作更容易。
 
 ```c
-Value::use_iterator —— use-list上的iterator的类型定义
+Value::use_iterator       —— use-list上的iterator的类型定义   遍历使用者的迭代器
 Value::const_use_iterator —— use-list上的const_iterator的类型定义
-unsigned use_size() —— 返回这个value的users数量。
-bool use_empty() —— 如果没有users，返回true。
-use_iterator use_begin() —— 获取指向use-list的开始的一个迭代器。
-use_iterator use_end() —— 获取指向use-list的结尾的一个迭代器。
-User *use_back() —— 返回列表中的最后一个元素。
+unsigned use_size()       —— 返回这个value的users数量。
+bool use_empty()          —— 如果没有users，返回true。
+use_iterator use_begin()  —— 获取指向use-list的开始的一个迭代器。
+use_iterator use_end()    —— 获取指向use-list的结尾的一个迭代器。
+User *use_back()          —— 返回列表中的最后一个元素。
+
 这些方法是访问LLVM中的def-use信息的接口。与LLVM中的所有其他iterators一样，命名约定遵循STL定义的约定。
+
 Type *getType() const 这个方法返回Value的Type。
 bool hasName() const
 std::string getName() const
 void setName(const std::string &Name)
 
 void replaceAllUsesWith(Value *V)
+
 此方法遍历一个Value的use列表，它更改当前value的所有Users以引用“V”。例如，如果您检测到一条指令总是产生一个常量值(例如通过常量折叠)，您可以像这样用常量替换该指令的所有用法：
 Inst->replaceAllUsesWith(ConstVal);
 
@@ -380,77 +400,89 @@ Inst->replaceAllUsesWith(ConstVal);
 ```
 
 
-**User类**
+**e. User类 包含了我使用了哪些操作数（LLVM Value）**
 
-是所有可能引用Values的LLVM节点的公共基类。它公开了一个“操作数”列表，这些“操作数”是User引用的所有Values。User类本身是Value的子类。
+是所有可能 引用Values的LLVM节点 的公共基类。它公开了一个“操作数”列表，这些“操作数”是User引用的所有Values。User类本身是Value的子类。
+
 User的操作数直接指向它引用的LLVM Value。因为LLVM使用静态单赋值(SSA)表单，所以只能引用一个定义，从而允许这种直接连接。这个连接在LLVM中提供use-def信息。
 
 User类以两种方式公开操作数列表：通过一个索引访问接口和一个基于iterator的接口。
 ```C
-Value *getOperand(unsigned i)
-unsigned getNumOperands()
-这两种方法以一个方便直接访问的形式公开User的操作数。
-User::op_iterator —— 操作数列表上的iterator的类型定义
-op_iterator op_begin() —— 获取指向操作数列表的开始的一个迭代器。
-op_iterator op_end() —— 获取指向操作数列表的末尾的一个迭代器。
+Value *getOperand(unsigned i);  // 通过一个索引访问接口
+unsigned getNumOperands();
+//一个基于iterator的接口访问
+User::op_iterator       —— 操作数列表上的iterator的类型定义
+op_iterator op_begin()  —— 获取指向操作数列表的开始的一个迭代器。
+op_iterator op_end()    —— 获取指向操作数列表的末尾的一个迭代器。
 这些方法一起组成了一个User操作数的基于iterator的接口。
 ```
 
-**Instruction类指令类**
-Instruction类是所有LLVM指令的公共基类。它只提供了几个方法，但是是一个非常常用的类。Instruction类本身跟踪的主要数据是操作码(指令类型)和嵌入Instruction的父BasicBlock。为了表示一个特定类型的指令，使用了众多Instruction子类中的一个。
+**f. Instruction 指令类**
+Instruction类是所有LLVM指令的公共基类。它只提供了几个方法，但是是一个非常常用的类。
 
-因为Instruction类是User类的子类，所以可以像访问其他Users一样访问它的操作数(使用getOperand()/getNumOperands()和op_begin()/op_end()方法)。Instruction类的一个重要文件是llvm/Instruction.def文件。这个文件包含一些关于LLVM中各种不同类型指令的元数据。它描述了用作操作码的enum值(例如，Instruction::Add和Instruction::ICmp)，以及实现该指令的具体Instruction子类(例如，BinaryOperator和CmpInst)。不幸的是，这个文件中宏的使用混淆了doxygen，所以这些enum值没有正确地显示在doxygen输出中。
+Instruction类本身跟踪的主要数据是操作码(指令类型)和嵌入Instruction的 父BasicBlock。
 
-**Instruction类的重要子类**
+为了表示一个特定类型的指令，使用了众多Instruction子类中的一个。
 
-BinaryOperator
-这个子类表示所有两个操作数指令，它们的操作数必须是相同的类型，比较指令除外。
+因为Instruction类是User类的子类，所以可以像访问其他Users一样访问它的操作数
+使用 getOperand() / getNumOperands() 和
 
-CastInst
-这个子类是12个casting指令的父类。它提供了对cast指令的通用操作。
+op_begin() / op_end()方法)。
 
-CmpInst
-这个子类表示两个比较指令，ICmpInst(整数操作数)和FCmpInst(浮点操作数)。
+Instruction类的一个重要文件是llvm/Instruction.def文件。
 
-**Instruction类的重要Public成员**
+这个文件包含一些关于LLVM中各种不同类型指令的元数据。
+
+它描述了用作操作码的enum值(例如，Instruction::Add和Instruction::ICmp)，以及实现该指令的具体Instruction子类(例如，BinaryOperator和CmpInst)。不幸的是，这个文件中宏的使用混淆了doxygen，所以这些enum值没有正确地显示在doxygen输出中。
+
+**g. Instruction类的重要子类**
+
+BinaryOperator:这个子类表示所有两个操作数指令，它们的操作数必须是相同的类型，比较指令除外。
+
+CastInst:这个子类是12个casting指令的父类。它提供了对cast指令的通用操作。
+
+CmpInst:这个子类表示两个比较指令，ICmpInst(整数操作数)和FCmpInst(浮点操作数)。
+
+**h. Instruction类的重要Public成员**
 ```c
 
-BasicBlock *getParent()
-返回嵌入该 Instruction 的BasicBlock。
-bool mayWriteToMemory()
-如果指令（即call、free、invoke或store）写入内存，则返回true。
-unsigned getOpcode()
-返回该 Instruction 的操作码。
+BasicBlock *getParent()：返回嵌入该 Instruction 的BasicBlock，返回该指令所属的 基本块。
+bool mayWriteToMemory()：如果指令（即call、free、invoke或store）写入内存，则返回true。
+unsigned getOpcode()   ：返回该 Instruction 的操作码。
 Instruction *clone() const
 返回指定指令的另一个实例，该实例在所有方面与原始指令相同，只是该指令没有parent(即没有嵌入到BasicBlock中)，而且没有名称。
 ```
-**Constant类和子类**
+**i. Constant类和子类**
 
-Constant表示不同类型常量的基类。它由ConstantInt、ConstantArray等构成子类，用于表示各种类型的Constants。GlobalValue也是一个子类，它表示全局变量或函数的地址。
+Constant表示不同类型常量的基类。它由 ConstantInt、ConstantArray 等构成子类，用于表示各种类型的Constants。GlobalValue也是一个子类，它表示全局变量或函数的地址。
 
-**Constant类的重要子类**
+**j. Constant类的重要子类**
 ```c
-ConstantInt：Constant的子类表示任意宽度的一个整数常量。
+ConstantInt                  ：Constant的子类表示任意宽度的一个整数常量。
 const APInt& getValue() const：返回这个常量的底层值，一个APInt值。
-int64_t getSExtValue() const：通过符号扩展将底层APInt值转换为int64_t。如果APInt的值(而不是位宽)太大，无法容纳int64_t，则会生成一个断言。由于这个原因，不鼓励使用这种方法。
+
+int64_t getSExtValue() const ：通过符号扩展将底层APInt值转换为int64_t。如果APInt的值(而不是位宽)太大，无法容纳int64_t，则会生成一个断言。由于这个原因，不鼓励使用这种方法。
+
 uint64_t getZExtValue() const：通过zero扩展将底层APInt值转换为uint64_t。如果APInt的值(而不是位宽)太大，无法放入uint64_t中，则会生成一个断言。由于这个原因，不鼓励使用这种方法。
+
 static ConstantInt* get(const APInt& Val)：返回代表Val提供的值的ConstantInt对象。该类型被暗示为与Val的位宽相对应的整数类型。
+
 static ConstantInt* get(const Type *Ty, uint64_t Val)：返回代表Val为整数类型Ty提供的值的ConstantInt对象。
 ConstantFP：这个类表示一个浮点常量。
 double getValue() const：返回这个常量的基础值。
-ConstantArray：这表示一个常量数组。
+ConstantArray          ：这表示一个常量数组。
 const std::vector<Use> &getValues() const：返回组成这个数组的一个组件常量向量。
-ConstantStruct：这表示一个常量Struct。
+ConstantStruct         ：这表示一个常量Struct。
 const std::vector<Use> &getValues() const：返回组成这个struct的一个组件常量向量。
 GlobalValue：它表示一个全局变量或函数。在这两种情况下，值都是一个常量固定地址(链接之后)。
 ```
-**GlobalValue类 全局变量**
+**k. GlobalValue类 全局变量**
 
 GlobalValue（GlobalVariables 或 Functions）是所有函数体中唯一可见的LLVM values。因为它们在全局范围内是可见的，所以它们还受制于与其他在不同翻译单元中定义的全局变量的链接。为了控制链接过程，GlobalValues知道它们的 linkage 规则。具体地说，GlobalValues知道它们是否具有internal或external linkage，这是由LinkageTypes枚举定义的。
 
 如果一个GlobalValue有internal linkage(相当于C语言中的static链接)，那么它对于当前翻译单元之外的代码是不可见的，并且不参与链接。如果它有external linkage，那么它对外部代码是可见的，并且确实参与了链接。除了linkage信息，GlobalValues还跟踪它们当前属于哪个Module。
 
-因为GlobalValues是内存对象，所以它们总是由它们的地址来引用。因此，一个全局的Type始终是指向其内容的一个指针。在使用GetElementPtrInst指令时，一定要记住这一点，因为必须首先取消对该指针的引用。例如，如果您有一个GlobalVariable (GlobalValue的子类)，它是一个24 int的数组，类型为[24xi32]，那么GlobalVariable是指向该数组的指针。虽然这个数组的第一个元素的地址和GlobalVariable的值是相同的，但是它们有不同的类型。全局变量的类型是[24xi32]。第一个元素的类型是i32。因此，访问一个global value需
+因为GlobalValues是内存对象，所以它们总是由它们的地址来引用。因此，一个全局的Type始终是指向其内容的一个指针。在使用GetElementPtrInst指令时，一定要记住这一点，因为必须首先取消对该指针的引用。例如，如果您有一个GlobalVariable (GlobalValue的子类)，它是一个24 int的数组，类型为[24xi32]，那么GlobalVariable是指向该数组的指针。虽然这个数组的第一个元素的地址和GlobalVariable的值是相同的，但是它们有不同的类型。全局变量的类型是[24xi32]。第一个元素的类型是i32。
 
 
 ### 遍历一个Function中的BasicBlock 遍历一个函数中的基本块
