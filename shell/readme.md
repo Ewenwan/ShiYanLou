@@ -25,6 +25,16 @@
 
 # jq 解析json文件
 
+# 获取文件的绝对路径
+test.sh
+```sh
+root_path=$(readlink -f "$(dirname "$0")")
+echo $root_path  
+```
+
+不管在那里运行 test.sh
+
+该脚本打印的都是 test.sh 所在的绝对路径
 
 # awk 文本分析
 [awk使用shell变量及shell使用awk中的变量](https://blog.csdn.net/rj042/article/details/72860177)
