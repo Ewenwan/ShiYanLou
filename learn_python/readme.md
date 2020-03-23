@@ -48,7 +48,7 @@
 
 [清华大学 anaconda 软件包 site-page ](https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/win-64)
 
-
+[pip安装包 在线下载后传到离线环境 使用 pip install xxx.whl安装](https://pypi.org/simple/numpy/)
 
 # 书籍
 [Python Pocket Reference ](https://github.com/Ewenwan/python-pocket-reference) 
