@@ -36,6 +36,17 @@ echo $root_path
 
 该脚本打印的都是 test.sh 所在的绝对路径
 
+# 数字比较
+```sh
+my_scale=0.056
+if [ `echo ${my_scale} | awk -v tem="0" '{print($1>tem)? "1":"0"}'` -eq "1" ]   # -gt ，-lt，-eq ,-ne 比较的都是整数数字
+then 
+     echo my_scale bigger then zero
+else
+     echo my_scale equal to zero
+fi
+```
+
 # awk 文本分析
 [awk使用shell变量及shell使用awk中的变量](https://blog.csdn.net/rj042/article/details/72860177)
 ```sh
