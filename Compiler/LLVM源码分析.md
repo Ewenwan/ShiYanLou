@@ -261,6 +261,24 @@ std::string getTypeName(const Type *Ty)
 
 bool addTypeName(const std::string &Name, const Type *Ty)
 在将Name映射到Ty的SymbolTable中插入一个条目。如果已经有该名称的条目，则返回true，并且不修改SymbolTable。
+BasicBlock
+
+```
+
+```c
+// 迭代器 iterator
+
+Module::iterator     遍历模块内的函数 Function
+
+Function::iterator   遍历函数内的基本块 BasicBlocks
+
+BasicBlock::iterator 遍历基本块BB内的 指令 Instruction (又名 使用者 User) 
+                     子类: 载入指令 存储指令 分配指令 调用指令 
+                     可使用 dyn_cast<AllocationInst>(val) 进行类别转换
+
+User::op_iterator    遍历使用者(User  指令 Instruction) 内使用的操作数op(值 Value)
+
+Value::use_iterator  遍历值的使用者(指令等)
 
 
 ```
