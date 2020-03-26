@@ -28,6 +28,42 @@
 
 [中文翻译](https://blog.csdn.net/qq_23599965/article/details/88538590?depth_1-utm_source=distribute.pc_relevant.none-task&utm_source=distribute.pc_relevant.none-task)
 
+## 关键字 字典
+```c
+ADCE  Aggressive Dead Code Elimination       积极的死代码消除
+AST   Abstract Syntax Tree                   抽象语法树 一个 “AST” 可能更像一个通用图而不是一棵“树”
+BB Vectorization   Basic-Block Vectorization 基本块向量化
+BURS   Bottom Up Rewriting System — A method of instruction selection for code generation.
+                                              自底向上重写系统－一种代码生成中的指令选择方法。
+CSE    Common Subexpression Elimination.     共同子表达式消除。
+     一种移除共同子表达式的优化。例如 (a+b)*(a+b) 有两个相同的子表达式: (a+b)。这个优化使得只做一次加法然后执行乘法（但是只针对正确且安全的计算）。
+DAG   Directed Acyclic Graph                 有向不循环图
+Derived Pointer                              一个指向对象内部的指针，使得垃圾回收器不能使用此指针进行可达性分析。
+     只要一个 derived 指针存在，对应的对象的指针必须保留在 root 内，否则垃圾回收器可能会释放引用的对象。对于拷贝收集器，derived 指针具有额外的风险使得它们可能在任何安全点处无效化。这个机制被用来对抗对象指针。
+
+DSA   数据结构分析
+DSE   Dead Store Elimination  可不达存储消除
+
+FCA  First Class Aggregate    第一类集合
+GC   垃圾回收。使用可达性分析替代显式的内存管理来回首不再使用的内存。  
+Heap 堆 在垃圾回收中，使用可达性分析管理的内存区域
+
+IPA   Inter-Procedural Analysis.  过程间分析。引用到过程、函数和编译单元（模块）之间发生的大量代码分析。
+IPO   Inter-Procedural Opti. 过程间优化。引用到过程、函数和编译单元（模块）之间发生的大量代码优化。
+ISel  instruction selection  指令选择
+LCSSA Loop-Closed Static Single Assignment Form  闭环静态单赋值形式
+LICM  Loop Invariant Code Motion 循环不变量
+Load-VN 负荷值编号
+LTO   link time opt 链接时优化
+MC    机器码
+Object Pointer  指向对象的指针，使得垃圾回收器可以追踪对象内的引用。这个机制用来对抗derived 指针。
+PRE   Partial Redundancy Elimination  部分冗余消除
+SCC   Strongly Connected Component 强链接组件
+SCCP  Sparse Conditional Constant Propagation  稀疏的条件常量传播
+
+TBAA Type-Based Alias Analysis  基于类型的别名分析
+
+```
 ### 重要且有用的LLVM APIs  函数
 
 > cast类型相关
