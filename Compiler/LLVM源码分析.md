@@ -26,6 +26,8 @@
 
 [使用libclang来处理c++代码用来做c++反射代码自动生成 ](https://github.com/Ewenwan/meta)
 
+[清华大学--开源机器学习框架——计图（Jittor）--Op编译器和调优器](https://cg.cs.tsinghua.edu.cn/jittor/)
+
 ## LLVM开发者手册
 
 [英文参考](http://llvm.org/docs/ProgrammersManual.html)
