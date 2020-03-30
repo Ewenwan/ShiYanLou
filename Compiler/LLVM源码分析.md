@@ -1,3 +1,4 @@
+
 # LLVM源码分析
 
 [LLVM  CMU 教案 ](www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/15745-s14/public/lectures/)
@@ -21,6 +22,8 @@
 [关于LLVM，这些东西你必须要知道！](https://blog.csdn.net/hypercode/article/details/53815894?depth_1-utm_source=distribute.pc_relevant.none-task&utm_source=distribute.pc_relevant.none-task)
 
 [LLVM学习笔记——目录（含7.0更新）](https://blog.csdn.net/wuhui_gdnt/article/details/61194221)
+
+[CLANG 分析](https://github.com/Ewenwan/llvm-project/blob/master/clang/lib/readme.md)
 
 ## LLVM开发者手册
 
