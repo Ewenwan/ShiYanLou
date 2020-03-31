@@ -1,5 +1,7 @@
 # 编译器 编译原理
 
+[编译器书籍 现代体系结构的优化编译器 高级编译器设计与实现](https://github.com/Ewenwan/compilerbook)
+
 [甲骨文公司编辑器Oracle Solaris Studio 12.4 Information Library (简体中文) c/cpp用户指南 数值计算指南 代码分析器 性能分析器 线程分析器](https://docs.oracle.com/cd/E57201_01/)
 
 [哈工大 编译原理 ](http://www.icourse163.org/course/HIT-1002123007)
