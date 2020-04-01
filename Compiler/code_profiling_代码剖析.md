@@ -371,6 +371,7 @@ demo
 
 但，因为其简单，却正好可以用来演示 perf 的基本使用。假如 perf 告诉您这个程序的瓶颈在别处，您就不必再浪费宝贵时间阅读本文了。
 
+
 编译为可执行文件 test1   gcc – o test1 – g test.c  此处一定要加-g选项，加入调试和符号表信息。
 
 perf stat ./test1   输出上下文切换数量 clock等信息
@@ -399,9 +400,20 @@ Cache-misses: cache 失效的次数。程序运行过程中总体的 cache 利�
 
 > 查找时间上的热点函数   hot spot
 
-     perf record – e cpu-clock ./test1 
+     perf record – e cpu-clock -g ./test1     或者 perf record -e cpu-clock -g -p 4522    -p后面接已经启动的进程id
+     使用ctrl+c中断perf进程，或者在程序执行结束后，会产生perf.data的文件，使用
      perf report 
-
+     会产生结果分析 
+     
+[perf的结果可以生成火焰图。生成火焰图需要借助Flame Graph](https://github.com/Ewenwan/FlameGraph)
+     
+     1、使用perf script工具对perf.data进行解析
+       perf script -i perf.data &> perf.unfold 
+     2、将perf.unfold中的符号进行折叠：
+      /data/stackcollapse-perf.pl perf.unfold &> perf.folded 
+     3、最后生成svg图：
+      /data/flamegraph.pl perf.folded > perf.svg
+      
 得到的结果有3个问题：
 
 1）perf未能定位本地符号表对应的symbol和地址的对应关系：0x000003d4对应的什么函数？ 高版本可能已经解决了 
