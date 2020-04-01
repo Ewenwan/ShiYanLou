@@ -226,15 +226,58 @@ perf是Linux kernel自带的系统性能优化工具。优势在于与Linux Kern
 
 事件分为以下三种：
 
-1）Hardware Event 是由 PMU 硬件产生的事件，比如 cache 命中，当您需要了解程序对硬件特性的使用情况时，便需要对这些事件进行采样；
+[perf.wiki](https://perf.wiki.kernel.org/index.php/Tutorial)
 
-   cycles instructions cache-references（命中）cache-misses（不命中） branches branche-miss bus-cycles idle-cycles ref-cycles
+1）Hardware Event 是由 PMU performance monitor unit(性能监控单元) 硬件产生的事件，比如 cache 命中，当您需要了解程序对硬件特性的使用情况时，便需要对这些事件进行采样；
+
+   cycles /instructions/ cache-references（命中）/cache-misses（不命中）/ branches/ branche-miss/ bus-cycles /idle-cycles /ref-cycles
+   
 
 2）Software Event 是内核软件产生的事件，比如进程切换，tick 数等 ;
 
-   cpu-clock  task-clock page-faults contsxt-switches
+   cpu-clock / task-clock/ page-faults /contsxt-switches /minor-faults  /major-faults/cpu-migrations/alignment-faults/emulation-faults
 
 3）Tracepoint event 是内核中的静态 tracepoint 所触发的事件，这些 tracepoint 用来判断程序运行期间内核的行为细节，比如 slab 分配器的分配次数等。
+   
+     kvmmmu:kvm_mmu_pagetable_walk   
+     sched:sched_stat_runtime                   [Tracepoint event]
+     sched:sched_pi_setprio                     [Tracepoint event]
+     syscalls:sys_enter_socket                  [Tracepoint event]
+     syscalls:sys_exit_socket                   [Tracepoint event]
+     ext4:ext4_allocate_inode                   [Tracepoint event] 
+     kmem:kmalloc                               [Tracepoint event] 
+     module:module_load                         [Tracepoint event] 
+     workqueue:workqueue_execution              [Tracepoint event] 
+     sched:sched_{wakeup,switch}                [Tracepoint event] 
+     syscalls:sys_{enter,exit}_epoll_wait       [Tracepoint event] 
+ 
+4) Hardware cache event
+
+         L1-dcache-loads   
+         L1-dcache-load-misses   
+         L1-dcache-stores    
+         L1-dcache-store-misses   
+         L1-dcache-prefetches    
+         L1-dcache-prefetch-misses 
+         L1-icache-loads             
+         L1-icache-load-misses            
+         L1-icache-prefetches         
+         L1-icache-prefetch-misses       
+         LLC-loads                             
+         LLC-load-misses                 
+         LLC-stores                       
+         LLC-store-misses       
+         LLC-prefetch-misses                        [Hardware cache event]
+         dTLB-loads                                 [Hardware cache event]
+         dTLB-load-misses                           [Hardware cache event]
+         dTLB-stores                                [Hardware cache event]
+         dTLB-store-misses                          [Hardware cache event]
+         dTLB-prefetches                            [Hardware cache event]
+         dTLB-prefetch-misses                       [Hardware cache event]
+         iTLB-loads                                 [Hardware cache event]
+         iTLB-load-misses                           [Hardware cache event]
+         branch-loads                               [Hardware cache event]
+         branch-load-misses                         [Hardware cache event]
 
 上述每一个事件都可以用于采样，并生成一项统计数据，时至今日，尚没有文档对每一个 event 的含义进行详细解释。
 
@@ -247,7 +290,37 @@ perf是Linux kernel自带的系统性能优化工具。优势在于与Linux Kern
 > **硬件特性之流水线，超标量体系结构，乱序执行**
 
 提高性能最有效的方式之一就是并行。处理器在硬件设计时也尽可能地并行，比如流水线，超标量体系结构以及乱序执行。
-处理器处理一条指令需要分多个步骤完成，比如先取指令，然后完成运算，最后将计算结果输出到总线上。在处理器内部，这可以看作一个三级流水线.
+
+1. 处理器处理一条指令需要分多个步骤完成，比如先取指令，然后完成运算，最后将计算结果输出到总线上。在处理器内部，这可以看作一个**三级流水线**.
+指令从左边进入处理器，上图中的流水线有三级，一个时钟周期内可以同时处理三条指令，分别被流水线的不同部分处理。
+
+2. **超标量（superscalar）**指一个时钟周期发射多条指令的流水线机器架构，比如 Intel 的 Pentium 处理器，内部有两个执行单元，在一个时钟周期内允许执行两条指令。
+
+3. 在处理器内部，不同指令所需要的处理步骤和时钟周期是不同的，如果严格按照程序的执行顺序执行，那么就无法充分利用处理器的流水线。因此指令有可能被**乱序执行**。
+
+上述三种并行技术对所执行的指令有一个基本要求，即**相邻的指令相互没有依赖关系**。假如某条指令需要依赖前面一条指令的执行结果数据，那么 pipeline 便失去作用，因为第二条指令必须等待第一条指令完成。因此好的软件必须尽量避免这种代码的生成。例如load指令后，如果紧跟着使用该load数据进行计算的指令，那么会造成等待
+
+> **硬件特性之分支预测 branche-misses 分支预测不命中（ BTB 失效）  跳转条件正误预测 可以提前载入相应分支的指令**
+
+分支指令对软件性能有比较大的影响。尤其是当处理器采用流水线设计之后，假设流水线有三级，当前进入流水的第一条指令为分支指令。假设处理器顺序读取指令，那么如果分支的结果是跳转到其他指令，那么被处理器流水线预取的后续两条指令都将被放弃，从而影响性能。为此，很多处理器都提供了分支预测功能，根据同一条指令的历史执行记录进行预测，读取最可能的下一条指令，而并非顺序读取指令。
+
+分支预测对软件结构有一些要求，对于重复性的分支指令序列，分支预测硬件能得到较好的预测结果，而对于类似 switch case 一类的程序结构，则往往无法得到理想的预测结果。相当于**指令不命中**.
+
+上面介绍的几种处理器特性对软件的性能有很大的影响，然而依赖时钟进行定期采样的 profiler 模式无法揭示程序对这些处理器硬件特性的使用情况。处理器厂商针对这种情况，在硬件中加入了 PMU 单元，即 performance monitor unit(性能监控单元)。
+
+PMU 允许软件针对某种硬件事件设置 counter，此后处理器便开始统计该事件的发生次数，当发生的次数超过 counter 内设置的值后，便产生中断。比如 cache miss 达到某个值后，PMU 便能产生相应的中断。
+
+捕获这些中断，便可以考察程序对这些硬件特性的利用效率了。
+
+> **Tracepoints，自行车轮胎上的 油漆斑点**
+
+Tracepoint 是散落在内核源代码中的一些 hook，一旦使能，它们便可以在特定的代码被运行到时被触发，这一特性可以被各种 trace/debug 工具所使用。Perf 就是该特性的用户之一。
+
+假如您想知道在应用程序运行期间，内核内存管理模块的行为，便可以利用潜伏在 slab 分配器中的 tracepoint。当内核运行到这些 tracepoint 时，便会通知 perf。
+
+Perf 将 tracepoint 产生的事件记录下来，生成报告，通过分析这些报告，调优人员便可以了解程序运行时期内核的种种细节，对性能症状作出更准确的诊断。
+
+
 
 ####  perf stat——概览程序的运行情况
 
@@ -288,6 +361,11 @@ demo
  } 
 
 ```
+
+找到这个程序的性能瓶颈无需任何工具，肉眼的阅读便可以完成。Longa() 是这个程序的关键，只要提高它的速度，就可以极大地提高整个程序的运行效率。
+
+但，因为其简单，却正好可以用来演示 perf 的基本使用。假如 perf 告诉您这个程序的瓶颈在别处，您就不必再浪费宝贵时间阅读本文了。
+
 编译为可执行文件 test1   gcc – o test1 – g test.c  此处一定要加-g选项，加入调试和符号表信息。
 
 perf stat ./test1   输出上下文切换数量 clock等信息
@@ -321,7 +399,7 @@ Cache-misses: cache 失效的次数。程序运行过程中总体的 cache 利�
 
 得到的结果有3个问题：
 
-1）perf未能定位本地符号表对应的symbol和地址的对应关系：0x000003d4对应的什么函数？
+1）perf未能定位本地符号表对应的symbol和地址的对应关系：0x000003d4对应的什么函数？ 高版本可能已经解决了 
 
 2）采样频率不够高，失去了一些函数的信息：显然一些内核函数没有显示在上面的结果中，因为采样频率如果不够高，那么势必会有一些函数中的采样点没有/
 
