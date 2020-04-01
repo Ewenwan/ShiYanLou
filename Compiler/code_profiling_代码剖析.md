@@ -83,6 +83,33 @@ gprof -b test gmon.out > analysis.txt
 
 
 
+## linux系统性能分析工具
+
+### vmstat--虚拟内存统计 VirtualMeomoryStatistics
+
+vmstat(VirtualMeomoryStatistics,虚拟内存统计) 是Linux中监控内存的常用工具,可对操作系统的虚拟内存、进程、CPU等的整体情况进行监视。
+
+vmstat的常规用法：
+
+vmstat interval times 
+
+即每隔interval秒采样一次，共采样times次，如果省略times,则一直采集数据，直到用户手动停止为止。
+
+vmstat 5  每隔5s采样一次，一直采样，可以使用ctrl+c停止vmstat采集数据。
+
+第一行显示了系统自启动以来的平均值，第二行开始显示现在正在发生的情况，接下来的行会显示每5秒间隔发生了什么，每一列的含义在头部，如下所示：
+
+
+▪ procs：r这一列显示了多少进程在等待cpu，b列显示多少进程正在不可中断的休眠（等待IO）。
+▪ memory：swapd列显示了多少块被换出了磁盘（页面交换），剩下的列显示了多少块是空闲的（未被使用），多少块正在被用作缓冲区，以及多少正在被用作操作系统的缓存。
+▪ swap：显示交换活动：每秒有多少块正在被换入（从磁盘）和换出（到磁盘）。
+▪ io：显示了多少块从块设备读取（bi）和写出（bo）,通常反映了硬盘I/O。
+▪ system：显示每秒中断(in)和上下文切换（cs）的数量。
+
+
+
+
+
 
 
 
