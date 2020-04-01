@@ -236,4 +236,69 @@ perf是Linux kernel自带的系统性能优化工具。优势在于与Linux Kern
 如果您认同这些说法的话，Perf stat 应该是您最先使用的一个工具。它通过概括精简的方式提供被调试程序运行的整体情况和汇总数据。   
 
 
+#### 测试
+
+demo
+```c
+ //test.c 
+ void longa() 
+ { 
+   int i,j; 
+   for(i = 0; i < 1000000; i++) 
+   j=i; //am I silly or crazy? I feel boring and desperate. 
+ } 
+ void foo2() 
+ { 
+   int i; 
+   for(i=0 ; i < 10; i++) 
+        longa(); 
+ } 
+ void foo1() 
+ { 
+   int i; 
+   for(i = 0; i< 100; i++) 
+      longa(); 
+ } 
+ int main(void) 
+ { 
+   foo1(); 
+   foo2(); 
+ } 
+
+```
+编译为可执行文件 test1   gcc – o test1 – g test.c  此处一定要加-g选项，加入调试和符号表信息。
+
+perf stat ./test1   输出上下文切换数量 clock等信息
+
+结果分析：
+
+对 test1进行调优应该要找到热点 ( 即最耗时的代码片段 )，再看看是否能够提高热点代码的效率。
+
+Task-clock-msecs：CPU 利用率，该值高，说明程序的多数时间花费在 CPU 计算上而非 IO。
+
+Context-switches：进程切换次数，记录了程序运行过程中发生了多少次进程切换，频繁的进程切换是应该避免的。
+
+Cache-misses：程序运行过程中总体的 cache 利用情况，如果该值过高，说明程序的 cache 利用不好
+
+CPU-migrations：表示进程 t1 运行过程中发生了多少次 CPU 迁移，即被调度器从一个 CPU 转移到另外一个 CPU 上运行。
+
+Cycles：处理器时钟，一条机器指令可能需要多个 cycles，
+
+Instructions: 机器指令数目。
+
+IPC：是 Instructions/Cycles 的比值，该值越大越好，说明程序充分利用了处理器的特性。
+
+Cache-references: cache 命中的次数
+
+Cache-misses: cache 失效的次数。
+
+
+
+
+
+
+
+
+
+
 
