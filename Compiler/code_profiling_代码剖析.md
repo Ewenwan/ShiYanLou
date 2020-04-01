@@ -1,5 +1,7 @@
 # 代码剖析（Code profiling） 代码 内存、耗时、调用等情况
 
+[Linux性能分析工具与图形化方法](https://zhuanlan.zhihu.com/p/34629489)
+
 [bcc 基于bpf 分析linux 系统性能的强大工具包 网络监控分析工具集（当然也可以分析java，ruby，python...）](https://github.com/Ewenwan/bcc)
 
 [linux 系统性能分析](https://nova.polymtl.ca/~suchakra/)
