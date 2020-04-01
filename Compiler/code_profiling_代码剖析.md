@@ -86,6 +86,11 @@ gprof -b test gmon.out > analysis.txt
 
 ## linux系统性能分析工具
 
+现代高性能 CPU 的流水线非常复杂。 一般来说，CPU 流水线在概念上分为两部分，即前端（Front-end）和后端（Back-end）。Front-end 负责获取程序代码指令，并将其解码为一个或多个称为微操作（uOps）的底层硬件指令。uOps 被分配给 Back-end 进行执行，Back-end 负责监控 uOp 的数据何时可用，并在可用的执行单元中执行 uOp。 uOp 执行的完成称为退役（Retirement），uOp 的执行结果提交并反馈到>架构状态（CPU 寄存器或写回内存）。 通常情况下，大多数 uOps 通过流水线正常执行然后退役，但有时候**投机执行（预测出来执行的）**的 uOps 可能会在退役前被取消，例如在分支预测错误的情况下。
+
+在最近的英特尔微体系结构上，流水线的 Front-end 每个 CPU 周期（cycle）可以分配4个 uOps ，而 Back-end 可以在每个周期中退役4个 uOps。 流水线槽（pipeline slot）代表处理一个 uOp 所需的硬件资源。在每个 CPU 周期中，pipeline slot 可以是空的或者被 uOp 填充。 如果在一个 CPU 周期内某个 pipeline slot 是空的，称之为一次停顿（stall）。如果 CPU 经常停顿，系统性能肯定是受到影响的。
+
+
 ### 1. vmstat--虚拟内存统计 VirtualMeomoryStatistics
 
 vmstat(VirtualMeomoryStatistics,虚拟内存统计) 是Linux中监控内存的常用工具,可对操作系统的虚拟内存、进程、CPU等的整体情况进行监视。
