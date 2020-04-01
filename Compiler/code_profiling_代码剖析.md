@@ -1,5 +1,10 @@
 # 代码剖析（Code profiling） 代码 内存、耗时、调用等情况
 
+[bcc 基于bpf 分析linux 系统性能的强大工具包 网络监控分析工具集（当然也可以分析java，ruby，python...）](https://github.com/Ewenwan/bcc)
+
+[linux 系统性能分析](https://nova.polymtl.ca/~suchakra/)
+
+
 程序员在优化软件性能时要注意应尽量优化软件中被频繁调用的部分，这样才能对程序进行有效优化。使用真实的数据，精确的分析应用程序在时间上的花费的行为就成为_代码剖析_。
 
 [GNU gprof](https://fooyou.github.io/document/2015/07/22/performance-tools-for-linux-cplusplus.html)
