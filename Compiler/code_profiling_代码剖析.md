@@ -227,7 +227,7 @@ perf是Linux kernel自带的系统性能优化工具。优势在于与Linux Kern
 
 上述每一个事件都可以用于采样，并生成一项统计数据，时至今日，尚没有文档对每一个 event 的含义进行详细解释。
 
-> perf stat——概览程序的运行情况
+####  perf stat——概览程序的运行情况
 
  面对一个问题程序，最好采用自顶向下的策略。先整体看看该程序运行时各种统计事件的大概，再针对某些方向深入细节。而不要一下子扎进琐碎细节，会一叶障目的。
 
@@ -236,7 +236,7 @@ perf是Linux kernel自带的系统性能优化工具。优势在于与Linux Kern
 如果您认同这些说法的话，Perf stat 应该是您最先使用的一个工具。它通过概括精简的方式提供被调试程序运行的整体情况和汇总数据。   
 
 
-#### 测试
+> 测试
 
 demo
 ```c
@@ -276,9 +276,7 @@ perf stat ./test1   输出上下文切换数量 clock等信息
 
 Task-clock-msecs：CPU 利用率，该值高，说明程序的多数时间花费在 CPU 计算上而非 IO。
 
-Context-switches：进程切换次数，记录了程序运行过程中发生了多少次进程切换，频繁的进程切换是应该避免的。
-
-Cache-misses：程序运行过程中总体的 cache 利用情况，如果该值过高，说明程序的 cache 利用不好
+Context-switches：cs上下文切换，进程切换次数，记录了程序运行过程中发生了多少次进程切换，频繁的进程切换是应该避免的。
 
 CPU-migrations：表示进程 t1 运行过程中发生了多少次 CPU 迁移，即被调度器从一个 CPU 转移到另外一个 CPU 上运行。
 
@@ -290,15 +288,35 @@ IPC：是 Instructions/Cycles 的比值，该值越大越好，说明程序充�
 
 Cache-references: cache 命中的次数
 
-Cache-misses: cache 失效的次数。
+Cache-misses: cache 失效的次数。程序运行过程中总体的 cache 利用情况，如果该值过高，说明程序的 cache 利用不好
+
+#### 精确制导——定位程序瓶颈perf record && perf report
+
+> 查找时间上的热点函数   hot spot
+
+     perf record – e cpu-clock ./test1 
+     perf report 
+
+得到的结果有3个问题：
+
+1）perf未能定位本地符号表对应的symbol和地址的对应关系：0x000003d4对应的什么函数？
+
+2）采样频率不够高，失去了一些函数的信息：显然一些内核函数没有显示在上面的结果中，因为采样频率如果不够高，那么势必会有一些函数中的采样点没有/
+
+3）如何克服采样的随机性带来的问题：为了在测量更加逼近正确值，我们采用多次重复取平均值的方法来逼近真实值。（这里可以用-r来指定重复次数）
 
 
+对于问题2），我们可以用perf record -F count 来指定采样频率加以解决：
+
+    perf record -F 50000 -e cpu-clock ./test1
+    perf report 
 
 
+使用 perf 的 -g 选项便可以得到需要的信息：当然，这里符号表没有定位的问题有依然没有解决！
 
+    perf record -g -e cpu-clock ./test1 
+    perf report
+    
+下面我用 ls 命令来演示 sys_enter 这个 tracepoint 的使用：
 
-
-
-
-
-
+perf stat -e raw_syscalls:sys_enter ls    系统调用次数
