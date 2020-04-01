@@ -14,7 +14,11 @@
 
 GNU gprof 是一款linux平台上的程序分析软件（unix也有prof)。借助gprof可以获得C/C++程序运行期间的统计数据，例如每个函数耗费的时间，函数被调用的次数以及各个函数相互之间的调用关系。gprof可以帮助我们找到程序运行的瓶颈，对占据大量CPU时间的函数进行调优。
 
+gprof用于监控程序中每个方法的执行时间和被调用次数，方便找出程序中最耗时的函数。在程序正常退出后，会生成gmon.out文件，解析这个文件，可以生成一个可视化的报告.
+
 PS：gprof统计的只是用户态CPU的占用时间，不包括内核态的CPU时间。gprof对I/O瓶颈无能为力，耗时甚久的I/O操作很可能只占据极少的CPU时间。
+
+只有在程序正常退出后才会生成gmon.out，kill进程的方法是没法生成gmon.out的。对于那些线程会一直run的服务，需要修改代码，让程序在某个时间点停止。
 
 > 如何使用gprof
 
@@ -81,7 +85,17 @@ gprof -a test gmon.out > analysis.txt
 
 gprof -b test gmon.out > analysis.txt 
 
+> 可视化
 
+gprof的结果文件需要借助 gprof2dot.py 和 graphviz来展示
+
+**使用gprof2dot.py生成dot文件**
+
+python gprof2dot.py report.txt >report.dot
+
+dot的打开需要 graphviz  工具，我是在windows下安装的graphviz，这个工具下载很简单。下载后使用gvedit.ext打开前一个步骤产生的report.dot文件即可。
+
+[gprof2dot graphviz  github ](https://github.com/jrfonseca/gprof2dot)
 
 
 ## linux系统性能分析工具
