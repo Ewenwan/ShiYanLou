@@ -55,6 +55,17 @@ exports.test = test;
 //module.exports.test = test;
 ```
 
+而hello.js中对于代码的使用如下：
+
+```js
+//利用require加载模块
+const renderer = require('./renderer')
+
+renderer.test('click', 'asynchronous message', 'ping');
+renderer.test('click', 'changeView', 'change');
+```
+
+可以说，这种方式完全符合我们程序封装的概念，思路统一，结构规整，个人最爱。
 []()
 
 
