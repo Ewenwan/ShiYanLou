@@ -797,3 +797,39 @@ staAc RegisterPass<BBinLoops> X("bbloop",
 "Count the number of BBs inside each loop");
 
 ```
+### 3.各种分支类型计数
+```c
+bool BranchCounter::runOnFunction(Function &F) {
+for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
+    if (BranchInst* BI = dyn_cast<BranchInst>(&*I)) {
+        // Count this branch in the total.
+        TotalBranches++;
+        // Count unconditional branches.
+        if (!BI->isConditional())
+          UnconditionalBranches++;
+        // Count the other types os branches
+        else if (ICmpInst* CI = dyn_cast<ICmpInst>(BI->getCondition())) {
+          bool const_op0 = dyn_cast<ConstantInt>(CI->getOperand(0)) != 0;
+          bool const_op1 = dyn_cast<ConstantInt>(CI->getOperand(1)) != 0;
+          // Both operands are constants.
+          if (const_op0 && const_op1)
+            ConstantAndConstantBranches++;
+          // Both operands are variables.
+          else if (!const_op0 && !const_op1)
+            VarAndVarBranches++;
+          // A variable and a constant operands.
+          else
+            ConstantAndVarBranches++;
+        // Count other types of branches.
+        } 
+        else
+          OtherBranches++;
+        }
+    }
+    return false;
+}
+
+```
+
+### 4.
+
