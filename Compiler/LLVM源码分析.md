@@ -757,3 +757,43 @@ static RegisterPass<CountOp> X("opCounter", "Counts opcodes per functions");
 
 ```
 
+### 2. 记录循环内的bb数量
+
+```c
+namespace {
+struct BBinLoops : public Func@onPass {
+staAc char ID;
+BBinLoops() : FuncAonPass(ID) {}
+
+// An LLVM pass must declare which other passes it requires to execute properly.
+void getAnalysisUsage(AnalysisUsage &AU) const {
+    AU.addRequired<LoopInfo>();
+    AU.setPreservesAll ();
+}
+
+void countBlocksInLoop(Loop *L, unsigned nesAng) {
+unsigned numBlocks = 0;
+Loop::block_iterator bb;
+for(bb = L‐>block_begin(); bb != L‐>block_end();++bb)
+numBlocks++;
+errs() << "Loop level " << nesAng << " has " << numBlocks << " blocks\n";
+vector<Loop*> subLoops = L‐>getSubLoops();
+Loop::iterator j, f;
+for (j = subLoops.begin(), f = subLoops.end(); j != f; ++j)
+    countBlocksInLoop(*j, nesAng + 1);
+}
+
+virtual bool runOnFuncAon(FuncAon &F) {
+LoopInfo &LI = getAnalysis<LoopInfo>();
+errs() << "FuncAon " << F.getName() + "\n";
+for (LoopInfo::iterator i = LI.begin(), e = LI.end(); i != e; ++i)
+    countBlocksInLoop(*i, 0);
+return(false);
+}
+};
+}
+char BBinLoops::ID = 0;
+staAc RegisterPass<BBinLoops> X("bbloop",
+"Count the number of BBs inside each loop");
+
+```
