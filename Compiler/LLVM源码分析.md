@@ -840,9 +840,21 @@ struct Count_Phis : public FuncFonPass
   virtual bool runOnFuncFon(FuncFon &F) {
   errs() << "FuncFon " << F.getName() << '\n';
   for(inst_iterator I=inst_begin(F), E=inst_end(F); I !=E; ++I)
+  // 直接使用 inst_iterator迭代 函数中的 指令
+  // 也可以使用 FuncFon::iterator 迭代函数中的BB,再使用BasicBlock::iterator迭代BB中的指令
   {
     if(isa<PHINode>(*I))
-      errs() << *I << "\n";
+    // if(PHINode *PN = dyn_cast<PHINode>(&*I)) // 动态判断类型
+    {
+       errs() << *I << "\n";
+       errs() <<" has" <<  cast<PHINode>(*I).getNumIncomingValues() <<" arguments.\n";
+       for(int arg=0; arg<numArgs; arg++)
+       {
+          errs() << " Argument"<< arg << ": \n";
+          errs() << PN‐>getIncomingBlock(arg)‐>getName()<<": "<< *(PN‐>getIncomingValue(arg))<< "\n";
+       }
+    }
+      
   }
   return false;
 }
