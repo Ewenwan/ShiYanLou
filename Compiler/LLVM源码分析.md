@@ -727,15 +727,19 @@ static char ID;
 CountOp() : FunctionPass(ID) {}
 virtual bool runOnFunction(Function &F) {
 errs() << "Function " << F.getName() << '\n';
-for (Function::iterator bb = F.begin(), e = F.end(); bb != e; ++bb) {
-for (BasicBlock::iterator i = bb->begin(), e = bb->end(); i != e; ++i) {
+// for (Module::iterator F = M.begin(), E = M.end(); F != E; ++F);        // 模块迭代器 得到函数列表
+for (Function::iterator bb = F.begin(), e = F.end(); bb != e; ++bb) {     // 函数迭代器 得到 基本快BB 列表
+for (BasicBlock::iterator i = bb->begin(), e = bb->end(); i != e; ++i) {  // 基本快迭代器 得到指令列表
+// for (User::op_iterator O = I.op_begin(), E = I.op_end(); O != E; ++O); // 指令是使用者User 迭代它 可以得到 操作op列表
 if(opCounter.find(i->getOpcodeName()) == opCounter.end()) {
-opCounter[i->getOpcodeName()] = 1;
+opCounter[i->getOpcodeName()] = 1; // 第一次遇到这个op，赋值为1
 } else {
-opCounter[i->getOpcodeName()] += 1;
+opCounter[i->getOpcodeName()] += 1; // 之后没遇到一次，+1
 }
 }
 }
+
+// 打印
 std::map <std::string, int>::iterator i = opCounter.begin();
 std::map <std::string, int>::iterator e = opCounter.end();
 while (i != e) {
