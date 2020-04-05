@@ -831,5 +831,21 @@ for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
 
 ```
 
-### 4.
+### 4. 控制流程图中的 分支会和节点 统计
+```c
+struct Count_Phis : public FuncFonPass
+{
+  static char ID;
+  Count_Phis(): FuncFonPass(ID) {}
+  virtual bool runOnFuncFon(FuncFon &F) {
+  errs() << "FuncFon " << F.getName() << '\n';
+  for(inst_iterator I=inst_begin(F), E=inst_end(F); I !=E; ++I)
+  {
+    if(isa<PHINode>(*I))
+      errs() << *I << "\n";
+  }
+  return false;
+}
+
+```
 
