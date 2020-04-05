@@ -833,15 +833,15 @@ for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
 
 ### 4. 控制流程图中的 分支会和节点 统计
 ```c
-struct Count_Phis : public FuncFonPass
+struct Count_Phis : public FunctionPass
 {
   static char ID;
-  Count_Phis(): FuncFonPass(ID) {}
-  virtual bool runOnFuncFon(FuncFon &F) {
+  Count_Phis(): FunctionPass(ID) {}
+  virtual bool runOnFunction(Function &F) {
   errs() << "FuncFon " << F.getName() << '\n';
   for(inst_iterator I=inst_begin(F), E=inst_end(F); I !=E; ++I)
   // 直接使用 inst_iterator迭代 函数中的 指令
-  // 也可以使用 FuncFon::iterator 迭代函数中的BB,再使用BasicBlock::iterator迭代BB中的指令
+  // 也可以使用 Function::iterator 迭代函数中的BB,再使用BasicBlock::iterator迭代BB中的指令
   {
     if(isa<PHINode>(*I))
     // if(PHINode *PN = dyn_cast<PHINode>(&*I)) // 动态判断类型
@@ -861,3 +861,40 @@ struct Count_Phis : public FuncFonPass
 
 ```
 
+### 5. 优化分支会和节点的 常量分支
+```c
+virtual bool runOnFunction(Function &F)
+{
+bool cutInstrucFon = false;
+errs() << "FuncFon " << F.getName() << '\n';
+SmallVector<PHINode*,16> Worklist;
+for(Function::iterator B = F.begin(), EB = F.end(); B != EB; ++B)
+{
+  for (BasicBlock::iterator I = B‐>begin(), EI = B‐>end(); I != EI; ++I)
+  {
+    if (PHINode *PN = dyn_cast<PHINode>(I))
+    {
+      if (PN‐>hasConstantValue()) // 常量
+      {
+        Worklist.push_back(PN); // 记录优化点
+        cutInstrucFon = true;
+      }
+    }
+    else
+    {
+      break;
+    }
+  }
+}
+
+// 优化处理
+while (!Worklist.empty())
+{
+  PHINode* PN = Worklist.pop_back_val();
+  PN‐>replaceAllUsesWith(PN‐>getIncomingValue(0));
+  PN‐>eraseFromParent();
+}
+return cutInstrucFon;
+}
+
+```
