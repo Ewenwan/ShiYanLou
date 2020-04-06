@@ -34,20 +34,80 @@
 
 [中文翻译](https://blog.csdn.net/qq_23599965/article/details/88538590?depth_1-utm_source=distribute.pc_relevant.none-task&utm_source=distribute.pc_relevant.none-task)
 
+[LLVM/Clang 学习笔记](https://github.com/Enna1/LLVM-Clang-Study-Notes)
+
+
 ## 关键字 字典
 ```c
-ADCE  Aggressive Dead Code Elimination       积极的死代码消除
-AST   Abstract Syntax Tree                   抽象语法树 一个 “AST” 可能更像一个通用图而不是一棵“树”
-BB Vectorization   Basic-Block Vectorization 基本块向量化
+1. ADCE  Aggressive Dead Code Elimination      
+
+积极的死代码消除,是一个 LLVM transform pass，用于消除冗余代码。该 ADCE 本质上是 liveness analysis(生存性分析) 的应用，是一个 backward dataflow analysis。Aggressive 的意思是对于每一条指令，该 pass 假设该指令是 dead 除非该指令被证明是 live 的，在分析结束后所有的被认为是 dead 的指令都会被消除。
+llvm/src/lib/Transforms/Scalar/ADCE.cpp 
+
+大体上来说，该分析的流程如下：
+该算法的起点是所有 terminator 指令 ( 例如 ReturnInst ), may side effecting 指令 ( 例如 StoreInst )，这些认为是 live 的
+然后，利用 SSA 形式的 use-def 信息，从上述起点出发迭代，把所有能通过 use-def 链到达的指令都标记为 live
+最后，没有被标记为 live 的指令就是 dead，遍历一次所有指令，把没有被标记为 live 的指令删除，DCE就完成了
+该分析可以看作是一个使用了只有 2 个元素的 lattice ( bottom 是 live，top 是 dead ) 的 backward 数据流分析。
+
+
+2. Alias Analysis 别名分析（又称指针分析）
+是程序分析中的一类技术，试图确定两个指针是否指向内存中的同一个对象。别名分析有很多中算法，也有很多种分类的方法：flow-sensitive( 流敏感 ) vs. flow-insensitive( 流不敏感 ), context-sensitive( 上下文敏感 ) vs. context-insensitive( 上下文不敏感 ), field-sensitive ( 域敏感 ) vs. field-insensitive( 域不敏感 ), unification-based vs. subset-based, etc.
+
+LLVM 中实现了很多别名分析算法：
+llvm/src/lib/Analysis/AliasAnalysisEvaluator.cpp
+
+basicaa - Basic Alias Analysis (stateless AA impl)
+cfl-anders-aa - Inclusion-Based CFL Alias Analysis
+cfl-steens-aa - Unification-Based CFL Alias Analysis
+external-aa - External Alias Analysis
+globals-aa - Globals Alias Analysis
+scev-aa - ScalarEvolution-based Alias Analysis
+scoped-noalias - Scoped NoAlias Alias Analysis
+tbaa - Type-Based Alias Analysis
+
+ LLVM 中别名分析的结果有四种：
+
+NoAlias，两个指针之前没有直接依赖的关系时就是 NoAlias 。
+   比如：两个指针指向非重叠的内存区域；两个指针只被用于读取内存 ( ? )；有一段内存空间，存在一个指针用于访问该段内存，该段内存空间被 free（释放），然后被 realloc（重新分配），另外一个指针用于访问该段内存空间，这两个指针之间为NoAlias;
+   
+MayAlias，两个指针可能指向同一个对象，MayAlias 是最不精确（保守）的分析结果;
+
+PartialAlias，两个内存对象以某种方式存在重叠的部分，注意：不管两个内存对象起始地址是否相同，只要有重叠的部分，它们之间就是 PartialAlias;
+
+MustAlias，两个内存对象互为别名;
+
+3. AST   Abstract Syntax Tree                  抽象语法树 一个 “AST” 可能更像一个通用图而不是一棵“树”
+
+BB Vectorization   Basic-Block Vectorization   基本块向量化
+
 BURS   Bottom Up Rewriting System — A method of instruction selection for code generation.
                                               自底向上重写系统－一种代码生成中的指令选择方法。
+CFG control flow graph  控制流程图
+                                              
 CSE    Common Subexpression Elimination.     共同子表达式消除。
      一种移除共同子表达式的优化。例如 (a+b)*(a+b) 有两个相同的子表达式: (a+b)。这个优化使得只做一次加法然后执行乘法（但是只针对正确且安全的计算）。
+     
 DAG   Directed Acyclic Graph                 有向不循环图
+
 Derived Pointer                              一个指向对象内部的指针，使得垃圾回收器不能使用此指针进行可达性分析。
      只要一个 derived 指针存在，对应的对象的指针必须保留在 root 内，否则垃圾回收器可能会释放引用的对象。对于拷贝收集器，derived 指针具有额外的风险使得它们可能在任何安全点处无效化。这个机制被用来对抗对象指针。
 
+DFA 数据流分析  Data Flow  Analysis
+    数据流分析是一种用于在计算在某个程序点的程序状态（数据流值）的技术。基于数据流分析的典型例子有常量传播、到达定值等。
+    llvm/src/include/llvm/Analysis/SparsePropagation.h
+在标准的数据流分析框架中，应该有如下的组成部分:
+
+D: 数据流分析方向，forward 还是 backward，即是前向的数据流分析还是后向的数据流分析
+V, ^ : 即数据流值和交汇运算。(V, ^)需要满足半格的定义，即(V, ^)是一个半格
+F: V 到 V 的传递函数族。
+
+CalledValuePropagation 是一个 transform pass，基于 SparsePropagation 实现了对间接调用点 (indirect call sites)的被调函数的可能取值进行分析。
+llvm/src/lib/Transforms/IPO/CalledValuePropagation.cpp
+
+
 DSA   数据结构分析
+
 DSE   Dead Store Elimination  可不达存储消除
 
 FCA  First Class Aggregate    第一类集合
@@ -69,6 +129,21 @@ SCCP  Sparse Conditional Constant Propagation  稀疏的条件常量传播
 
 TBAA Type-Based Alias Analysis  基于类型的别名分析
 
+支配 Dominator：
+
+https://blog.csdn.net/dashuniuniu/article/details/52224882
+
+N dominates M (N dom M) <==> 在 CFG 上，从 entry node（入口节点） 到 M 的所有路径都经过 N；
+真支配 (strictly dominate, sdom)，如果 N dom M 并且 N != M，则 N sdom M；
+直接支配 (immediate dominate, idom)，如果N dom M 并且不存在 N’，使 N dom N’，N’ dom M，则 N idom M，独一无二的支配；
+
+Dominator Tree 支配树，父节点是子节点的直接支配节点，支配树（dominator tree）用来表示支配信息，在树中，入口结点，并且每个结点只支配它在树中的后代结点。
+
+支配边界（dominance frontier），当前结点所能支配的边界（区域）（并不包括该边界）。
+
+llvm/src/lib/Analysis/IteratedDominanceFrontier.cpp
+
+
 ```
 ### 重要且有用的LLVM APIs  函数
 
@@ -76,9 +151,16 @@ TBAA Type-Based Alias Analysis  基于类型的别名分析
 
 [源码](http://llvm.org/doxygen/Casting_8h_source.html)
 
+**RTTI(Run-Time Type Identification,运行时类型辨认)**
+
 **1. isa<>：  isa<具体类型>(变量名)  判断该变量是否是某个具体类型**
 
-isa<>操作符的工作原理与Java “instanceof”操作符完全相同。它返回true或false，这取决于引用或指针是否指向指定类的实例。这对于各种类型的约束检查非常有用
+isa<>操作符的工作原理与Java “instanceof”操作符完全相同。它返回true或false，这取决于引用或指针是否指向指定类的实例。这对于各种类型的约束检查非常有用。
+
+实现机理：
+
+调用 isa<Argument>(V) 时，会返回 Argument::classof(V) 的值，而前面我们看到，Argument::classof(V) 的值就是 return V->getValueID() == ArgumentVal; ，因为在构造该 Argument 对象时，已经将其基类 Value 的 SubclassID 设置为 ArgumentVal ，所以最后会返回true，即指针 V 指向的对象是一个 Argument 类型的对象。
+
 
 **2.cast<>： 已知类型的强制转换**
 
@@ -93,6 +175,11 @@ static bool isLoopInvariant(const Value *V, const Loop *L) {
   return !L->contains(cast<Instruction>(V)->getParent());  // 将基类Value类型的V转换cast成派生类类型的 Instruction
 }
 ```
+
+实现机理：
+
+先使用 C++ const_cast 然后对 const_cast 的结果进行C风格的强制类型转换。
+
 **3.dyn_cast<>：未知类型的强制转换**
 
 dyn_cast<>操作符是一个“检查转换”操作。它检查操作数是否属于指定的类型，如果是，则返回指向它的指针(该操作符不与引用一起工作)。如果操作数类型不正确，则返回空指针。因此，这与c++中的dynamic_cast<>操作符非常相似，应该在相同的环境中使用。通常，dyn_cast<>操作符用于if语句或其他类似的流控制语句中：
@@ -105,6 +192,12 @@ if (auto *AI = dyn_cast<AllocationInst>(Val)) { // 如果Val可以转换成 Allo
 注意，dyn_cast<>操作符可以被滥用，就像c++的dynamic_cast<>或Java的instanceof操作符一样。特别是，不应该使用大的if/then/else块来检查类的许多不同变体。如果您发现自己想这样做，那么使用 InstVisitor 类直接分派指令类型会更清晰、更有效。
 
 
+实现机理：
+
+return isa<X>(Val) ? cast<X>(Val) : nullptr;
+  
+通过三元运算符实现的，如果 isa<X>(val) 返回 true (val是 X 类的一个对象)，则将 val cast 为 X 类后返回，否则返回空指针 nullptr 。
+
 **4.cast_or_null<>**
 
 cast_or_null<>操作符的工作原理与 cast<>操作符类似，只是它允许一个空指针作为参数(然后将其传播)。这有时很有用，允许您将多个null检查合并到一个检查中。
@@ -114,7 +207,11 @@ cast_or_null<>操作符的工作原理与 cast<>操作符类似，只是它允�
 dyn_cast_or_null<>操作符的工作原理与 dyn_cast<> 操作符类似，只是它允许一个空指针作为参数(然后将其传播)。这有时很有用，允许您将多个null检查合并到一个检查中。
 
 
+了解了 LLVM 中 RTTI 的实现，我们想要让其支持自己编写的类，模仿 Value 类 和 Argument 类的写法，声明一个枚举变量，在子类构造函数中显示调用父类构造函数并传递给父类构造函数一个表示子类类型的枚举常量，还有需要定义 classof 函数。
+
 > **传递字符串(StringRef和Twine类)**
+
+StringRef 类的定义位于  src/include/llvm/ADT/StringRef.h
 
 虽然LLVM通常不做太多字符串操作，但是我们有几个重要的APIs接受字符串。两个重要的例子是 Value 类（它有指令、函数等的名称）和 StringMap 类（在 LLVM 和 Clang 中广泛使用）。
 
@@ -137,6 +234,11 @@ Map.find(StringRef("\0baz", 4)); // Lookup "\0baz"  一个字符指针 和 长�
 类似地，需要返回string的APIs可能会返回一个StringRef实例，该实例可以直接使用，也可以使用str成员函数将其转换为std::string。有关更多信息，请查看 [llvm/ADT/StringRef.h](http://llvm.org/doxygen/StringRef_8h_source.html)
 
 您应该很少直接使用StringRef类，因为它包含指向外部内存的指针，所以存储该类的实例通常是不安全的（除非您知道不会释放外部存储）。StringRef在 LLVM 中足够小和普遍，因此它应该总是通过值传递。
+
+
+可以看到，StringRef 类有两个成员变量：Data 和 Length，Data是一个指向 const char 的指针，Length 用于存储字符串的长度。
+
+与 std::string 类似，StringRef 支持 data, empty, size, startswith, endswith 等常用的函数；当然 StringRef 还支持一些 std::string 中没有的成员函数，如 equals , split, trim 等。
 
 **2. Twine 字符串连接**
 
