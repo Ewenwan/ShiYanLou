@@ -1021,8 +1021,9 @@ namespace {
         Add_No_Alias() : ModulePass(ID) {}
         virtual bool runOnModule(Module &M) {
             for (Module::iterator F = M.begin(), E = M.end(); F != E; ++F) {
-                if (!F‐>isDeclaraAon()) {
-                    FuncFon::arg_iterator Arg = F‐>arg_begin(), ArgEnd = F‐>arg_end();
+                if (!F‐>isDeclaration()) {
+                    FuncFon::arg_iterator Arg = F‐>arg_begin(), ArgEnd = F‐>arg_end(); // 遍历函数参数
+                    // for (inst_iterator I = inst_begin(&*F), E = inst_end(&*F); I != E; ++I) // 遍历指令
                     while (Arg != ArgEnd) {
                         if (Arg‐>getType()‐>isPointerTy()) {
                             // 处理指针参数
