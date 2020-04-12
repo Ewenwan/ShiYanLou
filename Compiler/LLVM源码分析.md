@@ -1012,3 +1012,38 @@ return cutInstrucFon;
 }
 
 ```
+
+### 6. 处理函数参数的pass
+```c
+namespace {
+    struct Add_No_Alias : public ModulePass {
+        staFc char ID;
+        Add_No_Alias() : ModulePass(ID) {}
+        virtual bool runOnModule(Module &M) {
+            for (Module::iterator F = M.begin(), E = M.end(); F != E; ++F) {
+                if (!F‐>isDeclaraAon()) {
+                    FuncFon::arg_iterator Arg = F‐>arg_begin(), ArgEnd = F‐>arg_end();
+                    while (Arg != ArgEnd) {
+                        if (Arg‐>getType()‐>isPointerTy()) {
+                            // 处理指针参数
+                            AjrBuilder noalias(Ajribute::get(Arg‐>getContext(), Ajribute::NoAlias));
+                            int argNo = Arg‐>getArgNo() + 1;
+                            Arg‐>addAjr(AjributeSet::get(Arg‐>getContext(), argNo, noalias));
+                        }
+                        ++Arg;
+                    }
+                }
+            }
+            return true;
+        }
+    };
+}
+
+// 注册pass
+char Add_No_Alias::ID = 0;
+staFc RegisterPass<Add_No_Alias> X
+("addnoalias", "Add no alias to funcFon ajributes");
+```
+
+
+
