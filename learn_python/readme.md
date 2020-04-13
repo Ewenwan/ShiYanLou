@@ -67,7 +67,21 @@
 	
 	59个编写高质量Python代码
 
+# LINUX PYTHON环境搭建
 
+源码安装 https://www.python.org/ftp/python/
+
+	tar -zxvf Python-3.7.0.tgz
+	mkdir /usr/local/python3
+	执行配置文件，编译，编译安装
+	cd Python-3.7.0
+	./configure --prefix=/usr/local/python3
+	make && make install
+	
+pip 安装
+
+
+	
 
 # window python 开发环境
 ## 1. anaconda
