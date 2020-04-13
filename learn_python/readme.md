@@ -82,10 +82,11 @@
 	 
 	 安装  libffi-dev  https://packages.ubuntu.com/xenial/libffi-dev
 	
-	
-pip 安装
+	 pip 也安装好了
+	 
+	 可以去 
 
-
+[pip安装包 在线下载后传到离线环境 使用 pip install xxx.whl安装](https://pypi.org/simple/numpy/) 下载pip安装包 使用pip安装python包
 	
 
 # window python 开发环境
