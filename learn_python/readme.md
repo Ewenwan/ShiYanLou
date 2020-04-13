@@ -78,6 +78,11 @@
 	./configure --prefix=/usr/local/python3
 	make && make install
 	
+	 报错：No module named '_ctypes'
+	 
+	 安装  libffi-dev  https://packages.ubuntu.com/xenial/libffi-dev
+	
+	
 pip 安装
 
 
