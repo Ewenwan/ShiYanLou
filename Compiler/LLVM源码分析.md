@@ -48,6 +48,39 @@
 
 （4）Instruction：具体的指令。
 
+# 代码目录结构分析
+
+LLVM的主要优化流程和主流编译器教材并无大的差异，
+Analysis和Transformation是主要的部分，
+
+1. Analysis主要用于分析优化目标获取信息，
+
+2. Transformation则是实际去做优化变换。
+
+3. AsmParser,IR,IRReader,BitCode都是为中间llvm汇编的操作提供相关的支持。
+
+4. ExecutionEngine提供了解释器和即时编译的相关支持。
+
+5. **Fuzzer是提供关于测试代码时自动生成函数参数以增加代码覆盖率测试的工具，在最新的代码中已经从llvm核心移动了编译器运行时库compiler-rt中。**
+
+6. LTO提供连接时优化支持。
+
+剩下的一大块主要都与提供目录机器指令集支持，操作系统平台的目标文件类型支持等功能。
+
+7. Target目录是目标平台指令集相关内容，内部代码量很大，具体芯片指令，版本等相关信息都在其中，最新的专有功能，比如AMD,NVIDIA相关的显卡计算目标代码生成也在其中。
+
+8. Object中包含了很多目标格式，如XCOFF/COFF/ELF/MACHO等相关数据结构的内容，其中当然也有关于动态库的数据结构。
+
+9. ObjectYAML是关于将各种目标格式数据结构转化为YAML格式的内容，我不知道这个东西为什么会在这里也觉得没什么大的用处，估计逆向工程软件会调用到这块。
+
+10. MC/MCA两个目录是关于机器码，机器指令相关的内容(Machine Code)。
+
+11. **XRay是Google贡献的关于动态运行时动态插桩与解除插桩配置的工具，是个非常实用的运行时日志收集工具，集体请参考https://www.llvm.org/docs/XRay.html **
+
+12. DebugInfo是关于在目标中生成调试信息和符号相关的内容。
+
+13. 没有处在llvm的lib中的目录有些也和优化关系巨大，只是不会做为库被调用，比如polly目录中用于高级循环优化和数据局部性优化的polly项目。polly项目主要利用高维整数多面体的抽象代数结构来对像矩阵乘积等线性远算进行优化，效果非常显著甚至可以与专门的优化库做同一量级性能比较。更多请参考 http://polly.llvm.org/index.html 
+
 
 
 ## 关键字 字典
@@ -1193,6 +1226,8 @@ dead已经被移除，多余的phi node也被去除，替换成了常量。
 Passes主要分为三类
 
 llvm内置的pass特别多，基本上分为三类，Analysis Passes、Transform Passes、Utility Passes。
+
+Analysis主要用于分析优化目标获取信息，而Transformation则是实际去做优化变换。
 
 1. 分析 Analysis Passes类别的Pass主要用于计算分析和输出一些IR信息，用于调试用途、可视化用途等等。
 
