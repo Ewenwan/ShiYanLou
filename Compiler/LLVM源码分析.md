@@ -28,7 +28,7 @@
 
 [清华大学--开源机器学习框架——计图（Jittor）--Op编译器和调优器](https://cg.cs.tsinghua.edu.cn/jittor/)
 
-[Instrumentation Pass for LLVM](https://github.com/Ewenwan/LLVM_Instrumentation_Pass)
+[Instrumentation Pass for LLVM    函数打桩 良心推荐](https://github.com/Ewenwan/LLVM_Instrumentation_Pass)
 
 ## LLVM开发者手册
 
