@@ -1059,9 +1059,138 @@ staFc RegisterPass<Add_No_Alias> X
 ("addnoalias", "Add no alias to funcFon ajributes");
 ```
 
+### 利用深度遍历来剔除死代码 的pass   Dead Blocks Elimination
+[参考](https://monetaphilis.github.io/2019/04/21/DeadBlock/)
 
-# llvm内置的众多 
-PassesPasses主要分为三类
+```c
+#include "llvm/Pass.h"
+#include "llvm/IR/Function.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/ADT/DepthFirstIterator.h"  // LLVM的数据结构  深度优先遍历
+#include "llvm/IR/CFG.h" // 控制流程图
+#include <set>           // STL  SET集合
+
+using namespace llvm;
+
+namespace {
+struct DeadBlock : public FunctionPass   // 死代码块去除pass 继承 FunctionPass
+                                         // 这个pass将会在每个函数上运行一次
+{
+    static char ID;
+
+    DeadBlock() : FunctionPass(ID) {}
+    
+    virtual bool runOnFunction(llvm::Function& F) override {
+        // pass的入口
+        bool changed = false;  // 是否改变了函数
+         // 用来指示这个pass是否改变了目标function，如果改变了，则要标记为true。这个值将是我们的返回值
+
+        // visitedSet 用于存放已经被访问过的BaseBlock
+        // 从函数的root block开始，遍历这个root block可能会达到的block，被遍历到的block将会存放到这个 visitedSet 中
+        // unreachableSet 则在最后用于存放无法被访问到的block
+        // 在得到visitedSet之后，我们可以将其和这个函数中所有block做比较，如果有不在visitedSet中的block，就将其添加到unreachableSet
+        
+        std::set<BasicBlock*> visitedSet;
+        std::set<BasicBlock*> unreachableSet;
+
+        // 从EntryBlock开始深度优先遍历整个函数内可以访问的BaseBlock
+        // 将已被访问过的BaseBlock存放在visitedSet中
+        for (auto i = df_ext_begin<BasicBlock*,std::set<BasicBlock*>>(&F.getEntryBlock(), visitedSet),
+            e = df_ext_end<BasicBlock*,std::set<BasicBlock*>>(&F.getEntryBlock(), visitedSet);
+            i != e; i++);
+        // 我们无需自己手动实现深度优先遍历，
+        // 只需调用DepthFirstIterator.h里的df_ext_begin和df_ext_end两个模板，
+        // 就能轻松遍历整个函数，并将访问过的block添加到visitedSet之中。
+        
+        // 遍历函数内所有BaseBlock，将不在 vistitedSet 中的BaseBlock添加到unreachableSet中
+        for (BasicBlock & BB : F) {
+            if (visitedSet.find(&BB) == visitedSet.end()) { // 在 vistitedSet中未找到
+                unreachableSet.insert(&BB);
+            }
+        }
+
+        // 标记目标函数是否会被修改
+        if (!unreachableSet.empty()) {
+            changed = true;
+        }
+
+        // 遍历unreachableSet，通知其successor移除多余的phi node
+        for (BasicBlock* BB : unreachableSet) {
+            for (auto i = succ_begin(BB); i != succ_end(BB); i++) {
+                i->removePredecessor(BB); 
+                // removePredecessor()函数会通知该block有predecessor已被移除，
+                // 随后这个block会检查自己是否有会受到影响的phi node并自动做出修改。
+            }
+            BB->eraseFromParent();  // 删除掉不想要的block
+        }
+    
+        return changed;
+    };
+};
+}
+
+// LLVM会利用pass的地址来为这个id赋值，所以初始值并不重要
+char DeadBlock::ID = 0;
+// 注册pass，这个pass可能会改变CFG，所以将第三个参数设为true
+static RegisterPass<DeadBlock> X("deadblock", "Dead blocks elimination pass", true, false);
+
+
+
+```
+
+示例: IR
+```C
+; ModuleID = 'test.bc'
+
+define i32 @main() {
+b1:
+  br label %b2
+
+dead:                                             ; No predecessors!
+  br label %b3
+
+b2:                                               ; preds = %b1
+  br label %b3
+
+b3:                                               ; preds = %dead, %b2
+  %b = phi i32 [ 1, %b2 ], [ 2, %dead ]
+  ret i32 %b
+}
+```
+名为dead的这个base block实际是无法被访问到的！b1中的无条件br永远只会跳转到b2，而不是dead。我们现在要实现的DeadBlock pass正是要消去这样的base block。
+
+不过，并不是直接删掉dead就完事了，在b3之中，我们有一个phi node。为了让原来的代码保持正确，我们还需要调整或者删除受影响的phi node。
+
+
+名为dead的这个base block实际是无法被访问到的！b1中的无条件br永远只会跳转到b2，而不是dead。我们现在要实现的DeadBlock pass正是要消去这样的base block。
+
+不过，并不是直接删掉dead就完事了，在b3之中，我们有一个phi node。为了让原来的代码保持正确，我们还需要调整或者删除受影响的phi node。
+
+>  执行 
+
+opt -load ../../../Debug+Asserts/lib/DeadBlock.so -deadblock < test.bc > optimized.bc
+
+优化后的IR
+```C
+; ModuleID = 'optimized.bc'
+
+define i32 @main() {
+b1:
+  br label %b2
+
+b2:                                               ; preds = %b1
+  br label %b3
+
+b3:                                               ; preds = %b2
+  ret i32 1
+}
+
+```
+dead已经被移除，多余的phi node也被去除，替换成了常量。
+
+
+# llvm内置的众多 Passes
+Passes主要分为三类
 
 llvm内置的pass特别多，基本上分为三类，Analysis Passes、Transform Passes、Utility Passes。
 
