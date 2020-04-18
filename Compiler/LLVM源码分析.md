@@ -38,6 +38,17 @@
 
 [LLVM/Clang 学习笔记](https://github.com/Enna1/LLVM-Clang-Study-Notes)
 
+其中IR(intermediate representation)是前端语言生成的中间代码表示，也是Pass操作的对象，它主要包含四个部分：
+
+（1）Module：比如一个.c或者.cpp文件。
+
+（2）Function：代表文件中的一个函数。
+
+（3）BasicBlock：每个函数会被划分为一些block，它的划分标准是：一个block只有一个入口和一个出口。
+
+（4）Instruction：具体的指令。
+
+
 
 ## 关键字 字典
 ```c
@@ -1049,4 +1060,129 @@ staFc RegisterPass<Add_No_Alias> X
 ```
 
 
+# llvm内置的众多 
+PassesPasses主要分为三类
+
+llvm内置的pass特别多，基本上分为三类，Analysis Passes、Transform Passes、Utility Passes。
+
+1. 分析 Analysis Passes类别的Pass主要用于计算分析和输出一些IR信息，用于调试用途、可视化用途等等。
+
+2. 转化 Transform Passes类别的Pass就是我们的重点，可以彻底将现有的IR“更改成”另外一种形式的IR，具体如何更改，全看代码怎么写。可以在Transform Passes里调用Analysis Passes。
+
+3. Utility Passes则完全就是因为有些Pass既不是Analysis类型，也不是Transform类型，比如某些Pass的作用就是将函数释放成字节码，或者将某个模块生成字节码本质上既不是分析也不是转化，所以就归类成Utility Passes。
+
+
+       Analysis Passes
+          -aa-eval: Exhaustive Alias Analysis Precision Evaluator
+          -basicaa: Basic Alias Analysis (stateless AA impl)
+          -basiccg: Basic CallGraph Construction
+          -count-aa: Count Alias Analysis Query Responses
+          -da: Dependence Analysis
+          -debug-aa: AA use debugger
+          -domfrontier: Dominance Frontier Construction
+          -domtree: Dominator Tree Construction
+          -dot-callgraph: Print Call Graph to “dot” file
+          -dot-cfg: Print CFG of function to “dot” file
+          -dot-cfg-only: Print CFG of function to “dot” file (with no function bodies)
+          -dot-dom: Print dominance tree of function to “dot” file
+          -dot-dom-only: Print dominance tree of function to “dot” file (with no function bodies)
+          -dot-postdom: Print postdominance tree of function to “dot” file
+          -dot-postdom-only: Print postdominance tree of function to “dot” file (with no function bodies)
+          -globalsmodref-aa: Simple mod/ref analysis for globals
+          -instcount: Counts the various types of Instructions
+          -intervals: Interval Partition Construction
+          -iv-users: Induction Variable Users
+          -lazy-value-info: Lazy Value Information Analysis
+          -libcall-aa: LibCall Alias Analysis
+          -lint: Statically lint-checks LLVM IR
+          -loops: Natural Loop Information
+          -memdep: Memory Dependence Analysis
+          -module-debuginfo: Decodes module-level debug info
+          -postdomfrontier: Post-Dominance Frontier Construction
+          -postdomtree: Post-Dominator Tree Construction
+          -print-alias-sets: Alias Set Printer
+          -print-callgraph: Print a call graph
+          -print-callgraph-sccs: Print SCCs of the Call Graph
+          -print-cfg-sccs: Print SCCs of each function CFG
+          -print-dom-info: Dominator Info Printer
+          -print-externalfnconstants: Print external fn callsites passed constants
+          -print-function: Print function to stderr
+          -print-module: Print module to stderr
+          -print-used-types: Find Used Types
+          -regions: Detect single entry single exit regions
+          -scalar-evolution: Scalar Evolution Analysis
+          -scev-aa: ScalarEvolution-based Alias Analysis
+          -stack-safety: Stack Safety Analysis
+          -targetdata: Target Data Layout
+       Transform Passes
+          -adce: Aggressive Dead Code Elimination
+          -always-inline: Inliner for always_inline functions
+          -argpromotion: Promote ‘by reference’ arguments to scalars
+          -bb-vectorize: Basic-Block Vectorization
+          -block-placement: Profile Guided Basic Block Placement
+          -break-crit-edges: Break critical edges in CFG
+          -codegenprepare: Optimize for code generation
+          -constmerge: Merge Duplicate Global Constants
+          -constprop: Simple constant propagation
+          -dce: Dead Code Elimination
+          -deadargelim: Dead Argument Elimination
+          -deadtypeelim: Dead Type Elimination
+          -die: Dead Instruction Elimination
+          -dse: Dead Store Elimination
+          -functionattrs: Deduce function attributes
+          -globaldce: Dead Global Elimination
+          -globalopt: Global Variable Optimizer
+          -gvn: Global Value Numbering
+          -indvars: Canonicalize Induction Variables
+          -inline: Function Integration/Inlining
+          -instcombine: Combine redundant instructions
+          -aggressive-instcombine: Combine expression patterns
+          -internalize: Internalize Global Symbols
+          -ipconstprop: Interprocedural constant propagation
+          -ipsccp: Interprocedural Sparse Conditional Constant Propagation
+          -jump-threading: Jump Threading
+          -lcssa: Loop-Closed SSA Form Pass
+          -licm: Loop Invariant Code Motion
+          -loop-deletion: Delete dead loops
+          -loop-extract: Extract loops into new functions
+          -loop-extract-single: Extract at most one loop into a new function
+          -loop-reduce: Loop Strength Reduction
+          -loop-rotate: Rotate Loops
+          -loop-simplify: Canonicalize natural loops
+          -loop-unroll: Unroll loops
+          -loop-unroll-and-jam: Unroll and Jam loops
+          -loop-unswitch: Unswitch loops
+          -loweratomic: Lower atomic intrinsics to non-atomic form
+          -lowerinvoke: Lower invokes to calls, for unwindless code generators
+          -lowerswitch: Lower SwitchInsts to branches
+          -mem2reg: Promote Memory to Register
+          -memcpyopt: MemCpy Optimization
+          -mergefunc: Merge Functions
+          -mergereturn: Unify function exit nodes
+          -partial-inliner: Partial Inliner
+          -prune-eh: Remove unused exception handling info
+          -reassociate: Reassociate expressions
+          -reg2mem: Demote all values to stack slots
+          -sroa: Scalar Replacement of Aggregates
+          -sccp: Sparse Conditional Constant Propagation
+          -simplifycfg: Simplify the CFG
+          -sink: Code sinking
+          -strip: Strip all symbols from a module
+          -strip-dead-debug-info: Strip debug info for unused symbols
+          -strip-dead-prototypes: Strip Unused Function Prototypes
+          -strip-debug-declare: Strip all llvm.dbg.declare intrinsics
+          -strip-nondebug: Strip all symbols, except dbg symbols, from a module
+          -tailcallelim: Tail Call Elimination
+       Utility Passes
+          -deadarghaX0r: Dead Argument Hacking (BUGPOINT USE ONLY; DO NOT USE)
+          -extract-blocks: Extract Basic Blocks From Module (for bugpoint use)
+          -instnamer: Assign names to anonymous instructions
+          -verify: Module Verifier
+          -view-cfg: View CFG of function
+          -view-cfg-only: View CFG of function (with no function bodies)
+          -view-dom: View dominance tree of function
+          -view-dom-only: View dominance tree of function (with no function bodies)
+          -view-postdom: View postdominance tree of function
+          -view-postdom-only: View postdominance tree of function (with no function bodies)
+          -transform-warning: Report missed forced transformations
 
