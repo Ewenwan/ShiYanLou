@@ -1,7 +1,7 @@
 # CUDA编程
 CUDA（Compute Unified Device Architecture）的中文全称为计算统一设备架构。
 
-[高性能编程 笔记 ](https://github.com/Ewenwan/CUDA-notes)
+[高性能编程 笔记  GPU高性能编程CUDA实战  CUDA与OpenCV实战，用于加速计算机视觉 并行机器编程 CUDA自带文档：CUDA_C_Programming_Guide](https://github.com/Ewenwan/CUDA-notes)
 
 [pycuda](https://github.com/inducer/pycuda)
 
