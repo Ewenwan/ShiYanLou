@@ -95,6 +95,12 @@
 
 ![](https://github.com/Ewenwan/EwenWan/blob/master/zf.jpg)
 
+# Git
+
+git clone --recurse-submodules https://github.com/xxxxx.git
+
+注意 clone 的时候一定要带 --recurse-submodules 这个参数，否则会下载不完整。
+
 # 包含内容：
 		1. c
 
