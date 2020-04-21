@@ -7,3 +7,5 @@
 [Android图形显示系统](https://blog.csdn.net/jxt1234and2010/article/details/44503019)
 
 [AndroidlibJpeg库解码OpenCL优化](https://blog.csdn.net/jxt1234and2010/article/details/45200441)
+
+[adb 等工具](https://blog.csdn.net/wbdwsqwwn/article/details/25201779)
