@@ -475,6 +475,61 @@ Callgrind用于记录程序中函数之间的调用历史信息，对程序性�
 
 安装： 解压安装包后，顺次执行：./configue 、make、make install 就可以了
 
+
+交叉编译： 源码下有交叉编译的说明可参考
+
+[valgrind 交叉编译 android arm/arm64 平台](https://blog.csdn.net/Nuck_Cat/article/details/102917710)
+
+
+android32
+```sh
+#!/usr/bin/env bash
+
+export NDKROOT=~/opt/android-ndk-r14b/ # linux  ndk 版本 不能过高，会有问题
+export AR=$NDKROOT/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-ar
+export LD=$NDKROOT/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-ld
+export CC=$NDKROOT/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-gcc
+
+bash autogen.sh
+
+CPPFLAGS="--sysroot=$NDKROOT/platforms/android-14/arch-arm" \
+CFLAGS="--sysroot=$NDKROOT/platforms/android-14/arch-arm" \
+./configure --prefix=/data/local/Inst \
+    --host=armv7-unknown-linux --target=armv7-unknown-linux \
+    --with-tmpdir=/sdcard
+
+make -j4 
+make -j4 install DESTDIR=`pwd`/Inst
+```
+
+android64
+```sh
+
+#!/usr/bin/env bash
+
+export NDKROOT=~/opt/android-ndk-r14b/
+export AR=$NDKROOT/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin/aarch64-linux-android-ar 
+export LD=$NDKROOT/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin/aarch64-linux-android-ld
+export CC=$NDKROOT/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64/bin/aarch64-linux-android-gcc
+
+bash autogen.sh
+
+CPPFLAGS="--sysroot=$NDKROOT/platforms/android-21/arch-arm64" \
+   CFLAGS="--sysroot=$NDKROOT/platforms/android-21/arch-arm64" \
+   ./configure --prefix=/data/local/Inst \
+   --host=aarch64-unknown-linux --target=aarch64-unknown-linux \
+   --with-tmpdir=/sdcard
+
+make -j4
+make -j4 install DESTDIR=`pwd`/Inst
+
+
+```
+
+
+
+
+
 使用：
 
 使用valgrind来分析性能，必须使用valgrind来启动程序：
