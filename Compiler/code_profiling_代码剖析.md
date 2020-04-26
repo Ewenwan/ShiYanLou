@@ -526,7 +526,28 @@ make -j4 install DESTDIR=`pwd`/Inst
 
 ```
 
+## 编译好的
 
+下载：https://github.com/sunShuShu/ValgrindForAndroid
+
+cd /ValgrindForAndroid/valgrind-arm64/Inst/data/local
+
+adb -s 设备序列号 push Inst /data/local
+
+使用:
+
+export VALGRIND_LIB=/data/local/Inst/lib/valgrind
+
+export PATH=$PATH:/data/local/Inst/bin
+
+valgrind [--tool=callgrind]  <cmd> [args]
+
+
+使用示例：
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./
+
+valgrind --tool=cachegrind --branch-sim=yes  ./classification -m sqnet11.tm -l synset_words.txt -i cat.jpg
 
 
 
