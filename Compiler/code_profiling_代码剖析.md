@@ -480,6 +480,7 @@ Callgrind用于记录程序中函数之间的调用历史信息，对程序性�
 
 [valgrind 交叉编译 android arm/arm64 平台](https://blog.csdn.net/Nuck_Cat/article/details/102917710)
 
+[hisi3531 valgrind 交叉编译移植](https://blog.csdn.net/sunshineywz/article/details/105604604)
 
 android32
 ```sh
