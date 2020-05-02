@@ -1,5 +1,8 @@
 # 编译器 编译原理
 
+[使用自动代码生成技术TVM优化深度学习算子的一些思考](https://zhuanlan.zhihu.com/p/101026192)
+
+
 [基于clang static analyzer的源码漏洞检测插件](https://github.com/GoSSIP-SJTU/TripleDoggy)
 
 [编译器书籍 现代体系结构的优化编译器 高级编译器设计与实现](https://github.com/Ewenwan/compilerbook)
