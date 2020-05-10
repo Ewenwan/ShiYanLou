@@ -1,4 +1,5 @@
 # LLVM源码分析
+[llvm-pass-tutorial 推荐](https://github.com/LeadroyaL/llvm-pass-tutorial)
 
 [LLVM  CMU 教案 ](www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/15745-s14/public/lectures/)
 
