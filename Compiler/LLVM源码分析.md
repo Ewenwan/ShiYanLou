@@ -36,6 +36,8 @@
 
 [llvm学习（十二）：clang加载pass错误汇总](https://www.leadroyal.cn/?p=1014)
 
+[llvm学习（八）：Pass编写简单案例  推荐](https://www.leadroyal.cn/?p=719)
+
 ## LLVM开发者手册
 
 [英文参考](http://llvm.org/docs/ProgrammersManual.html)
@@ -879,6 +881,19 @@ I->eraseFromParent();
 ```
 这将从其包含的基本块中断开指令的链接并删除它。如果只是想从包含基本块的指令中断开链接，而不是删除它，可以使用removeFromParent()方法。
 
+**IRBuilder**
+
+这是一个非常非常好用的东西，对于连续插入语句时非常友好，包括了绝大多数的 Instruction  快速插入，也提供了一些方便的对于全局变量操作的API。
+
+主要有这两种构造方式
+
+IRBuilder<> IRB(BasicBlock*); 在某个 BasicBlock 末尾连续插入语句
+
+IRBuilder<> IRB(Instruction*); 在某个 Instruction 前方连续插入语句
+
+例如创建跳转， IRB.CreateBr ；创建加法， IRB.CreateAdd ；创建栈变量， IRB.CreateAlloca ；对于开发效率有巨大的提升。
+
+
 ## 线程和LLVM
 
 本节描述LLVM APIs与多线程的交互，包括客户端应用程序的交互和JIT中的交互，以及托管应用程序中的交互。
@@ -1639,6 +1654,20 @@ struct MyPlacementPass : public FunctionPass  // 继承 遍历函数的 pass
     return false;
   }
 };
+
+/*
+IRBuilder
+这是一个非常非常好用的东西，对于连续插入语句时非常友好，包括了绝大多数的 Instruction  快速插入，也提供了一些方便的对于全局变量操作的API。
+
+主要有这两种构造方式
+
+IRBuilder<> IRB(BasicBlock*); 在某个 BasicBlock 末尾连续插入语句
+
+IRBuilder<> IRB(Instruction*); 在某个 Instruction 前方连续插入语句
+
+例如创建跳转， IRB.CreateBr ；创建加法， IRB.CreateAdd ；创建栈变量， IRB.CreateAlloca ；对于开发效率有巨大的提升。
+*/
+
 
 // PASS  ID
 char MyPlacementPass::ID = 0;
