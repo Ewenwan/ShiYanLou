@@ -30,6 +30,8 @@
 
 [Instrumentation Pass for LLVM    函数打桩 +日志log  良心推荐](https://github.com/Ewenwan/LLVM_Instrumentation_Pass)
 
+[llvm学习（十二）：clang加载pass错误汇总](https://www.leadroyal.cn/?p=1014)
+
 ## LLVM开发者手册
 
 [英文参考](http://llvm.org/docs/ProgrammersManual.html)
