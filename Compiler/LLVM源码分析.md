@@ -1,4 +1,7 @@
 # LLVM源码分析
+
+[LLVM语言参考手册](https://blog.csdn.net/qq_23599965/article/details/89206919)
+
 [llvm-pass-tutorial 推荐](https://github.com/LeadroyaL/llvm-pass-tutorial)
 
 [LLVM  CMU 教案 ](www.cs.cmu.edu/afs/cs.cmu.edu/academic/class/15745-s14/public/lectures/)
