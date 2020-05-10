@@ -28,7 +28,7 @@
 
 [清华大学--开源机器学习框架——计图（Jittor）--Op编译器和调优器](https://cg.cs.tsinghua.edu.cn/jittor/)
 
-[Instrumentation Pass for LLVM    函数打桩 良心推荐](https://github.com/Ewenwan/LLVM_Instrumentation_Pass)
+[Instrumentation Pass for LLVM    函数打桩 +日志log  良心推荐](https://github.com/Ewenwan/LLVM_Instrumentation_Pass)
 
 ## LLVM开发者手册
 
@@ -915,6 +915,10 @@ LLVM的“eager”JIT编译器在线程程序中使用是安全的。多个线�
 …… (自行发挥想象)
 
 
+[LeadroyaL/llvm-pass-tutorial  Armariris Hikari ollvm skeleton   学习例子!!!](https://github.com/LeadroyaL/llvm-pass-tutorial)
+
+
+
 ### 1. 编写pass 记录函数中每种操作op的数量 
 
 ```c++
@@ -1137,7 +1141,7 @@ staFc RegisterPass<Add_No_Alias> X
 ("addnoalias", "Add no alias to funcFon ajributes");
 ```
 
-### 利用深度遍历来剔除死代码 的pass   Dead Blocks Elimination
+### 7. 利用深度遍历来剔除死代码 的pass   Dead Blocks Elimination
 [参考](https://monetaphilis.github.io/2019/04/21/DeadBlock/)
 
 ```c
@@ -1267,7 +1271,9 @@ b3:                                               ; preds = %b2
 dead已经被移除，多余的phi node也被去除，替换成了常量。
 
 
-### 代码插桩pass
+### 8. 代码插桩 pass +日志log 
+
+[Instrumentation Pass for LLVM    函数打桩 +日志log  良心推荐](https://github.com/Ewenwan/LLVM_Instrumentation_Pass)
 
 ```c
 
@@ -1476,6 +1482,174 @@ void log_function_call(const char* function) {
 
 
 ```
+
+### 9. 代码插桩 pass + 耗时打印
+[LLVM Pass 实现 C函数 插桩](https://www.jianshu.com/p/b2f9efea49c3)
+
+> 手动 在目标函数前后 + 计时函数
+
+```c
+// begin 起始 时间记录
+long _ly_fun_b()
+{
+  struct timeval star;
+  gettimeofday(&star, NULL);
+  long b = star.tv_sec * 1000000 + star.tv_usec;
+  return b;
+}
+
+// end结束时间 并计算耗时区间
+void _ly_fun_e(char *name, long b)
+{
+  struct timeval end;
+  gettimeofday(&end, NULL);
+  long e = end.tv_sec * 1000000 + end.tv_usec;
+  
+  // 计算耗时区间
+  long t = e - b;
+  printf("%s %ld us\n",name, t);
+}
+
+int main()
+{
+  long b = _ly_fun_b(); // 起始时间
+  
+  printf("hello world!");  // 目标代码  用户代码
+  
+  _ly_fun_e("main", b); // 结束时间 并打印耗时
+  return 0;
+}
+
+```
+
+> 自动插代码 pass
+
+比如我们要统计main函数的执行时间,可以创建两个函数_ly_fun_b, _ly_fun_e,然后插入到main函数的开始和结束的位置
+
+```c
+#include <string>
+#include <system_error>
+#include <iostream>
+
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/Pass.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/LegacyPassManager.h"
+#include "llvm/IR/IRBuilder.h"
+//#include "llvm/IR/BasicBlock.h"
+//#include "llvm/IR/Constants.h"
+//#include "llvm/IR/LLVMContext.h"
+//#include "llvm/IR/Type.h"
+#include "llvm/Transforms/IPO/PassManagerBuilder.h"
+
+using namespace llvm;
+
+struct MyPlacementPass : public FunctionPass  // 继承 遍历函数的 pass
+{
+  static char ID;
+  MyPlacementPass() : FunctionPass(ID){}
+    
+  bool runOnFunction(Function &F) override
+  {
+    printf("------------- runOnFunction --------------\n");
+    
+    // 跳过 不需要加 耗时记录的函数  这里为 跳过记录函数本身
+    // 为了防止死循环，在_ly_fun_b和_ly_fun_e中就不用插装了
+    if (F.getName().startswith("_ly_fun"))
+    {
+      return false;
+    }
+/*
+1. 插入开始函数
+
+找到开始函数插入的位置，就是在函数第一条指令之前。
+得到_ly_fun_b函数，先得到LLVM的Context，然后创建函数Type，包括返回值和参数。
+然后把函数的定义插入到模块中。函数中就能使用了。
+插入_ly_fun_b函数，在第一条指令之前插入上面得到的开始函数
+*/
+    // 代码上下文  (记录函数自身的一些 信息吧)
+    LLVMContext &context = F.getParent()->getContext();
+    
+    // 函数入口  基本块
+    BasicBlock &bb = F.getEntryBlock();
+    // 入口基本块 的 起始指令
+    Instruction *beginInst = dyn_cast<Instruction>(bb.begin());
+    
+    // 获取函数的类型 _ly_fun_b 函数类型为 long() 返回类型为 long型 也就是 Int64
+    // get(返回类型，输入参数类型，bool 不知道是啥)
+    FunctionType *type = FunctionType::get(Type::getInt64Ty(context), {}, false);
+    // 创建 起始 记录函数  需要传入函数 的 类型
+    Constant *beginFun = F.getParent()->getOrInsertFunction("_ly_fun_b", type);
+    
+    Value *beginTime = nullptr;
+
+    if (Function *fun = dyn_cast<Function>(beginFun))
+    {
+      // 创建一个函数调用 指令
+      CallInst *inst = CallInst::Create(fun);
+      // 在本函数最开始的指令beginInst 前  插入函数调用指令
+      inst->insertBefore(beginInst);
+      beginTime = inst;
+    }
+
+/*
+2. 插入结束函数
+结束指令要遍历函数中每一条指令，判断是否是ReturnInst类表示的返回指令，在这条指令前插入结束函数。这个函数有两个参数，开始函数传来的时间和当前函数名。
+*/
+    
+    for (Function::iterator I = F.begin(), E = F.end(); I != E; ++I)
+    {
+      BasicBlock &BB = *I; // 函数内的每一个 代码 基本块 包含 指令
+      for (BasicBlock::iterator I = BB.begin(), E = BB.end(); I != E; ++I)
+      {
+        // 强制转换为 return 指令
+        ReturnInst *IST = dyn_cast<ReturnInst>(I);
+        if (IST)// 如果确实为  return 指令 那么 已经到达函数末尾了
+        {
+          // 创建一个函数类型 返回类型为 void ，输入参数类型为 (char *name, long b)
+          // 也就是 (Int8Ptr 函数名字字符串 , 起始时间 Int64)
+          FunctionType *type = FunctionType::get(Type::getVoidTy(context), {Type::getInt8PtrTy(context),Type::getInt64Ty(context)}, false);
+          
+          // 创建 _ly_fun_e函数 
+          Constant *s = BB.getModule()->getOrInsertFunction("_ly_fun_e", type);
+          
+          if (Function *fun = dyn_cast<Function>(s)) // 将s强制转换为 函数指针
+          {
+             
+            IRBuilder<> builder(&BB);// 用于创建字符串变量 builder.CreateGlobalStringPtr
+            
+            // 创建函数调用指令   需要传入函数的参数
+            // 函数名 BB.getParent()->getName(),  起始函数的返回值 beginTime
+            CallInst *inst = CallInst::Create(fun, {builder.CreateGlobalStringPtr(BB.getParent()->getName()), beginTime});
+            
+            // 将该指令 插入到返回 语句之前(函数结尾之前)
+            inst->insertBefore(IST);
+          }
+        }
+      }
+    }
+    return false;
+  }
+};
+
+// PASS  ID
+char MyPlacementPass::ID = 0;
+
+// Automatically enable the pass.
+// http://adriansampson.net/blog/clangpass.html
+static void registerSkeletonPass(const PassManagerBuilder &, legacy::PassManagerBase &PM) 
+{
+  PM.add(new MyPlacementPass());  // 编译后会生成 MyPlacementPass.so 库 这
+}
+
+// 注册 PASS
+static RegisterStandardPasses RegisterMyPass(PassManagerBuilder::EP_EarlyAsPossible, registerSkeletonPass);
+
+
+```
+
 
 
 # llvm内置的众多 Passes
