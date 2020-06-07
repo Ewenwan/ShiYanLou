@@ -1,4 +1,7 @@
 # shell 编程
+
+[vim-quick-sh](http://robot.czxy.com/docs/linux/other/03-vim-quick-short/)
+
 [window 下 从零开始——PowerShell应用入门（全例子入门讲解） ](https://www.cnblogs.com/lavender000/p/6935589.html)
 
 [各种逗比脚本参考](https://github.com/Ewenwan/doubi)
