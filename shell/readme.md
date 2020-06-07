@@ -199,6 +199,153 @@ if [[ $a -lt 100 || $b -ge 100 ]]空格敏感
 -e 判断输入的文件或文件夹是否存在
 
 
+〉 函数使用场景:
+
+```sh
+执行频繁的命令
+执行命令格式相近的命令
+Python的函数格式
+
+# 定义
+def 函数名(参数):
+    函数体
+
+# 调用
+函数名(参数)
+Shell函数格式
+参数类似于Shell内置变量中的位置参数
+
+
+# 定义
+函数名(){
+    函数体 $n
+}
+
+# 调用
+函数名 参数
+函数的返回值
+函数返回值在调用该函数后通过 $? 获得
+```
+
+> hell计算方法 
+```sh
+let方式
+
+a=1
+let a=a+1
+$(())方式
+
+a=1
+a=$((a+1))
+$[] 方式
+
+a=1
+a=$[$a+1]
+```
+
+读取用户输入：read
+```sh
+等待用户输入内容并将结果赋值给name
+
+read name
+提示用户
+
+read -p "请输入用户名" uname
+隐藏用户输入的内容
+
+read -p "请输入密码" -s psw
+
+```
+
+生成一系列数字：seq 
+```sh
+# seq [选项]... 尾数
+echo $(seq 10) # 1-10
+# seq [选项]... 首数 尾数
+echo $(seq 2 8) # 2-8
+# seq [选项]... 首数 增量 尾数
+echo $(seq 1 2 8) # 1 3 5 7
+```
+列编辑
+```sh
+1.光标定位到要操作的地方。
+2.CTRL+v 进入"可视 块"模式，上下选取行。
+3.SHIFT+i 输入要插入的内容。
+4.ESC 按两次，会在每行的选定的区域出现插入的内容。
+```
+参数个数判断并打印 
+```sh
+#/bin/bash
+:<<!
+1.要求用户在执行程序时传入2-5个水果
+2.如果参数不符合条件, 提示用户并退出程序.
+3.打印这几种水果
+!
+if [[ $# < 2 || $# > 5 ]]
+then
+    echo "参数只能有2-5个"
+    exit
+fi
+
+for i in $*;do    # $* 脚本的所有参数
+    echo "喜欢吃的水果: ${i}"
+done
+```
+
+打印九九乘法表 
+```sh
+#!/bin/bash
+
+# 打印多行
+for i in $(seq 9); do
+    # 打印每行的内容
+    for j in $(seq $i); do
+        # 不换行输出
+        echo -n "${i}*${j}=$((i*j))  "
+    done
+    echo ""
+
+done
+```
+
+
+# Linux定时任务cron
+
+cron服务
+
+在Ubuntu中，定时任务cron服务默认被安装。可以通过以下命令操作该服务：
+```sh
+service cron status 查看服务运行状态
+service cron start 启动服务
+service cron stop 停止服务
+service cron restart 重启服务
+```
+
+crontab命令 
+```sh
+crontab -e 编辑crontab文件
+crontab -l 显示crontab文件
+crontab -ir 提示并删除crontab文件
+
+cat /var/spool/cron/crontabs/用户名直接查看crontab文件
+```
+crontab时间格式
+
+* 分钟   * 小时   * 几号  * 几月  * 星期几
+
+每分钟获取一次时间, 记录到 /tmp/test-date.log
+```sh
+*/1 * * * * echo `date` >> /tmp/test-date.log
+```
+
+每周二上午5点备份一次/home/
+```sh
+0 5 * * 2 tar -zcf /var/backups/home.tgz /home/
+```
+
+
+
+
 # awk 文本分析
 [awk使用shell变量及shell使用awk中的变量](https://blog.csdn.net/rj042/article/details/72860177)
 ```sh
