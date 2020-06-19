@@ -70,4 +70,75 @@
         当然这对软件工程师来说是小菜一碟。
         但假如是硬件出身的就有点费劲。
         
-        
+# 知识点
+
+## android绑核
+[参考](https://blog.csdn.net/h176nhx7/article/details/86520060)
+```c
+
+#include <jni.h>
+#include <android/log.h>
+
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
+
+#include <pthread.h>
+
+#include <sys/syscall.h>
+
+#include<stdlib.h>
+#include<stdio.h>
+#include<sys/types.h>
+#include<sys/sysinfo.h>
+#include<unistd.h>
+
+#define __USE_GNU
+#include<sched.h>
+#include<ctype.h>
+
+#ifndef CPU_ZERO
+#define CPU_SETSIZE 1024
+#define __NCPUBITS  (8 * sizeof (unsigned long))
+typedef struct
+{
+    unsigned long __bits[CPU_SETSIZE / __NCPUBITS];
+} cpu_set_t;
+
+#define CPU_SET(cpu, cpusetp) \
+  ((cpusetp)->__bits[(cpu)/__NCPUBITS] |= (1UL << ((cpu) % __NCPUBITS)))
+#define CPU_ZERO(cpusetp) \
+  memset((cpusetp), 0, sizeof(cpu_set_t))
+#else
+#define CPU_SET(cpu,cpustep) ((void)0)
+#define CPU_ZERO(cpu,cpustep) ((void)0)
+#endif
+
+#ifdef DEBUG
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,TAG,__VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,TAG,__VA_ARGS__)
+#else
+#define LOGD(...) ((void)0)
+#define LOGE(...) ((void)0)
+#endif
+
+void bind_core(int cpu)
+{
+    cpu_set_t mask;
+    CPU_ZERO(&mask);
+    CPU_SET(cpu,&mask);
+    if (sched_setaffinity(0, sizeof(mask), &mask) == -1)//设置线程CPU亲和力
+    {
+        LOGD("warning: could not set CPU affinity, continuing...\n");
+    }else
+    {
+        LOGD("set affinity to %d success",cpu);
+    }
+    
+    // linux 等绑核
+    // pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &mask);
+}
+
+
+
+```
