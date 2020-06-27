@@ -18,6 +18,9 @@
 [基于树莓派的智能小车 python](https://github.com/Ewenwan/robot_car)
 
 # 树莓派
+
+![](http://robot.czxy.com/docs/raspberry/img/rpi3-pins.png)
+
 ## 树莓派简介
 Raspberry Pi，中文名：树莓派。树莓派由注册于英国的慈善组织“Raspberry Pi 基金会”开发，旨在于学生计算机编程教育，树莓派官方的关键词就是："Teach, Learn, and Make with Raspberry Pi"。在2006年，树莓派早期概念是基于[Atmel](http://www.atmel.com/)(Atmel公司会在单片机一章中有介绍)的 ATmega644单片机。2012年2月29日，树莓派基金会发布了256MB内存的树莓派B型。四年后，也就是2016年2月29号，基金会宣布树莓派3 B型将以35美元的价格发售。
 ## 树莓参数对比
