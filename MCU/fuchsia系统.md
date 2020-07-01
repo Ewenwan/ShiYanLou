@@ -1,0 +1,8 @@
+# fuchsia系统
+
+Google的Git源码库出现了一种新的开源操作系统叫Fuchsia [1]  ，比较有趣的是，它不同于安卓使用的Linux内核，而是采用的比较新的Zircon的内核。该系统与当下Android相比，无论是存储器还是内存之类的硬件要求都大幅降低，可以看出这是一款面向物联网的家用电器用的系统。据悉Flutter引擎+Dart语言将很有可能成为Fuchsia系统主要的UI开发框架。谷歌Fuchsia选择Flutter作为UI并不令人意外，毕竟Dart语言由谷歌亲生，一方面不用担心被人起诉，另外当Fuchsia有需要时，也能灵活地在Dart虚拟机做出针对性的改变。
+ 
+Fuchsia系统支持32位和64位的ARM处理器和64位PC处理器。致力于Fuchsia系统的谷歌开发者的成员之一——Travis Geiselbrecht称，Fuchsia系统亦将于近期支持树莓派3。
+另有消息称，该系统的UI用户界面层使用的是Dart语言开发的Flutter，渲染器是Escher，应用程序框架是Mojo。
+
+[fuchsia系统下载编译和运行](https://zhuanlan.zhihu.com/p/140541361)
