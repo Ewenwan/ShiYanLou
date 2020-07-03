@@ -21,6 +21,42 @@
 
 [使用ARM NEON Intrinsics加速Video Codec](https://www.jianshu.com/p/70601b36540f)
 
+# android 开发
+
+
+linux adb 设被配置:
+
+            新建文件 /etc/udev/rules.d/80-android.rules  写入 设备usb编号(lusb查看得到)
+
+            增加内容:
+
+            SUBSYSTEM=="usb", ATTR{idVendor}=="4255", MODE="0666", GROUP="plugdev"
+
+            将设备usb编号替换到 ATTR{idVendor}=="4255"中，其他不用修改。
+
+            保存，sudo chmod 777 80-android.rules
+
+            执行以下命令：
+
+            sudo usermod -a -G plugdev $(id -u -n)
+
+            sudo udevadm control --reload-rules
+
+            sudo service udev restart
+
+            sudo udevadm trigger
+
+            第四步： 重启
+
+            adb adb kill-server
+            adb start-server 
+            adb devices
+            
+            adb -s 序列号 shell 登录指定设备
+             
+
+
+
 # ARM与单片机到底有啥区别
 
 ## 1、软件方面
