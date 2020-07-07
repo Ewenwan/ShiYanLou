@@ -1,4 +1,4 @@
-# 单片机MCU 树莓派  飞控
+# 单片机MCU 树莓派  飞控 cpu
 ## stm32
 ## TI
 ## arduino
@@ -15,6 +15,8 @@
 
 
 # ARM 
+
+[cpu 浮点峰值](https://github.com/Ewenwan/cpufp)
 
 先来谈一下ARM的发展史：1978年12月5日，物理学家赫尔曼·豪泽（Hermann Hauser）和工程师Chris Curry，在英国剑桥创办了CPU公司（Cambridge Processing Unit），主要业务是为当地市场供应电子设备。1979年，CPU公司改名为Acorn计算机公司。
 
