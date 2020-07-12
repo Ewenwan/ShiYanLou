@@ -2,6 +2,8 @@
 
 [Adafruit_NeoPixel 灯带控制库](https://github.com/adafruit/Adafruit_NeoPixel)
 
+
+> 两个灯一个单位 20个灯单位，一次有一个单位亮红灯
 ```c
 
 #include <Adafruit_NeoPixel.h>
