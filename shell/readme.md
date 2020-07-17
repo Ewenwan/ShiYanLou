@@ -26,6 +26,25 @@
 
 [LinuxShell命令行及脚本编程实例详解 推荐 CSDN下载](https://download.csdn.net/download/test0037/10571213)
 
+
+# 文件；列表生成
+
+```sh
+# $1指定目录
+
+cd $1
+
+ls *.jpg > img_list_txt.txt
+
+sed -i 's/jpg/txt/' img_list_txt.txt  # 修改
+
+ls *.jpg > img_list_jpg.txt
+
+# 合并
+paste -d " " img_list_jpg.txt img_list_txt.txt > img_list.txt
+```
+
+
 # jq 解析json文件
 
 # 获取文件的绝对路径
