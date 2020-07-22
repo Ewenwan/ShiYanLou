@@ -14,3 +14,20 @@
       b http://abc/svn/Proj/trunk/b/mem
       然后commit，即可。
       注意，必须有http://abc/svn/Proj/trunk/b/mem权限的人，才能取到a目录所有代码。b目录下的内容与mem中的内容是相同
+
+# SVN分支
+
+       创建branch
+      在/trunk/MyProject目录上右键，依次选择"TortoiseSVN" -> "Branch/tag..."，在弹出窗口的"To URL"中填入分支的
+
+      地址，在这里目标revision选择HEAD revision，如下图所示，添加log后点击ok分支便建立了。这个操作速度非常快，
+
+      新建的branch在repository中其实只是一个指向trunk某个revision的软连接而已，并没有真的复制文件。
+
+
+       Check out分支
+      右键TestSVN目录选择"TortoiseSVN Update"即可将刚刚建立的分支下载回本地。进入/branches/MyProject目录下你会
+
+      发现其文件结构和/trunk/MyProject一模一样。
+
+
