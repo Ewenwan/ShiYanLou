@@ -10,6 +10,13 @@
 
 [adb 等工具](https://blog.csdn.net/wbdwsqwwn/article/details/25201779)
 
+# android 挂载远程服务器
+```sh
+adb -s F8RZ6XQC6U shell  adb 登录设备之后：可挂载 远程服务器上的文件：
+
+busybox mount -t nfs 远程服务器ip地址:/远程文件地址 /mnt/本地地址-o nolock
+
+```
 
 # Android ADB linux命令集合
 
