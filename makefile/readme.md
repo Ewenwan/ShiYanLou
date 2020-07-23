@@ -1,7 +1,24 @@
+
 # mekefile 编写
 [参考](https://github.com/Ewenwan/Linux_Code_Test/tree/master/Samples_Make)
 
 [Linux下使用  autoconf和automake 自动构建 项目 make file文件](https://www.cnblogs.com/codingking/p/4381160.html)
+
+
+# makefile 中加入shell语句  if shell 
+[参考](https://stackoverflow.com/questions/20763629/test-whether-a-directory-exists-inside-a-makefile)
+
+```sh
+foo.bak: foo.bar
+    echo "foo"
+    if [ -d "~/Dropbox" ]; then echo "Dir exists"; fi
+Or
+foo.bak: foo.bar
+    echo "foo"
+    if [ -d "~/Dropbox" ]; then \
+        echo "Dir exists"; \
+    fi
+```
 
 
 # Makefile中的wildcard用法 获取所有源文件
