@@ -43,7 +43,40 @@ ls *.jpg > img_list_jpg.txt
 # 合并
 paste -d " " img_list_jpg.txt img_list_txt.txt > img_list.txt
 ```
+# 命令行参数解析 
+```sh
+[hello@Git shell]$ bash test.sh -a hello -b
+this is -a the arg is ! hello
+test.sh: option requires an argument -- b
+Invalid option: -
 
+[hello@Git shell]$ bash test.sh -a hello -b hello -c 
+this is -a the arg is ! hello
+this is -b the arg is ! hello
+this is -c the arg is ! 
+
+[hello@Git shell]$ more test.sh 
+#!/bin/bash
+while getopts "a:b:cdef" opt; do
+  case $opt in
+    a)
+      echo "this is -a the arg is ! $OPTARG" 
+      ;;
+    b)
+      echo "this is -b the arg is ! $OPTARG" 
+      ;;
+    c)
+      echo "this is -c the arg is ! $OPTARG" 
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" 
+      ;;
+  esac
+
+done
+
+
+```
 
 # jq 解析json文件
 
