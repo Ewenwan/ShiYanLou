@@ -53,6 +53,15 @@ sudo sh   cuda_xxxx.run
 
         输入如下命令查看是否安装成功：
         cat /usr/local/cuda/include/cudnn.h | grep CUDNN_MAJOR -A 2
+# 背景 
+
+GPU里有很多Compute Unit(计算单元), 这些单元是由专门的处理逻辑, 很多register, 和L1 cache 组成. Memory access subsystem 把GPU 和RAM 连起来(通常是个L2 cache). Threads 以SIMT的形式运行: 多个thread共享一个instruction unit. 对NV GPU来说, 32 thread 组成一个warps, 对AMD GPU 来说, 64 threads 叫做一个wave fronts. 本文只使用warp的定义. 想达到最高速度, 一定要讨论SIMT, 因为它影响着memory access 也会造成code的序列化(serialization, parallelism的反面)
+
+kernel function里会指出哪些code由一条thread处理, host program会决定多少条thread来处理一个kernel. 一个work group 里的thread可以通过barrier synchronization, 共享L1 cache 来互相协力. 再由compute unit处理这些work group. 能同时被conpute unit 运行的work group数量有限, 所以很多得等到其他完成之后再运行. 需要处理的work group的size和数量还有最大并行数量被称为kernel的execution configuration(运行配置).
+
+kernel 的占用率就是指同时运行的thread数量除以最大数量. 传统建议就是提升这个占用率来获得更好的性能, 但也有一些其他因素比如ILP, MLP, instruction latencies, 也很关键.
+
+
 
 # 1. GPU架构特点
 
