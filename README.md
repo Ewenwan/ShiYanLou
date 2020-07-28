@@ -1,4 +1,6 @@
 # 参考资料
+[gdb 调试入门，大牛写的高质量指南](https://blog.csdn.net/wu_cai_/article/details/79669842)
+
 [Computer Architecture A Quantitative Approach pdf 翻译](https://github.com/Ewenwan/Computer-Architecture-A-Quantitative-Approach)
 
 [自动编程体系设想 ](https://blog.csdn.net/jxt1234and2010/article/details/45201421)
