@@ -10,6 +10,28 @@
 
 [adb 等工具](https://blog.csdn.net/wbdwsqwwn/article/details/25201779)
 
+# adb执行多条连续cmd命令
+
+```sh
+
+#echo root > temp.txt
+adb -s $adb_device_id root
+
+echo mkdir -p $device_mount_dir >> temp.txt
+echo busybox umount $device_mount_dir >> temp.txt
+echo busybox mount -t nfs $serv_mount_dir $device_mount_dir -o nolock >> temp.txt
+echo cd $device_mount_dir/$demo_dir >> temp.txt
+echo chmod 777 ./run.sh >> temp.txt
+echo ./run.sh >> temp.txt
+adb -s $adb_device_id shell < temp.txt
+
+echo $?
+
+rm temp.txt
+
+
+```
+
 # android 挂载远程服务器
 ```sh
 adb -s F8RZ6XQC6U shell  adb 登录设备之后：可挂载 远程服务器上的文件：
