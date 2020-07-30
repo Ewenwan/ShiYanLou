@@ -26,6 +26,53 @@
 
 [LinuxShell命令行及脚本编程实例详解 推荐 CSDN下载](https://download.csdn.net/download/test0037/10571213)
 
+# expect 用于自动化交互
+```sh
+expect的核心是spawn、expect、send、set。
+
+（1）spawn调用要执行的命令
+ 
+（2）expect监听交互输出
+ 
+（3）send进行交互输入
+ 
+（3）set设置变量值
+ 
+（4）interact交互完后，将控制权交给控制台。
+ 
+（5）expect eof，与spawn对应，表示捕捉终端输出信息终止，类似if...endif
+其他设置
+
+set timeout -1，设置expect永不超时
+ 
+set timeout 300，如果300后没有捕捉到expect的监听的内容，那么就退出
+
+
+#!/usr/local/tcl/bin/expect
+spawn ./a.out　　# 开启子进程，执行a.out
+expect "input"　　# 监听 "input"
+send "xxxx\n"　　
+expect "input"　　
+send "xxxx\n"
+expect "input"
+send "xxxx\n"
+expect "input"
+send "xxxx\n"
+expect eof<br>exit
+
+
+
+#!/usr/local/bin/expect
+set user "yangxr\n"
+set passwd "yangxr123456\n"
+set timeout 20
+spawn ftp yun.xxx.cn
+expect "Name*" {send $user}
+expect "Password*" {send $passwd}
+interact
+
+
+```
 
 # 文件；列表生成
 
