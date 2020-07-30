@@ -72,6 +72,26 @@ expect "Password*" {send $passwd}
 interact
 
 
+expect支持if语句，
+if {条件1} {
+     条件1执行语句
+} elif {条件2} {
+     条件2执行语句
+} else {
+     其他情况执行语句
+}
+说明：
+1.if的条件用{}来包含条件
+2.if和后面的{}必须有空格隔开
+3.两个花括号之间必须有空格隔开，比如if {} {}，否则会报错 expect:extra characters after close-brace
+3.使用{来衔接下一行，所以if的条件后需要加左花括号{
+4.else不能单独放一行，所以else要跟在}后面
+
+expect {}，多行期望，匹配到哪条执行哪条
+背景：有时执行shell后预期结果是不固定的，有可能是询问是yes/no，有可能是去输入密码，所以可以用expect{}
+花括号内放多行语句，从上至下匹配，匹配到哪个expect执行哪句。
+
+
 ```
 
 # 文件；列表生成
