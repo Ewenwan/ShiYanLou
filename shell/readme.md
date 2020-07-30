@@ -117,7 +117,25 @@ exp_continue，跳过循环，就继续下一条语句。
 interact 允许用户交互
 
 
+expect脚本嵌入到shell脚本
 
+#!/bin/bash
+#Bash script for...
+
+echo "Start ..."
+for i in `seq 0 999`
+do
+{
+expect <<EOF
+  puts "\r"
+  puts "Create...$i"
+	spawn gaiacli keys add cosmos${i} //要执行的命令
+  expect "*passphrase*"  //触发交互
+  send "1234567890\r"  //交互
+  send "1234567890\r"
+EOF
+}
+done
 
 ```
 
