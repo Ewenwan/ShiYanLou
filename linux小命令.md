@@ -190,6 +190,8 @@
     # sudo unrar x all.rar all_file -y
     按原文件夹文件层级 关系解压文件到 all_file下 
 
+    unrar分卷解压 ： 假设第一个分卷的文件名CTOHome.r00，所有分卷都在同一个目录。
+    那么就直接 unrar  x -o- -y CTOHome.r00      /home/www.CTOHome.com / 
 
     各种压缩包的压缩和解压方法
 ## .tar.gz和.tgz
