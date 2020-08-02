@@ -16,6 +16,28 @@
 
 [DMX 控制库 DMXSerial](https://github.com/Ewenwan/DMXSerial)
 
+[DMX 控制库  Conceptinetics ](https://github.com/johnseghersmsft/Conceptinetics_RDM)
+
+> Conceptinetics
+```c
+
+#include <Conceptinetics.h>
+
+DMX_Master        dmx_master (100,2);
+
+void setup()
+{
+    dmx_master.enable ();
+}
+
+void loop()
+{
+    dmx_master.setChannelValue(11,100);
+    dmx_master.setChannelValue(14,100);
+    delay(100);
+}
+
+```
 
 ## 灯光控制
 
