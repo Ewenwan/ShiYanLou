@@ -39,6 +39,25 @@ void loop()
 
 ```
 
+> DmxMaster 
+```c
+#include <DmxMaster.h>
+
+void setup()
+{
+    DmxMaster.usePin(4);
+    DmxMaster.maxChannel(32);
+}
+
+void loop()
+{
+    DmxMaster.write(11, 100);
+    DmxMaster.write(14, 100);
+    delay(100);
+}
+
+```
+
 ## 灯光控制
 
 调光技术科普:可控硅/0-10v/DALi/DMX 区别有哪些?哪个更好?
