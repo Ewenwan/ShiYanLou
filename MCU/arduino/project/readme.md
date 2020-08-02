@@ -8,8 +8,13 @@
 
 [DMX-shields  DMX512灯控制器 扩展版2](https://item.taobao.com/item.htm?spm=a230r.1.14.16.6bf716667MCx4Z&id=585560386838&ns=1&abbucket=7#detail)
 
-[DMX 控制库](https://github.com/mathertel/DMXSerial)
+[DMX-shields  DMX512灯控制器 扩展版3](http://www.cqrobot.wiki/index.php/DMX_Shield_for_Arduino-CQR0260)
 
+[DMX 控制库 DMXSerial ](https://github.com/mathertel/DMXSerial)
+
+[DMX 控制库 DmxLightSource](https://github.com/mahaarbo/DmxLightSource)
+
+[DMX 控制库 DMXSerial](https://github.com/Ewenwan/DMXSerial)
 
 
 ## 灯光控制
