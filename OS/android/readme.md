@@ -196,3 +196,47 @@ linux adb 设被配置:
 　　12.端口转发: adb forward adb forward tcp:5555 tcp:1234 
 
 　　(将默认端口TCP 5555转发到1234端口上) 
+
+# adb  app 相关操作
+
+1启动命令很简单：
+
+adb shell am start -n package/launch activity
+2例如以下命令可以打开模拟器上的设置app。
+
+adb shell am start -n com.android.settings/com.android.settings.Settings
+
+3. 所以命令的关键是要获取package和launch activity。有多种方法可以获得。
+
+第一种，有代码的，打开AndroidManifest.xml，“package=”之后的就是命令需要的package，“android.intent.action.MAIN” action 所在的activity就是命令需要的launch activity，也就是图中蓝线的部分。这种方法对所有的APP都适用。
+
+第二种，打开App，在cmd窗口中输入以下命令。
+adb shell dumpsys window windows | grep Current
+
+如下图所示，/之前的就是package，之后的就是当前的activity，如下图红线的部分。对于大多数的App，这个当前的activity就是am命令需要的launch activity， 但也有些应用启动时包含了欢迎页之类的，在你打开App的时候就自动切换了activity，那用这种方法就获取不了需要的package。
+
+
+adb命令查看apk信息, adb启动你的apk 
+
+1.用adb获得手机里面某个apk的应用信息、版本信息
+
+　　adb shell dumpsys package com.sy.a268
+  
+2.列出所有
+
+　　adb shell dumpsys 
+  
+3.用adb启动apk
+
+　　adb shell am start -n com.sy.a268/com.sy.a268.MainActivity
+  
+  
+4.随机产生事件给某个应用程序, 随机产生500个事件给程序。你会发现你的程序不断的被点击，旋转！  随机测试
+
+　　adb  shell  monkey -p  com.sy.a268  -v 500
+  
+  
+  
+  
+  
+  
