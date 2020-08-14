@@ -37,7 +37,7 @@ rm temp.txt
 adb -s F8RZ6XQC6U shell  adb 登录设备之后：可挂载 远程服务器上的文件：
 
 busybox mount -t nfs 远程服务器ip地址:/远程文件地址 /mnt/本地地址-o nolock
-
+需要系统内核支持 nfs
 ```
 
 # Android ADB linux命令集合
@@ -252,5 +252,17 @@ adb命令查看apk信息, adb启动你的apk
           /data/androidvncserver &
 
 androidvncserver来自https://code.google.com/p/android-vnc-server/
+
+
+TCP/IP方式：
+
+     setprop service.adb.tcp.port 5555
+     stop adbd
+     start adbd
+usb方式：
+
+     setprop service.adb.tcp.port -1
+     stop adbd
+     start adbd
 
 
