@@ -183,7 +183,7 @@ linux adb 设被配置:
 
 　　 adb kill-server 一般在键入adb shell命令后显示device offline或者是显示有多个设备的情况下使用 
 
-　　7.adb remount 重新挂载系统分区，就是将系统分区重新挂载为可写。 
+ 　　7.adb remount 重新挂载系统分区，就是将系统分区重新挂载为可写。 
 
 　　8. adb root使用管理员权限 
 
@@ -238,5 +238,19 @@ adb命令查看apk信息, adb启动你的apk
   
   
   
-  
-  
+# android 开机启动脚本
+
+          android 开机启动脚本/init.rc是在ramdisk.img中的，每次开机启动会解出来。
+          所以直接修改/init.rc是行不通的，修改后，重启就恢复了。
+          但是/init.rc里面调用了/system/etc/install-recovery.sh （其实是 /system/bin/install-recovery.sh  可查看 /init.rc）
+          可以修改/system/etc/install-recovery.sh，来执行启动脚本
+          下面脚本自动启动wifi adb和vncserver
+          #!/system/bin/sh
+          setprop service.adb.tcp.port 5555
+          stop adbd
+          start adbd
+          /data/androidvncserver &
+
+androidvncserver来自https://code.google.com/p/android-vnc-server/
+
+
