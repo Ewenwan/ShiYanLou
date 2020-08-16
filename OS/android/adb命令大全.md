@@ -4,99 +4,163 @@
 基本用法
 命令语法
 adb 命令的基本语法如下：
+
 adb [-d|-e|-s ] 
+
 如果只有一个设备/模拟器连接时，可以省略掉 [-d|-e|-s ] 这一部分，直接使用 adb 。
+
 为命令指定目标设备
+
 如果有多个设备/模拟器连接，则需要为命令指定目标设备。
-参数
-含义
--d
-指定当前唯一通过 USB 连接的 Android 设备为命令目标
--e
-指定当前唯一运行的模拟器为命令目标
--s 
-指定相应 serialNumber 号的设备/模拟器为命令目标
+
+参数 含义
+-d 指定当前唯一通过 USB 连接的 Android 设备为命令目标
+-e 指定当前唯一运行的模拟器为命令目标
+-s 指定相应 serialNumber 号的设备/模拟器为命令目标
 在多个设备/模拟器连接的情况下较常用的是 -s 参数，serialNumber 可以通过 adb devices 命令获取。如：
+
 $ adb devicesList of devices attachedcf264b8f    deviceemulator-5554   device
+
 输出里的 cf264b8f 和 emulator-5554 即为 serialNumber。比如这时想指定 cf264b8f 这个设备来运行 adb 命令获取屏幕分辨率：
+
 adb -s cf264b8f shell wm size
+
 遇到多设备/模拟器的情况均使用这几个参数为命令指定目标设备，下文中为简化描述，不再重复。
+
 启动/停止
+
 启动 adb server 命令：
+
 adb start-server
+
 （一般无需手动执行此命令，在运行 adb 命令时若发现 adb server 没有启动会自动调起。）
+
 停止 adb server 命令：
+
 adb kill-server
+
 查看 adb 版本
+
 命令：
+
 adb version
+
 示例输出：
+
 Android Debug Bridge version 1.0.32Revision 09a0d98bebce-android
+
 以 root 权限运行 adbd
+
 adb 的运行原理是 PC 端的 adb server 与手机端的守护进程 adbd 建立连接，然后 PC 端的 adb client 通过 adb server 转发命令，adbd 接收命令后解析运行。
+
 所以如果 adbd 以普通权限执行，有些需要 root 权限才能执行的命令无法直接用 adb xxx 执行。这时可以 adb shell 然后 su 后执行命令，也可以让 adbd 以 root 权限执行，这个就能随意执行高权限命令了。
+
 命令：
+
 adb root
+
 正常输出：
+
 restarting adbd as root
+
 现在再运行 adb shell，看看命令行提示符是不是变成 # 了？
+
 有些手机 root 后也无法通过 adb root 命令让 adbd 以 root 权限执行，比如三星的部分机型，会提示 adbd cannot run as root in production builds，此时可以先安装 adbd Insecure，然后 adb root 试试。
+
 相应地，如果要恢复 adbd 为非 root 权限的话，可以使用 adb unroot 命令。
+
 指定 adb server 的网络端口
+
 命令：
+
 adb -P  start-server
+
 默认端口为 5037。
+
 设备连接管理
+
 查询已连接设备/模拟器
+
 命令：
+
 adb devices
+
 输出示例：
+
 List of devices attachedcf264b8f    deviceemulator-5554   device
+
 输出格式为 [serialNumber] [state]，serialNumber 即我们常说的 SN，state 有如下几种：
-offline —— 表示设备未连接成功或无响应。
-device —— 设备已连接。注意这个状态并不能标识 Android 系统已经完全启动和可操作，在设备启动过程中设备实例就可连接到 adb，但启动完毕后系统才处于可操作状态。
-no device —— 没有设备/模拟器连接。
-以上输出显示当前已经连接了两台设备/模拟器，cf264b8f 与 emulator-5554 分别是它们的 SN。从 emulator-5554 这个名字可以看出它是一个 Android 模拟器。
+
+    offline —— 表示设备未连接成功或无响应。
+    device —— 设备已连接。注意这个状态并不能标识 Android 系统已经完全启动和可操作，在设备启动过程中设备实例就可连接到 adb，但启动完毕后系统才处于可操作状态。
+    no device —— 没有设备/模拟器连接。
+    以上输出显示当前已经连接了两台设备/模拟器，cf264b8f 与 emulator-5554 分别是它们的 SN。从 emulator-5554 这个名字可以看出它是一个 Android 模拟器
+
+
 常见异常输出：
-没有设备/模拟器连接成功。
-List of devices attached
-设备/模拟器未连接到 adb 或无响应。
-List of devices attachedcf264b8f offline
+
+    没有设备/模拟器连接成功。
+    List of devices attached
+    设备/模拟器未连接到 adb 或无响应。
+    List of devices attachedcf264b8f offline
+
 USB 连接
+
 通过 USB 连接来正常使用 adb 需要保证几点：
-硬件状态正常。
-包括 Android 设备处于正常开机状态，USB 连接线和各种接口完好。
-Android 设备的开发者选项和 USB 调试模式已开启。
-可以到「设置」-「开发者选项」-「Android 调试」查看。
-如果在设置里找不到开发者选项，那需要通过一个彩蛋来让它显示出来：在「设置」-「关于手机」连续点击「版本号」7 次。
-设备驱动状态正常。
+
+     硬件状态正常。
+     包括 Android 设备处于正常开机状态，USB 连接线和各种接口完好。
+     Android 设备的开发者选项和 USB 调试模式已开启。
+     可以到「设置」-「开发者选项」-「Android 调试」查看。
+     如果在设置里找不到开发者选项，那需要通过一个彩蛋来让它显示出来：在「设置」-「关于手机」连续点击「版本号」7 次。
+     设备驱动状态正常。
+
 这一点貌似在 Linux 和 Mac OS X 下不用操心，在 Windows 下有可能遇到需要安装驱动的情况，确认这一点可以右键「计算机」-「属性」，到「设备管理器」里查看相关设备上是否有黄色感叹号或问号，如果没有就说明驱动状态已经好了。否则可以下载一个手机助手类程序来安装驱动先。
+
 通过 USB 线连接好电脑和设备后确认状态。
+
 adb devices
 如果能看到
+
 xxxxxx device
 说明连接成功。
-无线连接
+
+* 无线连接
+
 除了可以通过 USB 连接设备与电脑来使用 adb，也可以通过无线连接——虽然连接过程中也有需要使用 USB 的步骤，但是连接成功之后你的设备就可以在一定范围内摆脱 USB 连接线的限制啦！
+
 操作步骤：
+
 将 Android 设备与将运行 adb 的电脑连接到同一个局域网，比如连到同一个 WiFi。
+
 将设备与电脑通过 USB 线连接。
+
 应确保连接成功（可运行 adb devices 看是否能列出该设备）。
+
 让设备在 5555 端口监听 TCP/IP 连接：
+
 adb tcpip 5555
+
 断开 USB 连接。
+
 找到设备的 IP 地址。
+
 一般能在「设置」-「关于手机」-「状态信息」-「IP地址」找到。
+
 通过 IP 地址连接设备。
+
 adb connect 
+
 这里的 就是上一步中找到的设备 IP 地址。
+
 确认连接状态。
+
 adb devices
-如果能看到
-:5555 device
-说明连接成功。
+
+如果能看到 :5555 device 说明连接成功。
 如果连接不了，请确认 Android 设备与电脑是连接到了同一个 WiFi，然后再次执行 adb connect 那一步；
 如果还是不行的话，通过 adb kill-server 重新启动 adb 然后从头再来一次试试。
+
 断开无线连接
 命令：
 adb disconnect 
@@ -109,28 +173,27 @@ adb shell pm list packages [-f] [-d] [-e] [-s] [-3] [-i] [-u] [--user USER_ID] [
 显示列表
 无
 所有应用
--f
-显示应用关联的 apk 文件
--d
-只显示 disabled 的应用
--e
-只显示 enabled 的应用
--s
-只显示系统应用
--3
-只显示第三方应用
--i
-显示应用的 installer
--u
-包含已卸载应用
+
+    -f  显示应用关联的 apk 文件
+    -d  只显示 disabled 的应用
+    -e  只显示 enabled 的应用
+    -s  只显示系统应用
+    -3  只显示第三方应用
+    -i  显示应用的 installer
+    -u  包含已卸载应用
 
 包名包含 字符串
 所有应用
+
 命令：
 adb shell pm list packages
+
 输出示例：
+
 package:com.android.smoketestpackage:com.example.android.livecubespackage:com.android.providers.telephonypackage:com.google.android.googlequicksearchboxpackage:com.android.providers.calendarpackage:com.android.providers.mediapackage:com.android.protipspackage:com.android.documentsuipackage:com.android.gallerypackage:com.android.externalstorage...// other packages here...
+
 系统应用
+
 命令：
 adb shell pm list packages -s
 第三方应用
@@ -314,7 +377,9 @@ No space left on devicerm
 Permission denied ... sdcard ...
 sdcard 不可用
 
+
 参考：PackageManager.java
+
 卸载应用
 命令：
 adb uninstall [-k] 
