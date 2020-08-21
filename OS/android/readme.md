@@ -1,3 +1,5 @@
+
+
 # android 系统
 
 [android_C代码开发](https://github.com/Ewenwan/ShiYanLou/blob/master/MCU/arm/android_C代码开发.md)
@@ -9,6 +11,10 @@
 [AndroidlibJpeg库解码OpenCL优化](https://blog.csdn.net/jxt1234and2010/article/details/45200441)
 
 [adb 等工具](https://blog.csdn.net/wbdwsqwwn/article/details/25201779)
+
+https://dl.google.com/android/repository/platform-tools-latest-linux.zip
+
+https://dl.google.com/android/repository/platform-tools_r29.0.2-linux.zip
 
 # adb执行多条连续cmd命令
 
