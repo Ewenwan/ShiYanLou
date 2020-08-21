@@ -20,6 +20,8 @@ https://dl.google.com/android/repository/platform-tools_r26.0.2-linux.zip
 
 https://dl.google.com/android/repository/platform-tools_r24.0.2-linux.zip
 
+https://dl.google.com/android/repository/platform-tools_r16.0.1-linux.zip
+
 # adb执行多条连续cmd命令
 
 ```sh
