@@ -22,6 +22,14 @@ https://dl.google.com/android/repository/platform-tools_r24.0.2-linux.zip
 
 https://dl.google.com/android/repository/platform-tools_r16.0.1-linux.zip
 
+# 开发环境
+
+     使用adb工具通过USB线来调试Android设备，所以主机上需要安装adb工具，该程序无单独的安装包，需要通过安装android-studio程序来获取，android-studio程序的下载地址为https://zh.osdn.net/projects/libraryzip/downloads/68175/android-studio-bundle-162.4069837-windows.exe/，安装好android-studio后，adb工具位于安装包的sdk/platform-tools/adb.exe下，我们需要将工具的地址路径放入系统环境变量后，才可以使用adb工具来进行调试；
+
+     需要NDK(Android Native Development Kit)编译工具来将我们的程序编译成可以在Android平台执行的程序，NDK编译工具的下载地址为https://developer.android.google.cn/ndk/downloads/，根据主机平台类型下载相应的版本win32/win64/Linux，下载后解压到相应目录，NDK工具位于安装目录的主目录下/ndk-build.cmd或者/build/ndk-build.cmd下
+     
+[ndk 在线 github 问题处理等 ](https://github.com/android/ndk/issues/411)
+
 # adb执行多条连续cmd命令
 
 ```sh
