@@ -2,8 +2,9 @@
 
 [tvm会议](//sampl.cs.washington.edu/tvmconf/)
 
-
 [课程资料](https://github.com/Ewenwan/d2l-tvm)
+
+[在android上安装和运行tvm ](https://www.dazhuanlan.com/2020/03/07/5e6379972ef57/)
 
 ## TVM 中 Relay 涉及到的 Pass 优化操作
 
