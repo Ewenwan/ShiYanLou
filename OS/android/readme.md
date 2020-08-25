@@ -12,6 +12,8 @@
 
 [adb 等工具](https://blog.csdn.net/wbdwsqwwn/article/details/25201779)
 
+adb下载地址
+
 https://dl.google.com/android/repository/platform-tools-latest-linux.zip
 
 https://dl.google.com/android/repository/platform-tools_r29.0.2-linux.zip
@@ -21,6 +23,21 @@ https://dl.google.com/android/repository/platform-tools_r26.0.2-linux.zip
 https://dl.google.com/android/repository/platform-tools_r24.0.2-linux.zip
 
 https://dl.google.com/android/repository/platform-tools_r16.0.1-linux.zip
+
+       * Android SDK LINUX版本地址 : https://dl.google.com/android/android-sdk_r29.0.2-linux.tgz  tar -zxvf 解压，包含adb工具等
+       * Android NDK LINUX版本地址 ：https://developer.android.google.cn/ndk/downloads/
+       
+     * 安装
+       * 编辑 /etc/profile
+       
+        vim /etc/profile
+        export ANDROID_HOME=/usr/local/android-sdk-linux
+        export PATH=$ANDROID_HOME/tools:$PATH
+        export PATH=$ANDROID_HOME/platform-tools:$PATH
+        
+       * 生效
+         source /etc/profile
+         
 
 # 开发环境
 
