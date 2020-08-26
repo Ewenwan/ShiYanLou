@@ -2,6 +2,8 @@
 
 [pyopencl](https://github.com/inducer/pyopencl)
 
+[OpenCL-Headers ](https://github.com/KhronosGroup/OpenCL-Headers/)
+
 OpenCL(全称为Open Computing Langugae，开放运算语言)是第一个面向异构系统(此系统中可由CPU，GPU或其它类型的处理器架构组成)的并行编程的开放式标准。
 它是跨平台的。
 OpenCL由两部分组成，一是用于编写kernels（在OpenCL设备上运行的函数）的语言，二是用于定义并控制平台的API(函数)。
