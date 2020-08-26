@@ -38,7 +38,11 @@ https://dl.google.com/android/repository/platform-tools_r16.0.1-linux.zip
        * 生效
          source /etc/profile
          
-
+       * 更新 Android SDK 并获取许可
+         * 解压android-sdk_r24.4.1-linux.tgz
+         * cd android-sdk-linux/
+         * 更新 tools/android update sdk --no-ui
+       
 # 开发环境
 
      使用adb工具通过USB线来调试Android设备，所以主机上需要安装adb工具，该程序无单独的安装包，需要通过安装android-studio程序来获取，android-studio程序的下载地址为https://zh.osdn.net/projects/libraryzip/downloads/68175/android-studio-bundle-162.4069837-windows.exe/，安装好android-studio后，adb工具位于安装包的sdk/platform-tools/adb.exe下，我们需要将工具的地址路径放入系统环境变量后，才可以使用adb工具来进行调试；
