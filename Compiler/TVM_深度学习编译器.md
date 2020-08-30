@@ -1,5 +1,7 @@
 # TVM_深度学习编译器
 
+[tvm在线文档](https://tvm.apache.org/docs/install/index.html)
+
 [在TVM中添加新设备Codegen](https://zhuanlan.zhihu.com/p/108071133)
 
 [tvm会议](//sampl.cs.washington.edu/tvmconf/)
