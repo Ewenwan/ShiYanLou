@@ -1,10 +1,42 @@
 # TVM_深度学习编译器
 
+[在TVM中添加新设备Codegen](https://zhuanlan.zhihu.com/p/108071133)
+
 [tvm会议](//sampl.cs.washington.edu/tvmconf/)
 
 [课程资料](https://github.com/Ewenwan/d2l-tvm)
 
 [在android上安装和运行tvm ](https://www.dazhuanlan.com/2020/03/07/5e6379972ef57/)
+
+## TVM 使用示例
+```python
+# 矩阵赋值
+
+import tvm
+
+A = tvm.placeholder((10, 10))
+B = tvm.compute((10, 10), lambda i, j: A[i, j])
+s = tvm.create_schedule(B.op)     # 调度
+f = tvm.build(s, [A, B], "hello") # 编译生成代码
+print(f.get_source())             # 打印生成的代码
+```
+> 生成的代码
+```c
+// hello tvm backend!
+void default_function( void* args,  void* arg_type_ids, int32_t num_args,  void* out_ret_value,  void* out_ret_tcode) {
+  // ......
+  float* placeholder = (float*)(((DLTensor*)arg0)[0].data);
+  // ......
+  float* compute = (float*)(((DLTensor*)arg1)[0].data);
+  // ......
+  for (int32_t i = 0; i < 10; ++i) {
+    for (int32_t j = 0; j < 10; ++j) {
+      compute[((i * 10) + j)] = placeholder[((i * 10) + j)]; // 矩阵赋值
+    }
+  }
+}
+
+```
 
 ## TVM 中 Relay 涉及到的 Pass 优化操作
 
