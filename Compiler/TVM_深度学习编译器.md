@@ -42,6 +42,101 @@ void default_function( void* args,  void* arg_type_ids, int32_t num_args,  void*
 
 ```
 
+# tvm 调用分析
+
+[TVM代码走读（九） 计算和调度](https://zhuanlan.zhihu.com/p/166551011)
+
+```py
+import tvm
+from tvm import te
+import numpy as np
+
+A = te.placeholder((m, n), name='A')
+B = te.placeholder((m, n), name='B')
+C = te.compute((m, n), lambda i, j: A[i, j] * B[i, j], name='C')
+```
+
+compute python 接口  python/tvm/te/operation.py  def compute(shape, fcompute, name="compute", tag="", attrs=None): 函数
+```py
+def compute(shape, fcompute, name="compute", tag="", attrs=None):
+ """Construct a new tensor by computing over the shape domain.
+    The compute rule is result[axis] = fcompute(axis)
+    Parameters
+    ----------
+    shape: Tuple of Expr
+        The shape of the tensor
+    fcompute: lambda function of indices-> value
+        Specifies the input source expression
+        计算函数
+    name: str, optional
+        The name hint of the tensor
+    tag: str, optional
+        Additional tag information about the compute.
+
+    attrs: dict, optional
+        The additional auxiliary attributes about the compute.
+    Returns
+    -------
+    tensor: Tensor
+        The created tensor
+
+
+    if isinstance(body, _tensor.TensorIntrinCall):
+        for i, s in enumerate(shape[out_ndim:]):
+            var_name = "ax" + str(i)
+            dim_var.append(tvm.tir.IterVar((0, s), var_name, 4))
+        op_node = _ffi_api.TensorComputeOp(name,
+                                           tag,
+                                           dim_var,
+                                           body.reduce_axis,
+                                           out_ndim,
+                                           body.intrin,
+                                           body.tensors,
+                                           body.regions,
+                                           body.scalar_inputs)
+    else:
+        if not isinstance(body, (list, tuple)):
+            body = [body]
+        body = convert(body)
+        op_node = _ffi_api.ComputeOp(
+            name, tag, attrs, dim_var, body)
+```
+
+调用链 python/tvm/te/operation.py [def compute() 函数 ] ---> _ffi_api.TensorComputeOp()  ---> src/te/operation/compute_op.cc   ComputeOp::ComputeOp()
+
+```c
+ComputeOp::ComputeOp(std::string name, std::string tag, Map<String, ObjectRef> attrs,
+                     Array<IterVar> axis, Array<PrimExpr> body) {
+  if (!attrs.defined()) {
+    attrs = Map<String, ObjectRef>();
+  }
+  auto n = make_object<ComputeOpNode>();
+  n->name = std::move(name);
+  n->tag = std::move(tag);
+  n->attrs = std::move(attrs);
+  n->axis = std::move(axis);
+  n->body = std::move(body);
+  if (n->body[0]->IsInstance<tir::ReduceNode>()) {
+    const tir::ReduceNode* reduce = n->body[0].as<tir::ReduceNode>();
+    n->reduce_axis = reduce->axis;
+  }
+  VerifyComputeOp(n.get());
+  data_ = std::move(n);
+}
+
+
+
+```
+
+te.compute可以总结为如下几步:
+
+    根据传入的fcompute,翻译成对应的表达式传入.
+    生成ComputeOpNode,记录计算节点.
+    根据计算节点,返回计算节点输出对应的Tensor.
+
+
+
+
 ## TVM 中 Relay 涉及到的 Pass 优化操作
 
 > Concept
