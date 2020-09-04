@@ -190,6 +190,30 @@ done
 
 ```
 
+# 修改文件编码
+```sh
+find ../code/* -name *.c  > src.txt # 生成文件列表
+
+cat src.txt | while read line
+do
+    if [ $line == *xxx_wyw.c* -o $line == *xxxx-lrh.c* -o $line == *xxxx-xxxx.c* ]; then
+        continue; # 过滤掉某些文件
+    fi
+    iconv -f gb2312 -t utf8 $line > a # 修改编码生成新文件
+    [[ $? -ne 0 ]] && {
+        #echo $line
+        continue;  # 遇到错误，跳过
+    }
+    mv a $line # 覆盖源文件
+    echo $line" change to utf8"
+done
+
+rm src.txt
+
+
+
+```
+
 # jq 解析json文件
 
 # 获取文件的绝对路径
