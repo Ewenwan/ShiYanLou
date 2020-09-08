@@ -1,5 +1,7 @@
 # TVM_深度学习编译器
 
+[把你自己的代码生成TVM ](https://blog.csdn.net/weixin_42164269/article/details/104291635)
+
 [tvm.d2l.ai 笔记](https://github.com/Ewenwan/learning_tvm)
 
 [tvm.schedule 自动 代码 生成 调度 ](https://github.com/StrongSpoon/tvm.schedule)
