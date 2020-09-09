@@ -2,6 +2,8 @@
 
 [clang的python接口教程（二）](https://blog.csdn.net/wangtua/article/details/78612331)
 
+[Python接口clang解析C语言AST抽象语法树](https://blog.csdn.net/qq_32460819/article/details/102710636?utm_medium=distribute.pc_relevant.none-task-blog-title-5&spm=1001.2101.3001.4242)
+
 [clang static analyzer源码分析](https://blog.csdn.net/dashuniuniu/article/details/50773316)
 
 clang静态代码分析是clang相对于gcc一个比较能够引起关注的点，特别是clang静态代码分析基于checker的架构和大部分的静态分析工具都不相同。clang静态代码分析使用符号执行的技术执行路径敏感的代码分析，符号执行引擎并不实际进行报错，而是使用挂载在引擎上的checker对程序状态进行检查并报错。这种方式方便用户对代码检查规则或者bug类型进行扩展，但是这种架构也有其缺陷，符号执行完成一条语句后，clang静态分析引擎会遍历checker列表中的回调函数进行报错，也就是说checker的数量越多，clang静态分析扫描代码的速度越慢（clang静态分析引擎的速度是不变的）。
@@ -10,6 +12,38 @@ AnalysisASTConsumer 继承自ASTConsumer，是一个虚基类，只提供了一�
 
 clang静态分析checker提供了两种方法，一种是遍历AST进行语法层级的报错，例如位运算符的操作数是有符号整数等，这些直接从AST树上拿到相关信息就可以直接报错，另外一种是需要构建CFG并在其上进行符号执行实现路径敏感的代码分析，关于这个，就有人曾经问过我，clang静态分析中CFG和AST的关系是什么。现在我们从这个类的继承体系就可以看出，clang静态代码分析是继承自于ASTConsumer，也就是说无论是基于AST的检查还是基于CFG的检查都是在AST上实现的，因为构建CFG也需要AST的协助。
 
+# pyclang 使用
+
+     win10上安装LLVM 作用:能够安装各种lib
+     pip install clang 作用:作为调用clangAPI的接口,注意这个clang只是一个接口
+     目录AST树中调用的函数都在 D:\ProgramFiles\python3.6.8\Lib\site-packages\clang\cindex.py
+     
+     from clang.cindex import Index
+    类Index索引类型,clang.cindex库的主接口,通过提供一个接口来读写来解析翻译
+    index = Index.create() 创建一个索引
+    index.parse(filepath, 解析文件的路径
+    args=None, 额外参数通过命令行参数添加
+    Unsaveed_file=None, 列表,一项是映射文件名字 一项是替换内容
+    options=0) 其他参数
+
+```py
+import clang.cindex
+from clang.cindex import Index  #主要API
+from clang.cindex import Config  #配置
+from clang.cindex import CursorKind  #索引结点的类别
+from clang.cindex import TypeKind    #节点的语义类别
+
+# clang.cindex需要用到libclang.so共享库，所以先配置共享库
+libclangPath = r'D:/Program Files/LLVM/bin/libclang.dll'
+#这个路径需要自己先在笔记本上安装	
+if Config.loaded == True:
+    print("Config.loaded == True:")
+    #pass
+else:
+    Config.set_library_file(libclangPath)
+    print("install path")
+
+```
 ## 前端clang分析
 
 Clang是LLVM的C/C++前端，从原理上他会产生用于后端的IR指令。但实际上Clang会有两种执行方式： 我们可以使用”-###”观察Clang的执行过程
