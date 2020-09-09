@@ -1,5 +1,7 @@
 # clang 编译器前端 分析
 
+[clang的python接口教程（二）](https://blog.csdn.net/wangtua/article/details/78612331)
+
 [clang static analyzer源码分析](https://blog.csdn.net/dashuniuniu/article/details/50773316)
 
 clang静态代码分析是clang相对于gcc一个比较能够引起关注的点，特别是clang静态代码分析基于checker的架构和大部分的静态分析工具都不相同。clang静态代码分析使用符号执行的技术执行路径敏感的代码分析，符号执行引擎并不实际进行报错，而是使用挂载在引擎上的checker对程序状态进行检查并报错。这种方式方便用户对代码检查规则或者bug类型进行扩展，但是这种架构也有其缺陷，符号执行完成一条语句后，clang静态分析引擎会遍历checker列表中的回调函数进行报错，也就是说checker的数量越多，clang静态分析扫描代码的速度越慢（clang静态分析引擎的速度是不变的）。
