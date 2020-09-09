@@ -27,6 +27,7 @@ clang静态分析checker提供了两种方法，一种是遍历AST进行语法�
     options=0) 其他参数
 
 ```py
+
 import clang.cindex
 from clang.cindex import Index  #主要API
 from clang.cindex import Config  #配置
@@ -35,6 +36,7 @@ from clang.cindex import TypeKind    #节点的语义类别
 
 # clang.cindex需要用到libclang.so共享库，所以先配置共享库
 libclangPath = r'D:/Program Files/LLVM/bin/libclang.dll'
+
 #这个路径需要自己先在笔记本上安装	
 if Config.loaded == True:
     print("Config.loaded == True:")
@@ -42,7 +44,46 @@ if Config.loaded == True:
 else:
     Config.set_library_file(libclangPath)
     print("install path")
+    
+# 创建AST索引
+file_path = r"test.c"
+index = Index.create()
 
+tu = index.parse(file_path)
+AST_root_node= tu.cursor  #cursor根节点
+print(AST_root_node)
+
+#前序遍历AST
+'''
+前序遍历严格来说是一个二叉树才有的概念。这里指的是对于每个节点，先遍历本节点，再遍历子节点的过程。
+'''
+node_list = []
+def preorder_travers_AST(cursor):
+    for cur in cursor.get_children():
+        #do something
+        print(cur.spelling)
+        preorder_travers_AST(cur)
+
+preorder_travers_AST(AST_root_node)
+
+输出
+main
+
+printf
+printf
+printf
+
+
+"hello world\n"
+
+
+
+# 提取每个分词token 的方法。
+cursor_content=""
+for token in AST_root_node.get_tokens():
+#针对一个节点，调用get_tokens的方法。
+    print(token.spelling)
+    
 ```
 ## 前端clang分析
 
