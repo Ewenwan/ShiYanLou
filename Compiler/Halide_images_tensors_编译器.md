@@ -41,6 +41,19 @@ Halide的特点是其图像算法的计算的实现（Function和Expression）�
 
 其中，算法本身的设计是一方面，一个好的算法往往效率会高很多。而另外一个方面就是算法中计算顺序的组织，而Halide可以改变的就是我们算法在某个硬件平台上的计算顺序：
 
+## Halide的特点
+Halide这个底层优化库有几个比较亮眼的特点：
+
+* 1. Explicit programmer control
+
+      The compiler does exactly what you say.
+      Schedules cannot influence correctness.
+      Exploration is fast and easy.
+
+      明确的程序控制，也就是说，我们如何按照这个计算的顺序(与算法本身无关)是确定的，一旦我们已经设定好就不会再改变。
+
+
+
 ## 例子
 首先我们设计一个可以对图像进行模糊的操作函数：
 
@@ -164,11 +177,246 @@ for (int fused = 0; fused < 4*4; fused++) {
     printf("Evaluating at x = %d, y = %d: %d\n", x, y, x + y);
 }
 ```
+但是要知道，上述拆分和融合操作只是对Halide所能进行的操作进行一下演示而是，这种操作方式并没有实际用处，也就是说实际中的计算顺序并没有改变。
 
 
 
+* **平铺 tile**  相当于分块？  提高数据重复使用率 减少数据加载次数
+
+这一步中就要进入Halide中比较重要的部分了，这一步中我们将x和y轴以4为因子间隔进行划分，并且重新对计算的路径进行重排序：
+```c
+Var x_outer, x_inner, y_outer, y_inner;
+gradient.split(x, x_outer, x_inner, 4);
+gradient.split(y, y_outer, y_inner, 4);
+gradient.reorder(x_inner, y_inner, x_outer, y_outer);
+
+// 上面的步骤其实可以简化成
+gradient.tile(x, y, x_outer, y_outer, x_inner, y_inner, 4, 4);
+```
+
+对应的C++计算代码为：
+```c
+for (int y_outer = 0; y_outer < 2; y_outer++) {              // 两行两列个 4x4大小的快
+    for (int x_outer = 0; x_outer < 2; x_outer++) {
+        for (int y_inner = 0; y_inner < 4; y_inner++) {      // 分成 4x4大小的快为单位计算
+            for (int x_inner = 0; x_inner < 4; x_inner++) {
+                int x = x_outer * 4 + x_inner;
+                int y = y_outer * 4 + y_inner;
+                printf("Evaluating at x = %d, y = %d: %d\n", x, y, x + y);
+            }
+        }
+    }
+}
+
+```
+
+这种平铺的好处是可以充分利用相邻的像素，例如在模糊中，我们会使用重叠的输入数据(也就是存在一个元素使用两次的情况)，如果采用这种计算方式，可以大大加快计算性能。
+
+* **向量化 vector**
+
+向量化即我们使用cpu中的SIMD技术，一次性计算多个数据，充分利用硬件的特点，例如在x86中我们可以利用SSE技术来实现这个功能。
+
+在Halide中，我们首先将x轴的循环嵌套按照，内侧循环因子4的方式，拆分为两个(也就是内侧循环x执行四次，外侧根据总数进行计算，下例是2*4=8)，然后将内侧的x循环转化为向量的形式：
+```c
+Var x_outer, x_inner;
+gradient.split(x, x_outer, x_inner, 4); // x轴拆分成两个轴， 内层轴以4位循环因子
+gradient.vectorize(x_inner);            // 内层轴向量化， 相当于循环平铺写出来， 编译器可以识别到，会自动进行向量化
+
+````
 
 
+用C++来表示即为:
+
+```c
+for (int y = 0; y < 4; y++) {
+    for (int x_outer = 0; x_outer < 2; x_outer++) {
+        // The loop over x_inner has gone away, and has been
+        // replaced by a vectorized version of the
+        // expression. On x86 processors, Halide generates SSE
+        // for all of this.
+        int x_vec[] = {x_outer * 4 + 0,
+                        x_outer * 4 + 1,
+                        x_outer * 4 + 2,
+                        x_outer * 4 + 3};  // 生成输入向量 x坐标偏移
+                        
+        int val[] = {x_vec[0] + y,         // x坐标偏移 + 行偏移
+                        x_vec[1] + y,
+                        x_vec[2] + y,
+                        x_vec[3] + y};
+        printf("Evaluating at <%d, %d, %d, %d>, <%d, %d, %d, %d>:"
+                " <%d, %d, %d, %d>\n",
+                x_vec[0], x_vec[1], x_vec[2], x_vec[3],
+                y, y, y, y,
+                val[0], val[1], val[2], val[3]);
+    }
+}
+
+```
+可视化后就比较明显了，外部x每一行执行两次，内侧x变为向量的形式，一个指令集就可以执行完成：
+
+
+* **展开 unrolling**
+
+如果在图像中多个像素同时共享有重叠的数据，这个时候我们就可以将循环展开，从而使那些可以共享使用的数据只计算一次亦或是只加载一次。
+
+在下面中我们将x轴拆分为内侧和外侧，因为每次内侧的数值增长都是从0到1，如果我们将内测循环的x轴展开，就不需要每次循环到这里再读取内测循环的x的值了：
+```c
+Var x_outer, x_inner;
+gradient.split(x, x_outer, x_inner, 2);
+gradient.unroll(x_inner);
+```
+相应的C++代码为：
+```c
+printf("Equivalent C:\n");
+for (int y = 0; y < 4; y++) {
+    for (int x_outer = 0; x_outer < 2; x_outer++) {
+        // Instead of a for loop over x_inner, we get two
+        // copies of the innermost statement.
+        {
+            int x_inner = 0;
+            int x = x_outer * 2 + x_inner;
+            printf("Evaluating at x = %d, y = %d: %d\n", x, y, x + y);
+        }
+        {
+            int x_inner = 1;
+            int x = x_outer * 2 + x_inner;
+            printf("Evaluating at x = %d, y = %d: %d\n", x, y, x + y);
+        }
+    }
+}
+```
+
+
+
+* **融合、平铺、并行 Fusing, tiling, and parallelizing**
+这一步中，我们将融合、平铺和并行操作都融合到一起，来对一个8×8的图像进行操作。首先，我们将x轴和y轴都按照4因子进行平铺操作。随后我们将外侧的y和外侧的x轴循环进行融合(2+2=4)，再将这个融合后的操作进行并行操作，也就是同时执行这四个(2+2=4)操作：
+```c
+Var x_outer, y_outer, x_inner, y_inner, tile_index;
+gradient.tile(x, y, x_outer, y_outer, x_inner, y_inner, 4, 4);
+gradient.fuse(x_outer, y_outer, tile_index); // 外层两层循环合并成 一个循环 tile_index
+gradient.parallel(tile_index);
+```
+相应的C++代码为：
+```c
+// This outermost loop should be a parallel for loop, but that's hard in C.
+for (int tile_index = 0; tile_index < 4; tile_index++) {
+    int y_outer = tile_index / 2; // 合成循环 分别计算 合成前的两层循环 因子 
+    int x_outer = tile_index % 2;
+    for (int y_inner = 0; y_inner < 4; y_inner++) {
+        for (int x_inner = 0; x_inner < 4; x_inner++) {
+            int y = y_outer * 4 + y_inner;
+            int x = x_outer * 4 + x_inner;
+            printf("Evaluating at x = %d, y = %d: %d\n", x, y, x + y);
+        }
+    }
+}
+```
+可视化后的结果，可以看到8×8中左上、左下、右上、右下四个区域是几乎同时进行的(tile_index)，而每个区域和之前tile那一节的计算方式是一样的，只不过这次换成了并行计算。
+
+* **整合**
+
+这次来点大点的图像，我们输入的图像大小为350 x 250，对其进行最优化的操作：
+
+首先我们将其按照64 x 64的因子进行平铺，其次融合y轴和x轴外侧的循环操作数，最后对其进行并行操作
+
+（这里注意下，我们可以看到350或者250并不能被64整除，这个不用担心，Halide会自动处理多余或者不够的部分）。
+```c
+Var x_outer, y_outer, x_inner, y_inner, tile_index;
+gradient_fast
+    .tile(x, y, x_outer, y_outer, x_inner, y_inner, 64, 64)
+    .fuse(x_outer, y_outer, tile_index)
+    .parallel(tile_index);
+// 可以这样连续使用.写，因为对象函数返回的是对象本身的引用
+```
+
+这样还不够，上面我们已经将整个图像平铺为6*4个部分，而这一步中对每个平铺后的部分再进行一次平铺操作，这次将每个小块按照4×2的形式平铺为，
+
+其中y_inner_outer分成两个(每个为y_pairs)，x_inner_outer分成四个(每个为x_vectors)，然后将每个x_vectors并行化，将y_pairs展开。
+```c
+Var x_inner_outer, y_inner_outer, x_vectors, y_pairs;
+gradient_fast
+    .tile(x_inner, y_inner, x_inner_outer, y_inner_outer, x_vectors, y_pairs, 4, 2)
+    .vectorize(x_vectors)
+    .unroll(y_pairs);
+```
+
+对应的c++展示代码为：
+```c
+for (int tile_index = 0; tile_index < 6 * 4; tile_index++) {
+    int y_outer = tile_index / 4;
+    int x_outer = tile_index % 4;
+    for (int y_inner_outer = 0; y_inner_outer < 64/2; y_inner_outer++) {
+        for (int x_inner_outer = 0; x_inner_outer < 64/4; x_inner_outer++) {
+            // We're vectorized across x
+            int x = std::min(x_outer * 64, 350-64) + x_inner_outer*4;
+            int x_vec[4] = {x + 0,
+                            x + 1,
+                            x + 2,
+                            x + 3};
+
+            // And we unrolled across y
+            int y_base = std::min(y_outer * 64, 250-64) + y_inner_outer*2;
+            {
+                // y_pairs = 0
+                int y = y_base + 0;
+                int y_vec[4] = {y, y, y, y};
+                int val[4] = {x_vec[0] + y_vec[0],
+                                x_vec[1] + y_vec[1],
+                                x_vec[2] + y_vec[2],
+                                x_vec[3] + y_vec[3]};
+
+                // Check the result.
+                for (int i = 0; i < 4; i++) {
+                    if (result(x_vec[i], y_vec[i]) != val[i]) {
+                        printf("There was an error at %d %d!\n",
+                                x_vec[i], y_vec[i]);
+                        return -1;
+                    }
+                }
+            }
+            {
+                // y_pairs = 1
+                int y = y_base + 1;
+                int y_vec[4] = {y, y, y, y};
+                int val[4] = {x_vec[0] + y_vec[0],
+                                x_vec[1] + y_vec[1],
+                                x_vec[2] + y_vec[2],
+                                x_vec[3] + y_vec[3]};
+
+                // Check the result.
+                for (int i = 0; i < 4; i++) {
+                    if (result(x_vec[i], y_vec[i]) != val[i]) {
+                        printf("There was an error at %d %d!\n",
+                                x_vec[i], y_vec[i]);
+                        return -1;
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+
+哦，对了，如果用Halide来写文章一开头描述的模糊(blur)算法的话，会是这个样子：
+
+```c
+Func blur_3x3(Func input) {
+  Func blur_x, blur_y;
+  Var x, y, xi, yi;
+
+  // The algorithm - no storage or order
+  blur_x(x, y) = (input(x-1, y) + input(x, y) + input(x+1, y))/3;
+  blur_y(x, y) = (blur_x(x, y-1) + blur_x(x, y) + blur_x(x, y+1))/3;
+
+  // The schedule - defines order, locality; implies storage
+  blur_y.tile(x, y, xi, yi, 256, 32)
+        .vectorize(xi, 8).parallel(y);
+  blur_x.compute_at(blur_y, x).vectorize(x, 8);
+
+  return blur_y;
+}
+```
 
 
 
