@@ -16,6 +16,8 @@ Halide是用C++作为宿主语言的一个图像处理相关的DSL(Domain Specif
 
 [github](https://github.com/halide/Halide)
 
+[源码学习笔记](https://blog.csdn.net/luzhanbo207/category_7314346.html)
+
 Halide is a programming language designed to make it easier to write high-performance image and array processing code on modern machines. Halide currently targets: 
 * CPU architectures: X86, ARM, MIPS, Hexagon, PowerPC
 * Operating systems: Linux, Windows, macOS, Android, iOS, Qualcomm QuRT
@@ -31,6 +33,9 @@ Schedule: where and when it’s computed
 * Easy for programmers to build pipelines simpliﬁes algorithm codeimproves modularity
 * Easy for programmers to specify & explore optimizations fusion, tiling, parallelism, vectorization can’t break the algorithm
 * Easy for the compiler to generate fast code
+
+Halide的特点是其图像算法的计算的实现（Function和Expression）和这些计算在计算硬件单元上的调度（Schedule）是分离的，其调度以Function为单位。最终将整个图像算法转换为高效率的多层for循环，for循环的分部数据范围划分和数据加载都是由Halide来完成的，而且可以实现数据的加载和算法计算的Overlay，掩盖数据加载导致的延迟。Halide的Schedule可以由程序员来指定一些策略，指定硬件的buffer大小，缓冲线的相关设置，这样可以根据不同的计算硬件的特性来实现高效率的计算单元的调度，而图像算法的计算实现却不需要修改。
+
 
 ## Halide为什么可以优化算法
 
