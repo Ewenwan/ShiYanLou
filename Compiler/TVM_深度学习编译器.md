@@ -46,6 +46,65 @@ void default_function( void* args,  void* arg_type_ids, int32_t num_args,  void*
 
 ```
 
+
+# 相关TVM API
+* tvm.placeholder((n,), name='a')
+  * def placeholder(shape, dtype=None, name="placeholder")
+  * 作用：类似 tf.placeholder，占位符，后续可指定输入数据。 
+
+* tvm.compute(A.shape, lambda i: A[i] + B[i], name='c')
+  * def compute(shape, fcompute, name="compute", tag="", attrs=None)
+  * 作用：定义计算图。 fcompute 是 lambda function of indices-> value,匿名函数。
+
+* tvm.create_schedule(C.op)
+  * def create_schedule(ops) 
+  * 作用：为一系列Ops构建默认Schedule。
+  
+* tvm.lower(s, [A, B, C], simple_mode=True)
+  *　def lower(sch, args, name="default_function", binds=None, simple_mode=False) 
+  * 作用：输入schedule对象和输入输出tensor list。
+  * 如果 simple_mode 为True，则输出simple and compact statement（起始就是C语言形式的伪代码，表示op操作具体过程）。
+  * 如果 simple_mode 为False，我也不知道输出啥。
+  
+* tvm.build(s, [A, B, C]) 
+  * def build(inputs, args=None, target=None, target_host=None, name="default_function", binds=None)
+  * 通过输入Schedule等参数，构建可运行的module。
+  
+* mod.export_library(mod_fname) 与 tvm.module.load(mod_fname)
+  * def export_library(self, file_name, fcompile=None, **kwargs)
+  * def load(path, fmt="") 
+  * 作用：将 tvm.module.Module 导出为本地文件，或将本地文件导入生成 tvm.module.Module 对象。
+  
+* relay.frontend.from_mxnet(model, {'data': x.shape})
+  * def from_mxnet(symbol, shape=None, dtype="float32", arg_params=None, aux_params=None)
+  * 作用：将MXNet模型转换为TVM Relay模型。
+  
+* with relay.build_config(opt_level=3)
+  * def build_config(opt_level=2, fallback_device=_nd.cpu(), required_pass=None, disabled_pass=None):
+  * 作用：为 relay.build 设置一些参数，比如图优化等。
+  
+* tvm.context(target) 
+  * def context(dev_type, dev_id=0)
+  * 作用：为给定的设备设置运行环境。
+  
+* tvm.contrib.graph_runtime.create(graph, mod, ctx)
+  * def create(graph_json_str, libmod, ctx)
+  * 作用：通过 graph/module/ctx 创建实际可执行模块，之后导入输入数据、获取模型预测结果都通过这个方法返回的对象。
+  * 举例：rt.set_input, rt.run, rt.get_output 等。
+  
+* relay.save_param_dict(params) 
+  * def save_param_dict(params) 
+  * 作用：保存模型参数。
+  
+* remote = rpc.connect('172.31.0.149', 9090)
+  * def connect(url, port, key="", session_timeout=0)
+  * 作用：建立远程rpc连接，方便交叉编译等功能。
+  * 该remote对象有很多功能：
+  * remote.upload(mod_fname)：上传文件 
+  * remote.load_module(mod_fname)：导入模块
+  * remote.cpu()：建立远程context对象
+
+
 # tvm 调用分析
 
 [TVM代码走读（九） 计算和调度](https://zhuanlan.zhihu.com/p/166551011)
