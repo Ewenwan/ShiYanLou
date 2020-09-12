@@ -368,7 +368,7 @@ __isl_give isl_union_map *isl_union_map_empty(
 ```
 
 
-  * Universe sets and relations
+   ** Universe sets and relations
 
 ```c
 _isl_give isl_basic_set *isl_basic_set_universe(
@@ -385,3 +385,273 @@ __isl_give isl_union_map *isl_union_map_universe(
         __isl_take isl_union_map *umap);
 ```
 
+  ** Identity relations
+```c
+__isl_give isl_basic_map *isl_basic_map_identity(
+        __isl_take isl_space *space);
+__isl_give isl_map *isl_map_identity(
+        __isl_take isl_space *space);
+
+````
+
+** 可以使用以下功能将基本集合或关系转换为集合或关系：
+```c
+__isl_give isl_set *isl_set_from_basic_set(
+        __isl_take isl_basic_set *bset);
+__isl_give isl_map *isl_map_from_basic_map(
+        __isl_take isl_basic_map *bmap);
+```
+
+
+** 例如，要创建一个包含10到42之间的偶数整数的集合，可以使用以下代码。
+
+```
+isl_space *space;
+isl_local_space *ls;
+isl_constraint *c;
+isl_basic_set *bset;
+
+space = isl_space_set_alloc(ctx, 0, 2);
+bset = isl_basic_set_universe(isl_space_copy(space));
+ls = isl_local_space_from_space(space);
+
+c = isl_constraint_alloc_equality(isl_local_space_copy(ls));
+c = isl_constraint_set_coefficient_si(c, isl_dim_set, 0, -1);
+c = isl_constraint_set_coefficient_si(c, isl_dim_set, 1, 2);
+bset = isl_basic_set_add_constraint(bset, c);
+
+c = isl_constraint_alloc_inequality(isl_local_space_copy(ls));
+c = isl_constraint_set_constant_si(c, -10);
+c = isl_constraint_set_coefficient_si(c, isl_dim_set, 0, 1);
+bset = isl_basic_set_add_constraint(bset, c);
+
+c = isl_constraint_alloc_inequality(ls);
+c = isl_constraint_set_constant_si(c, 42);
+c = isl_constraint_set_coefficient_si(c, isl_dim_set, 0, -1);
+bset = isl_basic_set_add_constraint(bset, c);
+
+bset = isl_basic_set_project_out(bset, isl_dim_set, 1, 1);
+```
+
+或者：
+```c
+isl_basic_set *bset;
+bset = isl_basic_set_read_from_str(ctx,
+        "{[i] : exists (a : i = 2a and i >= 10 and i <= 42)}");
+```
+
+
+整体程序如下：
+```c
+int main()
+{
+	isl_ctx *ctx = isl_ctx_alloc();
+	isl_basic_set *bset;
+	bset = isl_basic_set_read_from_str(ctx, "{[i] : exists (a : i = 2a and i >= 10 and i <= 42)}");
+	const char *out = isl_basic_set_to_str(bset);
+	cout << out << endl;
+	return 0;
+}
+```
+
+最终输出：
+
+{ [i] : (i) mod 2 = 0 and 10 <= i <= 42 }
+
+这便是一个最简单的调度编写，这种语法表示 i 是一个循环变量，接下来我们看一下，如何能从字符串创建相应的 set、map 等对象。
+
+
+## 2.Input & output
+
+对于集合和关系，isl支持其自己的输入/输出格式，该格式类似于该Omega格式，但PolyLib在某些情况下还支持该格式。对于其他对象类型，通常仅isl支持一种格式。
+
+输入
+
+例如从输入格式创建一个basic_set对象：
+```
+#include <stdio.h>
+#include <isl/ctx.h>
+#include <isl/set.h>
+using namespace std;
+
+int main()
+{
+	isl_ctx *ctx = isl_ctx_alloc();//create a ctx object
+	isl_basic_set *bset;
+	bset = isl_basic_set_read_from_str(ctx, "[n] -> { [i] : exists (a = [i/10] : 0 <= i and i <= n and i - 10 a <= 6) }");
+	//表示 i % 10 <= 6
+	char *out = isl_basic_set_to_str(bset);
+	printf("%s\n", out);
+	isl_basic_set_free(bset);
+	isl_ctx_free(ctx);
+	return 0;
+}
+
+```
+
+输出结果：
+
+n -> { [i] : 0 <= i <= n and 10*floor((3 + i)/10) <= i }
+
+
+floor表示向下取整，可以看到isl帮我们把这样的循环变量进行了一些微调。
+
+我们还可以使用以下的函数来从特定的输入格式创建相应对象：
+```
+#include <isl/id.h>
+__isl_give isl_id *isl_id_read_from_str(isl_ctx *ctx,
+        const char *str);//创建id对象
+__isl_give isl_multi_id *isl_multi_id_read_from_str(
+        isl_ctx *ctx, const char *str);
+
+#include <isl/val.h>
+__isl_give isl_val *isl_val_read_from_str(isl_ctx *ctx,
+        const char *str);//创建一个val对象
+__isl_give isl_multi_val *isl_multi_val_read_from_str(
+        isl_ctx *ctx, const char *str);
+
+#include <isl/set.h>
+__isl_give isl_basic_set *isl_basic_set_read_from_file(
+        isl_ctx *ctx, FILE *input);
+__isl_give isl_basic_set *isl_basic_set_read_from_str(
+        isl_ctx *ctx, const char *str);
+__isl_give isl_set *isl_set_read_from_file(isl_ctx *ctx,
+        FILE *input);
+__isl_give isl_set *isl_set_read_from_str(isl_ctx *ctx,
+        const char *str);
+
+#include <isl/map.h>
+__isl_give isl_basic_map *isl_basic_map_read_from_file(
+        isl_ctx *ctx, FILE *input);
+__isl_give isl_basic_map *isl_basic_map_read_from_str(
+        isl_ctx *ctx, const char *str);
+__isl_give isl_map *isl_map_read_from_file(
+        isl_ctx *ctx, FILE *input);
+__isl_give isl_map *isl_map_read_from_str(isl_ctx *ctx,
+        const char *str);
+
+#include <isl/union_set.h>
+__isl_give isl_union_set *isl_union_set_read_from_file(
+        isl_ctx *ctx, FILE *input);
+__isl_give isl_union_set *isl_union_set_read_from_str(
+        isl_ctx *ctx, const char *str);
+
+#include <isl/union_map.h>
+__isl_give isl_union_map *isl_union_map_read_from_file(
+        isl_ctx *ctx, FILE *input);
+__isl_give isl_union_map *isl_union_map_read_from_str(
+        isl_ctx *ctx, const char *str);
+
+#include <isl/aff.h>
+__isl_give isl_aff *isl_aff_read_from_str(
+        isl_ctx *ctx, const char *str);
+__isl_give isl_multi_aff *isl_multi_aff_read_from_str(
+        isl_ctx *ctx, const char *str);
+__isl_give isl_pw_aff *isl_pw_aff_read_from_str(
+        isl_ctx *ctx, const char *str);
+__isl_give isl_pw_multi_aff *isl_pw_multi_aff_read_from_str(
+        isl_ctx *ctx, const char *str);
+__isl_give isl_multi_pw_aff *isl_multi_pw_aff_read_from_str(
+        isl_ctx *ctx, const char *str);
+__isl_give isl_union_pw_aff *
+isl_union_pw_aff_read_from_str(
+        isl_ctx *ctx, const char *str);
+__isl_give isl_union_pw_multi_aff *
+isl_union_pw_multi_aff_read_from_str(
+        isl_ctx *ctx, const char *str);
+__isl_give isl_multi_union_pw_aff *
+isl_multi_union_pw_aff_read_from_str(
+        isl_ctx *ctx, const char *str);
+
+#include <isl/polynomial.h>
+__isl_give isl_union_pw_qpolynomial *
+isl_union_pw_qpolynomial_read_from_str(
+        isl_ctx *ctx, const char *str);
+```
+
+
+
+输出
+
+在可以打印任何内容之前，需要先创建一个isl_printer对象：
+
+```c
+__isl_give isl_printer *isl_printer_to_file(isl_ctx *ctx,
+        FILE *file);
+__isl_give isl_printer *isl_printer_to_str(isl_ctx *ctx);
+__isl_null isl_printer *isl_printer_free(
+        __isl_take isl_printer *printer);
+```
+
+
+isl_printer_to_file打印到给定的文件，同时isl_printer_to_str打印到可以使用以下函数提取的字符串。
+```c
+#include <isl/printer.h>
+__isl_give char *isl_printer_get_str(
+        __isl_keep isl_printer *printer);
+        
+```
+
+
+还是刚才的程序，我们继续用isl_printer对象来输出：
+```c
+int main()
+{
+	isl_ctx *ctx = isl_ctx_alloc();//create a ctx object
+	isl_basic_set *bset;
+	bset = isl_basic_set_read_from_str(ctx, "[n] -> { [i] : exists (a = [i/10] : 0 <= i and i <= n and i - 10 a <= 6) }");
+	char *out = isl_basic_set_to_str(bset);
+	printf("%s\n", out);
+	
+	isl_printer *p = isl_printer_to_str(ctx);
+	p =  isl_printer_print_basic_set(p, bset); //表示输出basic_set
+	
+	char *out2 = isl_printer_get_str(p);
+	printf("%s", out2);
+	
+	isl_printer_free(p);
+	isl_basic_set_free(bset);
+	isl_ctx_free(ctx);
+	
+	return 0;
+}
+```
+
+输出结果为两行一样的循环变量约束：
+
+n -> { [i] : 0 <= i <= n and 10*floor((3 + i)/10) <= i }
+n -> { [i] : 0 <= i <= n and 10*floor((3 + i)/10) <= i }
+
+
+另外，可以使用以下函数直接获取字符串表示形式，该函数始终以isl格式打印：
+```c
+#include <isl/space.h>
+__isl_give char *isl_space_to_str(
+        __isl_keep isl_space *space);
+
+#include <isl/val.h>
+__isl_give char *isl_val_to_str(__isl_keep isl_val *v);
+__isl_give char *isl_multi_val_to_str(
+        __isl_keep isl_multi_val *mv);
+
+#include <isl/set.h>
+__isl_give char *isl_basic_set_to_str(
+        __isl_keep isl_basic_set *bset);
+__isl_give char *isl_set_to_str(
+        __isl_keep isl_set *set);
+
+#include <isl/union_set.h>
+__isl_give char *isl_union_set_to_str(
+        __isl_keep isl_union_set *uset);
+
+#include <isl/map.h>
+__isl_give char *isl_basic_map_to_str(
+        __isl_keep isl_basic_map *bmap);
+__isl_give char *isl_map_to_str(
+        __isl_keep isl_map *map);
+
+#include <isl/union_map.h>
+__isl_give char *isl_union_map_to_str(
+        __isl_keep isl_union_map *umap);
+        
+```
