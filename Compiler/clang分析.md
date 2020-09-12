@@ -65,7 +65,9 @@ def preorder_travers_AST(cursor):
         # 函数被定义的地方
         if cursor.is_definition():
             # 打印有定义的函数名 有函数体的 函数
-            print(cursor.spelling)
+            print(cursor.spelling + " " + str(cursor.extent.start.file)) # 函数名和所在的文件名
+            # cursor.extent.start.line, cursor.extent.start.column  # 起始行列
+            #  cursor.extent.end.line, cursor.extent.end.column     # 终止行列
             # 遍历该函数代码 经词法分析得到的每一个单词 token
             for token in cursor.get_tokens():
                 # 如果是 c/c++ 等语言关键字
@@ -77,6 +79,14 @@ def preorder_travers_AST(cursor):
                         # 如果已经遇到函数名了 则 该函数不是 静态函数
                         print("this func is not static" )
                         break
+            # 查找函数参数
+            for child in cursor.get_children():
+                if (not CursorKind._kinds[child._kind_id] is None) and child.kind == CursorKind.PARM_DECL:
+                    print(child.spelling )
+        else：
+            # 有可能被定义过得 函数 被多次声明
+            # 这里虽然没有定义但是名字在上面分支出现，也是有定义的
+            print(cursor.spelling + " current have not body")
     for cur in cursor.get_children():
         #do something
         #print(cur.spelling)
