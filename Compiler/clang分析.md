@@ -33,6 +33,7 @@ from clang.cindex import Index  #主要API
 from clang.cindex import Config  #配置
 from clang.cindex import CursorKind  #索引结点的类别
 from clang.cindex import TypeKind    #节点的语义类别
+from clang.cindex import TokenKind   #单词
 
 # clang.cindex需要用到libclang.so共享库，所以先配置共享库
 libclangPath = r'D:/Program Files/LLVM/bin/libclang.dll'
@@ -59,9 +60,26 @@ print(AST_root_node)
 '''
 node_list = []
 def preorder_travers_AST(cursor):
+    # 函数声明 CursorKind.FUNCTION_DECL 查找
+    if  (not CursorKind._kinds[cursor._kind_id] is None) and cursor.kind == CursorKind.FUNCTION_DECL:
+        # 函数被定义的地方
+        if cursor.is_definition():
+            # 打印有定义的函数名 有函数体的 函数
+            print(cursor.spelling)
+            # 遍历该函数代码 经词法分析得到的每一个单词 token
+            for token in cursor.get_tokens():
+                # 如果是 c/c++ 等语言关键字
+                if token.kind == TokenKind.KEYWORD:
+                    if token.spelling == "static":
+                        # 出现在 函数名 之前的 static 标记，该函数为静态函数
+                        print("this func is static" )
+                    elif token.spelling == cursor.spelling: 
+                        # 如果已经遇到函数名了 则 该函数不是 静态函数
+                        print("this func is not static" )
+                        break
     for cur in cursor.get_children():
         #do something
-        print(cur.spelling)
+        #print(cur.spelling)
         preorder_travers_AST(cur)
 
 preorder_travers_AST(AST_root_node)
