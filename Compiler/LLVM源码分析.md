@@ -46,6 +46,34 @@
 而在这之前，Apple公司一直使用GCC作为编译器，后来GCC对Objective-C的语言特性支持一直不够，Apple自己开发的GCC模块又很难得到GCC委员会的合并，所以老乔不开心。等到Chris Lattner毕业时，Apple就把他招入靡下，去开发自己的编译器，所以LLVM最初受到了Apple的大力支持。
 
 最初时，LLVM的前端是GCC，后来Apple还是立志自己开发了一套Clang出来把GCC取代了，不过现在带有Dragon Egg的GCC还是可以生成LLVM IR，也同样可以取代Clang的功能，我们也可以开发自己的前端，和LLVM后端配合起来，实现我们自定义的编程语言的编译器。
+
+## llvm-mca
+
+https://llvm.comptechs.cn/docs/man/llvm-mca.html
+
+llvm-mca 是一种性能分析工具，它使用LLVM中可用的信息（例如调度模型）来静态测量特定CPU中机器代码的性能。
+
+性能是根据吞吐量和处理器资源消耗来衡量的。该工具目前适用于具有无序后端的处理器，LLVM中提供了一种调度模型。
+
+此工具的主要目标不仅是在目标上运行时预测代码的性能，还有助于诊断潜在的性能问题。
+
+给定汇编代码序列，llvm-mca估计每周期指令（IPC）以及硬件资源压力。分析和报告风格的灵感来自英特尔的IACA工具。
+
+例如，您可以使用clang，输出程序集编译代码，并将其直接导入llvm-mca进行分析：
+
+$ clang foo.c -O2 -target x86_64-unknown-unknown -S -o - | llvm-mca -mcpu=btver2
+
+或者对于Intel语法：
+
+$ clang foo.c -O2 -target x86_64-unknown-unknown -mllvm -x86-asm-syntax=intel -S -o - | llvm-mca -mcpu=btver2
+
+使用标记分析特定代码块
+llvm-mca允许可选地使用特殊代码注释来标记要分析的汇编代码的区域。以substring LLVM-MCA-BEGIN开头的注释标记代码区域的开头。以substring开头的注释LLVM-MCA-END标记代码区域的结尾。例如：
+
+     # LLVM-MCA-BEGIN
+       ...
+     # LLVM-MCA-END
+如果未指定用户定义的区域，则llvm-mca将采用包含输入文件中每条指令的默认区域。每个区域都是单独分析的，最终的性能报告是为每个代码区域生成的所有报告的并集。
  
 ## LLVM开发者手册
 
