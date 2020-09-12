@@ -79,10 +79,21 @@ def preorder_travers_AST(cursor):
                         # 如果已经遇到函数名了 则 该函数不是 静态函数
                         print("this func is not static" )
                         break
-            # 查找函数参数
+            # 遍历函数内容
             for child in cursor.get_children():
+                # 查找函数参数 CursorKind.PARM_DECL
                 if (not CursorKind._kinds[child._kind_id] is None) and child.kind == CursorKind.PARM_DECL:
-                    print(child.spelling )
+                    print("param: "child.spelling )
+                # 查找函数调用 CursorKind.CALL_EXPR
+                if (not CursorKind._kinds[cursor._kind_id] is None) and cursor.kind == CursorKind.CALL_EXPR:  
+                    print("func call： "child.spelling" )
+                # 函数语句
+                if (not CursorKind._kinds[child_node._kind_id] is None) and child_node.kind == CursorKind.COMPOUND_STMT:
+                    for stmt in child_node.get_children():
+                        # 打印语句
+                        print(stmt.spelling)
+                        # 若未进来，说明是空函数
+                        
         else：
             # 有可能被定义过得 函数 被多次声明
             # 这里虽然没有定义但是名字在上面分支出现，也是有定义的
