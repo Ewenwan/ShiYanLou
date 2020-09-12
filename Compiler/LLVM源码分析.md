@@ -74,7 +74,19 @@ llvm-mca允许可选地使用特殊代码注释来标记要分析的汇编代码
        ...
      # LLVM-MCA-END
 如果未指定用户定义的区域，则llvm-mca将采用包含输入文件中每条指令的默认区域。每个区域都是单独分析的，最终的性能报告是为每个代码区域生成的所有报告的并集。
- 
+
+* LLVM-MCA是如何工作的：
+
+llvm-mca将汇编代码作为输入。在现有LLVM目标程序集解析器的帮助下，汇编代码被解析为MCInst序列。然后由Pipeline模块分析解析的MCInst序列以生成性能报告。
+Pipeline模块在迭代循环中模拟机器代码序列的执行（默认值为100）。在此过程中，管道收集许多与执行相关的统计信息。在此过程结束时，管道会根据收集的统计信息生成并打印报告
+
+网络预测：
+
+MIT推出预测代码速度新工具Ithemal，纯文本自动学习，无需手动添加特征
+
+https://github.com/Ewenwan/Ithemal
+
+
 ## LLVM开发者手册
 
 [英文参考](http://llvm.org/docs/ProgrammersManual.html)
