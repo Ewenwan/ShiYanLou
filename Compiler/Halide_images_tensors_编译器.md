@@ -27,6 +27,8 @@ Halide是用C++作为宿主语言的一个图像处理相关的DSL(Domain Specif
 
 [源码学习笔记](https://blog.csdn.net/luzhanbo207/category_7314346.html)
 
+[Halide_Tutorial demo 中文注释 源码仓库 ](https://github.com/Ewenwan/Halide_Tutorial)
+
 Halide is a programming language designed to make it easier to write high-performance image and array processing code on modern machines. Halide currently targets: 
 * CPU architectures: X86, ARM, MIPS, Hexagon, PowerPC
 * Operating systems: Linux, Windows, macOS, Android, iOS, Qualcomm QuRT
