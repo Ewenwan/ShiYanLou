@@ -1,6 +1,9 @@
 # Halide
 a language for fast, portable computation on images and tensors
 
+Halide是用C++作为宿主语言的一个图像处理相关的DSL(Domain Specified Language)语言，全称领域专用语言。主要的作用为在软硬层面上(与算法本身的设计无关)实现对算法的底层加速，我们有必要对其有一定的了解。因为不论是 传统的图像处理方法亦或是深度学习应用 都使用到了halide的思想。
+
+
 [官网](https://halide-lang.org/)
 
 [Halide_CVPR_intro pdf](https://halide-lang.org/assets/lectures/Halide_CVPR_intro.pdf)
