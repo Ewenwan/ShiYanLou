@@ -148,3 +148,66 @@ isl_ctx *isl_fixed_box_get_ctx(
         __isl_keep isl_fixed_box *box);
 ```
         
+* 2.返回的结果
+
+isl isl_size对返回非负值（通常是数字或位置）的函数使用特殊的返回类型。除了常规的非负返回值外，isl_size_error还可能返回一个特殊的（负）值，表明出错。
+
+isl对于返回布尔值或原则上不返回任何值的函数，它也使用两种特殊的返回类型。特别是，该isl_bool类型具有三个可能的值：（isl_bool_true一个正整数），表示true或yes；isl_bool_false（整数值零），表示false或no；和isl_bool_error（负整数值），表示出了点问题。在上定义了以下操作isl_bool。该函数isl_bool_not可以被用于否定的isl_bool，其中的否定isl_bool_error是isl_bool_error一次。该函数isl_bool_ok将整数转换为isl_bool。任何非零值的收益率isl_bool_true和零收益率isl_bool_false。
+
+```c
+bool
+int a = 0;
+isl_bool result = isl_bool_ok(a);
+cout << result << endl;
+ ```
+输出结果为0
+
+
+* 3.isl_val对象
+
+一个 isl_val 对象表示整数值，有理值或三个特殊值之一，即无穷大，负无穷大和正无穷大。可以使用以下功能创建一些预定义的值：
+```c
+#include <isl/val.h>
+__isl_give isl_val *isl_val_zero(isl_ctx *ctx);
+__isl_give isl_val *isl_val_one(isl_ctx *ctx);
+__isl_give isl_val *isl_val_negone(isl_ctx *ctx);
+__isl_give isl_val *isl_val_nan(isl_ctx *ctx);
+__isl_give isl_val *isl_val_infty(isl_ctx *ctx);
+__isl_give isl_val *isl_val_neginfty(isl_ctx *ctx);
+```
+测试：
+```c
+isl_val * val = isl_val_zero(isl);
+cout << val << endl;
+```
+输出：
+
+0x93c6080
+
+可以使用以下函数创建特定的整数值：
+```c
+#include <isl/val.h>
+__isl_give isl_val *isl_val_int_from_si(isl_ctx *ctx,
+        long i);
+__isl_give isl_val *isl_val_int_from_ui(isl_ctx *ctx,
+        unsigned long u);
+__isl_give isl_val *isl_val_int_from_chunks(isl_ctx *ctx,
+        size_t n, size_t size, const void *chunks);
+```
+一个isl_val可以使用下面的函数来修改：
+```c
+#include <isl/val.h>
+__isl_give isl_val *isl_val_set_si(__isl_take isl_val *v,
+        long i);
+```
+可以使用以下功能复制和释放 isl_val 。
+```c
+#include <isl/val.h>
+__isl_give isl_val *isl_val_copy(__isl_keep isl_val *v);
+__isl_null isl_val *isl_val_free(__isl_take isl_val *v);
+```
+对于这样的数值对象我们还可以对其进行一元运算、二元运算等，具体运算函数可以参考文档。
+
+
+
+
