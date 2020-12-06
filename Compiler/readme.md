@@ -1,5 +1,7 @@
 # 编译器 编译原理
 
+[一步步掌握 LLVM](https://www.zhihu.com/column/c_1250484713606819840)
+
 [定点数优化：性能成倍提升  llvm-mca代码分析 时钟 流水线 ](https://zhuanlan.zhihu.com/p/149517485)
 
 [基于python写的 简单的编译器 ](https://github.com/Phantom1003/MyCompiler)
