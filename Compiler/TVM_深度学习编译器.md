@@ -1,8 +1,12 @@
 # TVM_深度学习编译器
 
-TVM所做的是要比传统compiler更偏上层的，你可以把它理解成source-to-source compiler，需要其他的后端(backend)来生成最后的指令。比如当编译的Target是Intel CPU时，翻译的顺序是Relay IR -> TVM IR/ Halide IR -> LLVM IR，之后交给LLVM生成最后的可执行程序。当编译的Target是NVIDIA GPU时，这个顺序就变成了 Relay IR -> TVM IR/Halide IR -> CUDA program (比如生成一个文件, my_kernel.cu)，然后调用cuda的runtime compiler来生成CUDA可执行文件。细节上可能跟最新的不一样，因为TVM大概在逐渐废弃Halide IR，TVM IR也是每个版本都有改动。从前后端的角度上看，vitis AI可以作为TVM的后端之一，而且不久前，TVM也支持了这个后端([RFC][BYOC] Vitis-AI integration)，具体支持的如何，我没有试过。TVM的核心优势在于从Halide等框架借鉴来的算子描述与调度分离，TVM IR侧重于loop nest来做loop transformation。vitis从官网上看，可以做剪枝量化这些，之后把算子分派到具体的执行单元。
+TVM所做的是要比传统compiler更偏上层的，你可以把它理解成source-to-source compiler，需要其他的后端(backend)来生成最后的指令。比如当编译的Target是Intel CPU时，翻译的顺序是Relay IR -> TVM IR/ Halide IR -> LLVM IR，之后交给LLVM生成最后的可执行程序。当编译的Target是NVIDIA GPU时，这个顺序就变成了 Relay IR -> TVM IR/Halide IR -> CUDA program (比如生成一个文件, my_kernel.cu)，然后调用cuda的runtime compiler来生成CUDA可执行文件。
 
-TVM + vitis AI backend的话，从RFC来看，大概是先在TVM这一层做优化，然后翻译到vitis的graph IR。但是我很好奇，如果我做tiling，这个tiling size在底层没有支持，它怎么翻译？还是说这个RFC所做的只是Relay graph optimization，比如算子融合，constant folding这类，然后直接转换到vitis。从你描述来看，你的板子是定制的，这个翻译过程应该会更麻烦一些，大概需要对TVM的后端进行扩展，或者写tensor intrinsic之类。我魔改TVM做的比较多，写扩展的难度一般般，不算太复杂。我觉得你可以先用vitis AI成功部署之后（vitis支不支持自己设计的架构我也不知道, Orz...），再考虑借助TVM做一些别的优化。你的板子是定制的，从TVM入手的话，感觉怎么都得回到后端生成的这个问题上来。
+细节上可能跟最新的不一样，因为TVM大概在逐渐废弃Halide IR，TVM IR也是每个版本都有改动。从前后端的角度上看，vitis AI可以作为TVM的后端之一，而且不久前，TVM也支持了这个后端([RFC][BYOC] Vitis-AI integration)，具体支持的如何，我没有试过。TVM的核心优势在于从Halide等框架借鉴来的算子描述与调度分离，TVM IR侧重于loop nest来做loop transformation。vitis从官网上看，可以做剪枝量化这些，之后把算子分派到具体的执行单元。
+
+TVM + vitis AI backend的话，从RFC来看，大概是先在TVM这一层做优化，然后翻译到vitis的graph IR。但是我很好奇，如果我做tiling，这个tiling size在底层没有支持，它怎么翻译？还是说这个RFC所做的只是Relay graph optimization，比如算子融合，constant folding这类，然后直接转换到vitis。
+
+从你描述来看，你的板子是定制的，这个翻译过程应该会更麻烦一些，大概需要对TVM的后端进行扩展，或者写tensor intrinsic之类。我魔改TVM做的比较多，写扩展的难度一般般，不算太复杂。我觉得你可以先用vitis AI成功部署之后（vitis支不支持自己设计的架构我也不知道, Orz...），再考虑借助TVM做一些别的优化。你的板子是定制的，从TVM入手的话，感觉怎么都得回到后端生成的这个问题上来。
 
 [把你自己的代码生成TVM ](https://blog.csdn.net/weixin_42164269/article/details/104291635)
 
