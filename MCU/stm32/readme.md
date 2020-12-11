@@ -4,6 +4,11 @@
 
 [ebox是类似于arduino的一层api，简化stm32编程](https://github.com/eboxmaker/eBox_Framework)
 
+## 编译工具 开发环境
+
+编译的作用就是把程序转换成二进制文件，对于相同ARM内核的单片机，指令集都是一样的，二进制接口也是一样的，所以ARM单片机都可以arm-none-eabi-gcc套件编译，当然arm-none-eabi-gcc只适合编译裸机程序，裸机程序跟linux系统程序的二进制接口是不一样的。用make+gcc开发的感觉是非常舒服的，结合强大的终端命令行，开发效率直接加倍
+
+
 ## stm32103xxxx 开发工具
 
     keil5 开发环境：
