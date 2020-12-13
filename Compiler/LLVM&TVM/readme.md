@@ -1361,16 +1361,27 @@ $ echo $? # 获得返回值
   - LLVM 的实现在函数调用之前会将所有的虚拟寄存器中的内容保存到栈中，原因是当异常被抛出时，landing pad（处理异常的部分）可以在栈中找到所有虚拟寄存器的内容，这符合异常处理的要求。
 
 
-##
+# TVM
 
-```c
-
-
-/*
-
-*/
-```
-
+* 图表示
+    * NNVM
+        * NNVM相当于深度学习领域的LLVM，是一个神经网络中比较高级的中间表示模块，通常称为计算图。前端你框架只需要将其计算表达成NNVM中间表示，之后NNVM则统一的对图做与具体硬件和框架无关的优化。包括内存分配，数据类型和形状的推导，算子融合等。
+    * Relay
+        * Relay解决了静态图和动态图的矛盾。是一种专用于自动微分编程领域的特定域语言。
+    * 图优化方法
+        * OpFusion:算子融合
+        * FoldConstant:常量折叠
+        * CombineParallelConv2D:结合并行的卷积与运算
+        * FoldScaleAxis:折叠缩放轴
+        * AlterOpLayout:改变算子排布
+        * CanonicalizeOps:规范化算子
+        * EliminateCommonSubexpr:消除公共子表达式
+* 算子优化
+    * TVM低层次中间表达的特点
+        * Halide & HalideIR
+        * Auto-Tuning
+        * loopy循环变换工具，多面体模型分析
+        * python作为宿主语言
 
 ##
 
