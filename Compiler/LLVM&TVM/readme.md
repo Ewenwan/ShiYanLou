@@ -1,5 +1,10 @@
 # LLVM &TVM 相关
 
+[A Tour to LLVM IR（上）](https://zhuanlan.zhihu.com/p/66793637)
+
+[LLVM Language Reference Manual](https://releases.llvm.org/2.7/docs/LangRef.html#i_br)
+
+
 ##  下载LLVM 8.0.1源码并编译
 
 * Step 1) 首先是一些必要依赖的安装
@@ -49,6 +54,8 @@
   
   
 ## 函数构建 赋值语句构建 assign_generator
+
+
 ```c
 #include <llvm/IR/BasicBlock.h>
 #include <llvm/IR/Constants.h>
@@ -82,7 +89,7 @@ int main()
 
     auto mainFun = Function::Create(FunctionType::get(TYPE32, false), GlobalValue::ExternalLinkage, "main", module);
 
-    auto bb = BasicBlock::Create(context, "entry", mainFun);
+    auto bb = BasicBlock::Create(context, "entry", mainFun); //代码中只有 entry 一个 BasicBlock。
     // Begin: BasicBlock entry
     builder.SetInsertPoint(bb);
 
@@ -119,6 +126,8 @@ define i32 @main() {
 
 
 ## 函数调用语句构建
+代码中共有两个BasicBlock，都叫做entry，但是存在于不同的函数中，对应关系见注释。
+
 ```c
 
 #include <llvm/IR/BasicBlock.h>
@@ -354,6 +363,8 @@ int main() {
 
 ## IF 语句构建
 
+ 代码中共有 3 个 BasicBlock，分别是 entry, truebb, falsebb，对应关系在注释中给出。
+ 
 ```c
 #include <llvm/IR/BasicBlock.h>
 #include <llvm/IR/Constants.h>
@@ -436,12 +447,124 @@ if.end:
 
 
 
-## 
+## while 语句构建
+
+代码中共有 4 个basicBlock，分别是entry, loop, truebb, ret，对应关系见注释。
 
 ```c
+#include <llvm/IR/BasicBlock.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/Module.h>
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Verifier.h>
 
+#include <iostream>
+#include <memory>
 
+#ifdef DEBUG                                             // 用于调试信息,大家可以在编译过程中通过" -DDEBUG"来开启这一选项
+#define DEBUG_OUTPUT std::cout << __LINE__ << std::endl; // 输出行号的简单示例
+#else
+#define DEBUG_OUTPUT
+#endif
 
+using namespace llvm;
+
+#define CONST(num) ConstantInt::get(context, APInt(32, num))
+
+int main()
+{
+    LLVMContext context;
+    Type *TYPE32 = Type::getInt32Ty(context);
+    IRBuilder<> builder(context);
+    auto module = new Module("while", context);
+
+    auto mainFun = Function::Create(FunctionType::get(TYPE32, false), GlobalValue::ExternalLinkage, "main", module);
+
+    auto bb = BasicBlock::Create(context, "entry", mainFun);
+    builder.SetInsertPoint(bb);             // Entry.
+    // Begin: BasicBlock entry
+    auto a = builder.CreateAlloca(TYPE32);
+    auto i = builder.CreateAlloca(TYPE32);
+
+    builder.CreateStore(CONST(10), a);
+    builder.CreateStore(CONST(0), i);
+
+    auto loop = BasicBlock::Create(context, "loop", mainFun);
+    auto truebb =BasicBlock::Create(context, "truebb", mainFun);
+    auto ret = BasicBlock::Create(context, "ret", mainFun);
+    builder.CreateBr(loop);                 // Jump to loop.
+    // End: BasicBlock entry
+
+    // BasicBlock: BasicBlock loop
+    builder.SetInsertPoint(loop);
+
+    auto iLoad = builder.CreateLoad(i);
+    auto aLoad = builder.CreateLoad(a);
+    auto icmp = builder.CreateICmpSLT(iLoad, CONST(10)); // See if should break.
+    builder.CreateCondBr(icmp,truebb,ret);
+    // End: BasicBlock loop
+
+    // Begin: BasicBlock truebb
+    builder.SetInsertPoint(truebb);
+    auto inc = builder.CreateAdd(iLoad, CONST(1));
+    auto tempa = builder.CreateAdd(inc, aLoad);
+    builder.CreateStore(inc, i);
+    builder.CreateStore(tempa, a); // i = i + 1; a = a + i;
+    builder.CreateBr(loop);
+    // End: BasicBlock truebb
+
+    // Begin: BasicBlock ret
+    builder.SetInsertPoint(ret);
+    auto retval = builder.CreateLoad(a);
+    builder.CreateRet(retval); // Return a
+    // End: BasicBlock ret
+
+    module->print(outs(), nullptr);
+    delete module;
+    return 0;
+}
+
+/*
+
+; ModuleID = 'while.c'
+source_filename = "while.c"
+target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-unknown-linux-gnu"
+
+define i32 @main() {
+entry:
+    %a = alloca i32, align 4
+    %i = alloca i32, align 4      ; 定义 a, i
+
+    store i32 10, i32* %a, align 4
+    store i32 0, i32* %i, align 4   ; 赋初值
+
+    %0 = load i32, i32* %i, align 4
+
+    %cmp = icmp slt i32 %0, 10     ; i<10 ?
+    br i1 %cmp, label %loop, label %return
+    
+loop:
+    %1 = load i32, i32* %i, align 4
+    %2 = load i32, i32* %a, align 4
+    %inc = add i32 %1, 1                
+    store i32 %inc, i32* %i, align 4    ;i = i + 1
+    %add = add i32 %inc, %2             
+    store i32 %add, i32* %a, align 4    ; a = a + i
+
+    %3 = icmp slt i32 %inc, 10          ; i<10?
+    br i1 %3, label %loop, label %return
+
+return:
+    %retval = load i32, i32* %a, align 4;return a
+    ret i32 %retval
+}
+
+*/
 
 ```
 
@@ -451,7 +574,9 @@ if.end:
 ```c
 
 
+/*
 
+*/
 ```
 
 
@@ -459,6 +584,107 @@ if.end:
 ```c
 
 
+/*
+
+*/
+```
+
+
+##
+
+```c
+
+
+/*
+
+*/
+```
+
+
+##
+
+```c
+
+
+/*
+
+*/
+```
+
+
+##
+
+```c
+
+
+/*
+
+*/
+```
+
+
+##
+
+```c
+
+
+/*
+
+*/
+```
+
+
+##
+
+```c
+
+
+/*
+
+*/
+```
+
+
+##
+
+```c
+
+
+/*
+
+*/
+```
+
+
+##
+
+```c
+
+
+/*
+
+*/
+```
+
+
+##
+
+```c
+
+
+/*
+
+*/
+```
+
+
+##
+
+```c
+
+/*
+
+*/
 
 ```
 
@@ -468,7 +694,9 @@ if.end:
 ```c
 
 
+/*
 
+*/
 ```
 
 
@@ -477,7 +705,9 @@ if.end:
 ```c
 
 
+/*
 
+*/
 ```
 
 
@@ -486,7 +716,9 @@ if.end:
 ```c
 
 
+/*
 
+*/
 ```
 
 
@@ -495,7 +727,9 @@ if.end:
 ```c
 
 
+/*
 
+*/
 ```
 
 
@@ -504,6 +738,19 @@ if.end:
 ```c
 
 
+/*
+
+*/
+```
+
+
+##
+
+```c
+
+/*
+
+*/
 
 ```
 
@@ -512,97 +759,9 @@ if.end:
 
 ```c
 
+/*
 
-
-```
-
-
-##
-
-```c
-
-
-
-```
-
-
-##
-
-```c
-
-
-
-```
-
-
-##
-
-```c
-
-
-
-```
-
-
-##
-
-```c
-
-
-
-```
-
-
-##
-
-```c
-
-
-
-```
-
-
-##
-
-```c
-
-
-
-```
-
-
-##
-
-```c
-
-
-
-```
-
-
-##
-
-```c
-
-
-
-```
-
-
-##
-
-```c
-
-
-
-```
-
-
-##
-
-```c
-
-
+*/
 
 ```
 
