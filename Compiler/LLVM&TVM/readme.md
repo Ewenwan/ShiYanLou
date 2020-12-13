@@ -773,11 +773,19 @@ define i32 @some_func(){
   ret i32 1
 }
 
+; DCE 执行基本的死代码删除：
+; LLVM IR 是 SSA 的，
+; 因此 IR 中一个量有且只有一次赋值 (量被定义时即完成赋值)，
+; 因此 IR 中一个量如果未被使用，即代表是死代码，
+; DCE 即执行对这些死代码的删除，
+; 以上准则有一个例外
+; 如果初始化一个量的指令有潜在的额外作用
+; 则此赋值不能被删除
 define i32 @test_dce(){
   %used_alloca.ptr = alloca i32
-  %unused_alloca.ptr = alloca i32               ; (1) DCE 中会被删除
-  %unused_tmp = load i32, i32* %used_alloca.ptr ; (2) DCE 中会被删除
-  %tmp_wont_delete = call i32 @some_func()      ; (3) 调用函数可能会造成额外作用，因此这句不能删除
+  %unused_alloca.ptr = alloca i32               ; DCE 中会被删除
+  %unused_tmp = load i32, i32* %used_alloca.ptr ; DCE 中会被删除
+  %tmp_wont_delete = call i32 @some_func()     ; 调用函数可能会造成额外作用，因此这句不能能删除
   store i32 0, i32* %used_alloca.ptr
   %ret_val = load i32, i32* %used_alloca.ptr
   ret i32 %ret_val
@@ -854,16 +862,21 @@ ADCE 属于 Function Pass，激进地删除函数中的死代码。
 对于以下待优化代码：
 
 ```llvm
+; ADCE 除了 DCE 中的基本优化，还加了对控制流程的优化
+; 即如果一个有条件跳转，跳转到无论它的哪个后继，都不会对结果造成影响
+; 那么这个跳转指令就可以改成无条件跳转
+; ADCE 的具体实现中，会把它改为跳转到 “离返回点最近的” Basic Block
+
 ; 这个函数不会被优化
 define i32 @test_adce_origin(i32 %a){
   %result.ptr = alloca i32
   %cmp = icmp slt i32 %a, 0  ; if a<0
-  br i1 %cmp, label %if_true, label %if_false  ; (1) 因为走不同的分支会对最后的 return 值造成影响，因此 ADCE 不会把这句改成 无条件跳转
+  br i1 %cmp, label %if_true, label %if_false  ; 因为走不同的分支会对最后的 return 值造成影响，因此 ADCE 不会把这句改成 无条件跳转
 if_true:
-  store i32 -1, i32* %result.ptr		; (2)
+  store i32 -1, i32* %result.ptr
   br label %return
 if_false:
-  store i32 1, i32* %result.ptr			; (3)
+  store i32 1, i32* %result.ptr
   br label %return
 return:
   %result = load i32, i32* %result.ptr
@@ -885,6 +898,7 @@ return:
   %result = load i32, i32* %result.ptr
   ret i32 %result
 }
+
 ```
 
 执行 `opt -adce -S adce.ll`, 结果如下：
